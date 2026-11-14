@@ -1,0 +1,9 @@
+# second launch: station (after docking, work/xp_ours/dk_state.szx from ours_dock.txt) -> flight again
+from work/xp_ours/dk_state.szx
+run 150 keys 5:p/12,5:a/88
+run 100 shot rl_cursor
+run 50 keys 5:_/6
+run 100
+run 30 keys 5:_/6
+run 2200 shot rl_flight
+save rl_state

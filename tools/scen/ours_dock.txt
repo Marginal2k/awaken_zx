@@ -1,0 +1,10 @@
+# Real docking test: flight snapshot (work/xp_ours/fl_state.szx from ours_flight.txt) with the station object's z poked
+# to #0100 (the station is generated ~9300 units behind the ship at launch; flying back is impractical):
+#   python tools/scen/szxpoke.py work/xp_ours/fl_state.szx work/xp_ours/fl_dock.szx A244=0001 9BCE=217C 9BD1=4D
+# second poke: credits SUMM (#9BCE) = 31777, TONN low byte (#9BD1) = 77, to prove the state record is carried back
+# CARSB object 1 (#A240) = T_STATION, x=0 y=0 z=#0100 -> CRASH sees |x|,|y|,|z| < CRSHST -> RETST
+from work/xp_ours/fl_dock.szx
+run 100 shot dk_a
+run 1500 shot dk_b
+run 1500 shot dk_c
+save dk_state

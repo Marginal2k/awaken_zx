@@ -1,0 +1,5 @@
+# third part of the loop: second flight (rl_state.szx from ours_relaunch.txt) docks again (same z poke as ours_dock.txt)
+#   python tools/scen/szxpoke.py work/xp_ours/rl_state.szx work/xp_ours/rl_dock.szx DOCK   (finds the T_STATION record in the object table CARSB)
+from work/xp_ours/rl_dock.szx
+run 1600 shot dk2_a
+run 1500 shot dk2_b

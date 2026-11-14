@@ -80,8 +80,9 @@ def main():
         try:
             r = subprocess.run(cmd, capture_output=True, text=True, timeout=a.timeout)
         except subprocess.TimeoutExpired as e:
-            subprocess.run(['taskkill', '/F', '/IM', 'xpeccy-plus.exe'], capture_output=True)
-            print(f'[seg {i}] TIMEOUT after {a.timeout}s (xpeccy killed)'); return 9
+            # subprocess.run already killed OUR process; never kill by image name -
+            # the user may have their own emulator windows open
+            print(f'[seg {i}] TIMEOUT after {a.timeout}s (our xpeccy run killed)'); return 9
         rc = r.returncode
         out = (r.stdout + r.stderr).strip()
         keep = [l for l in out.splitlines() if re.search(r'ERR|WARN|bench:|SPAN|BP|reak|hash:|^F\d{8}|rror', l) and 'setTabOrder' not in l and 'QFSFileEngine' not in l]

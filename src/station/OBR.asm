@@ -2091,8 +2091,12 @@ WSOH:
 F_S12:
             call ERSOBJ2
             ld   a,(NSOH+1)
-
-            ret  
+; [glue] SAVE: item 0..4 of the window "В позицию N" -> file SAVE1..SAVE5 (the 1999 code of this
+; function was not part of the sources; the demo had it in the older image)
+            inc  a
+            ret  z                      ; #FF: nothing selected
+            ld   hl,TIME
+            jp   DiskSlotSave
 WSOHC:
             ld   de,#2803
             ld   hl,WSOH_
@@ -2141,8 +2145,12 @@ WWOS:
 F_S13:
             call ERSOBJ2
             ld   a,(NWOS+1)
-
-            ret  
+; [glue] LOAD: item 0..4 of "С позиции N" -> SAVE1..SAVE5 by the launcher: the station is reloaded and
+; takes the record exactly like after a landing (LaunchStationSlot, launcher.asm)
+            inc  a
+            ret  z
+            ld   (STATE_SLOT),a         ; (file SAVEn is read by the launcher stub after the station image is loaded)
+            jp   LaunchStationSlot
 WWOSC:
             ld   de,#2803
             ld   hl,WWOS_

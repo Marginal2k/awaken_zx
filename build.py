@@ -44,6 +44,13 @@ def main():
     # stscr = 16 packed pictures one after another (239 sectors, SECTAB in station/LOADER.asm); like the demo the catalogue
     # length is that of the first picture only (3230) while the sector count covers the whole file.
     d.add_file('stscr', 'C', open(ROOT + '/assets/stscr.C', 'rb').read(), start=0xC000, length=3230)
+    # save slots SAVE0..SAVE5 (512-byte state records, same layout as the TIME block): initial state of a new game.  The game
+    # overwrites them in place (common/disk.asm DiskSlotSave), so the files only have to exist with 2 sectors each.
+    time_addr = [int(l.split('0x')[1], 16) for l in open(B + '/station.sym') if l.startswith('TIME:')][0]
+    st = open(B + '/station/STATIONF.C', 'rb').read()
+    rec = st[time_addr - 0x6000:time_addr - 0x6000 + 0x200]
+    for n in range(6):
+        d.add_file('SAVE%d' % n, 's', rec, start=0x6000, length=0x200)
     code(B + '/flight/ACTION.C', 'ACTION', 0x6000)
     code(B + '/flight/VOXAL0.C', 'VOXAL0', 0xC000)
     code(B + '/flight/VOXAL.C', 'VOXAL', 0xEC00)

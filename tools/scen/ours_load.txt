@@ -1,0 +1,15 @@
+# load test: work/awaken_slot2.trd = build/awaken.trd with SAVE2 replaced by the record that ours_save1/2.txt wrote
+# (xpeccy does not carry disk writes across .szx segments reliably, so the saved record is copied into the TRD by hand:
+#  see docs/ANALYSIS.md section 13).  M = system menu, "Восстановиться" -> "С позиции 2"
+disk work/awaken_slot2.trd
+run 2200
+run 30 keys 5:_/6
+run 60
+run 40 keys 5:m/6
+run 60 keys 3:a/29,3:p/5
+run 40 keys 3:_/6
+run 80 keys 3:p/62,3:a/8
+run 40 shot ld_win
+run 30 keys 3:_/6
+run 2200 shot ld_loaded
+save ld_loaded

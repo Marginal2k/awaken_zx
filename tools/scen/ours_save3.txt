@@ -1,0 +1,15 @@
+# NOTE: Xpeccy+ does not carry disk writes across the .szx segment boundary (the disk is restored from the original image), so this part
+# only shows the window flow; the real load test is ours_load.txt
+# part 3 (after: szxpoke.py sv_saved.szx sv_saved2.szx 984C=5704 = credits 1111): leave the cursor row, M, "Восстановиться" -> "С позиции 2"
+from work/xp_ours/sv_saved2.szx
+run 60 keys 3:q/25
+run 40 keys 3:m/10
+run 100 shot ld_menu
+run 60 keys 3:a/27,3:p/6
+run 40 keys 3:_/6
+run 80 shot ld_win
+run 40 keys 3:p/62,3:q/5
+run 30 shot ld_sel
+run 30 keys 3:_/6
+run 2200 shot ld_loaded
+save ld_loaded

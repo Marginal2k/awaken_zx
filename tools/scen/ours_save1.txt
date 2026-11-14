@@ -1,0 +1,12 @@
+# save/load test part 1: boot, close the welcome window, M = system menu at the cursor, move onto "Сохраниться", click -> window "В позицию N"
+disk build/awaken.trd
+run 2200
+run 30 keys 5:_/6
+run 60
+run 40 keys 5:m/6
+run 60 shot sv_menu
+run 60 keys 3:a/33,3:p/5
+run 40 shot sv_cursor
+run 40 keys 3:_/6
+run 80 shot sv_save_win
+save sv_win

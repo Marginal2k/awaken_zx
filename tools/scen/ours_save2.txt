@@ -1,0 +1,7 @@
+# part 2 (after: szxpoke.py sv_win.szx sv_win2.szx 984C=217C  = credits 31777): pick "В позицию 2" -> SAVE2 is written
+from work/xp_ours/sv_win2.szx
+run 120 keys 3:a/4,3:p/23
+run 40 shot sv_item2
+run 40 keys 3:_/6
+run 300 shot sv_saved
+save sv_saved

@@ -9,6 +9,7 @@
 ; ------------------------------------------------------------------------------------------
 STATE_LEN       equ  #200               ; bytes of the state record (= size of a SAVEn.s file)
 STATE_BUF       equ  #4000              ; hand-over buffer (screen RAM, survives the file load)
+STATE_SLOT      equ  #5BFE              ; slot number 1..5 for a "load game" restart (launcher stub reads SAVEn into STATE_BUF)
 STATE_FLAG      equ  #5BFF              ; 1 = the station was entered from the flight part (state valid at STATE_BUF)
 STUB_ADDR       equ  #5B00              ; resident load stub (below the TR-DOS variables, above the screen attributes)
 STUB_SP         equ  #5FFF              ; stack of the stub: must be above the BASIC workspace, else TR-DOS fails with "4 Out of memory"

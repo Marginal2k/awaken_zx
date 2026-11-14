@@ -4,13 +4,13 @@
 ; demo v0.2 images (STATIONF #8170..#81B3, ACTION #7440..#745F); this is a clean re-write that
 ; keeps its idea: a small resident stub loads the other part and copies the state record.
 ;
-;   LAUNCHER_ROUTINE routine_name, file_label, load_addr, entry_addr, state_dst, state_src_label
+;   LAUNCHER_ROUTINE routine_name, file_label, load_addr, entry_addr, state_dst, state_src_label, flag, music_off, slot_req
 ;     emits   routine_name: [music off, IM 1] -> copy the state record from state_src_label to
 ;     STATE_BUF -> copy the stub to STUB_ADDR -> jp STUB_ADDR.
 ;     The stub (assembled for STUB_ADDR) loads the file, copies STATE_BUF to state_dst and jumps.
 ;   `file_label` points to the 9-byte TR-DOS name (e.g. "ACTION  C").
 ; ------------------------------------------------------------------------------------------
-            MACRO LAUNCHER_ROUTINE rname, fname, laddr, entry, sdst, ssrc, flagv, musicoff
+            MACRO LAUNCHER_ROUTINE rname, fname, laddr, entry, sdst, ssrc, flagv, musicoff, slotreq
 rname:
             di
             IF musicoff
@@ -44,6 +44,9 @@ rname:
             ld   (TRDOS_DRIVE),a
             ei                          ; TR-DOS waits for the drive motor with the frame counter: needs interrupts (IM 1)
             DISK_LOAD .fn,laddr
+            IF slotreq                  ; load game: the record comes from the file SAVEn (n = STATE_SLOT) instead of the old state
+            DISK_SLOT_READ STATE_SLOT,STATE_BUF
+            ENDIF
             di
             ld   hl,STATE_BUF
             ld   de,sdst

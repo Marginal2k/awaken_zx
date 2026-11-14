@@ -32,7 +32,10 @@ LDAT:       equ  $-DATAM
 ; [glue] station -> flight launcher (not in the 1999 sources; see common/launcher.asm)
             include "../common/state.inc"
             include "../common/launcher.asm"
-            LAUNCHER_ROUTINE LaunchFlight,"ACTION  C",#6000,FLIGHT_ENTRY,FLIGHT_STATE,TIME,0,1
+            LAUNCHER_ROUTINE LaunchFlight,"ACTION  C",#6000,FLIGHT_ENTRY,FLIGHT_STATE,TIME,0,1,0
+; [glue] save/load slots (the TR-DOS calls are in common/disk.asm); loading a slot restarts the station
+            LAUNCHER_ROUTINE LaunchStationSlot,"STATIONFC",#6000,STATION_ENTRY,STATE_BUF,TIME,1,1,1
+            DISK_SLOT_SAVE_ROUTINE
 END2:
             include "OBJ.asm"
             include "DATAT.asm"

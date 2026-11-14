@@ -534,40 +534,40 @@ Sfxn
         LD C,#FD
         LD B,#FF
         LD A,5
-        OUT A
+        OUT (C),A
         LD B,#BF
         LD A,#0C
-        OUT A
+        OUT (C),A
         LD B,#FF
         LD A,7
-        OUT A
+        OUT (C),A
         LD A,R
         CP #20
         JR C,$+4
         LD A,#20
         AND %00100000
         LD L,A
-        IN A
+        IN A,(C)
         AND %11011011
         OR L
         LD B,#BF
-        OUT A
+        OUT (C),A
         LD A,6
         LD B,#FF
-        OUT A
+        OUT (C),A
         LD B,#BF
         LD A,5
-        OUT A
+        OUT (C),A
         LD A,10
         LD B,#FF
-        OUT A
+        OUT (C),A
         LD B,#BF
 Nunu    LD A,0
         SRL A
         CP 4
         JR NC,$+4
         LD A,4
-        OUT A
+        OUT (C),A
         RET
 Roka
         DB 20, 2, %00001000, 11

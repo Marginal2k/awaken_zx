@@ -1,5 +1,6 @@
 ; EQUS -- restored from awk2/EQUS.C (2214 bytes, STORM tokenized)
 ; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
+; PATCHED vs the disk file (tools/storm_gen.py PATCH): EQU 0-#1388
 ;КОЛ. ТОВАРОВ
 TKOL    EQU 28
 ;КОЛ. ВООРУЖ. КОРАБЛЯ
@@ -96,7 +97,7 @@ MSPEED2 EQU 4
 Olen    EQU #20
 A3D     EQU 40 ;КОЛ. 3D ОБЪЕКТОВ В СПИСКЕ
 
-ADHIDE  EQU 0-#1388
+ADHIDE  EQU #10000-#1388
 
 PG3D    EQU #11
 PGSPR   EQU #13

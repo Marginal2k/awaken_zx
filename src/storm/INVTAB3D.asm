@@ -1,5 +1,6 @@
 ; INVTAB3D -- restored from awk2/INVTAB3D.C (95 bytes, STORM tokenized)
 ; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
+;ИНВЕРТИРОВАНИЕ ТАБЛИЦЫ МАСОК ДЛЯ 3D
         ORG #8000
         LD HL,#9000
         LD B,#80

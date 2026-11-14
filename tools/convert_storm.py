@@ -317,6 +317,11 @@ class Conv:
             return ['%s %s' % (U, ', '.join(self.data_arg(p) for p in parts))]
         if U in ('PUSH', 'POP', 'INC', 'DEC') and len(parts) > 1:
             return ['%s %s' % (U, conv_arg(p, P)) for p in parts]
+        # STORM shorthand: OUT r = OUT (C),r ; IN r = IN r,(C)   (verified: LAND AY-port code, awk4 text export uses it too)
+        if U == 'OUT' and len(parts) == 1 and parts[0].strip().upper() in REG8:
+            return ['OUT (C),%s' % parts[0].strip().upper()]
+        if U == 'IN' and len(parts) == 1 and parts[0].strip().upper() in REG8:
+            return ['IN %s,(C)' % parts[0].strip().upper()]
         if U == 'OUT' and len(parts) == 1 and parts[0].strip().startswith('('):
             return ['OUT %s,A' % conv_arg(parts[0], P)]
         if U == 'IN' and len(parts) == 1 and parts[0].strip().startswith('('):

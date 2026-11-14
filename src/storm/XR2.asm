@@ -1,5 +1,6 @@
 ; XR2 -- restored from awk2/XR2~1.C (10427 bytes, STORM tokenized)
 ; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
+; PATCHED vs the disk file (tools/storm_gen.py PATCH): JP NC,ED_
 ;HAЧAЛO ПPOЦEДУP BЫBOДA ПЛOCKOCTИ
 ;MUST BE ONLY FROM #XX00
 Lc5

@@ -1,5 +1,7 @@
 ; CNVVOXTB -- restored from awk2/CNVVOXTB.C (115 bytes, STORM tokenized)
 ; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
+;ПРЕОБРАЗОВАНИЕ ФОРМАТА ХРАНЕНИЯ
+;ВОКСЕЛЕЙ
         ORG #6000
         LD HL,#8000
         LD DE,#C000
@@ -38,4 +40,4 @@ M1
         JP NZ,M1
         RET
         ORG #8000
-        INCBIN "VOX.bin"
+        INCBIN "assets/VOX.bin"

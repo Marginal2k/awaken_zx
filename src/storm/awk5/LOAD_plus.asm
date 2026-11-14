@@ -3,7 +3,7 @@
         ORG #8000
         LD BC,#7FFD
         LD A,#17
-        OUT A
+        OUT (C),A
         LD HL,#C000
         LD DE,#C001
         LD BC,#1800
@@ -37,7 +37,7 @@ M1
         PUSH BC
         LD BC,#7FFD
 PG      LD A,%00010111
-        OUT A
+        OUT (C),A
         XOR %00001010
         LD (PG+1),A
         EXX

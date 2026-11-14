@@ -1,5 +1,6 @@
 ; VOXEL -- restored from awk2/VOXEL.C (4798 bytes, STORM tokenized)
 ; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
+; PATCHED vs the disk file (tools/storm_gen.py PATCH): INCL "CSIZE", INCL "CMOVE"
 STEPX   EQU 3
 STEPY   EQU 2
 SZX     EQU 5
@@ -53,8 +54,8 @@ Y1      LD DE,#00
 ;        INC H:JR NZ,$+3:INC H
         LD (L1+1),HL
 
-        INCLUDE "CSIZE.asm"
-        INCLUDE "CMOVE.asm"
+;INCL "CSIZE"  ; file CSIZE exists on no disk (not needed to assemble)
+;INCL "CMOVE"  ; file CMOVE exists on no disk (not needed to assemble)
 
 
 

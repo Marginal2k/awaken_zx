@@ -123,7 +123,7 @@ Repanel
         LD BC,#7FFD
         PUSH BC
         LD A,Pgnorm
-        OUT A
+        OUT (C),A
         LD A,1
         LD (Fspeed+1),A
         LD (Ffire+1),A
@@ -134,7 +134,7 @@ Repanel
         CALL Datalin ;ИHДИKATOPЫ
         POP BC
         LD A,Pgstar
-        OUT A
+        OUT (C),A
         LD HL,(Time+2)
         LD DE,(Time)
         LD B,#FF
@@ -148,12 +148,12 @@ Korni
         PUSH BC
         LD BC,#7FFD
         LD A,Pgcontr
-        OUT A
+        OUT (C),A
         CALL Korni2
         LD BC,#7FFD
         EX AF,AF
         LD A,Pgnorm
-        OUT A
+        OUT (C),A
         EX AF,AF
         POP BC
         RET
@@ -739,12 +739,12 @@ Datal_
         LD BC,#7FFD
         EX AF,AF
         LD A,Pgcontr
-        OUT A
+        OUT (C),A
         EX AF,AF
         CALL Datal
         LD BC,#7FFD
         LD A,Pgnorm
-        OUT A
+        OUT (C),A
         RET
 
 Datalin

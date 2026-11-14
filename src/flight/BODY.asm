@@ -360,7 +360,9 @@ EXIT:
             out  (c),a
             ld   a,#3F
             ld   i,a
-            include "RETASM.asm"
+; [glue] original: include "RETASM.asm" (restore the ZASM assembler); the game goes back to the station
+            jp   LaunchStation
+;           include "RETASM.asm"
 
 
 SIZEOBJ:

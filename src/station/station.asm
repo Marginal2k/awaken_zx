@@ -29,6 +29,10 @@ LDAT:       equ  $-DATAM
             include "BODY.asm"
             include "DOPPROC.asm"
             include "PNT.asm"
+; [glue] station -> flight launcher (not in the 1999 sources; see common/launcher.asm)
+            include "../common/state.inc"
+            include "../common/launcher.asm"
+            LAUNCHER_ROUTINE LaunchFlight,"ACTION  C",#6000,FLIGHT_ENTRY,FLIGHT_STATE,TIME,0,1
 END2:
             include "OBJ.asm"
             include "DATAT.asm"

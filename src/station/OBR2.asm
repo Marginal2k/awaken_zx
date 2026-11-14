@@ -1024,7 +1024,8 @@ BEXIT:
             and  a
             ret  m
 ;EXIT TO XAS
-            jp   EXAS
+; [glue] original: jp EXAS (back to the ZASM/XAS debugger); the game launches the flight part instead
+            jp   LaunchFlight
 
 BEXIT_:
             ld   hl,0

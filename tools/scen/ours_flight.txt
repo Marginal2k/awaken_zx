@@ -1,0 +1,11 @@
+# our build: station -> click "Vylet" (launch) -> flight part
+disk build/awaken.trd
+run 2200 shot fl_station
+run 150 keys 5:p/12,5:a/88
+run 100 shot fl_cursor
+run 50 keys 5:_/6
+run 100 shot fl_click1
+run 30 keys 5:_/6
+run 600 shot fl_after600
+run 1500 shot fl_after2100
+save fl_state

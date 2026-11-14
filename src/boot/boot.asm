@@ -5,6 +5,7 @@
 ; ------------------------------------------------------------------------------------------
             DEVICE ZXSPECTRUM48
             include "../common/disk.asm"
+            include "../common/state.inc"
 
 ; With TR-DOS paged in, PROG = #5D3B (23867); the REM body starts at PROG+5 = #5D40 = 23872.
 BASIC_PROG  equ  23867                  ; PROG under TR-DOS (sysvar PROG at 23635 holds this value)
@@ -21,6 +22,8 @@ START:
             ld   iy,#5C3A
             xor  a
             out  (#FE),a                ; black border
+            xor  a
+            ld   (STATE_FLAG),a         ; [glue] cold start: no state record to take over
             DISK_LOAD NAME_STATION,STATION_ORG
             jp   STATION_ENT
 NAME_STATION:

@@ -64,6 +64,10 @@ ZM25:       equ  $-#8C00
 ; ОСНОВНОЕ ТЕЛО ИГРЫ
 ; МАТЕМАТИКА
             include "BODY.asm"
+; [glue] flight -> station launcher (not in the 1999 sources; see common/launcher.asm)
+            include "../common/state.inc"
+            include "../common/launcher.asm"
+            LAUNCHER_ROUTINE LaunchStation,"STATIONFC",#6000,STATION_ENTRY,STATE_BUF,TIME,1,0
 
 
 END1:
@@ -223,3 +227,5 @@ MAKE_4:          equ  #C000
             endif
 
             savebin "OBJECT3D.C",MAKE_4,$-MAKE_4
+
+            ASSERT TIME == FLIGHT_STATE     ; common/state.inc: the station launcher copies the state record to this address

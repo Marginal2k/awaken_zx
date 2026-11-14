@@ -24,6 +24,17 @@
 ; ПРОЦЕДУРЫ УПРАВЛЕНИЕМ КУРСОРОМ И ЕГО
 ; ВЫВОДОМ НА ЭКРАН
 
+; [glue] returning from the flight part: take over the state record left in screen RAM by the
+; flight launcher (STATE_FLAG=1) before the loader code is copied over #4000
+            ld   a,(STATE_FLAG)
+            dec  a
+            jr   nz,NO_STATE
+            ld   (STATE_FLAG),a
+            ld   hl,STATE_BUF
+            ld   de,TIME
+            ld   bc,STATE_LEN
+            ldir
+NO_STATE:
             ld   hl,#5800
             ld   de,#5801
             ld   bc,#2FF

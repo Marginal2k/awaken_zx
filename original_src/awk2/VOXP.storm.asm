@@ -1,0 +1,1138 @@
+BEGIN
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39;K1
+        AND D
+        JR Z,$+32;K2
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46;K0
+;K3
+        RES 5,C
+        INC H,H,H
+        JP $+38;K0
+;K2
+        LD E,D:JP $+9;K4
+;K1
+        AND D
+        JR Z,$-13;K3
+        LD E,#F0
+        LD L,A
+;K4
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+;K0
+        INC C
+        EXX
+
+LEN     EQU $-BEGIN
+;LEN 84b
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        SET 5,C
+        DEC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        RES 5,C
+        INC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        SET 5,C
+        DEC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        RES 5,C
+        INC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        SET 5,C
+        DEC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        RES 5,C
+        INC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        SET 5,C
+        DEC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        RES 5,C
+        INC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        SET 5,C
+        DEC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        RES 5,C
+        INC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        SET 5,C
+        DEC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        RES 5,C
+        INC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        SET 5,C
+        DEC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        RES 5,C
+        INC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        SET 5,C
+        DEC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        RES 5,C
+        INC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        SET 5,C
+        DEC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        RES 5,C
+        INC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        SET 5,C
+        DEC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        RES 5,C
+        INC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        SET 5,C
+        DEC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        RES 5,C
+        INC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        SET 5,C
+        DEC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        RES 5,C
+        INC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        SET 5,C
+        DEC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        RES 5,C
+        INC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        SET 5,C
+        DEC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        RES 5,C
+        INC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        SET 5,C
+        DEC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+
+
+
+
+
+
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+39
+        AND D
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:INC H:SET 6,C
+_LD A,(HL):LD (BC),A:INC H:RES 5,C
+_LD A,(HL):LD (BC),A:INC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+46
+        RES 5,C
+        INC H,H,H
+        JP $+38
+        LD E,D:JP $+9
+        AND D
+        JR Z,$-13
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:INC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+        INC C
+        EXX
+
+
+
+;-LAST
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        AND #F0
+        EXX:LD L,A:EXX
+        LD E,H:ADD HL,SP
+        LD A,(DE)
+        EXX
+        JR Z,$+40
+AW1     AND #0F
+        JR Z,$+32
+        OR L:LD L,A
+_LD A,(HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(HL):LD (BC),A
+        JP $+47
+        SET 5,C
+        DEC H,H,H
+        JP $+39
+        LD E,D:JP $+10
+AW2     AND #0F
+        JR Z,$-14
+        LD E,#F0
+        LD L,A
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:SET 5,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A:DEC H:RES 6,C
+_LD A,(BC):AND E
+_OR (HL):LD (BC),A
+

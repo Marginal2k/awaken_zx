@@ -1,0 +1,122 @@
+
+            jr   LD1
+FILE1:
+            db   "KARTA   C"
+FILE2:
+            db   "MUZ1    C"
+FILE3:
+            db   "stscr   C"
+FILE4:
+            db   "HELP    C"
+FILE5:
+            db   "D3D     C"
+FILE6:
+            db   "LANG    C"
+; SECTAB: see common/disk.asm (DISK_SECTAB)
+LD1:
+;  ЗАГР. СТРАНИЦЫ
+            ld   a,9
+            ld   (TRDOS_DRIVE),a
+            PAGE_ PGKRT
+                        DISK_SETNAME FILE1
+            ld   hl,#C000
+            DISK_READ
+            PAGE_ PGMUZ
+                        DISK_SETNAME FILE2
+            ld   hl,#DB00
+            DISK_READ
+            call #DB00
+            PAGE_ PGHLP
+                        DISK_SETNAME FILE4
+            ld   hl,#DB00
+            DISK_READ
+            PAGE_ PG3D
+                        DISK_SETNAME FILE5
+            ld   hl,#C000
+            DISK_READ
+
+;  ОБЩАЯ ИНИЦИАЛИЗАЦИЯ
+            xor  a
+            ld   l,a
+            ld   h,a
+            ld   (Eye_a),hl
+            ld   (Eye_g),a
+            ld   (La12+1),hl
+            ld   (La21+1),hl
+            ld   (La31+1),hl
+            ld   (La32+1),hl
+            ld   (Lb13+1),hl
+            ld   (Lb23+1),hl
+            ld   hl,#7FFF
+            ld   (La11+1),hl
+            ld   (La22+1),hl
+            ld   (Lb33+1),hl
+
+
+            PAGE_ PGLANG
+                        DISK_SETNAME FILE6
+            ld   hl,#C000
+            DISK_READ
+
+            PAGE_ PGBGD
+                        DISK_SETNAME FILE3
+            DISK_FIND
+            ld   a,c
+            DISK_INFO
+            ld   a,r
+            and  #0F
+            ld   c,a
+            ld   l,a
+            ld   h,0
+            ld   de,DISK_SECTAB
+            add  hl,de
+            push hl
+            inc  c
+            EXD
+            xor  a
+_M2_:
+            dec  c
+            jr   z,_M_
+            add  a,(hl)
+            inc  hl
+            jr   _M2_
+_M_:
+            ld   de,(TRDOS_SECTOR)
+            ld   c,a
+            and  #0F
+            add  a,e
+            ld   e,a
+            rrca 
+            rrca 
+            rrca 
+            rrca 
+            and  #0F
+            add  a,d
+            ld   d,a
+            ld   a,c
+            rrca 
+            rrca 
+            rrca 
+            rrca 
+            and  #0F
+            add  a,d
+            ld   d,a
+            ld   a,e
+            and  #0F
+            ld   e,a
+            pop  hl
+            ld   b,(hl)
+            ld   hl,#C000
+            DISK_RDSEC
+            ld   hl,#C000
+            ld   de,#C000
+            call DEPACK
+
+; ДЕЛАЕМ ЦВЕТ ДЛЯ ЧАСОВ
+            ld   hl,#3838
+            ld   (#DAFE),hl
+            ld   (#DAFC),hl
+            ld   (#DAFB),hl
+
+            PAGE_ PGNORM
+

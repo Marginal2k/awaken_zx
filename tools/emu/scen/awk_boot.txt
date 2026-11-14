@@ -1,0 +1,6 @@
+boot
+w300
+c:a1
+w300
+c:a2
+r:regs

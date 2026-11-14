@@ -122,3 +122,14 @@ between the two parts** yet and the boot has NOT been emulator-tested (the br em
 tools/emu/scripts/awk.js is a first adaptation, unfinished).
 Disk layer: `src/common/disk.asm` (TRDOS_* equates, DISK_SETNAME/DISK_LOAD/DISK_READ/DISK_FIND/DISK_INFO/DISK_RDSEC/DISK_EXIT, `DISK_SECTAB`); flight `LOADI2`/`SETHJRET` and station `LOADER` use only these.
 The SECTAB data line was disabled (space-led comment) in the last saved awk6 source but is present in the demo binary -> restored in disk.asm.
+
+## 10. Phase 2b - boot investigation (stopped, budget exhausted)
+
+* Test method (works): load build/awaken.trd, poke STATIONF.C at #6000, `setRegisters pc=#6300 sp=#5FFF di`, run frames (scripts kept in work/t_station*.js, run via tools/cdp/cdp_eval.mjs).
+  The same test with the demo's STATIONF.C + demo disk stays inside TR-DOS loading (normal).  With OUR newest-source station image the program is running its own code for ~4 frames
+  (pc #4009 = the `phase #4000` part of BODYOCUR, then #A7xx math routines) and then executes the zero-filled memory at #F79A.. -> falls through to #0000 -> ROM reset ("0 OK, 0:1" in BASIC).
+  So the BASIC stub (src/boot/boot.asm) is OK; the **newest awk6 station sources crash early in their own code** (a jump/call/ret into an address beyond the image end #C5C4, e.g. a pointer
+  that the demo-era glue or intro initialised, or a table that depends on DISK_SECTAB/loader order).  Not yet located (needs an instruction-level trace from #6300; ring-buffer script work/t_station3.js,
+  the CDP tab disappeared before it could finish).
+* Typing `RUN` through zxDebug.typeText at the TR-DOS prompt drops the first character; kr/kEnter holds did not start the demo either - key entry in run_trd.mjs is unreliable (coder is on it).
+* Not started: tools/labelmap.py, src/common/launcher.asm/state.inc, intro.asm disassembly, roles of PANELF/PANELMET/PANELFF/FINALF/scene1po/choose/BANK/BD/BAR, save slot interface.

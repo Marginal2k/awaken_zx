@@ -1,0 +1,30 @@
+; INVTAB3D -- restored from awk2/INVTAB3D.C (95 bytes, STORM tokenized)
+; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
+        ORG #8000
+        LD HL,#9000
+        LD B,#80
+M1
+        LD A,(HL)
+        CPL
+        LD C,A
+        INC L
+        LD A,(HL)
+        CPL
+        AND C
+        LD (HL),A
+        DEC L
+        INC H
+        LD A,(HL)
+        CPL
+        LD C,A
+        INC L
+        LD A,(HL)
+        CPL
+        AND C
+        LD (HL),A
+        INC L
+        DEC H
+        DJNZ M1
+        RET
+        ORG #9000
+        INCBIN "assets/D9000_plus.bin"

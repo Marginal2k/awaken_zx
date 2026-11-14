@@ -53,7 +53,13 @@ def main(argv):
     srv = subprocess.Popen([sys.executable, os.path.join(ROOT, 'tools', 'emu', 'serve_emu.py'), str(PORT)])
     prof = tempfile.mkdtemp(prefix='zxrun')
     try:
-        time.sleep(0.8)
+        import socket                # wait until the server really listens (a busy machine needs >1 s)
+        for _ in range(100):
+            try:
+                socket.create_connection(('127.0.0.1', PORT), timeout=0.2).close()
+                break
+            except OSError:
+                time.sleep(0.1)
         url = f'http://127.0.0.1:{PORT}/h/harness.html?' + urllib.parse.urlencode(params)
         cmd = [EDGE, '--headless=new', '--disable-gpu', f'--user-data-dir={prof}', '--no-first-run',
                f'--virtual-time-budget={budget}', '--dump-dom', url]

@@ -74,6 +74,7 @@ async function ev(expr) {
 }
 const hex = s => s.startsWith('#') ? parseInt(s.slice(1), 16) : s.startsWith('0x') ? parseInt(s, 16) : +s;
 // ---- boot ----
+for (let i = 0; i < 60 && !(await ev("return typeof zxDebug") === 'object'); i++) await new Promise(r => setTimeout(r, 500));
 if (disk !== '-') {
   const b64 = fs.readFileSync(disk).toString('base64'), name = disk.split(/[\\/]/).pop();
   const auto = process.env.BOOT === 'none' ? "return 'loaded (no autoload)';"

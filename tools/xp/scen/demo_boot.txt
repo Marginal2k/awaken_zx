@@ -1,0 +1,5 @@
+disk reference/AwakenV0.2Demo.trd/Awakenv02.trd
+run 800 shot demo_0800
+run 700 shot demo_1500
+run 1000 shot demo_2500
+run 1500 shot demo_4000

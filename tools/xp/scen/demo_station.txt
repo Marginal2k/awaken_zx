@@ -1,0 +1,3 @@
+disk reference/AwakenV0.2Demo.trd/Awakenv02.trd
+run 4000 shot station
+save demo_station

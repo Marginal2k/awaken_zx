@@ -1,0 +1,7 @@
+# demo v0.2: station -> click "Карта" (Map). Cursor keys: Q up, A down, O left, P right, Space = fire, M = cancel
+from work/coder/xp/demo_station.szx
+run 100 shot demo_cursor_on_map keys 5:p/12,5:a/78
+save demo_cursor_map
+run 20 keys 5:_/6
+run 120 shot demo_map_0
+run 300 shot demo_map_1

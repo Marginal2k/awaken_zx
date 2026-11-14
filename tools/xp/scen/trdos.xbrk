@@ -1,0 +1,2 @@
+; every TR-DOS command entry (#3D13): C = function, DE = file descriptor ptr (name = 8 chars + type), HL, [SP] = caller
+CPU:3D13::FL:CNT::C,B,DE,HL,[SP],M(DE),M(DE+1),M(DE+2),M(DE+3),M(DE+4),M(DE+5),M(DE+6),M(DE+7),M(DE+8),[DE+9],[DE+11]

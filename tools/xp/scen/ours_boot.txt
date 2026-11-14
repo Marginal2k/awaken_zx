@@ -1,0 +1,5 @@
+disk build/awaken.trd
+run 300 shot ours_0300 hash
+run 300 shot ours_0600 hash
+run 600 shot ours_1200 hash
+save ours_1200

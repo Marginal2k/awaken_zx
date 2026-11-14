@@ -37,7 +37,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('scen'); ap.add_argument('-o', default='work/coder/xp'); ap.add_argument('-d')
     ap.add_argument('-l'); ap.add_argument('--brk', action='append', default=[]); ap.add_argument('--brk-log')
-    ap.add_argument('--keep', action='store_true'); ap.add_argument('--timeout', type=int, default=150)
+    ap.add_argument('--keep', action='store_true'); ap.add_argument('--timeout', type=int, default=90)
+    ap.add_argument('--conf', default=CONF, help='Xpeccy+ confdir (work/xpconf = Pentagon 512K, work/xpconf128 = 128K)')
+    ap.add_argument('--retries', type=int, default=3, help='re-run a segment that hangs (rare Xpeccy bench hang; runs are deterministic)')
     a = ap.parse_args()
     os.makedirs(a.o, exist_ok=True)
     disk, machine, start = a.d, 'pent', None
@@ -64,7 +66,7 @@ def main():
     prev = start; rc = 0
     for i, s in enumerate(segs):
         snap = os.path.join(a.o, f'_chain{i}.szx')
-        cmd = [XP, '--confdir', CONF, '-m', machine]
+        cmd = [XP, '--confdir', os.path.abspath(a.conf), '-m', machine]
         if prev is None:
             if not disk: print('no disk', file=sys.stderr); return 4
             cmd += ['--autostart', disk]
@@ -77,12 +79,19 @@ def main():
         if 'hash' in s: cmd += ['--bench-hash']
         shot = os.path.join(a.o, (s.get('shot') or f'_s{i}') + '.ppm')
         cmd += ['--bench', str(s['n']), '--bench-shot', shot, '--bench-save', snap]
-        try:
-            r = subprocess.run(cmd, capture_output=True, text=True, timeout=a.timeout)
-        except subprocess.TimeoutExpired as e:
-            # subprocess.run already killed OUR process; never kill by image name -
-            # the user may have their own emulator windows open
-            print(f'[seg {i}] TIMEOUT after {a.timeout}s (our xpeccy run killed)'); return 9
+        r = None
+        for attempt in range(a.retries + 1):
+            try:
+                r = subprocess.run(cmd, capture_output=True, text=True, timeout=a.timeout)
+                # under host load (antivirus lock on the fresh .szx) Xpeccy+ sometimes silently starts a blank machine instead of loading the chain snapshot
+                if prev is not None and 'open SZX snapshot' not in (r.stdout + r.stderr):
+                    print(f'[seg {i}] snapshot {prev} was not loaded, attempt {attempt+1}/{a.retries+1}'); r = None; continue
+                break
+            except subprocess.TimeoutExpired:
+                # subprocess.run already killed OUR process; never kill by image name -
+                # the user may have their own emulator windows open
+                print(f'[seg {i}] TIMEOUT after {a.timeout}s (our xpeccy run killed), attempt {attempt+1}/{a.retries+1}')
+        if r is None: return 9
         rc = r.returncode
         out = (r.stdout + r.stderr).strip()
         keep = [l for l in out.splitlines() if re.search(r'ERR|WARN|bench:|SPAN|BP|reak|hash:|^F\d{8}|rror', l) and 'setTabOrder' not in l and 'QFSFileEngine' not in l]

@@ -1,0 +1,9 @@
+# intro with SPACE skip: press SPACE (port #7FFE, held 30 frames) at frame ~1005 while the nebula effect runs (the unskipped run,
+# tools/scen/ours_intro.txt, shows the nebula at frame 1400 and the closing picture only at ~2000) -> straight to the closing picture + loader
+disk build/awaken.trd
+run 1000 shot is_1000
+run 60 keys 5:_/30 shot is_1060
+run 540 shot is_1600
+run 1400 shot is_3000
+run 1000 shot is_4000
+save intro_skip

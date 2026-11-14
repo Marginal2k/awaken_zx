@@ -1,0 +1,13 @@
+# stability: flight (from fl_state.szx) with pitch / roll / throttle / fire input, 10 x 1000 frames
+from work/xp_ours/fl_state.szx
+run 1000 keys 10:n/65,160:s/98,310:a/83,460:a/47,610:x/36
+run 1000 keys 10:_/51,160:n/70,310:n/30,460:s/77,610:n/90
+run 1000 keys 10:x/37,160:n/90,310:x/110,460:n/65,610:_/68 shot stab_fl_02
+run 1000 keys 10:s/39,160:a/42,310:s/49,460:_/49,610:a/82
+run 1000 keys 10:m/43,160:x/56,310:a/38,460:n/88,610:x/98
+run 1000 keys 10:m/60,160:s/108,310:m/99,460:_/106,610:_/26 shot stab_fl_05
+run 1000 keys 10:n/119,160:_/91,310:n/70,460:n/70,610:a/81
+run 1000 keys 10:_/71,160:a/44,310:a/46,460:n/40,610:a/63
+run 1000 keys 10:m/26,160:a/20,310:m/39,460:m/32,610:x/98
+run 1000 keys 10:a/29,160:s/98,310:n/39,460:_/52,610:x/97 shot stab_fl_09
+save stab_flight

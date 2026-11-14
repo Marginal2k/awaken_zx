@@ -1,0 +1,5 @@
+# flight key test from the flight snapshot (ours_flight.txt -> fl_state.szx): Space = throttle; the shot is taken 120 frames in (key still held);
+# regress.py compares it with the control run (no key): different picture/state = key has an effect
+from work/xp_ours/fl_state.szx
+run 120 keys 5:_/200 shot fkey_space
+save fkey_space

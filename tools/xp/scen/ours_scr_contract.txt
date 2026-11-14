@@ -1,0 +1,19 @@
+# station screen "contract": boot (no intro), dismiss the start window, cursor to the button, click, look;
+# then cursor to empty background (right edge), M = system menu, "Закрыть все" (the 2nd item), look
+disk build/awaken_nointro.trd
+run 2200 shot scr_contract_0boot
+run 30 keys 5:_/6
+run 60
+run 30 keys 5:_/6
+run 60
+run 120 keys 5:p/30,5:a/90
+run 30 shot scr_contract_1cursor
+run 30 keys 5:_/6
+run 300 shot scr_contract_2open
+run 120 keys 5:p/90,5:q/40
+run 40 keys 5:m/6
+run 60 shot scr_contract_3menu
+run 40 keys 5:a/4
+run 30 keys 5:_/6
+run 300 shot scr_contract_4closed
+save scr_contract

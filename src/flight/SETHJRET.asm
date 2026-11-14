@@ -425,132 +425,31 @@ RSTT2:
             ldir 
 
             ld   hl,TIME
-            ld   de,#4000
-            ld   bc,#200
+            ld   de,STATE_BUF
+            ld   bc,STATE_LEN
             ldir 
 
+; [glue] original: raw FDC track reads of the station image from the track in MTRK (protected loader),
+; then a RET into it.  Replaced by an ordinary TR-DOS file load of STATIONF; the state record stays in
+; STATE_BUF (screen RAM) and the station copies it into its own data at start (STATE_FLAG=1).
             ld   bc,#7FFD
-            ld   a,#18
-            out  (c),a
-
-            exx  
-            ld   (#5CF7),de
-            ld   (TRK+1),de
-            ld   iy,#5C3A
-            ld   b,LNSTAT
-            ld   hl,#6A00
-            push hl
-            call LOAD
-            ld   hl,(TRK+1)
-            ld   (#5CF4),hl
-            ret  
-LOAD:
-            ld   a,b
-            exx  
-            ld   c,a
-            and  #F0
-            rrca 
-            rrca 
-            rrca 
-            rrca 
-            ld   h,a
-            ld   a,c
-            and  #0F
-            rlca 
-            rlca 
-            rlca 
-            rlca 
-            ld   l,a
-TRK:        ld   bc,0
-            rlc  c
-            rlc  c
-            rlc  c
-            rlc  c
-            add  hl,bc
-            rrc  l
-            rrc  l
-            rrc  l
-            rrc  l
-            ld   (TRK+1),hl
-            exx  
-            inc  e
-            ld   a,d
-            srl  a
-            ld   c,#7F
-            call TOREG
-            ld   ix,#2F55
-            call TOTD
-            push de
-            push bc
-            exx  
-            pop  bc
-            pop  de
-LOD1:
-            ld   a,(DSK)
-            and  %00101111
-            ld   c,a
-            xor  a
-            bit  0,d
-            jr   nz,$+4
             ld   a,#10
-            or   c
-            ld   c,#FF
-            call TOREG
-            ld   a,d
-            srl  a
-            ld   c,#3F
-            call TOREG
-            ld   a,e
-            ld   c,#5F
-            call TOREG
-            exx  
-RETL:
-            push hl
-            ld   a,#80
-            ld   c,#1F
-            call TOREG
-            ld   c,#7F
-            ld   ix,#3FE5
-            call TOTD
-            exx  
-            ld   a,d
-            exx  
-            srl  a
-            ld   d,a
+            out  (c),a
+            im   1
+            ld   a,#3F
+            ld   i,a
+            ld   iy,#5C3A
+            ld   sp,STUB_SP
+            ld   a,9
+            ld   (TRDOS_DRIVE),a
+            ei
+            DISK_LOAD RSTT_NAME,#6000
+            di
             ld   a,1
-            ld   (#5CD8),a
-            ld   ix,#2740
-            call TOTD
-            ld   a,(#5CCD)
-            and  #7F
-            pop  hl
-            jr   nz,RETL
-            inc  h
-            exx  
-            inc  e
-            ld   a,e
-            cp   #11
-            jr   c,LOD2
-            inc  d
-            ld   e,1
-            bit  0,d
-            jr   nz,LOD2
-            exx  
-            ld   a,#58              ;STEP ON
-            ld   c,#1F
-            call TOREG
-            ld   ix,#2F59           ;WAIT
-            call TOTD
-            exx  
-LOD2:
-            dec  b
-            jp   nz,LOD1
-            ret  
-TOREG:
-            ld   ix,#2A53
-TOTD:
-            push ix
-            jp   TRDOS_EXIT
+            ld   (STATE_FLAG),a
+            ld   sp,#6000
+            jp   STATION_ENTRY
+RSTT_NAME:  db   "STATIONFC"
 LNRSTT:     equ  $-RSTT2
 
             ent

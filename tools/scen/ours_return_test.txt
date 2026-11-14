@@ -1,0 +1,12 @@
+# needs: python build.py --test-return ; cp build/awaken_test_return.trd work/
+disk work/awaken_test_return.trd
+run 2200
+run 150 keys 5:p/12,5:a/88
+run 100
+run 50 keys 5:_/6
+run 100
+run 30 keys 5:_/6
+run 1500 shot rr_a
+run 1500 shot rr_b
+run 1500 shot rr_c
+save rr

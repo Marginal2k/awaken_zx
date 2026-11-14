@@ -1,0 +1,5 @@
+# from the snapshot saved by ours_flight.txt (work/xp_ours/fl_state.szx): Elite-like keys A=laser S/X=pitch N/M=roll Space=throttle
+from work/xp_ours/fl_state.szx
+run 300 shot fk_a keys 5:x/200,50:a/100
+run 300 shot fk_b keys 5:m/250,100:a/50
+run 600 shot fk_c

@@ -18,11 +18,14 @@ def asm(src, cwd, extra=()):
         print(r.stdout + r.stderr); die('sjasmplus failed on ' + src)
 
 
+TEST = '--test-return' in sys.argv
+
+
 def main():
-    if os.path.exists(B): shutil.rmtree(B)
-    os.makedirs(B + '/flight'); os.makedirs(B + '/station'); os.makedirs(B + '/boot')
+    for sub in ('flight', 'station', 'boot'):          # clean the subdirectories (the top directory may be locked by an open shell on Windows)
+        shutil.rmtree(B + '/' + sub, ignore_errors=True); os.makedirs(B + '/' + sub, exist_ok=True)
     # symbol files + listings go to build/ (used by tools/xp/szxinfo.py --sym)
-    asm(ROOT + '/src/flight/flight.asm', B + '/flight', ['--sym=../flight.sym', '--lst=../flight.lst'])
+    asm(ROOT + '/src/flight/flight.asm', B + '/flight', ['--sym=../flight.sym', '--lst=../flight.lst'] + (['-DTEST_RETURN'] if TEST else []))
     asm(ROOT + '/src/station/station.asm', B + '/station', ['--sym=../station.sym', '--lst=../station.lst'])
     asm(ROOT + '/src/boot/boot.asm', B + '/boot', ['--sym=../boot.sym', '--lst=../boot.lst'])
     d = Trd(label='AWAKEN')
@@ -48,8 +51,9 @@ def main():
     code(B + '/flight/CONTROL.C', 'CONTROL', 0xE013)
     code(B + '/flight/OBJECT3D.C', 'OBJECT3D', 0xC000)
     code(ROOT + '/assets/PANEL.C', 'PANEL', 0x6373)
-    d.save(B + '/awaken.trd')
-    print('OK build/awaken.trd')
+    out = 'awaken_test_return.trd' if TEST else 'awaken.trd'
+    d.save(B + '/' + out)
+    print('OK build/' + out)
 
 
 main()

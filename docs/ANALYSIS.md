@@ -179,3 +179,27 @@ Previously listed differences (VOXAL0 -256, VOXAL +1 refs, CONTROL 2 bytes, OBJE
 So the newest sources of awk1/awk6 ARE the sources of the newest disk binaries.  Ported to `src/`: flight GMATRX/OBJECTS/OBJGENER, station LANG (rept lines, `db#33...`), plus my hand edits of PNT/BODY/DATAT/DATA_M/DATA3D.
 Check: assembling `src/station` with `-DDISK_ORIGINAL` (no `ld de,#FFFF` in `DISK_READ`) gives D3D.C byte-exact vs the disk and a STATIONF.C identical to the one built from the phase-1 files.
 Note: sjasmplus ENCODING "DOS" maps cp1251 #A0 to #D0, so the blank strings of #FF (CP866 nbsp) are written as `ds 31,255`.
+
+## 12. Phase 2d - station <-> flight (technician)
+
+**Our build runs the flight part from the station's "Вылет" button** (`tools/scen/ours_flight.txt`, screenshots `work/xp_ours/fl_*.png`, `contact3/5.png`): cockpit with
+panel, radar, clock continuing from the station state ("Все системы готовы"), keys respond (Elite-like: A laser, S/X pitch, N/M roll, Space throttle).
+Return path: flight `RETST` (3D-I.asm: flying into the station) -> `RETSTAT` (SETHJRET.asm) -> TR-DOS load of STATIONF -> station restarts with the state record
+(verified with a test build, `python build.py --test-return`, `tools/scen/ours_return_test.txt`: flight starts, jumps into RETST, the station is back with a different random picture and the clock at 0122:10:xx).
+The only other flight exit, `EXIT` (game over, any key), now also goes to the station (`LaunchStation`).  Not yet exercised in play: real docking by flying into the station, death/game-over return.
+
+Glue (all marked `[glue]`, nothing of it exists in the 1999 sources; the demo's versions are in STATIONF #8170-#81B3 / ACTION #7440-#745F):
+* `common/state.inc` (equates) and `common/launcher.asm` (macro `LAUNCHER_ROUTINE`).  State record = 512 bytes at `TIME` (station #983B, flight #9BBD, same layout as SAVEn.s); hand-over buffer `STATE_BUF`=#4000
+  (screen RAM survives the file load); stub at #5B00 loads the file through disk.asm, copies the state, sets `STATE_FLAG`, jumps.
+* station: `BEXIT` (button "Вылет", `jp EXAS` = exit to the XAS debugger in the sources) -> `LaunchFlight`; entry code at #6300 takes the state back when `STATE_FLAG`=1 (set by the flight side), `boot.asm` clears the flag.
+* flight: `flight.asm` ASSERTs TIME == #9BBD; `RSTT2` (the 1999 raw-FDC track loader of the station) replaced by an ordinary TR-DOS load; `EXIT` (was: restore ZASM) -> `LaunchStation`.
+* `assets/PANEL.C` was the wrong file (6912 bytes, FF-filled); the real one is the 1463-byte Hrust-packed PANEL (awk1 PANEL~1.C = demo PANEL, 6 sectors) that LOADI2 unpacks with DEHRUST.
+
+TR-DOS lessons (verified in Xpeccy+):
+* **The stub's stack must lie above the BASIC workspace** (SP #5FFF; SP #5AF0 gave "4 Out of memory, 20:1" printed over the screen by the TR-DOS/ROM error path - signature ROM trace `3D13 -> 3CFD -> 283C/2842/20F1 -> 2869/287F loop -> 1CB3/03E8`).
+* #0E with A=0 loads to the file's own start address, A=3 to HL with DE = length limit (see 11.4); interrupts may be disabled during loads, drive motor spin-up works.
+
+Demo v0.2 "Вылет" in Xpeccy+ (trace `work/scen/dv.txt`): TR-DOS calls: (1) F+4 `ACTION  C`, A=0, from the stub at #4236 (loads fine, 160 sectors in ~370 frames); (2) F+373 `PANEL   C`, A=3, HL=#C000, DE=#5CE6, from LOADI2 (#422C) with SP=#BFFE:
+TR-DOS runs ~80 frames of disk access (catalogue reads, FDC status always 0 = no error) and then the CPU ends in the same ROM error path as above; the BASIC system variables (#5C3A..#5D3A) are overwritten by font data (the ACTION font), then PC runs
+through ACTION's data at #AB90.  No third TR-DOS call is ever made, i.e. the failure is at the PANEL load / DEHRUST step of the demo's own LOADI2.  Our rewritten loader performs the same PANEL load (same file, same call) successfully in Xpeccy+, so the
+Xpeccy+ TR-DOS emulation itself is fine; the demo failure is specific to the demo's older ACTION (it worked in Unreal Speccy only by luck of uninitialised state - not analysed further).

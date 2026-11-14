@@ -87,6 +87,9 @@ ZM10:
             call GENTBXY
             PAGE_ CONTR+8
             call INIMS
+            IFDEF TEST_RETURN
+            jp   RETST                  ; test build only: immediately return to the station (build.py --test-return)
+            ENDIF
             jp   START
 
 

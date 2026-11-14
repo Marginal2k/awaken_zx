@@ -27,6 +27,10 @@ Line classes (see `tools/zasm_parse.py: parse_line`):
 * empty line;
 * **comment line**: starts with `;` or `FE`, **or** starts with anything that is not a label character / `06` (ZASM allows *bare* comment
   lines without `;` - mostly Russian prose; also a label followed by a literal blank and text, e.g. `X  text`);
+* **a blank (0x20) followed by tokenized text (`20 05 NN ...`) is an ACTIVE code line**, exactly like an indented one (the author's
+  quick way of typing/pasting statements, most `rept..endr`, `db`/`dw` text/data tables).  Confirmed by byte results: with these 680 lines compiled
+  (and only these) every binary on the developer disks is rebuilt byte-exact (DATAS, 3DPART, VOXAL0, VOXAL, CONTROL0, CONTROL, OBJECT3D, LANG, D3D, KARTA, HELP) and the
+  `LABELS` file matches 465/465.  A leading blank followed by *plain text* (Russian prose, or untokenized words) stays a comment.
 * **code line**: `[label[:]] [06 pad] statement[:statement...] [;comment]`.  A label starts in column 0 (`[A-Za-z_$@.?][A-Za-z0-9_$@.?]*`, optional `:`).
   A label may be followed by literal blanks and then a token (`SPACEBORDER equ #7D`), by `06 NN`, or by end of line.
 * statements are separated by `:`; the mnemonic token is glued to its operand in the file (`ld a,b:and 7` is stored with no blank after

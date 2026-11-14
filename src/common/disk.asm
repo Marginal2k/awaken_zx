@@ -25,7 +25,9 @@ TRDOS_DRIVE     equ  23814              ; #5D06  current drive (9 = ?, see LOADI
 
             ; load the file whose name is in the buffer to HL (HL must be set by the caller)
             MACRO DISK_READ
+            IFNDEF DISK_ORIGINAL            ; -DDISK_ORIGINAL reproduces the 1999 binaries byte-exactly (stale DE)
             ld   de,#FFFF                   ; length cap: DE is a LENGTH limit (a stale DE capped files at 92 sectors) - FFFF = whole file
+            ENDIF
             ld   c,#0E
             ld   a,3
             call TRDOS_CALL

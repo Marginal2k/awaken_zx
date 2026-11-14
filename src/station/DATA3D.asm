@@ -310,7 +310,8 @@ TSHIP:
 ;  ΥΕΔΕΠ ΔΛί ΟΞΚΣΟ.ΚΞΠΐΑΛί
             db   "Μξδελό",2
             db   "Φενΰ",CR
-            db   "                               ",ET
+            ds   31,255              ; 31 x CP866 #FF (non-breaking blank)
+            db   ET
 
 
 

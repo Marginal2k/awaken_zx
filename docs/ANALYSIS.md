@@ -164,3 +164,18 @@ Note `work/xpconf/machines/pent.conf` of this project already has `memory = 512`
 
 Demo v0.2 flight launch (user report: black screen, TR-DOS read error): catalogue of Awakenv02.trd has ACTION, DATAS, 3DPART, VOXAL0, VOXAL, CONTROL0, CONTROL, OBJECT3D, PANEL*, SAVE0-5, FINALF,
 scene1po, choose1/2, BANK0-5, BD0-3, BAR - everything named inside ACTION.C is present; the cause is not a missing file (to be traced with trdos.xbrk when item 6 is done).
+
+### 11a. Global fix of the "single-blank" lines (rule confirmed by bytes)
+
+ZASM rule: **a line that starts with one literal blank followed by tokenized text is live code** (680 such lines on awk1+awk6; the 268 blank+plain-text lines are real comments).
+`tools/zasm_parse.py` (`ACTIVE_BLANK_TOK`) now compiles them; `convert.py` regenerated `work/phase1_src`.  `tools/verify_original.py all` without any variant:
+
+| output | built | original | result |
+|--|--|--|--|
+| awk1 DATAS, 3DPART, VOXAL0, VOXAL, CONTROL0, CONTROL, OBJECT3D | 7469 8224 11264 3784 8211 6668 10580 | same | **all BYTE-EXACT**; LABELS 465 of 465 |
+| awk6 LANG, D3D, KARTA, HELP | 4204 15978 11776 5921 | same | **all BYTE-EXACT** |
+
+Previously listed differences (VOXAL0 -256, VOXAL +1 refs, CONTROL 2 bytes, OBJECT3D/DATAS `objects_line` variant, LANG/D3D size) were all this one cause; the variant is obsolete.
+So the newest sources of awk1/awk6 ARE the sources of the newest disk binaries.  Ported to `src/`: flight GMATRX/OBJECTS/OBJGENER, station LANG (rept lines, `db#33...`), plus my hand edits of PNT/BODY/DATAT/DATA_M/DATA3D.
+Check: assembling `src/station` with `-DDISK_ORIGINAL` (no `ld de,#FFFF` in `DISK_READ`) gives D3D.C byte-exact vs the disk and a STATIONF.C identical to the one built from the phase-1 files.
+Note: sjasmplus ENCODING "DOS" maps cp1251 #A0 to #D0, so the blank strings of #FF (CP866 nbsp) are written as `ds 31,255`.

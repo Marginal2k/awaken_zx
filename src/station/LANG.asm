@@ -823,8 +823,22 @@ _EQUALLY:
 _MULTI:
 ;de=bc*de
             ld   hl,0
-;  rept3:slac:rlb:jrnc$+3:addhl,de:addhl,hl:jpc$P32:endr
-;  rept12:slac:rlb:jrnc$+3:addhl,de:addhl,hl:jrc$P32:endr
+            rept 3
+            sla  c
+            rl   b
+            jr   nc,$+3
+            add  hl,de
+            add  hl,hl
+            jp   c,ZP32
+            endr
+            rept 12
+            sla  c
+            rl   b
+            jr   nc,$+3
+            add  hl,de
+            add  hl,hl
+            jr   c,ZP32
+            endr
             sla  c
             rl   b
             jr   nc,$+3

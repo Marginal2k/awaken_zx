@@ -293,9 +293,15 @@ DOPGEN:
             or   c
             jr   nz,DGN2
 
-;  ld   a,l:cpSPACEBS:jrncDGN2
-;  ld   a,e:cpSPACEBS:jrncDGN2
-;  ld   a,b:cpSPACEBS:jrncDGN2
+            ld   a,l
+            cp   SPACEBS
+            jr   nc,DGN2
+            ld   a,e
+            cp   SPACEBS
+            jr   nc,DGN2
+            ld   a,b
+            cp   SPACEBS
+            jr   nc,DGN2
 
             jp   STATGEN_
 

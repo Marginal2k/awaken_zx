@@ -14,6 +14,7 @@ import zasm_detok
 TAB = zasm_detok.default_table()
 REG_LO, REG_HI = 0x77, 0x9a          # operand tokens (registers/conditions); everything else is a mnemonic/directive
 
+ACTIVE_BLANK_TOK = True
 LABEL_RE = re.compile(rb'^[A-Za-z_$@.?][A-Za-z0-9_$@.?]*')
 
 
@@ -65,6 +66,9 @@ def parse_line(raw):
         L.kind = 'comment'; L.cmark = 'FE' if c0 == 0xFE else ';'
         L.comment = decode_cp866(render_items(items_of(raw[1:])))
         return L
+    if c0 == 0x20 and len(raw) > 1 and raw[1] in (2, 3, 4, 5) and ACTIVE_BLANK_TOK:
+        # a single literal blank followed by tokenized text: the assembler compiles it like an indented code line
+        raw = bytes([6, 0x81]) + raw[1:]; c0 = 6; L.raw = raw
     body = raw
     if c0 != 6:
         m = LABEL_RE.match(raw)

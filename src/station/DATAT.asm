@@ -593,14 +593,16 @@ Lintxt:
 TINFS1:
             db   "Топлива на:         сл",CR
             db   "Расстояние:         сл",CR
-            db   "                               ",CR
+            ds   31,255           ; 31 x #FF (non-breaking blank)
+            db   CR
             db   "Система перелета:",CR,CR,CR
             db   "Планета:",CR
             db   "Строй:",CR
             db   "Тип:",CR
             db   "Уровень:",CR
             db   "Планеты системы:",CR,CR,CR
-            db   "                               ",CR
+            ds   31,255           ; 31 x #FF (non-breaking blank)
+            db   CR
             db   "Система пребывания:",CR,CR,CR
             db   "Планета:",CR
             db   "Строй:",CR
@@ -640,7 +642,8 @@ TTWR1:
             db   "Наличие",CR,"Товара",2
             db   "Кол",3,"Цена",4,"Кол",5
             db   "Цена",6,"Ед",CR
-            db   "                               ",ET
+            ds   31,255           ; 31 x #FF (non-breaking blank)
+            db   ET
 
 TTWR2:
             db   CR,"Текстиль",6,"тн"
@@ -681,7 +684,8 @@ TWKRB1:
             db   "Цена",4
             db   "Вес",5
             db   "Уст",CR
-            db   "                               ",ET
+            ds   31,255           ; 31 x #FF (non-breaking blank)
+            db   ET
 
 
 TWKRB2:

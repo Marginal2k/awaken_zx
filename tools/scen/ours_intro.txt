@@ -1,0 +1,9 @@
+# boot -> intro animation -> station (our build; the demo's intro played the same 11 KB payload)
+disk build/awaken.trd
+run 400 shot in_0400
+run 400 shot in_0800
+run 600 shot in_1400
+run 600 shot in_2000
+run 1500 shot in_3500
+run 1500 shot in_5000
+save intro

@@ -1,5 +1,5 @@
 # our build: station -> click "Vylet" (launch) -> flight part
-disk build/awaken.trd
+disk build/awaken_nointro.trd
 run 2200 shot fl_station
 run 150 keys 5:p/12,5:a/88
 run 100 shot fl_cursor

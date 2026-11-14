@@ -55,6 +55,11 @@ TRDOS_DRIVE     equ  23814              ; #5D06  current drive (9 = ?, see LOADI
             call TRDOS_CALL
             ENDM
 
+            MACRO DISK_RDSEC_TAIL           ; same as DISK_RDSEC but a tail jump: TR-DOS returns to the address on the stack
+            ld   c,5
+            jp   TRDOS_CALL
+            ENDM
+
             MACRO DISK_EXIT
             jp   TRDOS_EXIT
             ENDM

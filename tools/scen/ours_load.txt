@@ -1,4 +1,4 @@
-# load test: work/awaken_slot2.trd = build/awaken.trd with SAVE2 replaced by the record that ours_save1/2.txt wrote
+# load test: work/awaken_slot2.trd = build/awaken_nointro.trd with SAVE2 replaced by the record that ours_save1/2.txt wrote
 # (xpeccy does not carry disk writes across .szx segments reliably, so the saved record is copied into the TRD by hand:
 #  see docs/ANALYSIS.md section 13).  M = system menu, "Восстановиться" -> "С позиции 2"
 disk work/awaken_slot2.trd

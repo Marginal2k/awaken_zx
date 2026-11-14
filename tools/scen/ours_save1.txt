@@ -1,5 +1,5 @@
 # save/load test part 1: boot, close the welcome window, M = system menu at the cursor, move onto "Сохраниться", click -> window "В позицию N"
-disk build/awaken.trd
+disk build/awaken_nointro.trd
 run 2200
 run 30 keys 5:_/6
 run 60

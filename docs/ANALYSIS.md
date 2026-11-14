@@ -117,7 +117,7 @@ Boot chain of the demo:
 4. The newest sources (awk1/awk6) contain **none** of this glue: no source references `ACTION`, `STATIONF`, `FINALF`, `SAVEn`; all labels resolve inside their own tree.  Flight<->station switching,
    save/load and the ending are therefore not in the restorable sources; they exist only in the demo's older images (STATIONF/ACTION), whose addresses differ from the newest sources (state block #9BBD vs DATA_M `PLACE`=#9647 etc.).
 
-Status of the phase 2a build (see README): `python build.py` produces `build/awaken.trd` with boot stub (new, `src/boot/boot.asm`), station part, flight part and assets, but there is **no launcher
+[Historic - see sections 11-14 for the current state.]  Status of the phase 2a build (see README): `python build.py` produces `build/awaken.trd` with boot stub (new, `src/boot/boot.asm`), station part, flight part and assets, but there is **no launcher
 between the two parts** yet and the boot has NOT been emulator-tested (the br emulator harness no longer fits the current ZX-M8XXX: `zxDebug` was removed and `window.spectrum` is not exposed in v26.11.02 -
 tools/emu/scripts/awk.js is a first adaptation, unfinished).
 Disk layer: `src/common/disk.asm` (TRDOS_* equates, DISK_SETNAME/DISK_LOAD/DISK_READ/DISK_FIND/DISK_INFO/DISK_RDSEC/DISK_EXIT, `DISK_SECTAB`); flight `LOADI2`/`SETHJRET` and station `LOADER` use only these.
@@ -203,3 +203,92 @@ Demo v0.2 "Вылет" in Xpeccy+ (trace `work/scen/dv.txt`): TR-DOS calls: (1) 
 TR-DOS runs ~80 frames of disk access (catalogue reads, FDC status always 0 = no error) and then the CPU ends in the same ROM error path as above; the BASIC system variables (#5C3A..#5D3A) are overwritten by font data (the ACTION font), then PC runs
 through ACTION's data at #AB90.  No third TR-DOS call is ever made, i.e. the failure is at the PANEL load / DEHRUST step of the demo's own LOADI2.  Our rewritten loader performs the same PANEL load (same file, same call) successfully in Xpeccy+, so the
 Xpeccy+ TR-DOS emulation itself is fine; the demo failure is specific to the demo's older ACTION (it worked in Unreal Speccy only by luck of uninitialised state - not analysed further).
+
+## 13. Phase 2e - docking, 128K, saves, ending, intro (technician)
+
+### 13.1 Docking (verified)
+Trigger: `CRASH` (3D-I.asm) is called when the player is inside an object's visibility box; for a `T_STATION` object (`TYPE` = #12) with `SETUP` bit 4 (docking block) it compares |x|,|y|,|z| (high bytes of the
+object's relative coordinates, record `CARSB` + n*`OLEN`, offsets +1/+3/+5) with `CRSHST` = 4 (1024 units): all three smaller -> `jp RETST` -> `RETSTAT` -> TR-DOS reload of STATIONF; otherwise it is a collision (shield loss).
+There is no docking computer and no angle test in this code, only the distance box.  At launch the station is generated about 9300 units *behind* the ship (z = #DB92 in object 1), so flying back is slow; the scenarios place it with a
+documented test poke: `tools/scen/szxpoke.py IN.szx OUT.szx DOCK ...` sets x = y = 0, z = #0100 in every station record of the object table (#A200, 26 x #40 bytes).
+Verified (`tools/scen/ours_dock.txt`, `ours_relaunch.txt`, `ours_dock2.txt`; shots `work/xp_ours/dk_c.png`, `rl_flight.png`, `dk2_b.png`): station -> flight -> poke -> station ("Добро пожаловать!", docking fee 70 cr) with the state
+carried (credits poked to 31777 in flight show as 31777 in the station, 31707 after the second docking = minus the 70 cr fee; cargo 00:77; clock continues 0122:10 -> 58 -> 77), the second launch from that station works, the second docking works.
+
+### 13.2 128K (verified)
+`work/run128.py` (xpconf128 = 128 KB Pentagon): boot (no-intro disk), station, flight, docking: same results (`work/xp128/*.png`).  Nothing needs more than 128 KB: all `#7FFD` values are #10..#1F;
+STATIONF now fills #6000-#FF30 (207 bytes spare).
+
+### 13.3 Save slots (verified)
+The UI already exists in the newest sources: key `M` (cancel) on an empty spot opens the menu `THIDE`; "Сохраниться" -> window `WSOH_` ("В позицию 1..5"), "Восстановиться" -> `WWOS_` ("С позиции 1..5") (OBR.asm, DOPPROC.asm `HIDEP7`).
+Only the disk handlers `F_S12` / `F_S13` (they ended with `ret`) were missing; they now call the glue:
+* save: `DiskSlotSave` (disk.asm macro `DISK_SLOT_SAVE_ROUTINE`, emitted in station.asm): TR-DOS find + catalogue entry of `SAVEn  s`, then function 6 (write 2 sectors) from `TIME` (512 bytes) in place - the catalogue never changes.
+  The caller's SP is kept (the station's stack is at #5FFx; switching to #5FFF got overwritten by TR-DOS and crashed - found in test).
+* load: `STATE_SLOT` = n, `jp LaunchStationSlot` = the normal launcher with `slotreq`: music off, the stub at #5B00 loads STATIONF again, then reads `SAVEn` into `STATE_BUF` (`DISK_SLOT_READ`) and enters #6300 with `STATE_FLAG` = 1,
+  i.e. exactly the path of a landing.  (Reading the slot into #4000 *before* the restart does not work: the running station keeps drawing into screen RAM.)  Side effect: the station restarts (new random background picture, about 35 s).
+* build.py writes `SAVE0..SAVE5` (`s`, 512 bytes = initial `TIME` record, 2 sectors each; slots 1-5 are in the UI, SAVE0 exists like in the demo).  The demo's own SAVEn files have an older layout and are not used.
+Verified: `ours_save1/2.txt` (M, "Сохраниться", slot 2, credits poked to 31777): the saved record appears in the disk image inside the snapshot (`work/xp_ours/sv_saved.szx`, track 37 sector 1: `.. 13 21 7C ..`).
+`ours_load.txt`: disk with that record copied into SAVE2 (`work/awaken_slot2.trd`), "Восстановиться" -> "С позиции 2": the station restarts with credits 31777.
+**Harness caveat:** Xpeccy+ does not keep disk writes across the .szx segment boundary (the disk is restored from the original image), so save and load were verified in two steps with the record copied by hand;
+a save -> reset -> load run in one go is not possible with `tools/xp/run.py`.
+
+### 13.4 Ending (wired, reachable only with a test build)
+`FINALF` (19114 bytes at #6000) is a self-contained program (code + graphics, **no disk access**: no #3D13 call, no FDC code - the `in a,(#7F)` hits are graphics bytes).  It shows a galaxy picture and a scrolling
+message (`work/xp_ours/end_c.png`).  `LaunchEnding` (station.asm, launcher macro) loads it to #6000 and jumps there; the file is on the disk.  The demo's trigger (STATIONF #7155: compares `PLACE` (#983F) with a word at #98B0,
+"destination reached") belongs to an older layout and has no counterpart in the newest sources (#98B0 = TIME+#75 is inside `WSKMI`).  **No trigger exists in the 1999 sources, so none was invented**:
+`python build.py --test-ending` connects "Вылет" to `LaunchEnding` (`tools/scen/ours_ending_test.txt`).  Open question for the author: when does the game end?
+`scene1po`, `choose1/2`, `BANK0-5`, `BD0-3`, `BAR`: not referenced by name or by track/sector in any v0.2 binary (STATIONF, ACTION, FINALF, boot payload, all overlays); `BANK/BD/BAR/choose` exist only on the v0.2 disk
+(not on AWAK_SDC), `scene1po` also on AWAK_SDC.  FINALF does not load them.  They are **not** on our disk.  `PANELF/PANELMET/PANELFF/PANELN` are likewise unreferenced
+(ACTION's name list is VOXAL VOXAL0 CONTROL CONTROL0 PANEL OBJECT3D).
+
+### 13.5 Intro (done)
+`src/boot/intro.asm` = disassembly of the demo's payload (work/boot_payload.bin, 11264 bytes at #6400), reassembled **byte-identical**.  Code is about 2.1 KB, the rest is data: `assets/intro_logo.scr` (6912 bytes, ZX screen of the
+"Awaken" logo; the same area is later used as work buffer) and `assets/intro_depack.bin` (1743 bytes: depacker + packed closing picture "Awaken - Second Breeze", copied over the logo area and called by the tail stub).
+Structure: `IntroStart` (#6500) copies the tail stub to #5D3B, shows the logo, runs the effects (unrolled run-time-generated LDI/POP code in #9100-#B3xx, buffers #7E00-#8FFF, banks 4/6; the names `WarpFrame`,
+`BuildSprites`, `RunUnrolled` ... describe what the code was seen to do, the maths was not analysed); `RunFrames` runs the per-frame routines and **SPACE skips the rest** (port #7FFE -> `IntroSkip` = straight to the tail stub);
+`TailStub` depacks the logo to the screen, mirrors it to the shadow screen, loads STATIONF with TR-DOS and enters #6300.  No music.  Glue change: the stub uses the disk.asm macros and the real sector count
+(`-DSTATION_SECTORS`; the demo read 192 sectors of a 160-sector file).  `boot.asm` (BASIC `10 REM <code>` / `20 RANDOMIZE USR 23872`) loads `INTRO C` to #6400 and jumps to #6500.
+**TR-DOS lesson:** the catalogue buffer (256 bytes) sits right behind the BASIC program (#5D3B + program length).  The tail stub lives at #5D3B and calls TR-DOS, so the BASIC program is padded to 123 bytes
+(the demo's AWAKEN.B had 119); with a 75-byte program TR-DOS overwrote the stub, with a long one buffer and stack collided at #5Fxx.
+`python build.py` builds `build/awaken.trd` (with intro) and `build/awaken_nointro.trd` (same, boots straight to the station; used by the scenarios).  `tools/scen/ours_intro.txt`: intro visible from frame ~800, station at ~4800.
+
+### 13.6 Source check against the regenerated phase-1 files
+`src/{flight,station}/*.asm` compared line by line (case/blank-insensitive) with `work/phase1_src/awk1|awk6` after the "blank + tokenized = live code" fix: 29 of the 47 files that have a phase-1 counterpart are identical (plus the new flight.asm and station.asm); the other 18 differ only by
+(a) `incbin` paths (assets/ directory) and `ENCODING "DOS"` for the Cyrillic data files (DATAT/DATA_M/DATA3D: cp866 byte lists -> readable text, sjasmplus converts back), (b) the documented `[glue]` edits (flight BODY `EXIT`,
+LOADI2/SETHJRET/LOADER loaders replaced by disk.asm macros, station OBR `F_S12`/`F_S13`, OBR2 `BEXIT`, BODYOCUR state take-over), (c) `; rept7: ...` comment lines in PNT/BODY documenting the expanded `rept` blocks.
+No further lost code found.  With `-DDISK_ORIGINAL` the station overlays LANG, D3D, KARTA, HELP and the flight overlays VOXAL0, CONTROL0, DATAS, OBJECT3D are byte-identical to the developer disks; the main images
+(STATIONF / ACTION) are not on the developer disks, and 3DPART/VOXAL/CONTROL differ in 1-2 bytes (3DPART, VOXAL: addresses shifted by the glue) or more (CONTROL: the raw-FDC loader was replaced).
+
+## 14. Final disk, memory map, glue list
+
+### 14.1 `build/awaken.trd` (1023 of 2544 sectors used; `python build.py`)
+| file | load | sectors | role |
+|--|--|--|--|
+| boot B | BASIC | 1 | `RUN` autostart, loads INTRO |
+| INTRO C | #6400 | 44 | intro animation, then loads STATIONF (SPACE skips) |
+| STATIONF C | #6000 (-#FF30) | 159 | station main image, entry #6300 |
+| LANG, D3D, KARTA, HELP, MUZ1 C | #C000 / #DB00 | 17, 63, 46, 24, 24 | station banks 6, 4, 1, 7, 3 (MUZ1 = music player) |
+| stscr C | #C000 | 239 | 16 packed station backgrounds (catalogue length 3230 = first picture, 239 sectors) |
+| SAVE0-5 s | - | 2 each | state records, overwritten in place |
+| ACTION C | #6000 | 153 | flight main image (LOADI2 entry #6000) |
+| VOXAL0, VOXAL, CONTROL0, CONTROL, OBJECT3D, PANEL C | see catalogue | 44, 15, 33, 26, 42, 6 | flight banks 3, 3, 1, 1, 4 + panel (Hrust-packed) |
+| FINALF C | #6000 | 75 | ending (not reachable in normal play, see 13.4) |
+
+### 14.2 Memory map
+* BASIC/boot: program at #5D3B (REM code #5D40), TR-DOS catalogue buffer behind it; stack #5FFF.  Intro #6400-#8FFF, tail stub copied to #5D3B.
+* Hand-over contract (common/state.inc): state record of 512 bytes at `TIME` (station #983B, flight #9BBD) <-> `STATE_BUF` #4000 (screen RAM); `STATE_FLAG` #5BFF, `STATE_SLOT` #5BFE, launcher stub #5B00, stub stack #5FFF.
+* Station: image #6000-#FF30; pages (#7FFD, bit 4 = ROM 48 always set): 0 `PGNORM` main tail at #C000, 1 KARTA, 3 stscr + MUZ1 (music at #DB00), 4 D3D, 6 LANG, 7 HELP + shadow screen.  IM 2, table at `Forint`.
+* Flight: image #6000-#BFFF + bank 0; pages MAIN 0, CONTR 1, VOXAL 3, OBJ3D 4, FREE (screen) 6; objects `CARSB` #A200, player #A880, state #9BBD.  IM 1.
+* All TR-DOS access goes through `src/common/disk.asm`.  TR-DOS rules found: loads with A=3 need DE=#FFFF (length cap), stack above the BASIC workspace or the caller's own SP (never an SP inside the catalogue buffer),
+  interrupts on during loads, catalogue buffer behind the BASIC program.
+
+### 14.3 Glue list (not in the 1999 sources; all marked `[glue]`)
+| where | what |
+|--|--|
+| common/state.inc, launcher.asm, disk.asm | equates, `LAUNCHER_ROUTINE` (hand-over stub), all TR-DOS macros incl. save slots |
+| station.asm | `LaunchFlight`, `LaunchStationSlot`, `LaunchEnding`, `DiskSlotSave` |
+| station/BODYOCUR.asm | take over `STATE_BUF` at entry when `STATE_FLAG` = 1 |
+| station/OBR2.asm `BEXIT` | "Вылет" -> `LaunchFlight` (was `jp EXAS`); `-DTEST_ENDING` -> `LaunchEnding` |
+| station/OBR.asm `F_S12`/`F_S13` | save / load slot handlers |
+| station/LOADER.asm | loader through disk.asm, `DISK_SECTAB` |
+| flight/BODY.asm `EXIT`, SETHJRET `RETSTAT`, LOADI2, flight.asm | -> `LaunchStation`; raw-FDC loader replaced; macros; ASSERT TIME == #9BBD |
+| boot/boot.asm, boot/intro.asm tail | BASIC loader; intro tail stub through disk.asm |

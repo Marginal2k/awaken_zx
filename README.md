@@ -1,16 +1,43 @@
-# Awaken - source restoration (phase 1)
+# Awaken - source restoration
 
-ZX Spectrum 128K game "Awaken" (Mythos / Rage Technologies, 1999). Input: `archive/awk1..6.trd` (developer disks), `reference/` (released demos).
+ZX Spectrum 128K game "Awaken" (Mythos / Rage Technologies, 1999).  Inputs: `archive/awk1..6.trd` (developer disks), `reference/` (released demos).
+Goal: readable sjasmplus sources that build a complete, working game on a plain TR-DOS disk (no protection, all disk I/O in `src/common/disk.asm`, editable assets).
 
-* `python tools/rebuild_all.py` - extract all disks, decode ZASM 3.10 / STORM sources, convert to sjasmplus, assemble and compare with the disk binaries.
-* `work/extract/<disk>/` extracted files, `work/catalogue.json`; `original_src/<disk>/` decoded sources (editor view); `src/<disk>/` sjasmplus conversion
-  (`src/awk1/SPACE.asm` = 3D flight part, `src/awk6/DOS.asm` = station part; build with `sjasmplus SPACE.asm` inside that directory).
-* `docs/ZASM_FORMAT.md` format + language; `docs/VERSIONS.md`, `docs/BINARIES.md`, `docs/CATALOGUE.md` generated tables.
-* `tools/verify_original.py all` / `awk1 --variant objects_line` - byte comparison report (3DPART, CONTROL0 exact; DATAS, OBJECT3D exact with the documented variant).
+## Build and run
 
-## Build (phase 2a)
+    python build.py                  # sjasmplus must be on PATH (or C:\sjasmplus) -> build/awaken.trd (+ awaken_nointro.trd, symbol files build/*.sym/.lst)
+    python build.py --test-return    # test disk: the flight returns to the station at once  -> build/awaken_test_return.trd
+    python build.py --test-ending    # test disk: "Вылет" starts the ending                  -> build/awaken_test_ending.trd
 
-    python build.py        # sjasmplus must be on PATH; -> build/awaken.trd (boot, STATIONF/LANG/D3D/KARTA/HELP/MUZ1/stscr, ACTION/VOXAL0/VOXAL/CONTROL0/CONTROL/OBJECT3D/PANEL)
+Load `build/awaken.trd` in a Pentagon/128K emulator with a Beta disk interface (TR-DOS) and `RUN` (autostart): intro animation (SPACE skips it) -> station -> "Вылет" -> flight -> fly into the station -> station.
+128 KB is enough.  Emulator harness and scenarios: `docs/TESTING.md`, `tools/xp/`, `tools/scen/` (e.g. `python tools/xp/run.py tools/scen/ours_flight.txt -o work/xp_ours`).
 
-Tree: `src/boot`, `src/station`, `src/flight`, `src/common/disk.asm` (all TR-DOS access), `assets/` (+MANIFEST.md), `src/legacy` (not built), `work/phase1_src` (phase-1 conversion used by `tools/verify_original.py`).
-Status: builds; boots to the station screen (see docs/ANALYSIS.md section 11); station->flight launcher not yet written.
+## Controls
+
+* Station: `Q` up, `A` down, `O` left, `P` right (or Kempston joystick/mouse), `Space` = click, `M` = cancel / system menu on empty background (save "Сохраниться", load "Восстановиться", settings).
+* Flight (Elite-like): `A` laser, `S` / `X` pitch, `N` / `M` roll, `Space` throttle.  Docking: fly into the station's docking block (distance box, no docking computer).
+* Intro: `Space` skips the effects.
+
+## Save slots
+
+Menu `M` -> "Сохраниться" -> "В позицию 1..5" writes the 512-byte state record into the file `SAVEn` (in place); "Восстановиться" -> "С позиции n" reloads the station with that record.
+
+## Disk layout (`build/awaken.trd`, details and memory map in `docs/ANALYSIS.md` section 14)
+
+`boot` (BASIC) -> `INTRO` (#6400) -> `STATIONF` (#6000, entry #6300) + banks `LANG D3D KARTA HELP MUZ1 stscr`; `ACTION` (#6000) + `VOXAL0 VOXAL CONTROL0 CONTROL OBJECT3D PANEL` (flight);
+`SAVE0..SAVE5`; `FINALF` (ending, test build only).  Station and flight swap by reloading each other; the 512-byte state record (`TIME`) is handed over in screen RAM (`src/common/state.inc`, `launcher.asm`).
+
+## Source tree
+
+* `src/boot` - `boot.asm` (BASIC loader), `intro.asm` (disassembled intro of demo v0.2).
+* `src/station`, `src/flight` - the game parts (ZASM 3.10 sources converted to sjasmplus; Cyrillic data files are Windows-1251 text with `ENCODING "DOS"`).
+* `src/common` - `disk.asm` (the only TR-DOS access), `launcher.asm`, `state.inc` (the glue between the parts, marked `[glue]`).
+* `src/storm` - finished isolated STORM 3D prototype (not part of the game); `src/legacy` - unused old sources, not built.
+* `assets/` (+ `MANIFEST.md`) - binary blobs `incbin`ed by the sources.
+* `work/phase1_src` - phase-1 conversion used by `tools/verify_original.py` (`python tools/verify_original.py all` checks that the developer-disk binaries rebuild byte-exact; `-DDISK_ORIGINAL` reproduces the 1999 loaders).
+* Phase 1 tools: `python tools/rebuild_all.py` (extract disks, decode ZASM/STORM sources, convert, compare); `docs/ZASM_FORMAT.md`, `VERSIONS.md`, `BINARIES.md`, `CATALOGUE.md`.
+
+## Status
+
+Boots, plays the intro, runs the station (map, trade windows, save/load), launches the flight, docks and returns with the state carried, launches again; the ending program is on the disk but has no trigger
+(open question, `docs/ANALYSIS.md` 13.4).  Verified in Xpeccy+ (Pentagon 512 and 128).  Not verified on real hardware.

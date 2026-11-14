@@ -24,6 +24,8 @@ Blobs `incbin`ed by the sources. Source = file extracted from the developer disk
 | station_D9200.d | 768 | a980d02c3ed6a464348ca1c3bfcdbfb1 | work\phase1_src\awk6\assets\D9200.d | station |
 | ways.d | 702 | 191388c7bc2c3fbbf292b20cf2d12aad | work\phase1_src\awk6\assets\ways.d | station |
 | MUZ1.C | 6054 | - | demo/awk6 disk file MUZ1 | station (loaded to bank 3 #DB00, music player) |
-| PANEL.C | 6912 | - | awk1 disk file PANEL | flight (loaded to #6373) |
+| PANEL.C | 1463 | - | awk1 disk file PANEL (Hrust-packed, = demo PANEL) | flight (loaded to #6373, unpacked by LOADI2) |
 | stscr.C | 61184 | - | demo v0.2 disk, file stscr (track 40 sector 3, 239 sectors) | station: 16 packed background pictures one after another (SECTAB in station/LOADER.asm); the catalogue length is 3230 (first picture) but the file occupies 239 sectors, `build.py` writes it like that |
 | FINALF.C | 19114 | 67e4ff62 (md5 prefix) | demo v0.2 disk file FINALF (identical in AWAK_SDC) | station `LaunchEnding` (self-contained ending program at #6000, no disk access) |
+| intro_logo.scr | 6912 | - | demo v0.2 AWAKEN.B payload (work/boot_payload.bin) #6E31..#8930 | boot/intro.asm: the "Awaken" logo screen (also the effect work buffer) |
+| intro_depack.bin | 1743 | - | demo v0.2 AWAKEN.B payload #8931..#8FFF | boot/intro.asm: depacker + packed closing picture (copied over the logo area, called by the tail stub) |

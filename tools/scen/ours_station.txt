@@ -1,0 +1,13 @@
+# our build: station idle; 1st click dismisses the first message window, 2nd click on "Karta" opens the map; M = cancel; idle 3000 frames
+disk build/awaken.trd
+run 2200 shot station_boot
+run 150 keys 5:p/12,5:a/78
+run 100 shot station_cursor
+run 50 keys 5:_/6
+run 100 shot station_click1
+run 50 keys 5:_/6
+run 300 shot station_map
+run 50 keys 5:m/6
+run 300 shot station_back
+run 3000 shot station_idle3000
+save station_final

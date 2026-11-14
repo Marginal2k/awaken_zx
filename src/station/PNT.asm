@@ -410,14 +410,26 @@ RETT:
 
 
 S00:
-;  rept7:lda,(de):LDX_HL_A:ince,h:endr
+;  rept7: lda,(de):LDX_HL_A:ince,h
+            rept 7
+            ld   a,(de)
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             ld   a,(de)
             LDX_HL_A
             exx  
             jp   Endpr
 
 S_00:
-;  rept7:lda,(de):LDX_HL_A:ince,h:endr
+;  rept7: lda,(de):LDX_HL_A:ince,h
+            rept 7
+            ld   a,(de)
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             NEXTZNAK
             exx  
             jp   RETT
@@ -425,7 +437,20 @@ S_00:
 
 
 S01:
-;  rept7:ldc,0:lda,(de):rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch:endr
+;  rept7: ldc,0:lda,(de):rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch
+            rept 7
+            ld   c,0
+            ld   a,(de)
+            rra
+            rr   c
+            LDX_HL_A
+            inc  l
+            inc  e
+            ld   a,c
+            LDX_HL_A
+            dec  l
+            inc  h
+            endr
             ld   c,0
             ld   a,(de)
             rra  
@@ -438,14 +463,34 @@ S01:
             jp   Endpr
 
 S_01:
-;  rept7:ldc,0:lda,(de):rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch:endr
+;  rept7: ldc,0:lda,(de):rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch
+            rept 7
+            ld   c,0
+            ld   a,(de)
+            rra
+            rr   c
+            LDX_HL_A
+            inc  l
+            inc  e
+            ld   a,c
+            LDX_HL_A
+            dec  l
+            inc  h
+            endr
             NEXTZNAK
             exx  
             jp   RETT
 
 
 S01_:
-;  rept7:lda,(de):rra:LDX_HL_A:ince:inch:endr
+;  rept7: lda,(de):rra:LDX_HL_A:ince:inch
+            rept 7
+            ld   a,(de)
+            rra
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             ld   a,(de)
             rra  
             LDX_HL_A
@@ -453,14 +498,36 @@ S01_:
             jp   Endpr
 
 S_01_:
-;  rept7:lda,(de):rra:LDX_HL_A:ince:inch:endr
+;  rept7: lda,(de):rra:LDX_HL_A:ince:inch
+            rept 7
+            ld   a,(de)
+            rra
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             NEXTZNAK
             exx  
             jp   RETT
 
 
 S02:
-;  rept7:ldc,0:lda,(de):rra:rrc:rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch:endr
+;  rept7: ldc,0:lda,(de):rra:rrc:rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch
+            rept 7
+            ld   c,0
+            ld   a,(de)
+            rra
+            rr   c
+            rra
+            rr   c
+            LDX_HL_A
+            inc  l
+            inc  e
+            ld   a,c
+            LDX_HL_A
+            dec  l
+            inc  h
+            endr
             ld   c,0
             ld   a,(de)
             rra  
@@ -475,14 +542,37 @@ S02:
             jp   Endpr
 
 S_02:
-;  rept7:ldc,0:lda,(de):rra:rrc:rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch:endr
+;  rept7: ldc,0:lda,(de):rra:rrc:rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch
+            rept 7
+            ld   c,0
+            ld   a,(de)
+            rra
+            rr   c
+            rra
+            rr   c
+            LDX_HL_A
+            inc  l
+            inc  e
+            ld   a,c
+            LDX_HL_A
+            dec  l
+            inc  h
+            endr
             NEXTZNAK
             exx  
             jp   RETT
 
 
 S02_:
-;  rept7:lda,(de):rra:srla:LDX_HL_A:ince:inch:endr
+;  rept7: lda,(de):rra:srla:LDX_HL_A:ince:inch
+            rept 7
+            ld   a,(de)
+            rra
+            srl  a
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             ld   a,(de)
             rra  
             srl  a
@@ -491,13 +581,38 @@ S02_:
             jp   Endpr
 
 S_02_:
-;  rept7:lda,(de):rra:srla:LDX_HL_A:ince:inch:endr
+;  rept7: lda,(de):rra:srla:LDX_HL_A:ince:inch
+            rept 7
+            ld   a,(de)
+            rra
+            srl  a
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             NEXTZNAK
             exx  
             jp   RETT
 
 S03:
-;  rept7:ldc,0:lda,(de):rra:rrc:rra:rrc:rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch:endr
+;  rept7: ldc,0:lda,(de):rra:rrc:rra:rrc:rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch
+            rept 7
+            ld   c,0
+            ld   a,(de)
+            rra
+            rr   c
+            rra
+            rr   c
+            rra
+            rr   c
+            LDX_HL_A
+            inc  l
+            inc  e
+            ld   a,c
+            LDX_HL_A
+            dec  l
+            inc  h
+            endr
             ld   c,0
             ld   a,(de)
             rra  
@@ -514,13 +629,40 @@ S03:
             jp   Endpr
 
 S_03:
-;  rept7:ldc,0:lda,(de):rra:rrc:rra:rrc:rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch:endr
+;  rept7: ldc,0:lda,(de):rra:rrc:rra:rrc:rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch
+            rept 7
+            ld   c,0
+            ld   a,(de)
+            rra
+            rr   c
+            rra
+            rr   c
+            rra
+            rr   c
+            LDX_HL_A
+            inc  l
+            inc  e
+            ld   a,c
+            LDX_HL_A
+            dec  l
+            inc  h
+            endr
             NEXTZNAK
             exx  
             jp   RETT
 
 S03_:
-;  rept7:lda,(de):rra:rra:rra:and#1F:LDX_HL_A:ince:inch:endr
+;  rept7: lda,(de):rra:rra:rra:and#1F:LDX_HL_A:ince:inch
+            rept 7
+            ld   a,(de)
+            rra
+            rra
+            rra
+            and  #1F
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             ld   a,(de)
             rra  
             rra  
@@ -531,7 +673,17 @@ S03_:
             jp   Endpr
 
 S_03_:
-;  rept7:lda,(de):rra:rra:rra:and#1F:LDX_HL_A:ince:inch:endr
+;  rept7: lda,(de):rra:rra:rra:and#1F:LDX_HL_A:ince:inch
+            rept 7
+            ld   a,(de)
+            rra
+            rra
+            rra
+            and  #1F
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             NEXTZNAK
             exx  
             jp   RETT
@@ -539,7 +691,26 @@ S_03_:
 
 
 S04:
-;  rept7:ldc,0:lda,(de):rra:rrc:rra:rrc:rra:rrc:rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch:endr
+;  rept7: ldc,0:lda,(de):rra:rrc:rra:rrc:rra:rrc:rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch
+            rept 7
+            ld   c,0
+            ld   a,(de)
+            rra
+            rr   c
+            rra
+            rr   c
+            rra
+            rr   c
+            rra
+            rr   c
+            LDX_HL_A
+            inc  l
+            inc  e
+            ld   a,c
+            LDX_HL_A
+            dec  l
+            inc  h
+            endr
             ld   c,0
             ld   a,(de)
             rra  
@@ -573,13 +744,43 @@ Endpr:
 
 
 S_04:
-;  rept7:ldc,0:lda,(de):rra:rrc:rra:rrc:rra:rrc:rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch:endr
+;  rept7: ldc,0:lda,(de):rra:rrc:rra:rrc:rra:rrc:rra:rrc:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch
+            rept 7
+            ld   c,0
+            ld   a,(de)
+            rra
+            rr   c
+            rra
+            rr   c
+            rra
+            rr   c
+            rra
+            rr   c
+            LDX_HL_A
+            inc  l
+            inc  e
+            ld   a,c
+            LDX_HL_A
+            dec  l
+            inc  h
+            endr
             NEXTZNAK
             exx  
             jp   RETT
 
 S04_:
-;  rept7:lda,(de):rra:rra:rra:rra:and#0F:LDX_HL_A:ince,h:endr
+;  rept7: lda,(de):rra:rra:rra:rra:and#0F:LDX_HL_A:ince,h
+            rept 7
+            ld   a,(de)
+            rra
+            rra
+            rra
+            rra
+            and  #0F
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             ld   a,(de)
             rra  
             rra  
@@ -591,7 +792,18 @@ S04_:
             jp   Endpr
 
 S_04_:
-;  rept7:lda,(de):rra:rra:rra:rra:and#0F:LDX_HL_A:ince,h:endr
+;  rept7: lda,(de):rra:rra:rra:rra:and#0F:LDX_HL_A:ince,h
+            rept 7
+            ld   a,(de)
+            rra
+            rra
+            rra
+            rra
+            and  #0F
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             NEXTZNAK
             exx  
             jp   RETT
@@ -599,7 +811,25 @@ S_04_:
 
 
 S05:
-;  rept7:lda,(de):ldc,a:xora:rlc:rla:rlc:rla:rlc:rla:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch:endr
+;  rept7: lda,(de):ldc,a:xora:rlc:rla:rlc:rla:rlc:rla:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch
+            rept 7
+            ld   a,(de)
+            ld   c,a
+            xor  a
+            rl   c
+            rla
+            rl   c
+            rla
+            rl   c
+            rla
+            LDX_HL_A
+            inc  l
+            inc  e
+            ld   a,c
+            LDX_HL_A
+            dec  l
+            inc  h
+            endr
             ld   a,(de)
             ld   c,a
             xor  a
@@ -617,13 +847,41 @@ S05:
             jp   Endpr
 
 S_05:
-;  rept7:lda,(de):ldc,a:xora:rlc:rla:rlc:rla:rlc:rla:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch:endr
+;  rept7: lda,(de):ldc,a:xora:rlc:rla:rlc:rla:rlc:rla:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch
+            rept 7
+            ld   a,(de)
+            ld   c,a
+            xor  a
+            rl   c
+            rla
+            rl   c
+            rla
+            rl   c
+            rla
+            LDX_HL_A
+            inc  l
+            inc  e
+            ld   a,c
+            LDX_HL_A
+            dec  l
+            inc  h
+            endr
             NEXTZNAK
             exx  
             jp   RETT
 
 S05_:
-;  rept7:lda,(de):rlca:rlca:rlca:and#07:LDX_HL_A:ince,h:endr
+;  rept7: lda,(de):rlca:rlca:rlca:and#07:LDX_HL_A:ince,h
+            rept 7
+            ld   a,(de)
+            rlca
+            rlca
+            rlca
+            and  #07
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             ld   a,(de)
             rlca 
             rlca 
@@ -634,14 +892,40 @@ S05_:
             jp   Endpr
 
 S_05_:
-;  rept7:lda,(de):rlca:rlca:rlca:and#07:LDX_HL_A:ince,h:endr
+;  rept7: lda,(de):rlca:rlca:rlca:and#07:LDX_HL_A:ince,h
+            rept 7
+            ld   a,(de)
+            rlca
+            rlca
+            rlca
+            and  #07
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             NEXTZNAK
             exx  
             jp   RETT
 
 
 S06:
-;  rept7:lda,(de):ldc,a:xora:rlc:rla:rlc:rla:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch:endr
+;  rept7: lda,(de):ldc,a:xora:rlc:rla:rlc:rla:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch
+            rept 7
+            ld   a,(de)
+            ld   c,a
+            xor  a
+            rl   c
+            rla
+            rl   c
+            rla
+            LDX_HL_A
+            inc  l
+            inc  e
+            ld   a,c
+            LDX_HL_A
+            dec  l
+            inc  h
+            endr
             ld   a,(de)
             ld   c,a
             xor  a
@@ -657,13 +941,38 @@ S06:
             jp   Endpr
 
 S_06:
-;  rept7:lda,(de):ldc,a:xora:rlc:rla:rlc:rla:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch:endr
+;  rept7: lda,(de):ldc,a:xora:rlc:rla:rlc:rla:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch
+            rept 7
+            ld   a,(de)
+            ld   c,a
+            xor  a
+            rl   c
+            rla
+            rl   c
+            rla
+            LDX_HL_A
+            inc  l
+            inc  e
+            ld   a,c
+            LDX_HL_A
+            dec  l
+            inc  h
+            endr
             NEXTZNAK
             exx  
             jp   RETT
 
 S06_:
-;  rept7:lda,(de):rlca:rlca:and3:LDX_HL_A:ince,h:endr
+;  rept7: lda,(de):rlca:rlca:and3:LDX_HL_A:ince,h
+            rept 7
+            ld   a,(de)
+            rlca
+            rlca
+            and  3
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             ld   a,(de)
             rlca 
             rlca 
@@ -673,14 +982,37 @@ S06_:
             jp   Endpr
 
 S_06_:
-;  rept7:lda,(de):rlca:rlca:and3:LDX_HL_A:ince,h:endr
+;  rept7: lda,(de):rlca:rlca:and3:LDX_HL_A:ince,h
+            rept 7
+            ld   a,(de)
+            rlca
+            rlca
+            and  3
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             NEXTZNAK
             exx  
             jp   RETT
 
 
 S07:
-;  rept7:lda,(de):ldc,a:xora:rlc:rla:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch:endr
+;  rept7: lda,(de):ldc,a:xora:rlc:rla:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch
+            rept 7
+            ld   a,(de)
+            ld   c,a
+            xor  a
+            rl   c
+            rla
+            LDX_HL_A
+            inc  l
+            inc  e
+            ld   a,c
+            LDX_HL_A
+            dec  l
+            inc  h
+            endr
             ld   a,(de)
             ld   c,a
             xor  a
@@ -694,13 +1026,35 @@ S07:
             jp   Endpr
 
 S_07:
-;  rept7:lda,(de):ldc,a:xora:rlc:rla:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch:endr
+;  rept7: lda,(de):ldc,a:xora:rlc:rla:LDX_HL_A:incl,e:lda,c:LDX_HL_A:decl:inch
+            rept 7
+            ld   a,(de)
+            ld   c,a
+            xor  a
+            rl   c
+            rla
+            LDX_HL_A
+            inc  l
+            inc  e
+            ld   a,c
+            LDX_HL_A
+            dec  l
+            inc  h
+            endr
             NEXTZNAK
             exx  
             jp   RETT
 
 S07_:
-;  rept7:lda,(de):rlca:and1:LDX_HL_A:ince,h:endr
+;  rept7: lda,(de):rlca:and1:LDX_HL_A:ince,h
+            rept 7
+            ld   a,(de)
+            rlca
+            and  1
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             ld   a,(de)
             rlca 
             and  1
@@ -709,7 +1063,15 @@ S07_:
             jp   Endpr
 
 S_07_:
-;  rept7:lda,(de):rlca:and1:LDX_HL_A:ince,h:endr
+;  rept7: lda,(de):rlca:and1:LDX_HL_A:ince,h
+            rept 7
+            ld   a,(de)
+            rlca
+            and  1
+            LDX_HL_A
+            inc  e
+            inc  h
+            endr
             NEXTZNAK
             exx  
             jp   RETT

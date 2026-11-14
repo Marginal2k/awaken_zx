@@ -13,4 +13,4 @@ ZX Spectrum 128K game "Awaken" (Mythos / Rage Technologies, 1999). Input: `archi
     python build.py        # sjasmplus must be on PATH; -> build/awaken.trd (boot, STATIONF/LANG/D3D/KARTA/HELP/MUZ1/stscr, ACTION/VOXAL0/VOXAL/CONTROL0/CONTROL/OBJECT3D/PANEL)
 
 Tree: `src/boot`, `src/station`, `src/flight`, `src/common/disk.asm` (all TR-DOS access), `assets/` (+MANIFEST.md), `src/legacy` (not built), `work/phase1_src` (phase-1 conversion used by `tools/verify_original.py`).
-Status: builds; boot and station<->flight switching not yet working/tested - see docs/ANALYSIS.md section 9.
+Status: builds; boots to the station screen (see docs/ANALYSIS.md section 11); station->flight launcher not yet written.

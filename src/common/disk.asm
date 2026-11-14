@@ -25,6 +25,7 @@ TRDOS_DRIVE     equ  23814              ; #5D06  current drive (9 = ?, see LOADI
 
             ; load the file whose name is in the buffer to HL (HL must be set by the caller)
             MACRO DISK_READ
+            ld   de,#FFFF                   ; length cap: DE is a LENGTH limit (a stale DE capped files at 92 sectors) - FFFF = whole file
             ld   c,#0E
             ld   a,3
             call TRDOS_CALL
@@ -56,8 +57,5 @@ TRDOS_DRIVE     equ  23814              ; #5D06  current drive (9 = ?, see LOADI
             jp   TRDOS_EXIT
             ENDM
 
-; random start sector offsets for the station background picture "stscr" (16 variants,
-; sizes in sectors); used by the station loader.  Present in the v0.2 demo binary, the
-; line was left disabled (space-led comment) in the last saved source.
-DISK_SECTAB:
-            db   13,11,11,12,8,14,19,15,15,13,19,12,16,20,21,20
+; NOTE: this file holds macros and equates only (it is included before the includer's ORG).
+; Any data a loader needs (e.g. the stscr SECTAB) must be placed by the includer.

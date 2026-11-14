@@ -133,3 +133,34 @@ The SECTAB data line was disabled (space-led comment) in the last saved awk6 sou
   the CDP tab disappeared before it could finish).
 * Typing `RUN` through zxDebug.typeText at the TR-DOS prompt drops the first character; kr/kEnter holds did not start the demo either - key entry in run_trd.mjs is unreliable (coder is on it).
 * Not started: tools/labelmap.py, src/common/launcher.asm/state.inc, intro.asm disassembly, roles of PANELF/PANELMET/PANELFF/FINALF/scene1po/choose/BANK/BD/BAR, save slot interface.
+
+## 11. Phase 2c - station boots and runs (technician)
+
+Result: `python build.py` -> `build/awaken.trd` boots in Xpeccy+ (Pentagon, also verified with a 128 KB Pentagon: identical frames), reaches the station screen at frame ~2200
+(demo: ~4000 incl. the intro), idles >3000 frames, the cursor (keys Q/A/O/P, Space, M) works, "Karta" opens the galaxy map.  Scenario: `tools/scen/ours_station.txt` (tools/scen/mainpc.py prints the main thread PC of a snapshot)
+(screens in `work/xp_ours/station_*.png`).  build.py now also writes `build/{station,flight,boot}.{sym,lst}`.
+
+Causes found and fixed (chain, in order of discovery):
+1. boot stub: PROG under TR-DOS is #5D3B (23867) -> `USR 23872`.
+2. `DISK_SECTAB` assembled at #0000 (disk.asm is included before `org`): disk.asm now holds macros/equates only; the table lives in `station/LOADER.asm` (inside the `disp #4000` loader).
+3. `stscr` = full 239-sector file (assets/stscr.C, 61184 bytes); catalogue length 3230 (as the demo).
+4. **TR-DOS function #0E takes DE as a length limit.**  The macro left DE = #5CE6 (end of the file-name buffer after `ldir`) = 23782 bytes -> STATIONF (26053 bytes) was cut at 92 sectors; the other files
+   happened to be smaller.  `DISK_READ` now sets DE=#FFFF (whole file).  (The original game had the same latent limit.)
+5. **The converted newest sources had lost code/data**: ZASM treats a line that starts with a single blank (instead of the `06 NN` indent token) as a comment; the converter turned
+   them into `;  ...` lines.  Evidence that these lines are *live* in the author's builds: (a) `Tabx` jump table (DATA_M) addresses `S00+5*k` = entry into 7x unrolled sprite steps `rept7:...:endr`;
+   without them the code jumped into the middle of an instruction; (b) with the lines re-enabled `D3D.C` becomes 15978 bytes = exactly the awk6 disk binary (was 15722), and STATIONF 40085 bytes
+   (demo 40960); (c) all game texts (DATAT: station names, goods, settings, key letters in DATA_M `SETSI/SETGI`) were such lines.  Re-enabled: the 30 `rept7` lines of `PNT.asm` and the one in
+   `BODY.asm` (expanded to `rept N ... endr` blocks, verified byte-exact against the demo's S00..S_07_ routines apart from jump targets) and all `db/dw/ds` lines of `DATAT/DATA_M/DATA3D`
+   (split at ':' and to <=50 characters per `db` because sjasmplus limits a DB statement to 128 bytes).  The three data files are now **Windows-1251** text with `ENCODING "DOS"`
+   (sjasmplus converts the Cyrillic to the CP866 codes of the game font) - edit them with a cp1251-aware editor.
+   NOT yet re-enabled (not needed so far, flight is untested): `;  rept` lines in `flight/GMATRX.asm` (2) and `station/LANG.asm` (2), `;  db#33,...` in flight OBJECTS (binary variant).
+   Other space-led pseudo-comments with glued mnemonics (`;  ld a,l:cpSPACEBS:jrncDGN2` etc.) were left as comments (they are old dead code).
+6. Open-looking behaviours that are by design: the first click after boot only closes the random start message window; the map is left with a click on a map button (M does not close it).
+
+Memory facts (flight and station): all `#7FFD` writes in sources and in the demo STATIONF/ACTION use values #10..#1F (bank 0-7, bit 3 shadow screen, bit 4 ROM48) - **no use of
+Pentagon-512 pages (bits 5-7) found**.  Station pages: 0 PGNORM main image tail #C000-#FFFF; 1 KARTA (#11); 3 stscr/background + MUZ1 (#13); 4 D3D (#14); 6 LANG (#16);
+7 HELP + shadow copy of the screen (#17); flight: MAIN 0, CONTR 1, VOXAL 3, OBJ3D 4, FREE(screen) 6.  The station runs identically on a 128 KB Pentagon (work/xpconf128, `work/run128.py`).
+Note `work/xpconf/machines/pent.conf` of this project already has `memory = 512`.
+
+Demo v0.2 flight launch (user report: black screen, TR-DOS read error): catalogue of Awakenv02.trd has ACTION, DATAS, 3DPART, VOXAL0, VOXAL, CONTROL0, CONTROL, OBJECT3D, PANEL*, SAVE0-5, FINALF,
+scene1po, choose1/2, BANK0-5, BD0-3, BAR - everything named inside ACTION.C is present; the cause is not a missing file (to be traced with trdos.xbrk when item 6 is done).

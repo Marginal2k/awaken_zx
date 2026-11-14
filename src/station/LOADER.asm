@@ -12,7 +12,11 @@ FILE5:
             db   "D3D     C"
 FILE6:
             db   "LANG    C"
-; SECTAB: see common/disk.asm (DISK_SECTAB)
+; SECTAB: sector counts of the 16 packed stscr pictures (the file holds all 16 one after another;
+; the catalogue length 3230 is only the first picture, the sector count is 239).  Present in the
+; v0.2 demo binary; the source line was disabled in the last saved ZASM source.
+DISK_SECTAB:
+            db   13,11,11,12,8,14,19,15,15,13,19,12,16,20,21,20
 LD1:
 ;  ЗАГР. СТРАНИЦЫ
             ld   a,9

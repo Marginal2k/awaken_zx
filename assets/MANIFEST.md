@@ -23,3 +23,6 @@ Blobs `incbin`ed by the sources. Source = file extracted from the developer disk
 | skim.tok | 657 | daa45a34a57f75011c72475ac0144816 | work\phase1_src\awk6\assets\skim~1.T | station |
 | station_D9200.d | 768 | a980d02c3ed6a464348ca1c3bfcdbfb1 | work\phase1_src\awk6\assets\D9200.d | station |
 | ways.d | 702 | 191388c7bc2c3fbbf292b20cf2d12aad | work\phase1_src\awk6\assets\ways.d | station |
+| MUZ1.C | 6054 | - | demo/awk6 disk file MUZ1 | station (loaded to bank 3 #DB00, music player) |
+| PANEL.C | 6912 | - | awk1 disk file PANEL | flight (loaded to #6373) |
+| stscr.C | 61184 | - | demo v0.2 disk, file stscr (track 40 sector 3, 239 sectors) | station: 16 packed background pictures one after another (SECTAB in station/LOADER.asm); the catalogue length is 3230 (first picture) but the file occupies 239 sectors, `build.py` writes it like that |

@@ -1,3 +1,5 @@
+; Text encoding: Windows-1251 source, converted to the game's CP866 font codes by sjasmplus (ENCODING "DOS")
+            ENCODING "DOS"
 
 L90k:
             incbin "D9000.d"
@@ -304,11 +306,11 @@ NAMSK:
 
 
 TSHIP:
-;  п÷пёп²п п╒п╚ п°п∙п²п╝ п╔п∙п⌡п÷п░
-;  п╔п∙п■п∙п═ п■п⌡п╞ п÷п·п пёп÷.п п·п═п░п▒п⌡п╞
-;  db"п°п╬п╢п╣п╩я▄",2
-;  db"п╕п╣п╫п╟",CR
-;  db"б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═б═",ET
+;  осмйрш лемч уекою
+;  уедеп дкъ онйсо.йнпюакъ
+            db   "лНДЕКЭ",2
+            db   "жЕМЮ",CR
+            db   "═══════════════════════════════",ET
 
 
 
@@ -339,3 +341,5 @@ L97:        equ  high($)
             dw   Trad,Trad
 
 
+
+            ENCODING "WIN"

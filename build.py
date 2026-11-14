@@ -21,9 +21,10 @@ def asm(src, cwd, extra=()):
 def main():
     if os.path.exists(B): shutil.rmtree(B)
     os.makedirs(B + '/flight'); os.makedirs(B + '/station'); os.makedirs(B + '/boot')
-    asm(ROOT + '/src/flight/flight.asm', B + '/flight')
-    asm(ROOT + '/src/station/station.asm', B + '/station')
-    asm(ROOT + '/src/boot/boot.asm', B + '/boot', ['--sym=boot.sym'])
+    # symbol files + listings go to build/ (used by tools/xp/szxinfo.py --sym)
+    asm(ROOT + '/src/flight/flight.asm', B + '/flight', ['--sym=../flight.sym', '--lst=../flight.lst'])
+    asm(ROOT + '/src/station/station.asm', B + '/station', ['--sym=../station.sym', '--lst=../station.lst'])
+    asm(ROOT + '/src/boot/boot.asm', B + '/boot', ['--sym=../boot.sym', '--lst=../boot.lst'])
     d = Trd(label='AWAKEN')
     # boot (BASIC) first so that RUN / boot picks it up
     boot = open(B + '/boot/AWAKEN.B', 'rb').read()
@@ -37,7 +38,9 @@ def main():
     code(B + '/station/KARTA.C', 'KARTA', 0xC000)
     code(B + '/station/HELP.C', 'HELP', 0xDB00)
     code(ROOT + '/assets/MUZ1.C', 'MUZ1', 0xDB00)
-    code(ROOT + '/assets/stscr.C', 'stscr', 0xC000)
+    # stscr = 16 packed pictures one after another (239 sectors, SECTAB in station/LOADER.asm); like the demo the catalogue
+    # length is that of the first picture only (3230) while the sector count covers the whole file.
+    d.add_file('stscr', 'C', open(ROOT + '/assets/stscr.C', 'rb').read(), start=0xC000, length=3230)
     code(B + '/flight/ACTION.C', 'ACTION', 0x6000)
     code(B + '/flight/VOXAL0.C', 'VOXAL0', 0xC000)
     code(B + '/flight/VOXAL.C', 'VOXAL', 0xEC00)

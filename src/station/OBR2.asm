@@ -1025,7 +1025,11 @@ BEXIT:
             ret  m
 ;EXIT TO XAS
 ; [glue] original: jp EXAS (back to the ZASM/XAS debugger); the game launches the flight part instead
+            IFDEF TEST_ENDING           ; build.py --test-ending: the button starts the ending instead (the real trigger is unknown, see docs)
+            jp   LaunchEnding
+            ELSE
             jp   LaunchFlight
+            ENDIF
 
 BEXIT_:
             ld   hl,0

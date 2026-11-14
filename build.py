@@ -19,6 +19,7 @@ def asm(src, cwd, extra=()):
 
 
 TEST = '--test-return' in sys.argv
+TEST_END = '--test-ending' in sys.argv
 
 
 def main():
@@ -26,7 +27,7 @@ def main():
         shutil.rmtree(B + '/' + sub, ignore_errors=True); os.makedirs(B + '/' + sub, exist_ok=True)
     # symbol files + listings go to build/ (used by tools/xp/szxinfo.py --sym)
     asm(ROOT + '/src/flight/flight.asm', B + '/flight', ['--sym=../flight.sym', '--lst=../flight.lst'] + (['-DTEST_RETURN'] if TEST else []))
-    asm(ROOT + '/src/station/station.asm', B + '/station', ['--sym=../station.sym', '--lst=../station.lst'])
+    asm(ROOT + '/src/station/station.asm', B + '/station', ['--sym=../station.sym', '--lst=../station.lst'] + (['-DTEST_ENDING'] if TEST_END else []))
     asm(ROOT + '/src/boot/boot.asm', B + '/boot', ['--sym=../boot.sym', '--lst=../boot.lst'])
     d = Trd(label='AWAKEN')
     # boot (BASIC) first so that RUN / boot picks it up
@@ -58,7 +59,8 @@ def main():
     code(B + '/flight/CONTROL.C', 'CONTROL', 0xE013)
     code(B + '/flight/OBJECT3D.C', 'OBJECT3D', 0xC000)
     code(ROOT + '/assets/PANEL.C', 'PANEL', 0x6373)
-    out = 'awaken_test_return.trd' if TEST else 'awaken.trd'
+    code(ROOT + '/assets/FINALF.C', 'FINALF', 0x6000)     # ending (self-contained); started by LaunchEnding in the station
+    out = 'awaken_test_return.trd' if TEST else 'awaken_test_ending.trd' if TEST_END else 'awaken.trd'
     d.save(B + '/' + out)
     print('OK build/' + out)
 

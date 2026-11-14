@@ -36,6 +36,9 @@ LDAT:       equ  $-DATAM
 ; [glue] save/load slots (the TR-DOS calls are in common/disk.asm); loading a slot restarts the station
             LAUNCHER_ROUTINE LaunchStationSlot,"STATIONFC",#6000,STATION_ENTRY,STATE_BUF,TIME,1,1,1
             DISK_SLOT_SAVE_ROUTINE
+; [glue] ending: FINALF is a self-contained program (code + graphics, no disk access); the demo's STATIONF started it from #7119.
+; No trigger exists in the 1999 sources; LaunchEnding is the entry point, build.py --test-ending connects it to the "Вылет" button.
+            LAUNCHER_ROUTINE LaunchEnding,"FINALF  C",#6000,#6000,STATE_BUF,TIME,0,1,0
 END2:
             include "OBJ.asm"
             include "DATAT.asm"

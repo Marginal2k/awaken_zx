@@ -1,132 +1,119 @@
-;WSHIP      ■WDSHIP
-;WSHIPZ     ■WISHIP
-;WHELP      ■WHELPL
-;WINF       ■WSETS
-;WABON      ■WMAP
-;WNEWS      ■WFOTO
-;WERR       ■WMISS1
-;WMISS2     ■WTWR
-;WWKRB      ■WWSKM
-;WSOH       ■WWOS
-;WHIDE      ■WSETG
-;WINFS      ■WPLAN
-;WPLANZ     ■WWELCOME
-
-
-
-
-
-
-
-
+;==============================================================================
+; OBR - обработчики окон: корабли, справка, настройки, карта, новости, торговля, оборудование
+;
+; Где живёт: основной образ STATIONF.C (ORG #6300 цепочка BODYOCUR, OBR, OBR2).
+;
+; Для каждого окна три части: W<имя> - описатель-обработчик (при нажатии в области окна),
+; W<имя>_ - процедура вывода (Outwin/BLACKW), N<имя>/I<имя>/F_Sxx - выбор пункта/индекс/реакция на огонь.
+; Окна: WSHIP/WDSHIP/WISHIP (корабли), WHELP/WHELPL (справка), WINF/WINFS (информация),
+; WSETS/WSETG (настройки среды и игры), WMAP/WPLAN (карта и планеты), WNEWS, WABON/WFOTO (абоненты),
+; WERR, WMISS1/2, WTWR (товары), WWKRB/WWSKM (оборудование), WSOH/WWOS (сохранить/загрузить),
+; WHIDE (системное меню), WWELCOME. Короткие метки там - соглашение исходного автора.
+; Таблица соглашений и переименований: docs/STATION_LABELS.md.
+;==============================================================================
 
 ;--------------------------------
-; ОБРАБОТЧИК СОБЫТИЙ ОБЪЕКТОВ ОКОН
-; ПЕРЕДАЮТСЯ
-; НОМЕР ОБЪЕКТА В de
-;a-CODE OF KEY,1-LEFT,0-RIGHT
+; Обработчик событий объектов окон
+; Передаются
+; Номер объекта в de
+; a-CODE of key,1-left,0-right
 ;--------------------------------
-; ПОСЛЕ ОБРАБОТЧИКА СРАЗУ ИДЕТ ШОУ
-; ПРОЦЕДУРА
+; После обработчика сразу идет шоу
+; Процедура
 ;--------------------------------
-; ВЫВОД ОБЪЕКТОВ И ИНФЫ В НИХ
+; Вывод объектов и инфы в них
 ;--------------------------------
 
 
-
-
-
-
-
-; ПРОДАЖА ПОКУПКА КОРАБЛЕЙ
-WSHIP:
-; ПЕРЕХОД ЕСЛИ КУРСОР В ОБЛАСТИ ОКНА
+; Продажа покупка кораблей
+WSHIP
+; Переход если курсор в области окна
             jp   WSHIPC
-; ЕСЛИ БЫЛО ДЕЙСТВИЕ В ОБЛАСТИ ОКНА
-; НАЖАТИЕ КНОПКИ МЫШИ
-            call WINOBR1
+; Если было действие в области окна
+; Нажатие кнопки мыши
+            call WindowHandler1
             ret  c
             dec  a
-; ЕСЛИ ЭТО ДЕЙСТВИЕ КНОПКОЙ ОГОНЬ
+; Если это действие кнопкой огонь
             jr   z,F_S29
-; ЕСЛИ ЭТО ДЕЙСТВИЕ КНОПКОЙ ОТМЕНА
-            call ERSOBJ
-; ЕСЛИ ОТМЕНОЙ ПО ДРУГОЙ ЧАСТИ
+; Если это действие кнопкой отмена
+            call EraseObject
+; Если отменой по другой части
             jr   nz,F_S28
-; ЕСЛИ ОТМЕНОЙ ПО ВЕРХНЕЙ ИНФО ЛИНИИ
-; ТО УДАЛЕНИЕ ОКНА
-ERASH:
-            ld   hl,RET_
-            ld   (ZADACHA+1),hl
+; Если отменой по верхней инфо линии
+; То удаление окна
+ERASH
+            ld   hl,DoNothing
+            ld   (TaskCall+1),hl
             ld   de,(BSDEL_+1)
-            call ERSOBJ2
+            call CloseObject
             ld   de,(WDSHIP_+1)
-            call ERSOBJ2
+            call CloseObject
             ld   de,(WISHIP_+1)
-            call ERSOBJ2
+            call CloseObject
             ld   de,(BTSHIP_+1)
-            call ERSOBJ2
+            call CloseObject
             ld   de,(BBSHIP_+1)
-            jp   ERSOBJ2
-; ЕСЛИ ОТМЕНОЙ ПО ВСЕМУ ОКНУ КРОМЕ ВЕРХНЕЙ
-; ЛИНИИ. ОБЫЧНО СКРОЛЛ
-F_S28:
-            ret  
+            jp   CloseObject
+; Если отменой по всему окну кроме верхней
+; Линии. обычно скролл
+F_S28
+            ret
 
-; ЕСЛИ ОГНЕМ ПО ВСЕМУ ОКНУ
-; ОБЫЧНО ВЫБОР ЧЕГО ТО
-F_S29:
-            call HIDESCR
+; Если огнем по всему окну
+; Обычно выбор чего то
+F_S29
+            call HideCursor
             PAGES PG3D
             ld   a,(NSHIP+1)
             cp   #FF
             jr   z,$+5
-            ld   (SHIPIND+1),a
+            ld   (ShipIndex+1),a
             PAGES__NOARG
             ld   hl,0
             ld   (IISH+1),hl
-            call RETSCR
+            call ShowCursorBack
             ld   a,1
             ld   (WSHIPZ+1),a
-            ret  
+            ret
 
-; ЕСЛИ ПРОСТО КУРСОР В ОБЛАСТИ ОКНА
-WSHIPC:
+; Если просто курсор в области окна
+WSHIPC
             ld   de,#1E1B
             ld   hl,WSHIP_
-NSHIP:
+NSHIP
             ld   a,#FF
-            call MARKO
+            call MarkRowStretch
             ret  z
             ld   (NSHIP+1),a
-            ret  
+            ret
 
 
-; ЭТА ЧАСТЬ НЕОБХОДИМА ДЛЯ ВЫВОДА ОКНА
-; И В ОКНЕ
-WSHIP_:
-; ВЫВОД ПУНКТОВ НАЗВАНИЙ КОРАБЛЕЙ
+; Эта часть необходима для вывода окна
+; И в окне
+WSHIP_
+; Вывод пунктов названий кораблей
             ld   hl,0
-            call Outwin
+            call OutWindow
 
             xor  a
             ld   (Mode+1),a
             ld   a,#FF
             ld   (NSHIP+1),a
             ld   a,36
-            ld   (CXTAB1+1),a
+            ld   (TabStop1+1),a
 
             ld   a,(BT2+1)
             or   a
-            jr   z,U0
+            jr   z,.U0
             ld   a,(T3D+1)
             or   a
             ld   a,(SHIP)
             jr   z,$+5
             ld   a,(SKIMMER)
-            jr   U01
-U0:
-            call PINFO2
+            jr   .U01
+.U0
+            call PlanetInfoHere
             dec  l
             ld   a,l
             add  a,a
@@ -139,285 +126,256 @@ U0:
             jr   z,$+3
             inc  hl
             ld   a,(hl)
-U01:
+.U01
             ex   af,af'
             PAGES PG3D
             ld   a,(BT2+1)
             ld   h,a
             ld   a,(T3D+1)
-            call NSHIP_
+            call DrawShipMenu
             PAGES__NOARG
             ex   af,af'
             ld   (WSHIPC+2),a
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-; ДЕМО КОРАБЛЯ
-WDSHIP:
-            jp   WDSHIPC
-            call WINOBR3
+; Демо корабля
+WDSHIP
+            jp   .WDSHIPC
+            call WindowHandler3
             ret  c
             dec  a
-            jr   z,F_S30
-            call ERSOBJ
+            jr   z,.F_S30
+            call EraseObject
             jr   nz,$+9
-            ld   hl,RET_
-            ld   (ZADACHA+1),hl
-            ret  
+            ld   hl,DoNothing
+            ld   (TaskCall+1),hl
+            ret
 
             PAGES PG3D
             ld   hl,#0020
-            call SETZET
+            call AddModelZ
             PAGES__NOARG
-            ret  
-F_S30:
+            ret
+.F_S30
             PAGES PG3D
             ld   hl,#FFE0
-            call SETZET
+            call AddModelZ
             PAGES__NOARG
-            ret  
-WDSHIPC:
-            ret  
+            ret
+.WDSHIPC
+            ret
 
-; СЛУЖИТ ЕСЛИ НЕОБХОДИМО ПЕРЕД ВЫВОДОМ
-; ОКНА ПРОВЕРИТЬ ЕГО СУЩЕСТВОВАНИЕ ВООБЩЕ
-WDSHI_P:
+; Служит если необходимо перед выводом
+; Окна проверить его существование вообще
+WDSHI_P
             ld   de,WDSHIP_
-            call FOBJ
+            call FindDeskObject
             ret  nz
-WDSHIP_:
+WDSHIP_
             ld   hl,0
-            call BLACKWP
-            call Outwin
-            call WHITEW
+            call SetBlackWindowPage
+            call OutWindow
+            call SetWhiteWindow
             ld   hl,(WDSHIP_+1)
-            call TESTSZ
-            ld   hl,RET_
+            call TestWindowOut
+            ld   hl,DoNothing
             jr   nc,$+5
             ld   hl,WSHIPZ
-            ld   (ZADACHA+1),hl
+            ld   (TaskCall+1),hl
             EXD
             ADDHLHL 3
             EXD
-            exx  
+            exx
             PAGES PG3D
             ld   de,0
 
-            ld   a,(Exw+1)
+            ld   a,(WinEndX+1)
             sub  13
             ld   l,a
-            ld   a,(Eyw+1)
+            ld   a,(WinEndY+1)
             sub  14
             ld   h,a
             ld   a,(T3D+1)
-            call ISHIP
+            call InitShipView
 
-            ld   hl,(ZADACHA+1)
-            ld   de,RET_
+            ld   hl,(TaskCall+1)
+            ld   de,DoNothing
             SUB_DE
             jr   z,$+9
-            halt 
+            halt
             ld   a,(T3D+1)
-            call OSHIP
+            call DrawShip3D
 
             PAGES__NOARG
-            ret  
+            ret
 
 
-W_Z2:
-; ВЫСТАВЛЯЕТ ОКНО НА ВЕРХ
+W_Z2
+; Выставляет окно на верх
             ld   a,(Unclick+1)
             or   a
             ret  nz
             ld   (WSHIPZ+1),a
-            call HIDESCR
+            call HideCursor
             call WSHIP_
             call WISHI_P
             ld   de,(WDSHIP_+1)
-            call Mactive
+            call ActivateObject
             call WDSHI_P
-            jp   RETSCR
+            jp   ShowCursorBack
 
-WSHIPZ:
-; ЗАДАЧА ВЫВОДА КОРАБЛЕЙ
+WSHIPZ
+; Задача вывода кораблей
             ld   a,0
             or   a
             jr   nz,W_Z2
-            call LASTOBJ
+            call LastDeskObject
             ld   de,WDSHIP_
             SUB_DE
-; НЕ ПОСЛЕДНИЙ НА СТОЛЕ
+; Не последний на столе
             ret  nz
-            call HIDESCR
-            call CLINW
-            halt 
+            call HideCursor
+            call ClearWindowChars
+            halt
             PAGES PG3D
-T3D:
+T3D
             ld   a,0
-            call OSHIP
+            call DrawShip3D
             PAGES__NOARG
-            call RETSCR
-            ret  
+            call ShowCursorBack
+            ret
 
 
-
-
-
-
-; ИНФО КОРАБЛЯ
-WISHIP:
+; Инфо корабля
+WISHIP
             jp   WISHIPC
-            call WINOBR1
+            call WindowHandler1
             ret  c
             dec  a
             jr   z,F_S31
-            call ERSOBJ
+            call EraseObject
             ret  z
 
             call IISHI
 
             ld   hl,NISH
             ld   (PROOUT+1),hl
-IKISH:
+IKISH
             ld   hl,0
             ld   (EINDX+1),hl
             ld   a,#08
-IISH:
+IISH
             ld   hl,0
-            call SCROL
+            call ScrollList
             ld   (IISH+1),hl
-            ret  
-F_S31:
-            ret  
-WISHIPC:
-            ret  
+            ret
+F_S31
+            ret
+WISHIPC
+            ret
 
 
-WISHI_P:
+WISHI_P
             ld   de,WISHIP_
-            call FOBJ
+            call FindDeskObject
             ret  nz
-WISHIP_:
+WISHIP_
             ld   hl,0
-            call Outwin
+            call OutWindow
             ld   hl,(IISH+1)
             call NISH
-            ret  
-NISH:
+            ret
+NISH
             PAGES PG3D
             ld   a,(T3D+1)
-            call SHIPI
+            call DrawShipInfo
             PAGES__NOARG
-            ret  
-IISHI:
+            ret
+IISHI
             PAGES PG3D
             ld   a,(T3D+1)
-            call ISHIPI
+            call CountShipLines
             PAGES__NOARG
             ld   (IKISH+1),de
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-WHELP:
+WHELP
             jp   WHELPC
-            call WINOBR1
+            call WindowHandler1
             ret  c
             dec  a
             jr   z,F_S24
-            call ERSOBJ
-            jr   nz,F_S25
+            call EraseObject
+            jr   nz,.F_S25
             ld   de,(WHELPL_+1)
-            jp   ERSOBJ2
-F_S25:
+            jp   CloseObject
+.F_S25
 
-; СКРОЛ
+; Скрол
             ld   hl,DHLP3
             ld   (PROOUT+1),hl
-IKHLP:
+IKHLP
             ld   hl,0
             ld   (EINDX+1),hl
             ld   a,#08
-IHLP:
+IHLP
             ld   hl,0
-            call SCROL
+            call ScrollList
             ld   (IHLP+1),hl
 
-            ret  
-F_S24:
-            ret  
+            ret
+F_S24
+            ret
 
-WHELPC:
-            ret  
+WHELPC
+            ret
 
-WHELP_:
+WHELP_
             ld   hl,0
-            call Outwin
-            call DHLP2
+            call OutWindow
+            call .DHLP2
             ld   hl,(IHLP+1)
             call DHLP3
-            ret  
+            ret
 
 
-DHLP2:
+.DHLP2
             ld   a,1
             ld   (Mode+1),a
             PAGES PGHLP
-            call DHLP2_
+            call HelpDrawList
             PAGES__NOARG
             ld   (IKHLP+1),de
-            ret  
+            ret
 
 
-
-
-DHLP3:
+DHLP3
             PAGES PGHLP
-            call DHLP3_
+            call HelpDrawItem
             PAGES__NOARG
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-
-
-WHELPL:
+WHELPL
 ; ХЕЛП
             jp   WHELPLC
-            call WINOBR1
+            call WindowHandler1
             ret  c
             dec  a
             jp   z,F_S27
-            call ERSOBJ
-            jr   nz,F_S26
+            call EraseObject
+            jr   nz,.F_S26
             ld   de,(WHELP_+1)
-            jp   ERSOBJ2
+            jp   CloseObject
 
-F_S26:
+.F_S26
             call DHLPL2
 
             ld   de,(WHELPLC+1)
             ld   a,(NHLPL+1)
-            call DELMK
+            call DeleteLastMark
             ld   a,#FF
             ld   (NHLPL+1),a
 
@@ -426,12 +384,12 @@ F_S26:
             ld   hl,HKOL-1
             ld   (EINDX+1),hl
             ld   a,#08
-IHLPL:
+IHLPL
             ld   hl,0
-            call SCROL
+            call ScrollList
             ld   (IHLPL+1),hl
-            ret  
-F_S27:
+            ret
+F_S27
             ld   a,(IHLPL+1)
             inc  a
             ret  z
@@ -444,30 +402,29 @@ F_S27:
             ex   af,af'
             PAGES PGHLP
             ex   af,af'
-            call SETHIND
+            call HelpSetIndex
             PAGES__NOARG
-            call HIDESCR
+            call HideCursor
             call WHELP_
             call WHELPL_
-            call RETSCR
-            ret  
+            call ShowCursorBack
+            ret
 
 
-
-WHELPLC:
+WHELPLC
             ld   de,#1E0B
             ld   hl,WHELPL_
-NHLPL:
+NHLPL
             ld   a,#FF
-            call MARKO
+            call MarkRowStretch
             ret  z
             ld   (NHLPL+1),a
-            ret  
+            ret
 
-WHELPL_:
-; ВЫВОД ПУНКТОВ УСТАНОВКИ
+WHELPL_
+; Вывод пунктов установки
             ld   hl,0
-            call Outwin
+            call OutWindow
 
             ld   a,#FF
             ld   (NHLPL+1),a
@@ -475,117 +432,97 @@ WHELPL_:
             call DHLPL2
 
             ld   hl,(IHLPL+1)
-DHLPL3:
+DHLPL3
 
             PAGES PGHLP
-            call DHLPL1
+            call HelpDrawLine
             PAGES__NOARG
             ex   af,af'
             ld   (WHELPLC+2),a
-            ret  
+            ret
 
-DHLPL2:
+DHLPL2
             xor  a
             ld   (Mode+1),a
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-
-
-
-
-; ИНФО О ВООРУЖЕНИИ
-WINF:
+; Инфо о вооружении
+WINF
             jp   WINFC
-            call WINOBR1
+            call WindowHandler1
             ret  c
             dec  a
             jp   z,F_S16
-            call ERSOBJ
+            call EraseObject
             ret  z
             call DINF2
             ld   hl,DINF3
             ld   (PROOUT+1),hl
-IKOL:
+IKOL
             ld   hl,0
             ld   (EINDX+1),hl
             ld   a,#08
-IINF:
+IINF
             ld   hl,0
-            call SCROL
+            call ScrollList
             ld   (IINF+1),hl
-            ret  
-F_S16:
-            ret  
-WINFC:
-            ret  
-WIN_F:
+            ret
+F_S16
+            ret
+WINFC
+            ret
+WIN_F
             ld   de,WINF_
-            call FOBJ
+            call FindDeskObject
             ret  nz
-WINF_:
+WINF_
             ld   hl,0
-            call Outwin
+            call OutWindow
             call DINF2
             ld   hl,(IINF+1)
             call DINF3
-            ret  
+            ret
 
-DINF2:
+DINF2
             ld   a,1
             ld   (Mode+1),a
-ARMINF:
+ARMINF
             ld   a,0
             ld   hl,TARMI
-            call FLIST
+            call FindTextByIndex
             ld   (AINF+1),hl
-            call KOLLIN
+            call CountTextLines
             ld   (IKOL+1),de
-            ret  
+            ret
 
-DINF3:
+DINF3
             EXD
-AINF:
+AINF
             ld   hl,0
             ld   bc,#0800
-            call FROMLIN
-            ret  
+            call PrintFromLine
+            ret
 
 
-
-
-
-
-
-
-
-
-
-WSETS:
-; СЕТАП СРЕДЫ
+WSETS
+; Сетап среды
             jp   WSETSC
-            call WINOBR1
+            call WindowHandler1
             ret  c
             dec  a
             jp   z,F_S10
-            call ERSOBJ
-            jr   nz,F_S10_1
+            call EraseObject
+            jr   nz,.F_S10_1
             ld   bc,SETSI
             ld   de,SETSD
-            jp   TOPORT
-F_S10_1:
+            jp   CodesToPorts
+.F_S10_1
             call DSETS2
 
             ld   de,(WSETSC+1)
             ld   a,(NSETS+1)
-            call DELMK
+            call DeleteLastMark
             ld   a,#FF
             ld   (NSETS+1),a
 
@@ -594,12 +531,12 @@ F_S10_1:
             ld   hl,SSKOL-1
             ld   (EINDX+1),hl
             ld   a,#08
-ISETS:
+ISETS
             ld   hl,0
-            call SCROL
+            call ScrollList
             ld   (ISETS+1),hl
-            ret  
-F_S10:
+            ret
+F_S10
             ld   a,(ISETS+1)
             inc  a
             ret  z
@@ -613,73 +550,73 @@ F_S10:
             add  hl,bc
             ld   a,c
             cp   4
-            jr   nc,W_S2
+            jr   nc,.W_S2
             ld   a,(hl)
             cp   "Y"
             ld   a,"N"
             jr   z,$+4
             ld   a,"Y"
             ld   (hl),a
-            jr   W_S3
-W_S2:
+            jr   .W_S3
+.W_S2
             ld   a,(hl)
             ld   (hl),"_"
-            call HIDESCR
+            call HideCursor
             push hl
             push bc
             call WSET_S
-            call RETSCR
-; ЧТЕНИЕ КЛАВЫ ДО ПЕРВОЙ КЛАВИШИ
+            call ShowCursorBack
+; Чтение клавы до первой клавиши
             pop  bc
-W_S4:
-            call READKEY
+.W_S4
+            call ReadKey
             cp   29
-            jr   z,W_S4
-; ЕСЛИ НЕ CS
+            jr   z,.W_S4
+; Если не cs
             ld   e,a
             ld   a,c
             cp   10
-            jr   c,W_S1
+            jr   c,.W_S1
             cp   12
             ld   a,e
-            jr   nc,W_S5
+            jr   nc,.W_S5
             cp   "0"
-            jr   c,W_S4
+            jr   c,.W_S4
             cp   "8"
-            jr   nc,W_S4
-            jr   W_S1
-W_S5:
+            jr   nc,.W_S4
+            jr   .W_S1
+.W_S5
             cp   "0"
-            jr   c,W_S4
+            jr   c,.W_S4
             cp   "2"
-            jr   nc,W_S4
-W_S1:
+            jr   nc,.W_S4
+.W_S1
             pop  hl
             ld   (hl),e
-W_S3:
-            call HIDESCR
+.W_S3
+            call HideCursor
             call WSET_S
-            call RETSCR
-            ret  
+            call ShowCursorBack
+            ret
 
-WSETSC:
+WSETSC
             ld   de,#1E0B
             ld   hl,WSETS_
-NSETS:
+NSETS
             ld   a,#FF
-            call MARKO
+            call MarkRowStretch
             ret  z
             ld   (NSETS+1),a
-            ret  
+            ret
 
-WSET_S:
+WSET_S
             ld   de,WSETS_
-            call FOBJ
+            call FindDeskObject
             ret  nz
-WSETS_:
-; ВЫВОД ПУНКТОВ УСТАНОВКИ
+WSETS_
+; Вывод пунктов установки
             ld   hl,0
-            call Outwin
+            call OutWindow
 
             ld   a,#FF
             ld   (NSETS+1),a
@@ -687,41 +624,41 @@ WSETS_:
             call DSETS2
 
             ld   hl,(ISETS+1)
-DSETS3:
-            call DSETS1
+DSETS3
+            call .DSETS1
             ex   af,af'
             ld   (WSETSC+2),a
-            ret  
-DSETS1:
+            ret
+.DSETS1
 
-;hl-ИНДЕКС ВЫВОДА
+; hl-индекс вывода
             EXD
 
-; КОРД.Y НА САМУЮ ПЕРВУЮ СТРОКУ
+; Корд.Y на самую первую строку
             ld   hl,#0800
             ld   (Cord),hl
 
             ld   hl,TSETS1
             push de
             ld   a,e
-            call LIST1
+            call PrintTextByIndex1
             ld   a,8
             ld   (Cord+1),a
-; ИНДЕКС ВЫВОДА
+; Индекс вывода
             pop  hl
 
-; ДАННЫЕ СОСТОЯНИЯ
+; Данные состояния
             ld   bc,SETSI
             add  hl,bc
             xor  a
             ex   af,af'
-W_SS1:
-            ld   a,(CXTAB1+1)
+W_SS1
+            ld   a,(TabStop1+1)
             ld   (Cord),a
             ld   a,(hl)
             or   a
             ret  z
-            call SPECSYM
+            call PrintSpecialChar
             inc  hl
             ex   af,af'
             inc  a
@@ -731,7 +668,7 @@ W_SS1:
             ret  z
             dec  a
             ret  z
-            ld   a,(Eyw+1)
+            ld   a,(WinEndY+1)
             ld   c,a
             ld   a,(Cord+1)
             add  a,8
@@ -741,66 +678,50 @@ W_SS1:
             jp   W_SS1
 
 
-DSETS2:
+DSETS2
             xor  a
             ld   (Mode+1),a
             ld   a,66
-            ld   (CXTAB1+1),a
-            ret  
+            ld   (TabStop1+1),a
+            ret
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-WMAP:
-            jp   WMAPC
-            call WINOBR2
+WMAP
+            jp   .WMAPC
+            call WindowHandler2
             ret  c
             dec  a
-            jp   z,F_S14
+            jp   z,.F_S14
             ld   a,(KFC)
             and  a
-            jp   m,W_K5
-            call ERSOBJ
-            jr   nz,W_K5
+            jp   m,.W_K5
+            call EraseObject
+            jr   nz,.W_K5
             ld   de,(BPERE_+1)
-            call ERSOBJ2
+            call CloseObject
             ld   de,(BMEM_+1)
-            call ERSOBJ2
+            call CloseObject
             ld   de,(BMAR_+1)
-            call ERSOBJ2
+            call CloseObject
             ld   de,(BCMAR_+1)
-            call ERSOBJ2
+            call CloseObject
             ld   de,(BNMEM_+1)
-            call ERSOBJ2
+            call CloseObject
             ld   de,(BCENT_+1)
-            call ERSOBJ2
+            call CloseObject
             ld   de,(BAWAY_+1)
-            call ERSOBJ2
+            call CloseObject
             ld   de,(BNABO_+1)
-            call ERSOBJ2
+            call CloseObject
             ld   de,(WINFS_+1)
-            call ERSOBJ2
+            call CloseObject
             ld   de,(WPLAN_+1)
-            call ERSOBJ2
+            call CloseObject
 
-            ld   hl,RET_
-            ld   (ZADACHA+1),hl
-            ret  
-W_K5:
+            ld   hl,DoNothing
+            ld   (TaskCall+1),hl
+            ret
+.W_K5
             ld   l,(ix+0)
             ld   h,(ix+1)
 
@@ -815,12 +736,12 @@ W_K5:
             add  a,a
             add  a,c
             add  a,b
-            rra  
+            rra
             ld   c,a
 
             ld   a,(ix+3)
-            rlca 
-            rlca 
+            rlca
+            rlca
             ld   b,a
             ld   hl,(Mcoord)
             ld   a,h
@@ -830,18 +751,18 @@ W_K5:
             sub  e
             sub  c
             ld   hl,#00F8
-            jr   c,K_T1
+            jr   c,.K_T1
             sub  c
             ld   l,8
-            jr   nc,K_T1
+            jr   nc,.K_T1
             ld   l,0
-K_T2:
+.K_T2
             ld   a,d
             sub  b
             ld   h,#F8
             jr   c,$+4
             ld   h,#08
-K_T1:
+.K_T1
             EXD
 
             ld   hl,(EYEX)
@@ -901,63 +822,61 @@ K_T1:
             ld   (KCORD),bc
 
             push ix
-            call SHOWK
+            call .SHOWK
             pop  ix
 
-            call Tfire
-            rra  
-            jp   c,W_K5
+            call ReadFireCancel
+            rra
+            jp   c,.W_K5
 
-            ret  
-
-
+            ret
 
 
-F_S14:
+.F_S14
             PAGE_ PGKRT
 
-            ld   a,(Bxw+1)
+            ld   a,(WinBeginX+1)
             add  a,5
             ld   l,a
-            ld   a,(Byw+1)
+            ld   a,(WinBeginY+1)
             add  a,13
             ld   h,a
-            call STARCH
+            call ChooseStar
             PAGE___NOARG
 
 
-            call HIDESCR
-            call WK1
-            call STOREW
+            call HideCursor
+            call .WK1
+            call SaveWindowParams
             call WINF_S
-            call RESTORW
+            call RestoreWindowParams
             ld   de,(WPLAN_+1)
-            call Mactiv
+            call ActivateIfOnDesk
             call WPLA_N
-            call RETSCR
+            call ShowCursorBack
 
-            ret  
-WMAPC:
-            ret  
+            ret
+.WMAPC
+            ret
 
-SHOWK:
-; ВЫВЕСТИ КАРТУ
-            call HIDESCR
-            call WK1
-            halt 
-            jp   RETSCR
+.SHOWK
+; Вывести карту
+            call HideCursor
+            call .WK1
+            halt
+            jp   ShowCursorBack
 
 
-; ВЫВОД В ОКНЕ КАРТЫ
-WK1:
+; Вывод в окне карты
+.WK1
             ld   hl,(WMAP_+1)
-            call TESTSZ
+            call TestWindowOut
             ret  nc
-            call CLINW
+            call ClearWindowChars
 
-WK2:
+WK2
             ld   hl,(WMAP_+1)
-            call TESTSZ
+            call TestWindowOut
             ret  nc
 
             dec  l
@@ -971,42 +890,42 @@ WK2:
             EXD
             ld   (BXKRT),hl
             PAGES PGKRT
-W_K4:
+W_K4
             ld   a,0
             and  a
             call nz,MTBXX2_
-W_K2:
+W_K2
             ld   a,0
             and  a
-            call nz,GENKART
+            call nz,GenerateMapTiles
 
-;h-yh,l-xh;hl-YHXH
-;d-yl,e-xl;de-YLXL
+; h-yh,l-xh;hl-YHXH
+; d-yl,e-xl;de-YLXL
             ld   de,0
-            ld   a,(Exw+1)
+            ld   a,(WinEndX+1)
             sub  13
             ld   l,a
-            ld   a,(Eyw+1)
+            ld   a,(WinEndY+1)
             sub  14
             ld   h,a
 
-W_K6:
+W_K6
             ld   a,0
             and  a
-            call nz,INIt
+            call nz,InitLineClip
             ld   a,(INVERSE)
-            call KARTOUT
+            call DrawGalaxyMap
             PAGES__NOARG
             xor  a
             ld   (W_K4+1),a
             ld   (W_K6+1),a
-            ret  
-WMAP_:
-; САМА КАРТА В КРУПНОМ МАСШТАБЕ
+            ret
+WMAP_
+; Сама карта в крупном масштабе
             ld   hl,0
-            call BLACKWP
-            call Outwin
-            call WHITEW
+            call SetBlackWindowPage
+            call OutWindow
+            call SetWhiteWindow
             ld   a,1
             ld   (W_K2+1),a
             ld   (W_K4+1),a
@@ -1014,183 +933,131 @@ WMAP_:
             jp   WK2
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-WNEWS:
-            jp   WNEWSC
-            call WINOBR1
+WNEWS
+            jp   .WNEWSC
+            call WindowHandler1
             ret  c
             dec  a
-            jp   z,F_S3
-            call ERSOBJ
+            jp   z,.F_S3
+            call EraseObject
             ret  z
-            ret  
-F_S3:
-            ret  
-WNEWSC:
-            ret  
+            ret
+.F_S3
+            ret
+.WNEWSC
+            ret
 
-WNEWS_:
+WNEWS_
             ld   hl,0
-            call Outwin
+            call OutWindow
             ld   a,1
             ld   (Mode+1),a
             ld   a,(NEWS)
             ld   hl,TNEWS
-            jp   LIST
+            jp   PrintTextByIndex
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-WABON:
-            jp   WABONC             ;НА ОБРАБ. КУРСОР В ОБЛ
-; ОБРАБОТЧИК НАЖАТИЯ КНОПКОК ОГОНЬ И ОТМЕ
-            call WINOBR1
+WABON
+            jp   WABONC             ; На обраб. курсор в обл
+; Обработчик нажатия кнопкок огонь и отме
+            call WindowHandler1
             ret  c
             dec  a
-            jp   z,F_S1
-            call ERSOBJ
-            jr   nz,F_S1_1
-; ДЕСТРУКТОР
+            jp   z,.F_S1
+            call EraseObject
+            jr   nz,.F_S1_1
+; Деструктор
             ld   de,(WFOTO_+1)
-            jp   ERSOBJ2
-F_S1_1:
+            jp   CloseObject
+.F_S1_1
 
-; ОБРАБОТЧИК ОТМЕНЫ ПО ОКНУ
-            ret  
-F_S1:
-; ОБРАБОТЧИК ОГНЯ ПО ОКНУ
-            ret  
-WABONC:
-;"КУРОСР В ОБЛАСТИ ОБЪЕКТА"
-;ix=ADR ВЕКТОРА ОПИСАТЕЛЯ
+; Обработчик отмены по окну
+            ret
+.F_S1
+; Обработчик огня по окну
+            ret
+WABONC
+; "Куроср в области объекта"
+; ix=adr вектора описателя
             ld   de,#1E1B
             ld   hl,WABON_
-NABON:      ld   a,#FF
-            call MARKO
+NABON
+            ld   a,#FF
+            call MarkRowStretch
             ret  z
             ld   (NABON+1),a
-            call HIDESCR
+            call HideCursor
             call WFOT_O
-            call RETSCR
-            ret  
+            call ShowCursorBack
+            ret
 
 
-WABON_:
+WABON_
             ld   hl,0
-            call Outwin
+            call OutWindow
             xor  a
             ld   (Mode+1),a
             ld   a,#FF
             ld   (NABON+1),a
             ld   a,80
-            ld   (CXTAB1+1),a
+            ld   (TabStop1+1),a
             ld   hl,TABON1
-            call Outtxt
+            call OutText
             ex   af,af'
             xor  a
             ex   af,af'
-            jp   c,W_N2
-; ВЫВОД АБОНЕНТОВ,0-КОНЕЦ СПИСКА
-;1-НЕВИДИМ,2-ВИДИМ
+            jp   c,.W_N2
+; Вывод абонентов,0-конец списка
+; 1-Невидим,2-видим
             ld   de,ABONS
             ld   b,#FF
-W_N1:
+.W_N1
             inc  b
             ld   a,(de)
             inc  de
             dec  a
             jr   z,$-4
-            jp   m,W_N2
+            jp   m,.W_N2
             ld   a,b
             ld   hl,NABONS
-            call LIST
+            call PrintTextByIndex
             ex   af,af'
             inc  a
             ex   af,af'
-            jp   nc,W_N1
-W_N2:
+            jp   nc,.W_N1
+.W_N2
             ex   af,af'
             ld   (WABONC+2),a
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-WFOTO:
-            jp   WFOTOC
-            call WINOBR1
+WFOTO
+            jp   .WFOTOC
+            call WindowHandler1
             ret  c
             dec  a
-            jp   z,F_S15
-            call ERSOBJ
+            jp   z,.F_S15
+            call EraseObject
             ret  z
-            ret  
-F_S15:
-            ret  
-WFOTOC:
-            ret  
+            ret
+.F_S15
+            ret
+.WFOTOC
+            ret
 
-WFOT_O:
+WFOT_O
             ld   de,WFOTO_
-            call FOBJ
+            call FindDeskObject
             ret  nz
-WFOTO_:
+WFOTO_
             ld   hl,0
-            call BLACKW
-            call Outwin
-            call WHITEW
+            call SetBlackWindow
+            call OutWindow
+            call SetWhiteWindow
             ld   hl,(WFOTO_+1)
-            call TESTSZ
+            call TestWindowOut
             ret  nc
-; НОМЕР ПЕРСОНАЖА
+; Номер персонажа
             ld   a,(NABON+1)
             inc  a
             ret  z
@@ -1206,164 +1073,100 @@ WFOTO_:
             djnz $-6
             xor  a
             srl  h
-            rra  
+            rra
             ld   l,a
             ld   de,FOTOS
             add  hl,de
             PAGES PGFOTOS
-            call INWIN
+            call DrawSpriteInWindow
             PAGES__NOARG
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-
-
-; ПРОСТО ОШИБКА
-WERR:
-            jp   WERRC
-            call WINOBR1
+; Просто ошибка
+WERR
+            jp   .WERRC
+            call WindowHandler1
             ret  c
-            jp   ERSOBJ2
-WERRC:
-            ret  
+            jp   CloseObject
+.WERRC
+            ret
 
-WERR_:
+WERR_
             ld   hl,0
-            call Outwin
-NERR:
+            call OutWindow
+NERR
             ld   a,0
             ld   hl,ERORS
-            call LIST0
-            ret  
+            call PrintTextByIndex0
+            ret
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-WMISS1:
-            jp   WMISS1C
-            call WINOBR1
+WMISS1
+            jp   .WMISS1C
+            call WindowHandler1
             ret  c
             dec  a
-            jp   z,F_S4
-            call ERSOBJ
+            jp   z,.F_S4
+            call EraseObject
             ret  z
-            ret  
-F_S4:
+            ret
+.F_S4
 
-            ret  
+            ret
 
-WMISS1C:
-            ret  
+.WMISS1C
+            ret
 
-WMISS1_:
+WMISS1_
             ld   hl,0
-            call Outwin
+            call OutWindow
             ld   a,1
             ld   (Mode+1),a
             ld   hl,Txt
-            jp   OTXT
+            jp   PrintText
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-WMISS2:
-            jp   WMISS2C
-            call WINOBR1
+WMISS2
+            jp   .WMISS2C
+            call WindowHandler1
             ret  c
             dec  a
-            jp   z,F_S5
-            call ERSOBJ
+            jp   z,.F_S5
+            call EraseObject
             ret  z
-            ret  
-F_S5:
+            ret
+.F_S5
 
-            ret  
-WMISS2C:
-            ret  
+            ret
+.WMISS2C
+            ret
 
-WMISS2_:
+WMISS2_
             ld   hl,0
-            call Outwin
+            call OutWindow
             ld   a,1
             ld   (Mode+1),a
             ld   hl,Txt
-            jp   Outtxt
+            jp   OutText
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-WTWR:
+WTWR
             jp   WTWRC
-            call WINOBR1
+            call WindowHandler1
             ret  c
             dec  a
             jp   z,F_S6
-            call ERSOBJ
-            jr   nz,W_R1
+            call EraseObject
+            jr   nz,.W_R1
             ld   de,(BTTW_+1)
-            jp   ERSOBJ2
-W_R1:
+            jp   CloseObject
+.W_R1
             call DTWR2
 
             ld   de,(WTWRC+1)
             ld   a,(NTWR+1)
-            call DELMK
+            call DeleteLastMark
             ld   a,#FF
             ld   (NTWR+1),a
 
@@ -1372,108 +1175,108 @@ W_R1:
             ld   hl,TKOL-1
             ld   (EINDX+1),hl
             ld   a,#20
-ITWR:
+ITWR
             ld   hl,0
-            call SCROL
+            call ScrollList
             ld   (ITWR+1),hl
-            ret  
-F_S6:
-; ВЫБОР ПУНКТА
-; МАРКЕР ПОКУПКИ ТОВАРА
+            ret
+F_S6
+; Выбор пункта
+; Маркер покупки товара
             ld   a,(NTWR+1)
             inc  a
             ret  z
             ld   hl,(Mcoord)
-            ld   a,(Bxw+1)
+            ld   a,(WinBeginX+1)
             sub  l
-            neg  
+            neg
             cp   135
             ld   a,10
             jr   c,$+3
             dec  a
-F_S60:
+F_S60
             ld   (OPERATION),a
             PAGES PGLANG
             call PARADOX
             PAGES__NOARG
-            call HIDESCR
+            call HideCursor
             call LINE_
             call WTWR_
-            call RETSCR
-            ret  
-WTWRC:
+            call ShowCursorBack
+            ret
+WTWRC
             ld   de,#1E23
             ld   hl,WTWR_
-NTWR:
+NTWR
             ld   a,#FF
-            call MARKO
+            call MarkRowStretch
             ret  z
             ld   (NTWR+1),a
-            ret  
+            ret
 
-WTWR_:
-; ВЫВОД ТОВРОВ
+WTWR_
+; Вывод товров
             ld   hl,0
-            call Outwin
+            call OutWindow
             call DTWR2
-; ВЫВОД НЕЙМ СТРОКИ И ВСЕХ ТОВАРОВ
+; Вывод нейм строки и всех товаров
 
             ld   a,#FF
             ld   (NTWR+1),a
 
             ld   hl,TTWR1
-            call Outtxt
+            call OutText
             ex   af,af'
             xor  a
             ex   af,af'
             jp   c,TW_N1
             ld   hl,(ITWR+1)
 
-DTWR3:
+DTWR3
             call DTWR1
-TW_N1:
+TW_N1
             ex   af,af'
             ld   (WTWRC+2),a
-            ret  
+            ret
 
-DTWR1:
-;hl-ИНДЕКС ВЫВОДА
+DTWR1
+; hl-индекс вывода
 
             EXD
 
-; КОРД.Y НА САМУЮ ПЕРВУЮ СТРОКУ С ТОВАРОМ
+; Корд.Y на самую первую строку с товаром
             ld   hl,#2000
             ld   (Cord),hl
 
             ld   hl,TTWR2
             push de
             ld   a,e
-            call LIST1
+            call PrintTextByIndex1
 
             ld   a,32
             ld   (Cord+1),a
 
-; ИНДЕКС ВЫВОДА
+; Индекс вывода
             pop  hl
 
             add  hl,hl
             ld   b,h
             ld   c,l
 
-; ВЫВОД ТОВАРОВ,#FF-КОНЕЦ СПИСКА
+; Вывод товаров,#ff-конец списка
 
-; ТОВАР НА СТАНЦИИ, КОЛ.,ЦЕНА
+; Товар на станции, кол.,цена
             ld   hl,TWRS
             add  hl,bc
             EXD
 
-; ТОВАР У ИГРОКА, КОЛ. СТАРАЯ ЦЕНА
+; Товар у игрока, кол. старая цена
             ld   hl,TWRI
             add  hl,bc
             xor  a
             ex   af,af'
-W_T1:
-            ld   a,(CXTAB1+1)
+.W_T1
+            ld   a,(TabStop1+1)
             ld   (Cord),a
             ld   a,(de)
             inc  a
@@ -1490,7 +1293,7 @@ W_T1:
             jr   $+8
             ld   c,a
             ld   b,0
-            call ONUMB
+            call PrintNumber
 
             jr   c,$+6
             dec  a
@@ -1501,22 +1304,21 @@ W_T1:
 
             ld   a,(de)
             inc  de
-            rla  
+            rla
             jr   nc,$+12
 
-; КООРД. ПЕЧАТИ "■" КАК ЗАПР. ТОВАР
             ld   a,109
             ld   (Cord),a
 
             RST_ 254
 
-            ld   a,(CXTAB2+1)
+            ld   a,(TabStop2+1)
             ld   (Cord),a
             ld   a,(de)
             inc  de
             ld   c,a
             ld   b,0
-            call ONUMB
+            call PrintNumber
 
             jr   c,$+6
             dec  a
@@ -1524,7 +1326,7 @@ W_T1:
             dec  a
             ret  z
 
-            ld   a,(CXTAB3+1)
+            ld   a,(TabStop3+1)
             ld   (Cord),a
             ld   a,(hl)
             and  #7F
@@ -1536,7 +1338,7 @@ W_T1:
             jr   $+8
             ld   c,a
             ld   b,0
-            call ONUMB
+            call PrintNumber
 
             jr   c,$+6
             dec  a
@@ -1546,18 +1348,18 @@ W_T1:
 
             ld   a,(hl)
             inc  hl
-            rla  
+            rla
             jr   nc,$+12
             ld   a,134
             ld   (Cord),a
             RST_ 254
 
-            ld   a,(CXTAB4+1)
+            ld   a,(TabStop4+1)
             ld   (Cord),a
             ld   c,(hl)
             ld   b,0
             inc  hl
-            call ONUMB
+            call PrintNumber
 
             jr   c,$+6
             dec  a
@@ -1565,71 +1367,57 @@ W_T1:
             dec  a
             ret  z
 
-            ld   a,(Eyw+1)
+            ld   a,(WinEndY+1)
             ld   c,a
             ld   a,(Cord+1)
             add  a,8
             cp   c
             ret  nc
             ld   (Cord+1),a
-            jp   W_T1
-DTWR2:
-; ДОПОЛН.ПРОЦЕДУРЫ ДЛЯ ПОДГОТОВКИ
-; ВЫВОДА В ОКНО ТОВАРОВ
+            jp   .W_T1
+DTWR2
+; Дополн.процедуры для подготовки
+; Вывода в окно товаров
 ;   push ix:callRANDTT:popix
             xor  a
             ld   (Mode+1),a
             ld   a,96
-            ld   (CXTAB1+1),a
+            ld   (TabStop1+1),a
             ld   a,114
-            ld   (CXTAB2+1),a
+            ld   (TabStop2+1),a
             ld   a,136
-            ld   (CXTAB3+1),a
+            ld   (TabStop3+1),a
             ld   a,154
-            ld   (CXTAB4+1),a
+            ld   (TabStop4+1),a
             ld   a,176
-            ld   (CXTAB5+1),a
-            ret  
+            ld   (TabStop5+1),a
+            ret
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-WWKRB:
+WWKRB
             jp   WWKRBC
-            call WINOBR1
+            call WindowHandler1
             ret  c
             dec  a
             jp   z,F_S7
-            call ERSOBJ
+            call EraseObject
             jr   nz,WK_1
-; ДЕСТРУКТОР
-DE_1:
+; Деструктор
+DE_1
             ld   de,(BBUY_+1)
-            call ERSOBJ2
+            call CloseObject
             ld   de,(BTRD_+1)
-            call ERSOBJ2
+            call CloseObject
             ld   de,(WINF_+1)
-            call ERSOBJ2
-            ret  
-WK_1:
+            call CloseObject
+            ret
+WK_1
             call DWKRB2
 
-; УДАЛЯЕМ ПОСЛЕДНИЙ МАРК
+; Удаляем последний марк
             ld   de,(WWKRBC+1)
             ld   a,(NWKRB+1)
-            call DELMK
+            call DeleteLastMark
             ld   a,#FF
             ld   (NWKRB+1),a
 
@@ -1638,12 +1426,12 @@ WK_1:
             ld   hl,WKKOL-1
             ld   (EINDX+1),hl
             ld   a,#18
-IWKRB:
+IWKRB
             ld   hl,0
-            call SCROL
+            call ScrollList
             ld   (IWKRB+1),hl
-            ret  
-F_S7:
+            ret
+F_S7
             ld   a,(NWKRB+1)
             inc  a
             ret  z
@@ -1654,18 +1442,19 @@ F_S7:
             ld   l,a
             ld   a,(ARMINF+1)
             cp   l
-            jr   z,SDWK             ;СДЕЛКА
+            jr   z,.SDWK             ; Сделка
             ld   a,l
             ld   (ARMINF+1),a
             ld   hl,0
             ld   (IINF+1),hl
-            call HIDESCR
+            call HideCursor
             call WIN_F
             call WWKR_B
-            call RETSCR
-            ret  
-SDWK:
-BT1:        ld   a,0
+            call ShowCursorBack
+            ret
+.SDWK
+BT1
+            ld   a,0
             or   a
             ld   a,5
             jr   z,$+3
@@ -1674,58 +1463,57 @@ BT1:        ld   a,0
             PAGES PGLANG
             call PARADOX
             PAGES__NOARG
-            call HIDESCR
+            call HideCursor
             call LINE_
             call WWKRB_
-            call RETSCR
-            ret  
+            call ShowCursorBack
+            ret
 
 
-
-WWKRBC:
+WWKRBC
             ld   de,#1E1B
             ld   hl,WWKRB_
-NWKRB:
+NWKRB
             ld   a,#FF
-            call MARKO
+            call MarkRowStretch
             ret  z
             ld   (NWKRB+1),a
-            ret  
+            ret
 
-WWKR_B:
+WWKR_B
             ld   de,WWKRB_
-            call FOBJ
+            call FindDeskObject
             ret  nz
-WWKRB_:
-; ВЫВОД ВООРУЖЕНИЕ КОРБЛЕЙ
+WWKRB_
+; Вывод вооружение корблей
             ld   hl,0
-            call Outwin
+            call OutWindow
 
             ld   a,#FF
             ld   (NWKRB+1),a
 
             call DWKRB2
-; ВЫВОД НЕЙМ СТРОКИ И ВСЕХ ТОВАРОВ
+; Вывод нейм строки и всех товаров
 
 
             ld   hl,TWKRB1
-            call Outtxt
+            call OutText
             ex   af,af'
             xor  a
             ex   af,af'
             jp   c,WK_N1
             ld   hl,(IWKRB+1)
 
-DWKRB3:
+DWKRB3
             call DWKRB1
-WK_N1:
+WK_N1
             ex   af,af'
             ld   (WWKRBC+2),a
-            ret  
+            ret
 
-DWKRB1:
-;hl-ИНДЕКС ВЫВОДА
-;retA'-КОЛ. ВЫВЕДЕННЫХ СТРОК
+DWKRB1
+; hl-индекс вывода
+; Reta'-кол. выведенных строк
             EXD
 
             ld   hl,CENS
@@ -1740,22 +1528,22 @@ DWKRB1:
             push hl
             ld   hl,TWKRB2
 
-W_K9:
-; КОРД.Y НА САМУЮ ПЕРВУЮ СТРОКУ С ТОВАРОМ
+W_K9
+; Корд.Y на самую первую строку с товаром
             ld   bc,#1800
             ld   (Cord),bc
 
             push de
             ld   a,e
-            call LIST1
+            call PrintTextByIndex1
 
             ld   a,#18
             ld   (Cord+1),a
 
-; ИНДЕКС ВЫВОДА
+; Индекс вывода
             pop  bc
 
-; ВООРУЖ У ИГРОКА, КОЛ.
+; Вооруж у игрока, кол.
             pop  hl
             add  hl,bc
             EXD
@@ -1763,7 +1551,7 @@ W_K9:
             sla  c
             rl   b
             push bc
-            exx  
+            exx
             pop  bc
             pop  hl
             add  hl,bc
@@ -1773,22 +1561,22 @@ W_K9:
             pop  hl
             add  hl,bc
             EXD
-            exx  
+            exx
 
             pop  af
             ld   (_KRBNUM+1),a
 
-; ВЫВОД ВООРУЖ.,#FF-КОНЕЦ СПИСКА
+; Вывод вооруж.,#ff-конец списка
 
-; ВООРУЖ НА СТАНЦИИ, ЦЕНА
+; Вооруж на станции, цена
             pop  hl
             add  hl,bc
             EXD
-; СЧЕТЧИК НА КОЛИЧЕСТВО ВЫВЕДЕННЫХ СТРОК
+; Счетчик на количество выведенных строк
             xor  a
             ex   af,af'
-W_K1:
-            ld   a,(CXTAB1+1)
+W_K1
+            ld   a,(TabStop1+1)
             ld   (Cord),a
 
             ex   af,af'
@@ -1802,14 +1590,14 @@ W_K1:
 
             and  a
             jp   p,$+4
-            cpl  
+            cpl
             and  a
             jr   nz,$+9
             RST_ "-"
             jr   $+8
             ld   c,a
             ld   b,0
-            call ONUMB
+            call PrintNumber
 
             jr   c,$+6
             dec  a
@@ -1818,7 +1606,7 @@ W_K1:
             ret  z
 
 ; ЦЕНА
-            ld   a,(CXTAB2+1)
+            ld   a,(TabStop2+1)
             ld   (Cord),a
             ld   a,(de)
             ld   c,a
@@ -1827,7 +1615,7 @@ W_K1:
             ld   b,a
             inc  de
             xor  a
-            call Onum5
+            call PrintNumberPad
 
             jr   c,$+6
             dec  a
@@ -1836,27 +1624,28 @@ W_K1:
             ret  z
 
 ; ВЕС
-            ld   a,(CXTAB3+1)
+            ld   a,(TabStop3+1)
             add  a,4
             ld   (Cord),a
 
-            exx  
-LEV1:       ld   a,0
+            exx
+LEV1
+            ld   a,0
             cp   (hl)
             inc  hl
-            jr   nc,LV1
+            jr   nc,.LV1
             inc  hl
-            exx  
+            exx
             RST_ "-"
-            jr   LV2
-LV1:
+            jr   .LV2
+.LV1
             ld   a,(hl)
             inc  hl
-            exx  
+            exx
             ld   c,a
             ld   b,0
-            call ONUMB
-LV2:
+            call PrintNumber
+.LV2
             jr   c,$+6
             dec  a
             ret  z
@@ -1864,26 +1653,27 @@ LV2:
             ret  z
 
 
-            ld   a,(CXTAB4+1)
+            ld   a,(TabStop4+1)
             add  a,4
             ld   (Cord),a
 
-            exx  
+            exx
             EXD
             push hl
-_KRBNUM:    ld   a,0
+_KRBNUM
+            ld   a,0
             or   a
-            jp   m,_I1
+            jp   m,._I1
 
             rept 4
             cp   (hl)
             inc  hl
-            jr   z,_I1
+            jr   z,._I1
             endr
-            scf  
-_I1:
+            scf
+._I1
             ld   a,251
-            call c,Pntpro
+            call c,PrintGlyph
 
             pop  hl
 
@@ -1897,8 +1687,8 @@ _I1:
             add  hl,bc
 
             EXD
-            exx  
-            ld   a,(Eyw+1)
+            exx
+            ld   a,(WinEndY+1)
             ld   c,a
             ld   a,(Cord+1)
             add  a,8
@@ -1907,55 +1697,38 @@ _I1:
             ld   (Cord+1),a
             jp   W_K1
 
-DWKRB2:
-; ДОПОПЛН.ПРОЦЕДУРЫ ДЛЯ ПОДГОТОВКИ
-; ВЫВОДА В ОКНО ВООРУЖЕНИЯ
+DWKRB2
+; Допоплн.процедуры для подготовки
+; Вывода в окно вооружения
             xor  a
             ld   (Mode+1),a
             ld   a,116
-            ld   (CXTAB1+1),a
+            ld   (TabStop1+1),a
             ld   a,134
-            ld   (CXTAB2+1),a
+            ld   (TabStop2+1),a
             ld   a,156
-            ld   (CXTAB3+1),a
+            ld   (TabStop3+1),a
             ld   a,174
-            ld   (CXTAB4+1),a
-            call PINFO2
+            ld   (TabStop4+1),a
+            call PlanetInfoHere
             ld   a,l
             ld   (LEV1+1),a
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-WWSKM:
+WWSKM
             jp   WWSKMC
-            call WINOBR1
+            call WindowHandler1
             ret  c
             dec  a
             jp   z,F_S8
-            call ERSOBJ
-            jp   z,DE_1             ;НА ДЕСТРУКТОР
+            call EraseObject
+            jp   z,DE_1             ; На деструктор
             call DWKRB2
 
             ld   de,(WWSKMC+1)
             ld   a,(NWSKM+1)
-            call DELMK
+            call DeleteLastMark
             ld   a,#FF
             ld   (NWSKM+1),a
 
@@ -1964,12 +1737,12 @@ WWSKM:
             ld   hl,WSKOL-1
             ld   (EINDX+1),hl
             ld   a,#18
-IWSKM:
+IWSKM
             ld   hl,0
-            call SCROL
+            call ScrollList
             ld   (IWSKM+1),hl
-            ret  
-F_S8:
+            ret
+F_S8
             ld   a,(NWSKM+1)
             inc  a
             ret  z
@@ -1981,17 +1754,17 @@ F_S8:
             ld   l,a
             ld   a,(ARMINF+1)
             cp   l
-            jr   z,SDWS             ;СДЕЛКА
+            jr   z,.SDWS             ; Сделка
             ld   a,l
             ld   (ARMINF+1),a
             ld   hl,0
             ld   (IINF+1),hl
-            call HIDESCR
+            call HideCursor
             call WIN_F
             call WWSK_M
-            call RETSCR
-            ret  
-SDWS:
+            call ShowCursorBack
+            ret
+.SDWS
             ld   a,(BT1+1)
             or   a
             ld   a,7
@@ -2001,54 +1774,54 @@ SDWS:
             PAGES PGLANG
             call PARADOX
             PAGES__NOARG
-            call HIDESCR
+            call HideCursor
             call LINE_
             call WWSKM_
-            call RETSCR
-            ret  
+            call ShowCursorBack
+            ret
 
 
-WWSKMC:
+WWSKMC
             ld   de,#0F1B
             ld   hl,WWSKM_
-NWSKM:
+NWSKM
             ld   a,#FF
-            call MARKO
+            call MarkRowStretch
             ret  z
             ld   (NWSKM+1),a
-            ret  
+            ret
 
-WWSK_M:
+WWSK_M
             ld   de,WWSKM_
-            call FOBJ
+            call FindDeskObject
             ret  nz
-WWSKM_:
-; ВЫВОД ВООРУЖЕНИЕ КОРБЛЕЙ
+WWSKM_
+; Вывод вооружение корблей
             ld   hl,0
-            call Outwin
+            call OutWindow
             call DWKRB2
-; ВЫВОД НЕЙМ СТРОКИ И ВСЕХ ТОВАРОВ
+; Вывод нейм строки и всех товаров
 
             ld   a,#FF
             ld   (NWSKM+1),a
 
             ld   hl,TWKRB1
-            call Outtxt
+            call OutText
             ex   af,af'
             xor  a
             ex   af,af'
             jp   c,WS_N1
             ld   hl,(IWSKM+1)
 
-DWSKM3:
+DWSKM3
             call DWSKM1
-WS_N1:
+WS_N1
             ex   af,af'
             ld   (WWSKMC+2),a
-            ret  
+            ret
 
-DWSKM1:
-;hl-ИНДЕКС ВЫВОДА
+DWSKM1
+; hl-индекс вывода
             EXD
             ld   hl,CENS1
             push hl
@@ -2064,32 +1837,17 @@ DWSKM1:
             jp   W_K9
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-WSOH:
-            jp   WSOHC
-            call WINOBR1
+WSOH
+            jp   .WSOHC
+            call WindowHandler1
             ret  c
             dec  a
-            jp   z,F_S12
-            call ERSOBJ
+            jp   z,.F_S12
+            call EraseObject
             ret  z
-            ret  
-F_S12:
-            call ERSOBJ2
+            ret
+.F_S12
+            call CloseObject
             ld   a,(NSOH+1)
 ; [glue] SAVE: item 0..4 of the window "В позицию N" -> file SAVE1..SAVE5 (the 1999 code of this
 ; function was not part of the sources; the demo had it in the older image)
@@ -2097,53 +1855,40 @@ F_S12:
             ret  z                      ; #FF: nothing selected
             ld   hl,TIME
             jp   DiskSlotSave
-WSOHC:
+.WSOHC
             ld   de,#2803
             ld   hl,WSOH_
-NSOH:
+NSOH
             ld   a,#FF
-            call MARKo
+            call MarkRowFixed
             ret  z
             ld   (NSOH+1),a
-            ret  
+            ret
 
-WSOH_:
-; ОКНО ПОКАЖЕТ ПОЗИЦИИ СОХРАНЕНИЯ
+WSOH_
+; Окно покажет позиции сохранения
             ld   hl,0
-            call Outwin
+            call OutWindow
 
             ld   a,#FF
             ld   (NSOH+1),a
             xor  a
             ld   (Mode+1),a
             ld   hl,TSOH1
-            jp   Outtxt
+            jp   OutText
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-WWOS:
-            jp   WWOSC
-            call WINOBR1
+WWOS
+            jp   .WWOSC
+            call WindowHandler1
             ret  c
             dec  a
-            jp   z,F_S13
-            call ERSOBJ
+            jp   z,.F_S13
+            call EraseObject
             ret  z
-            ret  
-F_S13:
-            call ERSOBJ2
+            ret
+.F_S13
+            call CloseObject
             ld   a,(NWOS+1)
 ; [glue] LOAD: item 0..4 of "С позиции N" -> SAVE1..SAVE5 by the launcher: the station is reloaded and
 ; takes the record exactly like after a landing (LaunchStationSlot, launcher.asm)
@@ -2151,134 +1896,101 @@ F_S13:
             ret  z
             ld   (STATE_SLOT),a         ; (file SAVEn is read by the launcher stub after the station image is loaded)
             jp   LaunchStationSlot
-WWOSC:
+.WWOSC
             ld   de,#2803
             ld   hl,WWOS_
-NWOS:
+NWOS
             ld   a,#FF
-            call MARKo
+            call MarkRowFixed
             ret  z
             ld   (NWOS+1),a
-            ret  
+            ret
 
-WWOS_:
-; ОКНО ПОКАЖЕТ ПОЗИЦИИ СОХРАНЕНИЯ
+WWOS_
+; Окно покажет позиции сохранения
             ld   hl,0
-            call Outwin
+            call OutWindow
 
             ld   a,#FF
             ld   (NWOS+1),a
             xor  a
             ld   (Mode+1),a
             ld   hl,TWOS1
-            jp   Outtxt
+            jp   OutText
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-WHIDE:
-            jp   WHIDEC
-            call WINOBR1
+WHIDE
+            jp   .WHIDEC
+            call WindowHandler1
             ret  c
             dec  a
-            jp   z,F_S9
-            call ERSOBJ
+            jp   z,.F_S9
+            call EraseObject
             ret  z
-            ret  
-F_S9:
-            call ERSOBJ2
+            ret
+.F_S9
+            call CloseObject
             ld   a,(NHIDE+1)
             inc  a
             ret  z
             dec  a
-            jp   z,HIDEP1
+            jp   z,MenuHideAll
             dec  a
-            jp   z,HIDEP2
+            jp   z,MenuCloseWindows
             dec  a
-            jp   z,HIDEP3
+            jp   z,MenuSaveSurround
             dec  a
-            jp   z,HIDEP4
+            jp   z,MenuArrange
             dec  a
-            jp   z,HIDEP5
+            jp   z,MenuSetupSurround
             dec  a
-            jp   z,HIDEP6
+            jp   z,MenuSetupGame
             dec  a
-            jp   z,HIDEP7
-; СОХРАНИТЬСЯ
+            jp   z,MenuRestore
+; Сохраниться
             ld   hl,WSOH_
-            jp   NEWOBJ
+            jp   OpenObject
 
-WHIDEC:
+.WHIDEC
             ld   de,#4003
             ld   hl,WHIDE_
-NHIDE:
+NHIDE
             ld   a,#FF
-            call MARKo
+            call MarkRowFixed
             ret  z
             ld   (NHIDE+1),a
-            ret  
+            ret
 
-WHIDE_:
+WHIDE_
             ld   hl,0
-            call Outwin
-; ОБНОВЛЯЕМ ПЕРЕМЕННУЮ НОМЕРА ПУНКТА
+            call OutWindow
+; Обновляем переменную номера пункта
             ld   a,#FF
             ld   (NHIDE+1),a
             ld   a,1
             ld   (Mode+1),a
             ld   hl,THIDE
-            jp   Outtxt
+            jp   OutText
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-WSETG:
-; СЕТАП ИГРЫ
+WSETG
+; Сетап игры
             jp   WSETGC
-            call WINOBR1
+            call WindowHandler1
             ret  c
             dec  a
             jp   z,F_S11
-            call ERSOBJ
-            jr   nz,F_S11_1
+            call EraseObject
+            jr   nz,.F_S11_1
             ld   bc,SETGI
             ld   de,SETGD
-            jp   TOPORT
-F_S11_1:
+            jp   CodesToPorts
+.F_S11_1
             call DSETG2
 
             ld   de,(WSETGC+1)
             ld   a,(NSETG+1)
-            call DELMK
+            call DeleteLastMark
             ld   a,#FF
             ld   (NSETG+1),a
 
@@ -2287,12 +1999,12 @@ F_S11_1:
             ld   hl,SGKOL-1
             ld   (EINDX+1),hl
             ld   a,#08
-ISETG:
+ISETG
             ld   hl,0
-            call SCROL
+            call ScrollList
             ld   (ISETG+1),hl
-            ret  
-F_S11:
+            ret
+F_S11
             ld   a,(ISETG+1)
             inc  a
             ret  z
@@ -2306,57 +2018,57 @@ F_S11:
             add  hl,bc
             ld   a,c
             and  a
-            jr   nz,W_G2
+            jr   nz,.W_G2
             ld   a,(hl)
             cp   "Y"
             ld   a,"N"
             jr   z,$+4
             ld   a,"Y"
             ld   (hl),a
-            jr   W_G3
-W_G2:
+            jr   .W_G3
+.W_G2
             ld   a,(hl)
             ld   (hl),"_"
-            call HIDESCR
+            call HideCursor
             push hl
             push bc
             call WSETG_
-            call RETSCR
-; ЧТЕНИЕ КЛАВЫ ДО ПЕРВОЙ КЛАВИШИ
+            call ShowCursorBack
+; Чтение клавы до первой клавиши
             pop  bc
-W_G4:
-            call READKEY
+.W_G4
+            call ReadKey
             cp   29
-            jr   z,W_G4
-; ЕСЛИ НЕ CS
+            jr   z,.W_G4
+; Если не cs
             pop  hl
             ld   (hl),a
-W_G3:
-            call HIDESCR
+.W_G3
+            call HideCursor
             call WSET_G
-            call RETSCR
+            call ShowCursorBack
 
-            ret  
+            ret
 
-WSETGC:
+WSETGC
             ld   de,#1E0B
             ld   hl,WSETG_
-NSETG:
+NSETG
             ld   a,#FF
-            call MARKO
+            call MarkRowStretch
             ret  z
             ld   (NSETG+1),a
-            ret  
+            ret
 
-WSET_G:
+WSET_G
             ld   de,WSETG_
-            call FOBJ
+            call FindDeskObject
             ret  nz
-; УСТАНОВКИ ИГРОВЫЕ
-WSETG_:
-; ВЫВОД ПУНКТОВ УСТАНОВКИ
+; Установки игровые
+WSETG_
+; Вывод пунктов установки
             ld   hl,0
-            call Outwin
+            call OutWindow
 
             ld   a,#FF
             ld   (NSETG+1),a
@@ -2365,78 +2077,69 @@ WSETG_:
 
             ld   hl,(ISETG+1)
 
-DSETG3:
-            call DSETG1
+DSETG3
+            call .DSETG1
             ex   af,af'
             ld   (WSETGC+2),a
-            ret  
-DSETG1:
+            ret
+.DSETG1
 
-;hl-ИНДЕКС ВЫВОДА
+; hl-индекс вывода
             EXD
 
-; КОРД.Y НА САМУЮ ПЕРВУЮ СТРОКУ
+; Корд.Y на самую первую строку
             ld   hl,#0800
             ld   (Cord),hl
 
             ld   hl,TSETG1
             push de
             ld   a,e
-            call LIST1
+            call PrintTextByIndex1
             ld   a,8
             ld   (Cord+1),a
-; ИНДЕКС ВЫВОДА
+; Индекс вывода
             pop  hl
 
-; ДАННЫЕ СОСТОЯНИЯ
+; Данные состояния
             ld   bc,SETGI
             add  hl,bc
             jp   W_SS1-2
 
-DSETG2:
+DSETG2
             xor  a
             ld   (Mode+1),a
             ld   a,110
-            ld   (CXTAB1+1),a
-            ret  
+            ld   (TabStop1+1),a
+            ret
 
 
-
-
-
-
-
-
-
-
-
-WINFS:
-            jp   WINFSC
-            call WINOBR1
+WINFS
+            jp   .WINFSC
+            call WindowHandler1
             ret  c
             dec  a
-            jp   z,F_S20
-            call ERSOBJ
+            jp   z,.F_S20
+            call EraseObject
             ret  z
-            ret  
-F_S20:
-            ret  
-WINFSC:
-            ret  
+            ret
+.F_S20
+            ret
+.WINFSC
+            ret
 
-WINF_S:
+WINF_S
             ld   de,WINFS_
-            call FOBJ
+            call FindDeskObject
             ret  nz
-WINFS_:
-; ОКНО ПОКАЖЕТ ИНФУ И СИСТЕМЕ
+WINFS_
+; Окно покажет инфу и системе
             ld   hl,0
-            call Outwin
+            call OutWindow
 
             xor  a
             ld   (Mode+1),a
             ld   hl,TINFS1
-            call Outtxt
+            call OutText
 
             ld   hl,#0831
             ld   (Cord),hl
@@ -2446,23 +2149,23 @@ WINFS_:
             and  a
             jr   nz,$+4
             ld   a,l
-            rra  
+            rra
 
             ld   c,a
             ld   b,0
             xor  a
-            call Onum5
+            call PrintNumberPad
 
 
-; РАСТОЯНИЕ
+; Растояние
             ld   de,(WHERE)
             ld   bc,(WHERE+2)
-            exx  
+            exx
             ld   de,(PLACE)
             ld   bc,(PLACE+2)
-            exx  
+            exx
             PAGES PGKRT
-            call FARER
+            call StarDistance
             ld   c,a
             ld   b,0
             PAGES__NOARG
@@ -2474,135 +2177,135 @@ WINFS_:
             RST_ "-"
             jr   $+6
             xor  a
-            call Onum5
+            call PrintNumberPad
 
 
-; ГЕНЕРИМ ИМЯ ЗВЕЗДЫ И ГОСУДАРСТВА
+; Генерим имя звезды и государства
             ld   hl,(WHERE)
             ld   de,(WHERE+2)
             PAGES PGKRT
             call NAME
             ld   hl,(WHERE)
-            call GOSTA
+            call FindStateAtMap
             ex   af,af'
             PAGES__NOARG
 
-; ВЫВОД ГОСУДАРСТВА
+; Вывод государства
             ld   hl,#2800
             ld   (Cord),hl
             ld   hl,TGOST
             ex   af,af'
-            call LIST
+            call PrintTextByIndex
 
-; ВЫВОД ЗВЕЗДЫ
+; Вывод звезды
             ld   hl,#3000
             ld   (Cord),hl
             ld   hl,TNAME
-            call Outtxt
+            call OutText
 
-; ПЛАНЕТА
+; Планета
             PAGES PGKRT
             ld   hl,#3822
             ld   (Cord),hl
             ld   hl,(WHERE)
             ld   de,(WHERE+2)
             ld   a,(WPLANET)
-            call PNTPLAN
+            call PrintPlanetName
             PAGES__NOARG
 
 
             ld   a,(WPLANET)
             ld   hl,(WHERE)
             ld   de,(WHERE+2)
-; ПРОВЕРКА ГОСУДАРСТВА
-            call PINFO
+; Проверка государства
+            call PlanetInfo
 
             and  a
             jr   nz,$+17
             ld   hl,#6000
             ld   (Cord),hl
             ld   hl,TINFS2
-            call Outtxt
-            jp   U_9
+            call OutText
+            jp   .U_9
 
-            exx  
+            exx
             ld   hl,#4019
             ld   (Cord),hl
-            exx  
+            exx
 
             push af
-            call PLIN
+            call PrintPlanetInfo
             pop  bc
 
             PAGES PGKRT
 
-; ВЫВОД ПЛАНЕТ
+; Вывод планет
             ld   a,0
             ld   hl,#6000
             ld   (Cord),hl
             push af
             push bc
-            call PNTPLN
+            call PrintPlanetNameHere
             pop  bc
             pop  af
             inc  a
             dec  b
-            jr   z,U_7
+            jr   z,.U_7
             ld   hl,#6020
             ld   (Cord),hl
             push af
             push bc
-            call PNTPLN
+            call PrintPlanetNameHere
             pop  bc
             pop  af
             inc  a
             dec  b
-            jr   z,U_7
+            jr   z,.U_7
             ld   hl,#6040
             ld   (Cord),hl
             push af
             push bc
-            call PNTPLN
+            call PrintPlanetNameHere
             pop  bc
             pop  af
             inc  a
             dec  b
-            jr   z,U_7
+            jr   z,.U_7
             ld   hl,#6800
             ld   (Cord),hl
             push af
             push bc
-            call PNTPLN
+            call PrintPlanetNameHere
             pop  bc
             pop  af
             inc  a
             dec  b
-            jr   z,U_7
+            jr   z,.U_7
             ld   hl,#6820
             ld   (Cord),hl
             push af
             push bc
-            call PNTPLN
+            call PrintPlanetNameHere
             pop  bc
             pop  af
             inc  a
             dec  b
-            jr   z,U_7
+            jr   z,.U_7
             ld   hl,#6840
             ld   (Cord),hl
-            call PNTPLN
+            call PrintPlanetNameHere
 
 
-U_7:
+.U_7
             PAGES__NOARG
 
-U_9:
+.U_9
             ld   hl,(PLACE)
             ld   de,(PLACE+2)
             PAGES PGKRT
             call NAME
             ld   hl,(PLACE)
-            call GOSTA
+            call FindStateAtMap
             ex   af,af'
             PAGES__NOARG
 
@@ -2610,12 +2313,12 @@ U_9:
             ld   (Cord),hl
             ld   hl,TGOST
             ex   af,af'
-            call LIST
+            call PrintTextByIndex
 
             ld   hl,#8800
             ld   (Cord),hl
             ld   hl,TNAME
-            call Outtxt
+            call OutText
 
 
             PAGES PGKRT
@@ -2624,142 +2327,140 @@ U_9:
             ld   hl,(PLACE)
             ld   de,(PLACE+2)
             ld   a,(PLANET)
-            call PNTPLAN
+            call PrintPlanetName
             PAGES__NOARG
 
 
-; ПРОВЕРКА ГОСУДАРСТВА
-            call PINFO2
+; Проверка государства
+            call PlanetInfoHere
 
-            jr   z,U_10
+            jr   z,.U_10
 
-            exx  
+            exx
             ld   hl,#9819
             ld   (Cord),hl
-            exx  
+            exx
 
             push af
-            call PLIN
+            call PrintPlanetInfo
             pop  bc
 
-U_10:
-            ret  
+.U_10
+            ret
 
 
-; ПОКАЗ ПЛАНЕТ СИСТЕМЫ
-WPLAN:
-            jp   WPLANC
-            call WINOBR1
+; Показ планет системы
+WPLAN
+            jp   .WPLANC
+            call WindowHandler1
             ret  c
             dec  a
-            jp   z,F_S22
-            call ERSOBJ
-            jr   nz,F_S23
-            ld   hl,RET_
-            ld   (ZADACHA+1),hl
-F_S23:
-            ret  
-F_S22:
-; ВЫБОР ПЛАНЕТЫ
+            jp   z,.F_S22
+            call EraseObject
+            jr   nz,.F_S23
+            ld   hl,DoNothing
+            ld   (TaskCall+1),hl
+.F_S23
+            ret
+.F_S22
+; Выбор планеты
 
             ld   a,(WPLANET)
             ld   hl,(WHERE)
             ld   de,(WHERE+2)
-            call PINFO
+            call PlanetInfo
             ret  z
             ex   af,af'
 
             ld   hl,(WPLAN_+1)
             xor  a
-            call TOOBJ
+            call ObjFieldAddr
             ld   a,(hl)
             inc  hl
             ld   h,(hl)
             ld   l,a
 
-;HL-КООРД. ОКНА
-;A-КОЛ. ПЛАНЕТ
+; HL-коорд. окна
+; A-кол. планет
             PAGES PGKRT
             ex   af,af'
-            call PLANCH
+            call ChoosePlanet
             PAGES__NOARG
-            call HIDESCR
+            call HideCursor
             call WINF_S
             call WPLA_N
-            call RETSCR
-            ret  
-WPLANC:
-            ret  
+            call ShowCursorBack
+            ret
+.WPLANC
+            ret
 
-WPLA_N:
+WPLA_N
             ld   de,WPLAN_
-            call FOBJ
+            call FindDeskObject
             ret  nz
-WPLAN_:
-; САМА КАРТА В КРУПНОМ МАСШТАБЕ
+WPLAN_
+; Сама карта в крупном масштабе
             ld   hl,0
-            call BLACKWP
-            call Outwin
-            call WHITEW
+            call SetBlackWindowPage
+            call OutWindow
+            call SetWhiteWindow
             ld   hl,(WPLAN_+1)
-            call TESTSZ
-            ld   hl,RET_
-            jr   nc,WN1
+            call TestWindowOut
+            ld   hl,DoNothing
+            jr   nc,.WN1
             ld   hl,WPLANZ
-WN1:
-            ld   (ZADACHA+1),hl
+.WN1
+            ld   (TaskCall+1),hl
 
-            call AMPLAN
+            call PlanetCount
             ret  z
 
             ex   af,af'
             PAGES PGKRT
             ex   af,af'
-            call WHO
+            call PlanetsSelectionKind
             PAGES__NOARG
 
-            ret  
+            ret
 
 
-
-
-W_Z:
-; ВЫСТАВЛЯЕТ ОКНО НА ВЕРХ
+W_Z
+; Выставляет окно на верх
             ld   a,(Unclick+1)
             or   a
             ret  nz
             xor  a
             ld   (WPLANZ+1),a
             ld   de,(WPLAN_+1)
-            call Mactive
-            call HIDESCR
+            call ActivateObject
+            call HideCursor
             call WPLA_N
-            jp   RETSCR
+            jp   ShowCursorBack
 
-WPLANZ:
-; ЗАДАЧА ВЫВОДА ПЛАНЕТ
+WPLANZ
+; Задача вывода планет
             ld   a,0
             or   a
             jr   nz,W_Z
 
             ld   a,%10000000
-            rrca 
+            rrca
             ld   ($-2),a
             ret  nc
 
-            call LASTOBJ
+            call LastDeskObject
             ld   de,WPLAN_
             SUB_DE
-; НЕ ПОСЛЕДНИЙ НА СТОЛЕ
+; Не последний на столе
             ret  nz
 
-            call AMPLAN
+            call PlanetCount
 
             push af
 
             xor  a
             ld   hl,(WPLAN_+1)
-            call TOOBJ
+            call ObjFieldAddr
             ld   e,(hl)
             inc  hl
             ld   d,(hl)
@@ -2777,98 +2478,98 @@ WPLANZ:
             ld   a,l
             inc  a
             sub  e
-            jr   c,NJ1
-            jr   z,NJ22
+            jr   c,.NJ1
+            jr   z,.NJ22
             dec  a
             cp   c
-            jr   nc,NJ1
-NJ22:
+            jr   nc,.NJ1
+.NJ22
             ld   a,h
             inc  a
             sub  d
-            jr   c,NJ1
-            jr   z,NJ2
+            jr   c,.NJ1
+            jr   z,.NJ2
             dec  a
             cp   b
-            jr   nc,NJ1
-NJ2:
-            call WOST
+            jr   nc,.NJ1
+.NJ2
+            call CursorRestoreSafe
             ld   a,1
             jr   $+3
-NJ1:
+.NJ1
             xor  a
-            ld   (NJ3+1),a
+            ld   (.NJ3+1),a
             push de
-            call CLINW
+            call ClearWindowChars
             pop  de
             PAGES PGKRT
 
             pop  af
 
-            call MOVPLAN
+            call AnimatePlanets
             PAGES__NOARG
-NJ3:        ld   a,0
+.NJ3
+            ld   a,0
             or   a
-            call nz,OUTC
-            ret  
+            call nz,CursorDrawSafe
+            ret
 
 
-; ИНФО ПРИВЕТСТВИЕ
-WWELCOME:
-            jp   WWELCOMEC
-            call WINOBR1
+; Инфо приветствие
+WWELCOME
+            jp   .WWELCOMEC
+            call WindowHandler1
             ret  c
             dec  a
             ret  z
-            jp   ERSOBJ
-WWELCOMEC:
-            ret  
+            jp   EraseObject
+.WWELCOMEC
+            ret
 
-WWELCOME_:
+WWELCOME_
             ld   hl,0
-            call Outwin
+            call OutWindow
             ld   a,1
             ld   (Mode+1),a
             ld   hl,WELCOME
-            call Outtxt
+            call OutText
             push hl
-; МОДЕЛЬ СТАНЦИИ
-            call PINFO2
+; Модель станции
+            call PlanetInfoHere
             ld   a,l
             dec  a
             ld   hl,MODELS
-            call LIST
+            call PrintTextByIndex
             pop  hl
-            call Outtxt
+            call OutText
             push hl
-; СИСТЕМА, ПЛАНЕТА
+; Система, планета
             ld   hl,(PLACE)
             ld   de,(PLACE+2)
             PAGES PGKRT
             call NAME
             ld   hl,TNAME
-            call Outtxt
+            call OutText
             ld   a,(Cord)
             add  a,4
             ld   (Cord),a
             ld   hl,(PLACE)
             ld   de,(PLACE+2)
             ld   a,(PLANET)
-            call PNTPLAN
+            call PrintPlanetName
             PAGES__NOARG
             pop  hl
-            call Outtxt
+            call OutText
             push hl
-; ЦЕНА ПРИБЫТИЯ
-            call PINFO2
+; Цена прибытия
+            call PlanetInfoHere
             ld   a,l
             add  a,a
             add  a,a
             add  a,l
             ld   c,a
             ld   b,0
-            call ONUMB
+            call PrintNumber
             pop  hl
-            call Outtxt
-            ret  
-
+            call OutText
+            ret

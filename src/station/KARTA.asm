@@ -1,38 +1,30 @@
-;KARTOUT    ■KUROT
-;CENTRE     ■CENTRE2
-;RAST       ■STARCH
-;OPRPLAN    ■GENKART
-;RNDI       ■MTBXX2_
-;MBUFM      ■PLANCH
-;MINRA      ■MOVPLAN
-;WHO_       ■WHO
-;PLOUT      ■FSTAR2
-;FSTAR      ■PNTPLN
-;PNTPLAN    ■CHHS
-;PINFO_     ■MARKOL
-;PWAYS
+;==============================================================================
+; KARTA - карта галактики: генерация звёздного поля, выбор звезды и планеты
+;
+; Где живёт: оверлей KARTA.C, ORG #C000, страница PGKRT (#11); первым в блоке (KARTA, DRAWLIN, CIRCMATH).
+;
+; Точки входа: DrawGalaxyMap (A = инверсия) выводит всё в окно карты; CenterMap/CenterMapAt;
+; GenerateMapTiles (четыре карты 256x256 из ГСЧ по координатам тайла) и BuildVisibleStars (отсечение
+; по окну, таблица DOTB); ChooseStar/FindPlanetAtCursor (звезда и планета под курсором); ChoosePlanet,
+; AnimatePlanets, DrawPlanetSprite (окно системы с вращающимися планетами); FindStarInMemory/Route
+; (память 10 звёзд и маршрут); GetSystemData (данные системы из семени, GAME_DESIGN 5.3);
+; PrintPlanetName; MarkRouteLine. Спрайты планет и маркеров Spr* (в конце файла), PWAYS (ways.d).
+; См. GAME_DESIGN 5.1-5.6.
+;==============================================================================
 
+DrawGalaxyMap   ; orig: KARTOUT
+; Вывод всего на карту
+; a-inverse
+            ld   (DrawCircle+1),a
 
-
-
-
-
-
-
-
-KARTOUT:
-; ВЫВОД ВСЕГО НА КАРТУ
-;a-INVERSE
-            ld   (CIRCLE+1),a
-
-; ВЫВОД КРУГА
+; Вывод круга
 
             ld   hl,(FUEL)
             ld   a,h
             and  a
             jr   nz,$+4
             ld   a,l
-            rra  
+            rra
             ld   l,a
             add  a,a
             add  a,l
@@ -66,12 +58,12 @@ KARTOUT:
             ld   de,(RDH)
             ld   d,0
             SUB_DE
-            jr   c,NOC1
+            jr   c,.NOC1
             ld   de,(MX1+1)
             ld   d,0
             SUB_DE
-            jr   nc,NOC
-NOC1:
+            jr   nc,.NOC
+.NOC1
             ld   a,(EYEY)
             ld   l,a
             ld   a,(KCORD+1)
@@ -92,42 +84,41 @@ NOC1:
             ld   bc,(RDH)
             ld   b,0
             SUB_BC
-            jr   c,NOC2
+            jr   c,.NOC2
             ld   bc,(MY1+1)
             ld   b,0
             SUB_BC
-            jr   nc,NOC
-NOC2:
+            jr   nc,.NOC
+.NOC2
             ex   af,af'
             ld   h,a
             xor  a
             rlc  e
-            ccf  
-            rla  
+            ccf
+            rla
             rlc  h
-            ccf  
-            rla  
+            ccf
+            rla
             ld   (RDS),a
 
-            call CIRCLE
-NOC:
+            call DrawCircle
+.NOC
 
 
-
-; ВЫВОД КУРСОРОВ
+; Вывод курсоров
 
             ld   de,(PLACE)
             ld   bc,(PLACE+2)
-            ld   hl,SKREST
-            call KUROT
+            ld   hl,SprCross
+            call .KUROT
             ld   de,(WHERE)
             ld   bc,(WHERE+2)
-            ld   hl,SPLUS
-            call KUROT
+            ld   hl,SprPlus
+            call .KUROT
             ld   hl,(AWAYS)
             ld   e,(hl)
             inc  e
-            jr   z,K_J1
+            jr   z,.K_J1
             dec  e
             inc  hl
             ld   d,(hl)
@@ -135,19 +126,19 @@ NOC:
             ld   c,(hl)
             inc  hl
             ld   b,(hl)
-            ld   hl,SNULL
-            call KUROT
-K_J1:
+            ld   hl,SprEmpty
+            call .KUROT
+.K_J1
 
-; БУФЕР ЗАПОМНЕННЫХ ЗВЕЗД
+; Буфер запомненных звезд
             ld   hl,MSTARS
-;#FF-ПУСТО,#80-КОНЕЦ СПИСКА
-O_K2:
+; #Ff-пусто,#80-конец списка
+.O_K2
             ld   e,(hl)
             inc  e
-            jr   z,O_K3
+            jr   z,.O_K3
             dec  e
-            jp   m,O_K1
+            jp   m,.O_K1
             inc  hl
             ld   d,(hl)
             inc  hl
@@ -156,46 +147,46 @@ O_K2:
             ld   b,(hl)
             INC_HL 2
             push hl
-            ld   hl,SQUADR
-            call KUROT
+            ld   hl,SprSquare
+            call .KUROT
             pop  hl
-            jp   O_K2
-O_K3:
+            jp   .O_K2
+.O_K3
             ld   bc,5
             add  hl,bc
-            jp   O_K2
-O_K1:
+            jp   .O_K2
+.O_K1
 
-; БУФЕР ЗВЕЗД ГДЕ ЖИВУТ ПИПЛЫ
+; Буфер звезд где живут пиплы
             ld   ix,PSTARS
-            ld   hl,ABONS           ;ОПИСАТЕЛЬ ВКЛ.ЛЮДЕЙ
-;#FF-КОНЕЦ СПИСКА
-O_K21:
+            ld   hl,ABONS           ; Описатель вкл.людей
+; #Ff-конец списка
+.O_K21
             ld   a,(hl)
             inc  hl
             and  a
-            jr   z,O_K31
-            jp   m,O_K11
+            jr   z,.O_K31
+            jp   m,.O_K11
             push hl
             ld   e,(ix+0)
             ld   d,(ix+1)
             ld   c,(ix+2)
             ld   b,(ix+3)
-            ld   hl,STREUG
-            call KUROT
+            ld   hl,SprTriangle
+            call .KUROT
             pop  hl
-O_K31:
+.O_K31
             ld   bc,4
             add  ix,bc
-            jp   O_K21
-O_K11:
-; БУФЕР МАРШРУТНЫХ ЗВЕЗД
+            jp   .O_K21
+.O_K11
+; Буфер маршрутных звезд
             ld   hl,WAY
-;#FF-ПУСТО,#80-КОНЕЦ СПИСКА
-O_K22:
+; #Ff-пусто,#80-конец списка
+.O_K22
             ld   a,(hl)
             or   a
-            jp   m,O_K12
+            jp   m,.O_K12
             ld   e,a
             inc  hl
             ld   d,(hl)
@@ -205,169 +196,168 @@ O_K22:
             ld   b,(hl)
             INC_HL 2
             push hl
-            ld   hl,SMINI
-            call KUROT
+            ld   hl,SprMinus
+            call .KUROT
             pop  hl
-            jp   O_K22
-O_K12:
+            jp   .O_K22
+.O_K12
 
-; ПОКАЗАТЬ МАРШРУТ ЛИНИИ
+; Показать маршрут линии
             ld   hl,WAY
             ld   de,WAYMASK
-;>=#80-НЕТ МАРШРУТА
+; >=#80-Нет маршрута
             bit  7,(hl)
-            call z,OUTLINE
-O_K4:
+            call z,DrawLine
+.O_K4
 
 
+; Вывод карты
+            halt
 
-; ВЫВОД КАРТЫ
-            halt 
+            ld   (.STK99+1),sp
+            exx
 
-            ld   (STK99+1),sp
-            exx  
-
-; КООРД. ГЛАЗ
-; Т.Е. ВЕРХНЕГО ЛЕВОГО КРАЯ ОКНА ПРОСМОТРА
-; КАРТЫ В ПИКСЕЛЯХ
+; Коорд. глаз
+; Т.е. верхнего левого края окна просмотра
+; Карты в пикселях
             ld   de,(EYEX)
 
             ld   a,(BXKRT)
-            ld   (BXK1+1),a
-            ld   (BXK3+1),a
+            ld   (.BXK1+1),a
+            ld   (.BXK3+1),a
             dec  a
-            neg  
-            ld   (BXK4+1),a
-            ld   (BXK2+1),a
+            neg
+            ld   (.BXK4+1),a
+            ld   (.BXK2+1),a
 
             ld   a,(BYKRT)
-            ld   (BYK1+1),a
+            ld   (.BYK1+1),a
             dec  a
-            neg  
-            ld   (BYK2+1),a
+            neg
+            ld   (.BYK2+1),a
 
-BYK1:       ld   bc,#8070           ;c=Y-BORDERS
+.BYK1
+            ld   bc,#8070           ; c=Y-borders
             ld   sp,KR1-2
             pop  hl
-NDT3:
+.NDT3
             pop  hl
             ld   a,h
             sub  d
-            jp   c,NDT
+            jp   c,.NDT
             cp   c
-            jp   nc,NDT
+            jp   nc,.NDT
             ex   af,af'
             ld   a,l
             sub  e
-            jp   c,NDT
-BXK1:       cp   #D0
-            jp   nc,NDT
-            exx  
+            jp   c,.NDT
+.BXK1
+            cp   #D0
+            jp   nc,.NDT
+            exx
             ld   b,a
             ex   af,af'
 
             PUTDOT
 
-            exx  
-NDT:
-            djnz NDT3
+            exx
+.NDT
+            djnz .NDT3
 
             ld   b,#80
-NDT31:
+.NDT31
             pop  hl
             ld   a,h
             sub  d
-            jp   c,NDT4
+            jp   c,.NDT4
             cp   c
-            jp   nc,NDT4
+            jp   nc,.NDT4
             ex   af,af'
             ld   a,e
             sub  l
-            jp   c,NDT4
-BXK2:       cp   #31
-            jp   c,NDT4
-            exx  
-            neg  
+            jp   c,.NDT4
+.BXK2
+            cp   #31
+            jp   c,.NDT4
+            exx
+            neg
             ld   b,a
             ex   af,af'
 
             PUTDOT
 
-            exx  
-NDT4:
-            djnz NDT31
+            exx
+.NDT4
+            djnz .NDT31
 
-BYK2:       ld   bc,#8091
-NDT32:
+.BYK2
+            ld   bc,#8091
+.NDT32
             pop  hl
             ld   a,d
             sub  h
-            jp   c,NDT41
+            jp   c,.NDT41
             cp   c
-            jp   c,NDT41
+            jp   c,.NDT41
             ex   af,af'
             ld   a,l
             sub  e
-            jp   c,NDT41
-BXK3:       cp   #D0
-            jp   nc,NDT41
-            exx  
+            jp   c,.NDT41
+.BXK3
+            cp   #D0
+            jp   nc,.NDT41
+            exx
             ld   b,a
             ex   af,af'
-            neg  
+            neg
 
             PUTDOT
 
-            exx  
-NDT41:
-            djnz NDT32
+            exx
+.NDT41
+            djnz .NDT32
 
             ld   b,#80
-NDT33:
+.NDT33
             pop  hl
             ld   a,d
             sub  h
-            jp   c,NDT42
+            jp   c,.NDT42
             cp   c
-            jp   c,NDT42
+            jp   c,.NDT42
             ex   af,af'
             ld   a,e
             sub  l
-            jp   c,NDT42
-BXK4:       cp   #31
-            jp   c,NDT42
-            exx  
-            neg  
+            jp   c,.NDT42
+.BXK4
+            cp   #31
+            jp   c,.NDT42
+            exx
+            neg
             ld   b,a
             ex   af,af'
-            neg  
+            neg
 
             PUTDOT
 
-            exx  
-NDT42:
-            djnz NDT33
-STK99:      ld   sp,0
+            exx
+.NDT42
+            djnz .NDT33
+.STK99
+            ld   sp,0
 
-            ret  
-
-
-
+            ret
 
 
-
-
-
-
-KUROT:
-; ВЫВОД КУРСОРА С ОБРЕЗАНИЕМ ПО КРАЯМ
-;de-КООРД. КАРТЫ
-;bc-КООРД. В КАРТЕ
-;hl-АДРЕС СПРАЙТА
+.KUROT
+; Вывод курсора с обрезанием по краям
+; de-коорд. карты
+; bc-коорд. в карте
+; hl-адрес спрайта
             ld   a,b
             ld   b,e
             ld   e,a
-;bc-BIG X,de- BIG Y
+; bc-big X,de- big Y
             push hl
             push de
             ld   hl,(KCORD)
@@ -375,7 +365,7 @@ KUROT:
             ld   a,d
             ld   d,l
             ld   l,a
-;de-BIG X,hl-BIG Y
+; de-big X,hl-big Y
             push hl
             ld   h,b
             ld   l,c
@@ -388,11 +378,11 @@ KUROT:
             DEC_HL 3
             pop  bc
 
-;hl-Y,de-X,bc-АДРЕС СПРАЙТА
+; hl-Y,de-X,bc-адрес спрайта
             ld   a,h
             or   d
-            ret  nz                 ;ВЫЛЕТ
-; ПРОВЕРКА НА ВЫЛЕТЫ
+            ret  nz                 ; Вылет
+; Проверка на вылеты
             ld   a,(BXKRT)
             sub  8
             cp   e
@@ -416,7 +406,7 @@ KUROT:
             ld   a,l
             and  7
             rept 4
-            rlca 
+            rlca
             endr
             ld   l,a
             ld   h,0
@@ -434,29 +424,30 @@ KUROT:
             ld   a,(de)
             xor  (hl)
             ld   (de),a
-            ret  
+            ret
 
 
-
-CENTRE:
-;de-КООРД. КАРТЫ
-;hl-КООРД. В КАРТЕ
+CenterMap   ; orig: CENTRE
+; Центрировать карту на звезде
+; de-коорд. карты
+; hl-коорд. в карте
             ld   (WHERE),de
             ld   (WHERE+2),hl
             push hl
             push de
-            call OPRPLAN
+            call FindPlanetAtCursor
             pop  de
             pop  hl
 
-CENTRE2:
+CenterMapAt   ; orig: CENTRE2
+; Центрирование по координатам
             ld   a,h
             ld   h,e
             ld   e,a
-;hl-X,de-Y
+; hl-X,de-Y
             ld   a,(BXKRT)
             srl  a
-            neg  
+            neg
             ld   b,#FF
             ld   c,a
             and  a
@@ -466,28 +457,27 @@ CENTRE2:
             EXD
             ld   a,(BYKRT)
             srl  a
-            neg  
+            neg
             ld   b,#FF
             ld   c,a
             and  a
             adc  hl,bc
             jp   p,$+6
             ld   hl,0
-;hl-Y,de-X
+; hl-Y,de-X
             ld   a,l
             ld   l,d
             ld   d,a
-;hl-KCORD
-;de-PSX
+; hl-KCORD
+; de-PSX
             ld   (KCORD),hl
             ld   (EYEX),de
-            ret  
+            ret
 
 
-
-RAST:
-;a-1-ST CORD
-;A'-2-ND CORD
+RAST
+; a-1-ST CORD
+; A'-2-ND CORD
             ld   e,a
             ld   d,a
             ld   b,8
@@ -495,7 +485,7 @@ RAST:
             rr   e
             jr   nc,$+3
             add  a,d
-            rra  
+            rra
             djnz $-6
             rr   e
             ld   h,a
@@ -508,26 +498,24 @@ RAST:
             rr   e
             jr   nc,$+3
             add  a,d
-            rra  
+            rra
             djnz $-6
             rr   e
             ld   d,a
             add  hl,de
-            ret  
+            ret
 
 
-
-
-STARCH:
-; ВЫБОР ЗВЕЗДЫ
-; ЕСЛИ ПЕРЕХОД НА ПОКАЗ ПЛАНЕТЫ ТО FZ-ON
-;FZ-OFF ПРОСТО ВЫБОР ЗВЕЗДЫ
-;FC-ON-СРОЧНЫЙ ВЫХОД БЕЗ РЕЗУЛЬТАТА
-;hl-КООРД. ОКНА В ПИКС
+ChooseStar   ; orig: STARCH
+; Выбор звезды
+; Если переход на показ планеты то FZ-on
+; FZ-off просто выбор звезды
+; Fc-on-срочный выход без результата
+; hl-коорд. окна в пикс
             push hl
             ld   hl,#FFFF
-            ld   (MINR+1),hl
-            call MBUFM
+            ld   (.MINR+1),hl
+            call BuildVisibleStars
             ld   bc,(Mcoord)
             pop  hl
 
@@ -550,147 +538,143 @@ STARCH:
 
             ld   hl,DOTB
 
-; ПОЛУЧАЕМ DX,DY
-SH31:
+; Получаем dx,dy
+.SH31
             inc  h
             inc  l
             ld   a,(hl)
             and  a
-            jp   z,SH21
+            jp   z,.SH21
             dec  l
             dec  h
             ld   a,(hl)
             sub  c
             jp   p,$+5
-            neg  
+            neg
             ex   af,af'
             inc  l
             ld   a,(hl)
             sub  b
             jp   p,$+5
-            neg  
-            exx  
+            neg
+            exx
             call RAST
-MINR:       ld   de,#FFFF
+.MINR
+            ld   de,#FFFF
             SUB_DE
-            jr   nc,SH11
+            jr   nc,.SH11
             add  hl,de
-            ld   (MINR+1),hl
-            exx  
+            ld   (.MINR+1),hl
+            exx
             dec  l
-            ld   (ADMIN+1),hl
+            ld   (.ADMIN+1),hl
             inc  l
-            exx  
-SH11:
-            exx  
+            exx
+.SH11
+            exx
             inc  l
-            jp   SH31
-SH21:
-ADMIN:      ld   hl,0
+            jp   .SH31
+.SH21
+.ADMIN
+            ld   hl,0
             inc  h
             ld   a,(hl)
             inc  l
             ld   h,(hl)
             ld   l,a
-;hl-DOT ADR inKART TABL
+; hl-dot adr inkart tabl
             ld   e,(hl)
             inc  l
             ld   d,(hl)
-;de-KOORDS. AS aRND DATA1
+; de-koords. as arnd DATA1
             ld   (WHERE+2),de
             ld   de,(KCORD)
             ld   a,h
             cp   high(KR1)
-            jr   z,SH41
+            jr   z,.SH41
             inc  e
             cp   high(KR2)
-            jr   z,SH41
+            jr   z,.SH41
             dec  e
             inc  d
             cp   high(KR3)
-            jr   z,SH41
+            jr   z,.SH41
             inc  e
-SH41:
+.SH41
             ld   (WHERE),de
 
-OPRPLAN:
-; ОПРЕДЕЛЕНИЕ ПЛАНЕТЫ НА КОТОРУЮ ПОСТАВИТЬ
-; КУРСОР
+FindPlanetAtCursor   ; orig: OPRPLAN
+; Определение планеты на которую поставить
+; Курсор
             ld   ix,MSTARS-5
             ld   bc,5
-AQ3:
+.AQ3
             ld   de,(WHERE+2)
-AQ1:
+.AQ1
             add  ix,bc
             ld   a,(ix+0)
             and  a
-            jp   m,AQ2
+            jp   m,.AQ2
             ld   l,(ix+2)
             ld   h,(ix+3)
             SUB_DE
-            jr   nz,AQ1
+            jr   nz,.AQ1
             ld   l,a
             ld   h,(ix+1)
             ld   de,(WHERE)
             SUB_DE
-            jr   nz,AQ3
+            jr   nz,.AQ3
             ld   a,(ix+4)
-            jr   AQ4
-AQ2:
+            jr   .AQ4
+.AQ2
             cp   #FF
-            jp   z,AQ1
+            jp   z,.AQ1
             xor  a
-AQ4:
+.AQ4
             ld   (WPLANET),a
-            ret  
+            ret
 
 
-
-
-
-
-
-GENKART:
-; ГЕНЕРИТЬ ЧЕТЫРЕ КАРТЫ КООРДИНАТЫ ВЕРХНЕЙ
-; ЛЕВОЙ КАРТЫ ИЗ ЭТИХ ЧЕТЫРЕХ ГЕНЕРИРУЕМЫХ
+GenerateMapTiles   ; orig: GENKART
+; Генерация четырёх карт (знакомест звёздного поля)
+; Генерить четыре карты координаты верхней
+; Левой карты из этих четырех генерируемых
             push de
             push hl
             push bc
             ld   de,(KCORD)
-            exx  
+            exx
             ld   hl,KR1
-            call RNDI
+            call .RNDI
             inc  e
-            exx  
+            exx
             ld   hl,KR2
-            call RNDI
+            call .RNDI
             inc  d
-            exx  
+            exx
             ld   hl,KR4
-            call RNDI
+            call .RNDI
             dec  e
-            exx  
+            exx
             ld   hl,KR3
-            call RNDI
+            call .RNDI
             pop  bc
             pop  hl
             pop  de
-            ret  
+            ret
 
 
-
-
-RNDI:
-            exx  
+.RNDI
+            exx
             push de
             ld   l,e
             ld   e,d
             ld   bc,#8237
             ld   h,0
             ld   d,h
-            exx  
-RNX:
-            exx  
+            exx
+.RNX
+            exx
             add  hl,de
             ld   a,h
             xor  #0A
@@ -703,30 +687,26 @@ RNX:
             ld   c,l
             pop  hl
             ld   a,h
-            exx  
+            exx
             ld   (hl),a
             inc  l
-            exx  
+            exx
             ld   a,d
-            exx  
+            exx
             ld   (hl),a
             inc  l
-            jp   nz,RNX
-            exx  
+            jp   nz,.RNX
+            exx
             pop  de
-            ret  
+            ret
 
 
+; Генерация таблицы поиска адреса по
+; Координатам в окне карты и байт пиксели
+; Для каждой позиции
+; de-коорд. карты
 
-
-
-
-; ГЕНЕРАЦИЯ ТАБЛИЦЫ ПОИСКА АДРЕСА ПО
-; КООРДИНАТАМ В ОКНЕ КАРТЫ И БАЙТ ПИКСЕЛИ
-; ДЛЯ КАЖДОЙ ПОЗИЦИИ
-;de-КООРД. КАРТЫ
-
-MTBXX2_:
+MTBXX2_
             ld   a,e
             add  a,8
             ld   e,a
@@ -736,7 +716,7 @@ MTBXX2_:
 
             GETADR
 
-;de-АДРЕС НА ЭКРАНЕ
+; de-адрес на экране
             and  #1F
             ex   af,af'
             ld   a,e
@@ -744,89 +724,82 @@ MTBXX2_:
             ld   e,a
 
             ld   hl,TBXX2_
-MT1_2:
+.MT1_2
             ld   (hl),d
             inc  h
             ld   (hl),e
             dec  h
             NEXTLINEDE
             inc  l
-            jr   nz,MT1_2
+            jr   nz,.MT1_2
             inc  h
             inc  h
             ld   a,#80
             ex   af,af'
-MT3_2:
+.MT3_2
             ld   b,8
-MT2:
+.MT2
             ld   (hl),a
             ex   af,af'
             inc  h
             ld   (hl),a
-            rrca 
+            rrca
             dec  h
             ex   af,af'
             inc  l
-            djnz MT2
+            djnz .MT2
             inc  a
             inc  l
             dec  l
-            jr   nz,MT3_2
-            ret  
+            jr   nz,.MT3_2
+            ret
 
 
-
-
-
-
-
-
-
-
-
-MBUFM:
-; СОЗДАНИЕ БУФЕРА ВИДИМЫХ ЗВЕЗД
-;1:1=0 END
-            halt 
-            ld   (STK97+1),sp
+BuildVisibleStars   ; orig: MBUFM
+; Создание буфера видимых звезд
+; 1:1=0 END
+            halt
+            ld   (.STK97+1),sp
             ld   hl,DOTB
-            exx  
-            ld   de,(EYEX)          ;PSY,PSX
+            exx
+            ld   de,(EYEX)          ; Psy,psx
 
             ld   a,(BXKRT)
-            ld   (BXK1_+1),a
-            ld   (BXK3_+1),a
+            ld   (.BXK1_+1),a
+            ld   (.BXK3_+1),a
             dec  a
-            neg  
-            ld   (BXK4_+1),a
-            ld   (BXK2_+1),a
+            neg
+            ld   (.BXK4_+1),a
+            ld   (.BXK2_+1),a
 
             ld   a,(BYKRT)
-            ld   (BYK1_+1),a
+            ld   (.BYK1_+1),a
             dec  a
-            neg  
-            ld   (BYK2_+1),a
+            neg
+            ld   (.BYK2_+1),a
 
 
-BYK1_:      ld   bc,#8170           ;Y-BORDERS
+.BYK1_
+            ld   bc,#8170           ; Y-borders
             ld   sp,KR1
-NT:
-            djnz NT3
-            jr   NT4-2
-NT3:
+.NT
+            djnz .NT3
+            jr   .NT4-2
+.NT3
             pop  hl
             ld   a,h
             sub  d
-            jp   c,NT
+            jp   c,.NT
             cp   c
-            jp   nc,NT
+            jp   nc,.NT
             ex   af,af'
             ld   a,l
             sub  e
-            jp   c,NT
-BXK1_:      cp   #D0
-            jp   nc,NT
-            exx  
+            jp   c,.NT
+.BXK1_
+            cp   #D0
+            jp   nc,.NT
+            exx
             ld   (hl),a
             inc  l
             ex   af,af'
@@ -842,27 +815,28 @@ BXK1_:      cp   #D0
             inc  l
             inc  l
             dec  h
-            exx  
-            jp   NT
+            exx
+            jp   .NT
             ld   b,#81
-NT4:
-            djnz NT31
-            jr   NT41-3
-NT31:
+.NT4
+            djnz .NT31
+            jr   .NT41-3
+.NT31
             pop  hl
             ld   a,h
             sub  d
-            jp   c,NT4
+            jp   c,.NT4
             cp   c
-            jp   nc,NT4
+            jp   nc,.NT4
             ex   af,af'
             ld   a,e
             sub  l
-            jp   c,NT4
-BXK2_:      cp   #31
-            jp   c,NT4
-            exx  
-            neg  
+            jp   c,.NT4
+.BXK2_
+            cp   #31
+            jp   c,.NT4
+            exx
+            neg
             ld   (hl),a
             inc  l
             ex   af,af'
@@ -878,30 +852,32 @@ BXK2_:      cp   #31
             inc  l
             inc  l
             dec  h
-            exx  
-            jp   NT4
-BYK2_:      ld   bc,#8191
-NT41:
-            djnz NT32
-            jr   NT42-2
-NT32:
+            exx
+            jp   .NT4
+.BYK2_
+            ld   bc,#8191
+.NT41
+            djnz .NT32
+            jr   .NT42-2
+.NT32
             pop  hl
             ld   a,d
             sub  h
-            jp   c,NT41
+            jp   c,.NT41
             cp   c
-            jp   c,NT41
+            jp   c,.NT41
             ex   af,af'
             ld   a,l
             sub  e
-            jp   c,NT41
-BXK3_:      cp   #D0
-            jp   nc,NT41
-            exx  
+            jp   c,.NT41
+.BXK3_
+            cp   #D0
+            jp   nc,.NT41
+            exx
             ld   (hl),a
             inc  l
             ex   af,af'
-            neg  
+            neg
             ld   (hl),a
             EXD
             ld   hl,0-2
@@ -914,36 +890,38 @@ BXK3_:      cp   #D0
             inc  l
             inc  l
             dec  h
-            exx  
-            jp   NT41
+            exx
+            jp   .NT41
             ld   b,#81
-NT42:
-            djnz NT33
-            exx  
+.NT42
+            djnz .NT33
+            exx
             inc  h
             inc  l
             ld   (hl),0
-STK97:      ld   sp,0
-            ret  
-NT33:
+.STK97
+            ld   sp,0
+            ret
+.NT33
             pop  hl
             ld   a,d
             sub  h
-            jp   c,NT42
+            jp   c,.NT42
             cp   c
-            jp   c,NT42
+            jp   c,.NT42
             ex   af,af'
             ld   a,e
             sub  l
-            jp   c,NT42
-BXK4_:      cp   #31
-            jp   c,NT42
-            exx  
-            neg  
+            jp   c,.NT42
+.BXK4_
+            cp   #31
+            jp   c,.NT42
+            exx
+            neg
             ld   (hl),a
             inc  l
             ex   af,af'
-            neg  
+            neg
             ld   (hl),a
             EXD
             ld   hl,0-2
@@ -956,15 +934,16 @@ BXK4_:      cp   #31
             inc  l
             inc  l
             dec  h
-            exx  
-            jp   NT42
+            exx
+            jp   .NT42
 
 
-PLANCH:
-; ВЫБРАТЬ ПЛАНЕТУ В КАРТЕ
-;hl-КООРД. ОКНА
-;a-КОЛ. ПЛАНЕТ
-; В WPLANET ВОЗВР. НОМЕР
+ChoosePlanet   ; orig: PLANCH
+; Выбор планеты в окне карты
+; Выбрать планету в карте
+; hl-коорд. окна
+; a-кол. планет
+; В wplanet возвр. номер
 
             ld   de,(Mcoord)
             ld   bc,#0404
@@ -976,83 +955,81 @@ PLANCH:
             SUB_DE
             EXD
             ld   hl,#FFFF
-            ld   (MINR2+1),hl
+            ld   (.MINR2+1),hl
 
             ld   b,a
 
             ld   hl,(PW1+1)
-            call MINRA
+            call .MINRA
             jr   nc,$+4
             ld   c,0
             dec  b
-            jr   z,PH0
+            jr   z,.PH0
             ld   hl,(PW2+1)
-            call MINRA
+            call .MINRA
             jr   nc,$+4
             ld   c,1
             dec  b
-            jr   z,PH0
+            jr   z,.PH0
             ld   hl,(PW3+1)
-            call MINRA
+            call .MINRA
             jr   nc,$+4
             ld   c,2
             dec  b
-            jr   z,PH0
+            jr   z,.PH0
             ld   hl,(PW4+1)
-            call MINRA
+            call .MINRA
             jr   nc,$+4
             ld   c,3
             dec  b
-            jr   z,PH0
+            jr   z,.PH0
             ld   hl,(PW5+1)
-            call MINRA
+            call .MINRA
             jr   nc,$+4
             ld   c,4
             dec  b
-            jr   z,PH0
+            jr   z,.PH0
             ld   hl,(PW6+1)
-            call MINRA
+            call .MINRA
             jr   nc,$+4
             ld   c,5
-PH0:
+.PH0
             ld   a,c
             ld   (WPLANET),a
-            ret  
+            ret
 
 
-
-
-MINRA:
-; НАЙТИ БЛИЖ ПЛАНЕТУ
+.MINRA
+; Найти ближ планету
             ld   a,(hl)
             inc  hl
             sub  e
             jp   p,$+5
-            neg  
+            neg
             ex   af,af'
             ld   a,(hl)
             sub  d
             jp   p,$+5
-            neg  
-            exx  
+            neg
+            exx
             call RAST
-MINR2:      ld   de,#FFFF
+.MINR2
+            ld   de,#FFFF
             SUB_DE
-            exx  
+            exx
             ret  nc
-            exx  
+            exx
             add  hl,de
-            ld   (MINR2+1),hl
-            scf  
-            exx  
-            ret  
+            ld   (.MINR2+1),hl
+            scf
+            exx
+            ret
 
 
-
-MOVPLAN:
-; ДВИЖЕНИЕ ПЛАНЕТ В ОКНЕ
-;a-КОЛ. ПЛАНЕТ
-;de-КООРД. ОКНА В ЗНАКАХ
+AnimatePlanets   ; orig: MOVPLAN
+; Движение планет в окне
+; a-кол. планет
+; de-коорд. окна в знаках
             ld   (KOLP+1),a
             ex   af,af'
             ld   a,4
@@ -1097,206 +1074,213 @@ MOVPLAN:
             ld   c,l
 
 
-ADP1:       ld   hl,0
-            call WHO_
+ADP1
+            ld   hl,0
+            call PlanetCursorKind
             ld   (ADP+1),hl
-PW1:        ld   hl,PWAYS+138+40
+PW1
+            ld   hl,PWAYS+138+40
             ld   a,(hl)
             cp   #80
             jr   nz,$+7
             ld   hl,PWAYS+138
             jr   $-8
-            call PLOUT
+            call DrawPlanetSprite
             ld   (PW1+1),hl
             ret  m
 
-ADP2:       ld   hl,0
-            call WHO_
+ADP2
+            ld   hl,0
+            call PlanetCursorKind
             ld   (ADP+1),hl
-PW2:        ld   hl,PWAYS+57+28
+PW2
+            ld   hl,PWAYS+57+28
             ld   a,(hl)
             cp   #80
             jr   nz,$+7
             ld   hl,PWAYS+57
             jr   $-8
-            call PLOUT
+            call DrawPlanetSprite
             ld   (PW2+1),hl
             ret  m
 
-ADP3:       ld   hl,0
-            call WHO_
+ADP3
+            ld   hl,0
+            call PlanetCursorKind
             ld   (ADP+1),hl
-PW3:        ld   hl,PWAYS+12
+PW3
+            ld   hl,PWAYS+12
             ld   a,(hl)
             cp   #80
             jr   nz,$+7
             ld   hl,PWAYS
             jr   $-8
-            call PLOUT
+            call DrawPlanetSprite
             ld   (PW3+1),hl
             ret  m
 
-ADP4:       ld   hl,0
-            call WHO_
+ADP4
+            ld   hl,0
+            call PlanetCursorKind
             ld   (ADP+1),hl
-PW4:        ld   hl,PWAYS+243+60
+PW4
+            ld   hl,PWAYS+243+60
             ld   a,(hl)
             cp   #80
             jr   nz,$+7
             ld   hl,PWAYS+243
             jr   $-8
-            call PLOUT
+            call DrawPlanetSprite
             ld   (PW4+1),hl
             ret  m
 
-ADP5:       ld   hl,0
-            call WHO_
+ADP5
+            ld   hl,0
+            call PlanetCursorKind
             ld   (ADP+1),hl
-PW5:        ld   hl,PWAYS+372+100
+PW5
+            ld   hl,PWAYS+372+100
             ld   a,(hl)
             cp   #80
             jr   nz,$+7
             ld   hl,PWAYS+372
             jr   $-8
-            call PLOUT
+            call DrawPlanetSprite
             ld   (PW5+1),hl
             ret  m
 
-ADP6:       ld   hl,0
-            call WHO_
+ADP6
+            ld   hl,0
+            call PlanetCursorKind
             ld   (ADP+1),hl
-PW6:        ld   hl,PWAYS+525
+PW6
+            ld   hl,PWAYS+525
             ld   a,(hl)
             cp   #80
             jr   nz,$+7
             ld   hl,PWAYS+525
             jr   $-8
-            call PLOUT
+            call DrawPlanetSprite
             ld   (PW6+1),hl
-            ret  
+            ret
 
 
-
-WHO_:
-; ОПРЕД. ВИДА КУРСОРА ЕСЛИ ТОТ МАРГАЕТ
-; МАРГАЕТ ТОЛЬКО КУРСОР ТЕКУЩЕЙ ПЛАНЕТЫ
-            ld   de,SPRP4
+PlanetCursorKind   ; orig: WHO_
+; Вид курсора мигающей планеты
+; Опред. вида курсора если тот маргает
+; Маргает только курсор текущей планеты
+            ld   de,SprPlanetCursor
             SUB_DE
             add  hl,de
             ret  nz
             ld   a,%11001100
-            rrca 
+            rrca
             ld   ($-2),a
             ret  c
-            ld   hl,SPRP
-            ret  
+            ld   hl,SprPlanet
+            ret
 
 
-
-
-
-
-WHO:
-; ОПРЕДЕЛЕНИЕ ТИПА ВЫДЕЛЕНИЯ ВСЕХ ПЛАНЕТ
-;a-КОЛ. ПЛАНЕТ
+PlanetsSelectionKind   ; orig: WHO
+; Определение типа выделения всех планет
+; a-кол. планет
             ld   b,a
             ld   (KOLP+1),a
-            call WHO2
+            call .WHO2
             ld   (ADP1+1),hl
             dec  b
             ret  z
-            call WHO2
+            call .WHO2
             ld   (ADP2+1),hl
             dec  b
             ret  z
-            call WHO2
+            call .WHO2
             ld   (ADP3+1),hl
             dec  b
             ret  z
-            call WHO2
+            call .WHO2
             ld   (ADP4+1),hl
             dec  b
             ret  z
-            call WHO2
+            call .WHO2
             ld   (ADP5+1),hl
             dec  b
             ret  z
-            call WHO2
+            call .WHO2
             ld   (ADP6+1),hl
-            ret  
+            ret
 
-WHO2:
+.WHO2
             ld   l,b
-KOLP:       ld   a,0
+KOLP
+            ld   a,0
             sub  l
             ld   hl,(WHERE+2)
             ld   de,(PLACE+2)
             SUB_DE
-            jr   nz,PW_
+            jr   nz,.PW_
             ld   hl,(WHERE)
             ld   de,(PLACE)
             SUB_DE
-            jr   nz,PW_
+            jr   nz,.PW_
             ld   l,a
             ld   a,(PLANET)
             cp   l
             ld   a,l
-            jr   nz,PW_
-            ld   hl,SPRP2
-            ret  
-PW_:
+            jr   nz,.PW_
+            ld   hl,SprPlanetHere
+            ret
+.PW_
             ld   l,a
             ld   a,(WPLANET)
             cp   l
-; ВЫБОР
+; Выбор
             ld   a,l
-            ld   hl,SPRP4
+            ld   hl,SprPlanetCursor
             ret  z
-            ld   (NP1+1),a
+            ld   (.NP1+1),a
 
-; НА ПРОВЕРКУ ДАЛЕЕ
+; На проверку далее
             push bc
 
 
             ld   ix,WAY-5
             ld   bc,5
-PW_3:
+.PW_3
             ld   de,(WHERE+2)
-PW_4:
+.PW_4
             add  ix,bc
             ld   a,(ix+0)
             or   a
-            jp   m,PW_2
+            jp   m,.PW_2
             ld   l,(ix+2)
             ld   h,(ix+3)
             SUB_DE
-            jr   nz,PW_4
+            jr   nz,.PW_4
             ld   l,a
             ld   h,(ix+1)
             ld   de,(WHERE)
             SUB_DE
-            jr   nz,PW_3
-NP1:        ld   a,0
+            jr   nz,.PW_3
+.NP1
+            ld   a,0
             cp   (ix+4)
-            jr   nz,PW_3
-            ld   hl,SPRP3
+            jr   nz,.PW_3
+            ld   hl,SprPlanetRoute
             pop  bc
-            ret  
-PW_2:
-            ld   hl,SPRP
+            ret
+.PW_2
+            ld   hl,SprPlanet
             pop  bc
-            ret  
+            ret
 
 
-
-
-
-PLOUT:
-; ВЫВОД СПРАЙТА ПЛАНЕТЫ ИЛИ МАРКЕРА ЕЕ
-;a-X
-;(HL+1)-Y
-;A'-КОЛ. ПЛАНЕТ
-;c,b-КООРД. ЦЕНТРА
+DrawPlanetSprite   ; orig: PLOUT
+; Вывод спрайта планеты или маркера ее
+; a-X
+; (HL+1)-Y
+; A'-кол. планет
+; c,b-коорд. центра
             inc  hl
             add  a,c
             ld   e,a
@@ -1320,7 +1304,8 @@ PLOUT:
             ld   l,a
             add  a,a
             add  a,l
-ADP:        ld   hl,0
+ADP
+            ld   hl,0
             add  a,l
             ld   l,a
             ld   a,h
@@ -1354,28 +1339,25 @@ ADP:        ld   hl,0
             LDX_HL_A
             pop  hl
             xor  a
-            ret  
+            ret
 
 
-
-
-
-FSTAR2:
-; ПОИСК ЗВЕЗДЫ (WHERE)
-; В БУФЕРЕ МАРШРУТА
-;FS-ON НЕ НАЙДЕНА
+FindStarInRoute   ; orig: FSTAR2
+; Поиск звезды (where)
+; В буфере маршрута
+; Fs-on не найдена
             ld   de,WAY
-            jr   FSTAR+3
+            jr   FindStarInMemory+3
 
-FSTAR:
-; ПОИСК ЗВЕЗДЫ (WHERE)
-; В БУФЕРЕ ЗАПОМИНАНИЙ
-;FS-ON НЕ НАЙДЕНА
+FindStarInMemory   ; orig: FSTAR
+; Поиск звезды (where)
+; В буфере запоминаний
+; Fs-on не найдена
             ld   de,MSTARS
-F_R2:
+.F_R2
             ld   a,(de)
             inc  a
-            jr   z,F_R1
+            jr   z,.F_R1
             dec  a
             ret  m
             ld   l,a
@@ -1385,7 +1367,7 @@ F_R2:
             inc  de
             ld   bc,(WHERE)
             SUB_BC
-            jr   nz,F_R1+2
+            jr   nz,.F_R1+2
             ld   a,(de)
             ld   l,a
             inc  de
@@ -1393,20 +1375,22 @@ F_R2:
             ld   h,a
             ld   bc,(WHERE+2)
             SUB_BC
-            jr   nz,F_R1+3
+            jr   nz,.F_R1+3
             xor  a
-            ret  
-F_R1:
+            ret
+.F_R1
             INC_DE 5
-            jr   F_R2
+            jr   .F_R2
 
-PNTPLN:
+PrintPlanetNameHere   ; orig: PNTPLN
+; Печать имени планеты текущей системы
             ld   hl,(WHERE)
             ld   de,(WHERE+2)
-PNTPLAN:
-; ПЕЧАТЬ ИМЕНИ ПЛАНЕТЫ
-;a-НОМЕР С 0
-;hl,de-ДАННЫЕ СИСТЕМЫ
+
+PrintPlanetName   ; orig: PNTPLAN
+; Печать имени планеты
+; a-номер с 0
+; hl,de-данные системы
             ld   (RNDD1),hl
             ld   (RNDD2),de
             ld   c,a
@@ -1422,7 +1406,7 @@ PNTPLAN:
             xor  a
             jr   nz,$+8
             RST_ "-"
-            ret  
+            ret
 
             call RNDD
             djnz $-3
@@ -1433,34 +1417,31 @@ PNTPLAN:
             RST_ "-"
             ld   a,b
             and  #F0
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             inc  a
             add  a,c
             ld   c,a
             ld   b,0
             xor  a
-            jp   Onum5
+            jp   PrintNumberPad
 
 
-
-
-
-
-CHHS:
-; КРАСИТ СТРОКУ ДЛЯ МАРКИРОВКИ
-;b-ШИРИНА ОКНА
-;hl-АДРЕС НА ЕКРАНЕ
+PaintMarkRow   ; orig: CHHS
+; Закрасить строку для маркировки
+; Красит строку для маркировки
+; b-ширина окна
+; hl-адрес на екране
             ld   a,31
-            sub  b                  ;ШИРИНА ОКНА
+            sub  b                  ; Ширина окна
             add  a,a
             add  a,a
-            ld   (JJ_88+1),a
+            ld   (.JJ_88+1),a
 
             ld   b,8
-U_2:
+.U_2
             ld   c,l
             rrc  e
             jr   c,$+7
@@ -1468,10 +1449,11 @@ U_2:
             LDX_HL_A
             inc  l
 
-JJ_88:      jr   $+2
+.JJ_88
+            jr   $+2
             rept 31
             ld   a,(hl)
-            cpl  
+            cpl
             ld   (hl),a
             inc  l
             endr
@@ -1484,25 +1466,21 @@ JJ_88:      jr   $+2
             ld   l,c
             NEXTLINE
             dec  b
-            jp   nz,U_2
-            ret  
+            jp   nz,.U_2
+            ret
 
 
-
-
-
-
-
-PINFO_:
-; ОПРЕДЕЛЕНИЕ ДАННЫХ СИСТЕМЫ
-;hl,de-ДАННЫЕ СИСТЕМЫ
-;a-НОМЕР ПЛАНЕТЫ С 0
-;ret:
-;a-КОЛ. ПЛАНЕТ
-;l-УРОВЕНЬ
-;h-СТРОЙ
-;e-СПЕЦИАЛИЗАЦИЯ
-;d-НОМЕР ГОСУДАРТСВА
+GetSystemData   ; orig: PINFO_
+; Данные системы по номеру планеты
+; Определение данных системы
+; hl,de-данные системы
+; a-номер планеты с 0
+; ret:
+; a-кол. планет
+; l-уровень
+; h-строй
+; e-специализация
+; d-номер государтсва
             push bc
             ex   af,af'
             ld   a,h
@@ -1519,7 +1497,7 @@ PINFO_:
             inc  a
             ld   b,a
 
-            call GOSTA
+            call FindStateAtMap
             push af
             cp   3
             ld   c,0
@@ -1529,17 +1507,17 @@ PINFO_:
             djnz $-3
             pop  de
 
-            cpl  
+            cpl
             ld   e,a
-;%SSUUUUTT
+; %Ssuuuutt
             and  %00111100
-            rrca 
-            rrca 
+            rrca
+            rrca
             inc  a
             ld   l,a
             ld   a,e
-            rlca 
-            rlca 
+            rlca
+            rlca
             and  3
             dec  c
             jr   nz,$+4
@@ -1550,20 +1528,17 @@ PINFO_:
             ld   e,a
             ex   af,af'
             pop  bc
-            ret  
+            ret
 
 
+MarkRouteLine   ; orig: MARKOL
+; Определение и коректировка вектора
+; Маски линии, количества узлов и номера
+; Их опр. кол.
 
-
-
-MARKOL:
-; ОПРЕДЕЛЕНИЕ И КОРЕКТИРОВКА ВЕКТОРА
-; МАСКИ ЛИНИИ, КОЛИЧЕСТВА УЗЛОВ И НОМЕРА
-; ИХ ОПР. КОЛ.
-
-; ПРОВЕРИТЬ АДРЕС ЗВЕЗДЫ С КОТОР. БУДЕТ
-; ПОСТРОЕНИЕ ЧТОБЫ НЕ БЫЛО ВЫЛЕТОВ
-; ИЛИ ПУСТОГО МЕСТА
+; Проверить адрес звезды с котор. будет
+; Построение чтобы не было вылетов
+; Или пустого места
             ld   hl,(AWAYS)
             ld   bc,0-5
             ld   a,(hl)
@@ -1603,16 +1578,16 @@ MARKOL:
             inc  hl
             add  a,5
             djnz $-4
-            ret  
+            ret
 
-PWAYS:
+PWAYS
             incbin "ways.d"
 
 
+; Просто планета
 
-
-; ПРОСТО ПЛАНЕТА
-SPRP:
+SprPlanet   ; orig: SPRP
+; Спрайт: просто планета
             db   %00000000,0
             db   %01000000,0
             db   %00000000,0
@@ -1637,8 +1612,10 @@ SPRP:
             db   %00000000,%00000000
             db   %00000000,%10000000
             db   %00000000,%00000000
-; ПРЕБЫВАНИЕ НА ПЛАНЕТЕ
-SPRP2:
+; Пребывание на планете
+
+SprPlanetHere   ; orig: SPRP2
+; Спрайт: планета пребывания
             db   %10100000,0
             db   %01000000,0
             db   %10100000,0
@@ -1663,8 +1640,10 @@ SPRP2:
             db   %00000001,%01000000
             db   %00000000,%10000000
             db   %00000001,%01000000
-; МАРШРУТНАЯ ПЛАНЕТА
-SPRP3:
+; Маршрутная планета
+
+SprPlanetRoute   ; orig: SPRP3
+; Спрайт: маршрутная планета
             db   %11100000,0
             db   %10100000,0
             db   %11100000,0
@@ -1689,8 +1668,10 @@ SPRP3:
             db   %00000001,%11000000
             db   %00000001,%01000000
             db   %00000001,%11000000
-; ВЫБОР ПЛАНЕТЫ
-SPRP4:
+; Выбор планеты
+
+SprPlanetCursor   ; orig: SPRP4
+; Спрайт: выбор планеты
             db   %01000000,0
             db   %11100000,0
             db   %01000000,0
@@ -1717,7 +1698,8 @@ SPRP4:
             db   %00000000,%10000000
 
 
-SPLUS:
+SprPlus   ; orig: SPLUS
+; Спрайт-маркер плюс
             db   %00010000,%00000000
             db   %00010000,%00000000
             db   %00000000,%00000000
@@ -1782,7 +1764,9 @@ SPLUS:
             db   %00000000,%00100000
             db   %00000000,%00100000
             db   %00000000,%00000000
-SMINI:
+
+SprMinus   ; orig: SMINI
+; Спрайт-маркер минус
             db   %00000000,%00000000
             db   %00000000,%00000000
             db   %00111000,%00000000
@@ -1847,7 +1831,9 @@ SMINI:
             db   %00000000,%00000000
             db   %00000000,%00000000
             db   %00000000,%00000000
-STREUG:
+
+SprTriangle   ; orig: STREUG
+; Спрайт-маркер треугольник
             db   %00010000,%00000000
             db   %00101000,%00000000
             db   %01000100,%00000000
@@ -1912,7 +1898,9 @@ STREUG:
             db   %00000000,%01010000
             db   %00000000,%00100000
             db   %00000000,%00000000
-SNULL:
+
+SprEmpty   ; orig: SNULL
+; Спрайт-маркер пустой
             db   %00000000,%00000000
             db   %00111000,%00000000
             db   %01000100,%00000000
@@ -1977,7 +1965,9 @@ SNULL:
             db   %00000000,%01110000
             db   %00000000,%00000000
             db   %00000000,%00000000
-SKREST:
+
+SprCross   ; orig: SKREST
+; Спрайт-маркер крест
             db   %10000010,%00000000
             db   %01000100,%00000000
             db   %00000000,%00000000
@@ -2044,7 +2034,8 @@ SKREST:
             db   %00000000,%00000000
 
 
-SQUADR:
+SprSquare   ; orig: SQUADR
+; Спрайт-маркер квадрат
             db   %11000110,%00000000
             db   %10000010,%00000000
             db   %00000000,%00000000
@@ -2109,5 +2100,3 @@ SQUADR:
             db   %00000001,%00000100
             db   %00000001,%10001100
             db   %00000000,%00000000
-
-

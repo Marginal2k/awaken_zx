@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+import { renderZX } from '../js/zxrender.js';
+import { sheet } from './png.mjs';
+import { loadAll } from './common.mjs';
+const [, , fr, name, x0, y0, out, cull, parity, rowOrigin] = process.argv;
+const frame = JSON.parse(fs.readFileSync(fr, 'utf8'));
+const m = loadAll()[1].models.find((e) => e.name === name).model;
+const W = frame.xh + 1, H = frame.yh + 1;
+const r = renderZX(m, { matrix: frame.matrix, pos: { x: 0, y: 0, z: frame.zet }, w: W, h: H, cx: frame.mdx, cy: frame.mdy, cull: 'pos', parity: +(parity || 0), engine: 'station' });
+const X = +x0, Y = +y0;
+const game = { w: W, h: H, get: (x, y) => (frame.screen[Y + y][X + x] ? 0 : 1) };
+const mine = { w: W, h: H, get: (x, y) => r.bm.lit(x, y) };
+const diff = { w: W, h: H, get: (x, y) => { const a = game.get(x, y), b = mine.get(x, y); return a === b ? a : 2; } };
+fs.writeFileSync(out, sheet([game, mine, diff], 4));
+console.log('visible faces', r.visible.map((v, i) => v ? i : '').filter((x) => x !== '').join(' '));

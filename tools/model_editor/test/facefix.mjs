@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import { renderZX } from '../js/zxrender.js';
+import { loadAll } from './common.mjs';
+const frame = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+const m = loadAll()[1].models.find((e) => e.name === process.argv[3]).model;
+const W = frame.xh + 1, H = frame.yh + 1, X = +process.argv[4], Y = +process.argv[5];
+const score = (o) => { const r = renderZX(m, { matrix: frame.matrix, pos: { x: 0, y: 0, z: frame.zet }, w: W, h: H, cx: frame.mdx, cy: frame.mdy, cull: 'pos', ...o });
+  let ok = 0; for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (frame.screen[Y + y][X + x] === r.bm.d[y * W + x]) ok++; return [ok, r]; };
+const [base, r0] = score({});
+console.log('base', base, 'of', W * H);
+m.faces.forEach((f, i) => { const ov = []; ov[i] = !r0.visible[i]; const [s] = score({ override: ov }); console.log(i, f.kind, f.hi, f.v.join(','), 'vis', r0.visible[i], 'cross', r0.cross[i], 'flip->', s - base); });

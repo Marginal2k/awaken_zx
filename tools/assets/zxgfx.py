@@ -77,6 +77,23 @@ def image_to_scr(im, name='image', layout='screen'):
     return bytes(out)
 
 
+def image_to_bitmap(im, name='image'):
+    """256x192 picture -> 6144 bitmap bytes in ZX screen order; white (or any bright) pixel = 1, black = 0 (no attributes)."""
+    im = im.convert('L')
+    if im.size != (256, 192):
+        raise ValueError('%s: the picture must be 256x192 pixels, it is %dx%d' % (name, im.size[0], im.size[1]))
+    px = im.load()
+    out = bytearray(6144)
+    for y in range(192):
+        for xb in range(32):
+            v = 0
+            for k in range(8):
+                if px[xb * 8 + k, y] > 127:
+                    v |= 0x80 >> k
+            out[bitmap_offset(y, xb, 'screen')] = v
+    return bytes(out)
+
+
 def pixels_hash(im):
     import hashlib
     im = im.convert('RGBA')

@@ -78,6 +78,12 @@ def generate(root, outdir):
         if len(blob) > 0x1B00:
             raise SystemExit('intro_closing.png packs to %d bytes; the intro copies at most 6912 bytes of the blob.  Simplify the picture (long runs of equal bytes pack well).' % len(blob))
     open(os.path.join(outdir, 'intro_depack.bin'), 'wb').write(blob)
+    # --- the ending FINALF.C: code (assets/ending/finalf_code.bin) + three 1-bit screens (the code copies them from #62A9 into banks 7, 0, 1)
+    code = open(os.path.join(root, 'assets', 'ending', 'finalf_code.bin'), 'rb').read()
+    bms = []
+    for n in ('ending_1_spas_mir', 'ending_2_sdelal_eto', 'ending_3_galaxy'):
+        bms.append(zxgfx.image_to_bitmap(Image.open(os.path.join(gfx, n + '.png')), n))
+    open(os.path.join(outdir, 'FINALF.C'), 'wb').write(code[:0x2A9] + b''.join(bms) + code[0x2A9:])
     # --- fonts and cursors (exact conversions)
     widths = []
     for l in open(os.path.join(gfx, 'pro_font_widths.csv'), encoding='utf-8'):

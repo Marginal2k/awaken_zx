@@ -81,7 +81,7 @@ def main():
       code(B + '/flight/CONTROL.C', 'CONTROL', 0xE013)
       code(B + '/flight/OBJECT3D.C', 'OBJECT3D', 0xC000)
       code(B + '/gen/PANEL.C', 'PANEL', 0x6373)
-      code(ROOT + '/assets/FINALF.C', 'FINALF', 0x6000)     # ending (self-contained); started by LaunchEnding in the station
+      code(B + '/gen/FINALF.C', 'FINALF', 0x6000)     # ending (self-contained); started by LaunchEnding in the station
       d.save(B + '/' + out)
       print('OK build/' + out)
     if TEST or TEST_END:        # test builds boot straight into the station (the scenarios do not wait for the intro)

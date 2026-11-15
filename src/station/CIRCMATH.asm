@@ -1,72 +1,51 @@
-;CIRCLE
-;CLIP
-;NAME
-;NUMTXT
-;NAMTAB
-;GOSTA
-;FARER
-;KORNI
+;==============================================================================
+; CIRCMATH - окружность на карте, имена звёзд, государства, расстояния
+;
+; Где живёт: оверлей KARTA.C, ORG #C000, страница PGKRT (#11); собирается после KARTA и DRAWLIN.
+;
+; Содержит: DrawCircle (круг радиуса прыжка в окне карты с клиппированием по окну), Square, CircleHalfWidth
+; (X = sqrt(r^2 - Y^2) по таблице квадратов/корней), NAME (имя звезды по координатам: греческое слово
+; из NAMTAB), FindStateAtMap (государство по координатам карты), StarDistance (расстояние через таблицу
+; KORNI.d), буферы KR1..KR4, DOTB, DOTCO, DOTCLP (поле звёзд, видимые точки; EQU после TBXX2_).
+; Данные: 0E0200.d, KORNI.d (assets), NAMTAB.inc. См. GAME_DESIGN 5.1-5.3, 5.6.
+;==============================================================================
+
+; Файлы cyrcle & матнк
 
 
+RDY         db   0
+RDX         db   0
+;  Знаки b0-X,b1-Y ,1-plus
+;  Так же b2,b3=1,1
+RDS         db   #0F
+RDH         db   40                 ; Длинна полу стороны
 
+RYX         db   0,0
+CY          db   0
+CX          db   0
+VY          db   0
+STK_L       dw   0
+VAR1        dw   0
+MASK        db   0
+UPDWN       db   0
 
+ADL         dw   #4000
+ADH         dw   #5800
 
-
-
-
-
-
-
-
-
-
-; ФАЙЛЫ CYRCLE & MATHK
-
-
-RDY:        db   0
-RDX:        db   0
-;  ЗНАКИ b0-X,b1-Y ,1-PLUS
-;  ТАК ЖЕ b2,b3=1,1
-RDS:        db   #0F
-RDH:        db   40                 ;ДЛИННА ПОЛУ СТОРОНЫ
-
-RYX:        db   0,0
-CY:         db   0
-CX:         db   0
-VY:         db   0
-STK_L:      dw   0
-VAR1:       dw   0
-MASK:       db   0
-UPDWN:      db   0
-
-ADL:        dw   #4000
-ADH:        dw   #5800
-
-BRX:        db   0
-MIDX:       db   0
-MIDY:       db   0
-MIDX0:      db   0
-MIDX8:      db   0
-
-
-
-
-
-
-
-
-
-
-
-
-
+BRX         db   0
+MIDX        db   0
+MIDY        db   0
+MIDX0       db   0
+MIDX8       db   0
 
 
 ;-----------------
-CIRCLE:
-;a-INVERSE
+
+DrawCircle   ; orig: CIRCLE
+; Вывод окружности/круга в окне карты
+; a-inverse
             ld   a,0
-            rra  
+            rra
             ld   a,#38
             jr   c,$+4
             ld   a,#30
@@ -78,10 +57,11 @@ CIRCLE:
             cp   #09
             ret  c
 
-;  КЛИПИНГ И ВЫВОД
-CLIP:       ld   bc,(RDY)
+;  Клипинг и вывод
+.CLIP
+            ld   bc,(RDY)
             ld   (RYX),bc
-;  НАЙДЕМ РЕАЛЬНЫЕ КООРДИНАТЫ
+;  Найдем реальные координаты
             ld   de,(RDS)
             ld   a,(MIDY)
             bit  1,e
@@ -89,64 +69,65 @@ CLIP:       ld   bc,(RDY)
             add  a,c
             add  a,c
             sub  c
-            ld   (CY),a             ;Y ОТ КРАЯ ОКНА
+            ld   (CY),a             ; Y от края окна
             ld   a,(MIDX)
             bit  0,e
             jr   z,$+4
             add  a,b
             add  a,b
             sub  b
-            ld   (CX),a             ;X ОТ КРАЯ ОКНА
-;  ПРОВЕРКА ГДЕ ЛЕЖИТ ЦЕНТР КРУГА
-;  ВЫЛЕТЕЛ ЛИ ОН СЛЕВА ИЛИ СПРАВА,
-;  СНИЗУ ИЛИ СВЕРХУ ЦЕНТРА ОКНА
+            ld   (CX),a             ; X от края окна
+;  Проверка где лежит центр круга
+;  Вылетел ли он слева или справа,
+;  Снизу или сверху центра окна
             ld   a,c
-MY1:        cp   0
+MY1
+            cp   0
             ex   af,af'
             ld   a,b
-MX81:       cp   0
-            jp   nc,CPOX            ;СПРАВА ИЛИ СЛЕВА
-;  ПОКА НА ЭКРАНЕ
+MX81
+            cp   0
+            jp   nc,CPOX            ; Справа или слева
+;  Пока на экране
             ex   af,af'
-            jp   nc,CPOY            ;СВЕРХУ ИЛИ СНИЗУ
-;  ЛЕЖИТ НА ЭКРАНЕ
+            jp   nc,CPOY            ; Сверху или снизу
+;  Лежит на экране
             ld   a,b
             add  a,d
-            jr   c,L873F            ;ВЫЛЕТ ПО Х ОДИН
-MX82:       cp   0
-            jp   c,VFULL            ;ПОЛНОСТЬЮ ВИДИМ ПО X
-;  ОДИН ВЫЛЕТ ПО Х
-L873F:      ld   a,d
+            jr   c,L873F            ; Вылет по х один
+MX82
+            cp   0
+            jp   c,VFULL            ; Полностью видим по X
+;  Один вылет по х
+L873F
+            ld   a,d
             sub  b
-            jp   c,VPOX             ;ОДИН ВЫЛЕТ ПО Х
-MX83:       cp   0
-            jp   c,VPOX             ;ОДИН ВЫЛЕТ ПО Х
+            jp   c,VPOX             ; Один вылет по х
+MX83
+            cp   0
+            jp   c,VPOX             ; Один вылет по х
 
 
-
-
-
-
-;  ВЫЛЕТ ПО Х ОБА КРАЯ
+;  Вылет по х оба края
 
             ld   a,(MIDX0)
             sub  b
-            neg  
+            neg
             inc  a
 
-VPOXX:
+VPOXX
             ex   af,af'
             ld   a,(MIDX8)
             add  a,b
 
-;a- КООРД. X ПРАВОГО КРАЯ
-;  ПОЛУЧИМ Y КООРД. ЭТОГО КРАЯ
-            call TAKECRD
+; a- коорд. X правого края
+;  Получим Y коорд. этого края
+            call CircleHalfWidth
             ld   (VY),a
             ld   b,a
             ld   a,(CY)
-            call MISLNUP
-            call PCOUNT3            ;1
+            call SkipRowsUp
+            call PCOUNT3            ; 1
             call ADLOW
             ld   a,(RDS)
             bit  0,a
@@ -155,162 +136,169 @@ VPOXX:
             ld   a,(VY)
             ld   b,a
             ld   a,(CY)
-            call MISLNDN
-            call PCOUNT3            ;1
+            call SkipRowsDown
+            call PCOUNT3            ; 1
             call ADLOW
             ld   a,(RDS)
             bit  0,a
             call z,OUTRD
             call nz,OUTLD
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-;  ЦЕНТР ВЫЛЕТЕЛ ЗА ОКНО ПО Х
-CPOX:       ex   af,af'
-            jp   nc,CPOXY           ;А ЕЩЕ И ПО У
+;  Центр вылетел за окно по х
+CPOX
+            ex   af,af'
+            jp   nc,CPOXY           ; А еще и по у
 ;  ПО Х
             ld   a,b
-MX84:       sub  0
+MX84
+            sub  0
             ld   b,a
             ld   a,d
             sub  b
             ret  c
-            ret  z                  ;ВООБЩЕ НЕ ВИДИМ
-LENS:       sub  #F0
-            jp   nc,L87F4           ;ОЧ БОЛЬШОЙ РАДИУС
+            ret  z                  ; Вообще не видим
+LENS
+            sub  #F0
+            jp   nc,L87F4           ; Оч большой радиус
             ld   a,b
-MX88:       add  a,0
+MX88
+            add  a,0
             ld   (RYX+1),a
             ld   b,a
             xor  a
             jp   VPOX_
 
-L87F4:      ld   a,b
-MX86:       add  a,0
+L87F4
+            ld   a,b
+MX86
+            add  a,0
             ld   b,a
             ld   (RYX+1),a
             xor  a
-            jp   VPOXX              ;ВЫЛЕТ ПО ОБОИ СТОРОНЫ
+            jp   VPOXX              ; Вылет по обои стороны
 
 
-
-
-
-
-
-
-
-;  ЦЕНТР ВЫЛЕТЕЛ ЗА ОКНО ПО У
-CPOY:       ld   a,c
-MY2:        sub  0
+;  Центр вылетел за окно по у
+CPOY
+            ld   a,c
+MY2
+            sub  0
             ld   c,a
             ld   (RYX),a
             ld   a,d
             sub  c
-            ret  c                  ;НЕ ВИДИМ
+            ret  c                  ; Не видим
             ld   a,d
-            call XQUAD
+            call Square
             ld   h,d
             ld   l,e
             ld   a,c
-            call XQUAD
+            call Square
             sbc  hl,de
             ld   a,(MIDX8)
             sub  b
-            call XQUAD
+            call Square
             sbc  hl,de
             jp   c,L893F
             add  hl,de
             ld   a,(MIDX8)
             add  a,b
-            call XQUAD
+            call Square
             sbc  hl,de
             jp   nc,L884A
 
 
             ld   a,b
-MX93:       sub  0
+MX93
+            sub  0
             inc  a
-L88C5:      ex   af,af'
+L88C5
+            ex   af,af'
             ld   de,(RDS)
             ld   a,c
-            call TAKECRD
+            call CircleHalfWidth
             ld   (VY),a
             ld   a,c
-            exx  
+            exx
             ld   e,a
             ld   a,(VY)
-            neg  
+            neg
             ld   c,a
-            exx  
+            exx
             bit  0,e
             jr   z,L8910
             ld   a,(VY)
-            cpl  
-MX11:       add  a,0
+            cpl
+MX11
+            add  a,0
             add  a,b
             ld   c,#00
             bit  1,e
             jr   nz,L88EE
-BRX1:       ld   c,0
-L88EE:      call TKAD1
+BRX1
+            ld   c,0
+L88EE
+            call TKAD1
             ld   a,e
             and  #E0
-SH1:        or   #1E
+SH1
+            or   #1E
             ld   l,a
             ld   c,#01
             ld   a,(RDS)
             bit  1,a
             call nz,OUTLD
             call z,OUTLU
-            ret  
+            ret
 
 
-L8910:      ld   a,(VY)
-MX1:        add  a,0
+L8910
+            ld   a,(VY)
+MX1
+            add  a,0
             sub  b
 ;        cp#08
 ;        retc
             ld   c,#00
             bit  1,e
             jr   nz,L8921
-BRX2:       ld   c,0
-L8921:      call TKAD2
+BRX2
+            ld   c,0
+L8921
+            call TKAD2
             ld   a,l
             and  #E0
-SL1:        or   #01
+SL1
+            or   #01
             ld   e,a
             ld   b,#80
             ld   a,(RDS)
             bit  1,a
             call nz,OUTRD
             call z,OUTRU
-            ret  
+            ret
 
 
-L893F:      ld   de,(RDS)
+L893F
+            ld   de,(RDS)
             ld   a,c
-            call TAKECRD
+            call CircleHalfWidth
             ld   (VY),a
             ld   a,c
-            exx  
+            exx
             ld   e,a
             ld   a,(VY)
-            neg  
+            neg
             ld   c,a
-            exx  
+            exx
             xor  a
             bit  1,e
-            jr   nz,L895B
+            jr   nz,.L895B
             ld   a,(BRX)
-L895B:      ld   (CY),a
+.L895B
+            ld   (CY),a
             ld   c,a
             ld   a,(VY)
             ld   l,a
@@ -328,116 +316,115 @@ L895B:      ld   (CY),a
             bit  1,a
             call nz,OUTFD
             call z,OUTFU
-            ret  
+            ret
 
 
-L884A:      ld   a,b
-MX91:       sub  0
+L884A
+            ld   a,b
+MX91
+            sub  0
             inc  a
-L884D:      ex   af,af'
+L884D
+            ex   af,af'
             ld   de,(RDS)
             ld   a,(MIDX8)
             add  a,b
-            call TAKECRD
+            call CircleHalfWidth
             ld   (VY),a
             sub  c
             ld   b,a
             bit  1,e
-            jr   z,L8877
+            jr   z,.L8877
             xor  a
-            call MISLNDN
-            call PCOUNT3            ;1
+            call SkipRowsDown
+            call PCOUNT3            ; 1
             call ADLOW
             ld   a,(RDS)
             bit  0,a
             call z,OUTRD
             call nz,OUTLD
-            ret  
+            ret
 
 
-L8877:      ld   a,(BRX)
-            call MISLNUP
-            call PCOUNT3            ;1
+.L8877
+            ld   a,(BRX)
+            call SkipRowsUp
+            call PCOUNT3            ; 1
             call ADLOW
             ld   a,(RDS)
             bit  0,a
             call z,OUTRU
             call nz,OUTLU
-            ret  
+            ret
 
 
-
-
-
-
-
-
-;  ЦЕНТР ВЫЛЕТЕЛ ПО Х И ПО У ЗА ОКНО
-CPOXY:      ld   a,b
-MX85:       sub  0
+;  Центр вылетел по х и по у за окно
+CPOXY
+            ld   a,b
+MX85
+            sub  0
             ld   b,a
             ld   a,c
-MY3:        sub  0
+MY3
+            sub  0
             ld   c,a
             ld   (RYX),bc
             ld   a,d
-            call XQUAD
+            call Square
             ld   h,d
             ld   l,e
             ld   a,c
-            call XQUAD
+            call Square
             sbc  hl,de
-            ret  c                  ;РАДИУС МЕНЬШЕ У
+            ret  c                  ; Радиус меньше у
             ld   a,b
-            call XQUAD
+            call Square
             sbc  hl,de
-            ret  c                  ;РАДИУС МЕНЬШЕ Х
+            ret  c                  ; Радиус меньше х
             add  hl,de
             ld   a,b
-LENS2:
+LENS2
             add  a,#F8
-            jr   c,L87BC
-            call XQUAD
+            jr   c,.L87BC
+            call Square
             sbc  hl,de
             jp   nc,L8840
-L87BC:      ld   a,b
-MX89:       add  a,0
+.L87BC
+            ld   a,b
+MX89
+            add  a,0
             ld   (RYX+1),a
             ld   b,a
             xor  a
             jp   L88C5
 
 
-L8840:      ld   a,b
-MX87:       add  a,0
+L8840
+            ld   a,b
+MX87
+            add  a,0
             ld   b,a
             ld   (RYX+1),a
             xor  a
             jp   L884D
 
 
-
-
-
-
-
-
-
-
-;  ПОЛНОСТЬЮ ВИВИМ
-VFULL:      call L87D4
+;  Полностью вивим
+VFULL
+            call .L87D4
             call OUTFU
-            call L87D4
+            call .L87D4
             jp   OUTFD
 
-L87D4:      ld   bc,(CY)
+.L87D4
+            ld   bc,(CY)
             ld   de,(RDS)
             ld   a,d
-            neg  
-            exx  
+            neg
+            exx
             ld   c,a
             ld   e,#00
-            exx  
+            exx
             ld   a,b
             sub  d
             call TKAD1
@@ -448,122 +435,105 @@ L87D4:      ld   bc,(CY)
             jp   TKAD2
 
 
-
-
-
-
-
-
-
-
-;  ВЫЛЕТ ПО Х С ОДНОЙ СТОРОНЫ
-VPOX:       ld   a,b
-MX92:       sub  0
-VPOX_:      ex   af,af'
+;  Вылет по х с одной стороны
+VPOX
+            ld   a,b
+MX92
+            sub  0
+VPOX_
+            ex   af,af'
             bit  0,e
-            jr   z,L88AC
-;  СПРАВА
-            call ADRH
-            call OUTLD              ;DOWN PART
-            call ADRH
-            jp   OUTLU              ;UP PART
-;  СЛЕВА
-L88AC:      call ADRL
+            jr   z,.L88AC
+;  Справа
+            call .ADRH
+            call OUTLD              ; Down part
+            call .ADRH
+            jp   OUTLU              ; UP PART
+;  Слева
+.L88AC
+            call ADRL
             call OUTRD
             call ADRL
             jp   OUTRU
 
 
-ADRH:       call PCOUNT2
+.ADRH
+            call PCOUNT2
             ld   a,(CY)
             ld   c,a
             ld   a,(MIDX)
             add  a,b
-            sub  d                  ;MX+X-RADIUS
+            sub  d                  ; Mx+X-radius
             call TKAD1
             ld   a,e
             and  #E0
-SH2:        or   #1E
+SH2
+            or   #1E
             ld   l,a
             ld   c,#01
-            ret  
+            ret
 
 
-ADRL:       call PCOUNT2
+ADRL
+            call PCOUNT2
             ld   a,(CY)
             ld   c,a
             ld   a,(MIDX)
             add  a,d
-            sub  b                  ;MX+RADIUS-X
+            sub  b                  ; Mx+radius-X
             call TKAD2
             ld   a,l
             and  #E0
-SL2:        or   #01
+SL2
+            or   #01
             ld   e,a
             ld   b,#80
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-
-PCOUNT2:    ld   bc,(RYX)
+PCOUNT2
+            ld   bc,(RYX)
             ld   de,(RDS)
             ld   a,d
-            neg  
-            exx  
+            neg
+            exx
             ld   c,a
             ld   e,#00
-            exx  
-            ret  
+            exx
+            ret
 
 
-PCOUNT1:    ld   bc,(RYX)
+.PCOUNT1
+            ld   bc,(RYX)
             ld   a,(MIDX0)
             sub  b
-            exx  
+            exx
             ld   c,a
             ld   a,(VY)
             ld   e,a
-            exx  
-            ret  
+            exx
+            ret
 
 
-PCOUNT3:    ld   bc,(RYX)
+PCOUNT3
+            ld   bc,(RYX)
             ld   a,(MIDX)
             add  a,b
-            neg  
-            exx  
+            neg
+            exx
             ld   c,a
             ld   a,(VY)
             ld   e,a
-            exx  
-            ret  
+            exx
+            ret
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-;  ВЫВОД ЛЕВОЙ ПОЛОВИНЫ
-OUTL:
-;  ПРОЦ. ВЫВОДА, ПРОВЕРКА АДРЕСА НА ВЫЛЕТ
+;  Вывод левой половины
+OUTL
+;  Проц. вывода, проверка адреса на вылет
             ld   a,(UPDWN)
             and  a
-            jr   nz,L9074
+            jr   nz,.L9074
 
             push hl
             ld   a,l
@@ -575,9 +545,9 @@ OUTL:
             ld   e,a
             pop  hl
 
-            jr   nz,L907B
-            jr   L9079
-L9074:
+            jr   nz,.L907B
+            jr   .L9079
+.L9074
 
             push hl
             ld   a,l
@@ -589,105 +559,116 @@ L9074:
             ld   e,a
             pop  hl
 
-            jr   nz,L907B
+            jr   nz,.L907B
 
-L9079:      pop  af
-            ret  
-L907B:      ld   (STK_L),sp
-L907F:      ld   d,l
-            ld   l,e
-            ld   a,b
-            LDX_HL_A
-            ld   l,d
-            ld   a,(UPDWN)
-            and  a
-            jr   nz,L9090
-            call LINUP
-            jr   L9093
-L9090:      call LINDOWN
-L9093:      exx  
-            add  hl,de
-            inc  e
-            add  hl,de
-            bit  7,h
-            exx  
-            jr   nz,L907F
-            rrc  b
-            jr   c,L90B0
-L90A0:      exx  
-            add  hl,bc
-            inc  c
-            ex   af,af'
-            cp   c
-            jr   z,L90B7
-            ex   af,af'
-            add  hl,bc
-            bit  7,h
-            exx  
-            jr   nz,L907F
-            jr   L90CC
-L90B0:      inc  e
-            ld   a,l
-            sub  e
-            jr   c,L90BF
-            jr   L90A0
-L90B7:      ex   af,af'
-            jp   L914B
-L90BB:      ex   af,af'
-            jp   L9191
-L90BF:      ld   sp,(STK_L)
+.L9079
             pop  af
-            ret  
-L90C5:      inc  e
+            ret
+.L907B
+            ld   (STK_L),sp
+.L907F
+            ld   d,l
+            ld   l,e
+            ld   a,b
+            LDX_HL_A
+            ld   l,d
+            ld   a,(UPDWN)
+            and  a
+            jr   nz,.L9090
+            call LINUP
+            jr   .L9093
+.L9090
+            call LINDOWN
+.L9093
+            exx
+            add  hl,de
+            inc  e
+            add  hl,de
+            bit  7,h
+            exx
+            jr   nz,.L907F
+            rrc  b
+            jr   c,.L90B0
+.L90A0
+            exx
+            add  hl,bc
+            inc  c
+            ex   af,af'
+            cp   c
+            jr   z,.L90B7
+            ex   af,af'
+            add  hl,bc
+            bit  7,h
+            exx
+            jr   nz,.L907F
+            jr   .L90CC
+.L90B0
+            inc  e
             ld   a,l
             sub  e
-            jr   c,L90BF
-            jr   L90D6
-L90CC:      ld   d,l
+            jr   c,.L90BF
+            jr   .L90A0
+.L90B7
+            ex   af,af'
+            jp   L914B
+.L90BB
+            ex   af,af'
+            jp   L9191
+.L90BF
+            ld   sp,(STK_L)
+            pop  af
+            ret
+.L90C5
+            inc  e
+            ld   a,l
+            sub  e
+            jr   c,.L90BF
+            jr   .L90D6
+.L90CC
+            ld   d,l
             ld   l,e
             ld   a,b
             LDX_HL_A
             ld   l,d
             rrc  b
-            jr   c,L90C5
-L90D6:      exx  
+            jr   c,.L90C5
+.L90D6
+            exx
             add  hl,bc
             inc  c
-            jr   z,L90BF
+            jr   z,.L90BF
             ex   af,af'
             cp   c
-            jr   z,L90BB
+            jr   z,.L90BB
             ex   af,af'
             add  hl,bc
             bit  7,h
-            exx  
-            jr   z,L90CC
-            exx  
+            exx
+            jr   z,.L90CC
+            exx
             add  hl,de
             inc  e
             add  hl,de
-            exx  
+            exx
             ld   a,(UPDWN)
             and  a
-            jr   nz,L90F6
+            jr   nz,.L90F6
             call LINUP
-            jr   L90CC
-L90F6:      call LINDOWN
-            jr   L90CC
+            jr   .L90CC
+.L90F6
+            call LINDOWN
+            jr   .L90CC
 
 
-
-
-
-
-;  ВЫВОД ПОЛНОСТЬЮ
-;  ПРОЦ. ВЫВОДА, ПРОВЕРКА АДРЕСА НА ВЫЛЕТ
-OUTFULL:    ld   a,e
+;  Вывод полностью
+;  Проц. вывода, проверка адреса на вылет
+OUTFULL
+            ld   a,e
             sub  l
-            jr   nc,L9111
+            jr   nc,.L9111
             ld   a,(UPDWN)
             and  a
-            jr   nz,L910C
+            jr   nz,.L910C
 
             push hl
             ld   a,l
@@ -699,9 +680,9 @@ OUTFULL:    ld   a,e
             ld   e,a
             pop  hl
 
-            jr   nz,L9113
-            jr   L9111
-L910C:
+            jr   nz,.L9113
+            jr   .L9111
+.L910C
             push hl
             ld   a,l
             and  #E0
@@ -712,11 +693,14 @@ L910C:
             ld   e,a
             pop  hl
 
-            jr   nz,L9113
-L9111:      pop  af
-            ret  
-L9113:      ld   (STK_L),sp
-L9117:      ld   a,c
+            jr   nz,.L9113
+.L9111
+            pop  af
+            ret
+.L9113
+            ld   (STK_L),sp
+L9117
+            ld   a,c
             LDX_HL_A
             ld   d,l
             ld   l,e
@@ -725,57 +709,67 @@ L9117:      ld   a,c
             ld   l,d
             ld   a,(UPDWN)
             and  a
-            jr   nz,L912F
+            jr   nz,.L912F
             call LINUP
-            jr   L9136
-L912F:
+            jr   .L9136
+.L912F
             call LINDOWN
-L9136:      exx  
+.L9136
+            exx
             add  hl,de
             inc  e
             add  hl,de
             bit  7,h
-            exx  
+            exx
             jp   nz,L9117
             rrc  b
             jr   c,L9155
-L9144:      rlc  c
+L9144
+            rlc  c
             jr   c,L915D
-L9148:      exx  
+L9148
+            exx
             add  hl,bc
             inc  c
-L914B:      add  hl,bc
+L914B
+            add  hl,bc
             bit  7,h
-            exx  
+            exx
             jp   nz,L9117
             jp   L917B
-L9155:      inc  e
+L9155
+            inc  e
             ld   a,l
             sub  e
             jp   nz,L9144
             ld   sp,(STK_L)
             pop  af
-            ret  
-L915D:      dec  l
+            ret
+L915D
+            dec  l
             ld   a,l
             sub  e
             jp   nz,L9148
-L9165:      ld   sp,(STK_L)
+L9165
+            ld   sp,(STK_L)
             pop  af
-            ret  
+            ret
 
 
-L916B:      inc  e
+L916B
+            inc  e
             ld   a,l
             sub  e
             jp   nz,L9188
             jr   L91AC
-L9173:      dec  l
+L9173
+            dec  l
             ld   a,l
             sub  e
             jp   nz,L918C
             jr   L91C0
-L917B:      ld   a,c
+L917B
+            ld   a,c
             LDX_HL_A
             ld   d,l
             ld   l,e
@@ -784,70 +778,84 @@ L917B:      ld   a,c
             ld   l,d
             rrc  b
             jr   c,L916B
-L9188:      rlc  c
+L9188
+            rlc  c
             jr   c,L9173
-L918C:      exx  
+L918C
+            exx
             add  hl,bc
             inc  c
             jr   z,L91D1
-L9191:      add  hl,bc
+L9191
+            add  hl,bc
             bit  7,h
-            exx  
+            exx
             jr   z,L917B
-            exx  
+            exx
             add  hl,de
             inc  e
             add  hl,de
-            exx  
+            exx
             ld   a,(UPDWN)
             and  a
-            jr   nz,L91A7
+            jr   nz,.L91A7
             call LINUP
             jr   L917B
-L91A7:      call LINDOWN
+.L91A7
+            call LINDOWN
             jr   L917B
-L91AC:      ld   l,e
+L91AC
+            ld   l,e
             ld   a,(hl)
             ld   b,#00
             and  a
             jr   z,L91CD
             ld   b,a
             ld   a,#FF
-L91B6:      srl  b
-INV1:       jr   c,L91BD
+L91B6
+            srl  b
+INV1
+            jr   c,.L91BD
             add  a,a
             jr   L91B6
-L91BD:
-            cpl  
+.L91BD
+            cpl
             LDX_HL_A
             jr   L91CE
-L91C0:      ld   a,(hl)
+L91C0
+            ld   a,(hl)
             ld   b,0
             and  a
             jr   z,L91CD
             dec  b
-L91C6:      add  a,a
-INV2:       jr   c,L91CD
+L91C6
+            add  a,a
+INV2
+            jr   c,L91CD
             srl  b
             jr   L91C6
-L91CD:
+L91CD
             ld   a,b
-            cpl  
+            cpl
             LDX_HL_A
-L91CE:      jp   L9165
+L91CE
+            jp   L9165
 
-L91D1:      exx  
+L91D1
+            exx
             ld   a,(hl)
             and  a
             jr   z,L91E2
             ld   b,a
             ld   a,#FF
-L91D9:      srl  b
-INV3:       jr   c,L91E2
+L91D9
+            srl  b
+INV3
+            jr   c,L91E2
             add  a,a
             jr   L91D9
-L91E2:
-            cpl  
+L91E2
+            cpl
             LDX_HL_A
             ld   l,e
             ld   a,(hl)
@@ -855,26 +863,24 @@ L91E2:
             and  a
             jr   z,L91F1
             dec  b
-L91EA:      add  a,a
-INV4:       jr   c,L91F1
+L91EA
+            add  a,a
+INV4
+            jr   c,L91F1
             srl  b
             jr   L91EA
-L91F1:
+L91F1
             ld   a,b
-            cpl  
+            cpl
             LDX_HL_A
             jr   L91CE
 
 
-
-
-
-
-;  ВЫВОД ПРАВОЙ ПОЛОВИНЫ
-OUTR:
+;  Вывод правой половины
+OUTR
             ld   a,(UPDWN)
             and  a
-            jr   nz,L9208
+            jr   nz,.L9208
             push hl
             ld   a,l
             and  #E0
@@ -885,9 +891,9 @@ OUTR:
             ld   e,a
             pop  hl
 
-            jr   nz,L920F
-            jr   L920D
-L9208:
+            jr   nz,.L920F
+            jr   .L920D
+.L9208
             push hl
             ld   a,l
             and  #E0
@@ -898,104 +904,105 @@ L9208:
             ld   e,a
             pop  hl
 
-            jr   nz,L920F
-L920D:      pop  af
-            ret  
-
-L920F:      ld   (STK_L),sp
-L9213:      ld   a,c
-            LDX_HL_A
-            ld   a,(UPDWN)
-            and  a
-            jr   nz,L9221
-            call LINUP
-            jr   L9224
-
-L9221:      call LINDOWN
-L9224:      exx  
-            add  hl,de
-            inc  e
-            add  hl,de
-            bit  7,h
-            exx  
-            jr   nz,L9213
-            rlc  c
-            jr   c,L9241
-L9231:      exx  
-            add  hl,bc
-            inc  c
-            ex   af,af'
-            cp   c
-            jr   z,L9249
-            ex   af,af'
-            add  hl,bc
-            bit  7,h
-            exx  
-            jr   nz,L9213
-            jr   L925F
-L9241:      dec  l
-            ld   a,l
-            sub  e
-            inc  a
-            jr   z,L9251
-            jr   L9231
-L9249:      ex   af,af'
-            jp   L914B
-L924D:      ex   af,af'
-            jp   L9191
-L9251:      ld   sp,(STK_L)
+            jr   nz,.L920F
+.L920D
             pop  af
-            ret  
-L9257:      dec  l
-            ld   a,l
-            sub  e
-            inc  a
-            jr   z,L9251
-            jr   L9266
-L925F:      ld   a,c
+            ret
+
+.L920F
+            ld   (STK_L),sp
+.L9213
+            ld   a,c
             LDX_HL_A
-            rlc  c
-            jr   c,L9257
-L9266:      exx  
-            add  hl,bc
-            inc  c
-            jr   z,L9251
-            ex   af,af'
-            cp   c
-            jr   z,L924D
-            ex   af,af'
-            add  hl,bc
-            bit  7,h
-            exx  
-            jr   z,L925F
-            exx  
+            ld   a,(UPDWN)
+            and  a
+            jr   nz,.L9221
+            call LINUP
+            jr   .L9224
+
+.L9221
+            call LINDOWN
+.L9224
+            exx
             add  hl,de
             inc  e
             add  hl,de
-            exx  
+            bit  7,h
+            exx
+            jr   nz,.L9213
+            rlc  c
+            jr   c,.L9241
+.L9231
+            exx
+            add  hl,bc
+            inc  c
+            ex   af,af'
+            cp   c
+            jr   z,.L9249
+            ex   af,af'
+            add  hl,bc
+            bit  7,h
+            exx
+            jr   nz,.L9213
+            jr   .L925F
+.L9241
+            dec  l
+            ld   a,l
+            sub  e
+            inc  a
+            jr   z,.L9251
+            jr   .L9231
+.L9249
+            ex   af,af'
+            jp   L914B
+.L924D
+            ex   af,af'
+            jp   L9191
+.L9251
+            ld   sp,(STK_L)
+            pop  af
+            ret
+.L9257
+            dec  l
+            ld   a,l
+            sub  e
+            inc  a
+            jr   z,.L9251
+            jr   .L9266
+.L925F
+            ld   a,c
+            LDX_HL_A
+            rlc  c
+            jr   c,.L9257
+.L9266
+            exx
+            add  hl,bc
+            inc  c
+            jr   z,.L9251
+            ex   af,af'
+            cp   c
+            jr   z,.L924D
+            ex   af,af'
+            add  hl,bc
+            bit  7,h
+            exx
+            jr   z,.L925F
+            exx
+            add  hl,de
+            inc  e
+            add  hl,de
+            exx
             ld   a,(UPDWN)
             and  a
-            jr   nz,L9286
+            jr   nz,.L9286
             call LINUP
-            jr   L925F
-L9286:      call LINDOWN
-            jr   L925F
+            jr   .L925F
+.L9286
+            call LINDOWN
+            jr   .L925F
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-TKAD1:
+TKAD1
             ld   l,c
             ld   c,a
 
@@ -1018,13 +1025,10 @@ TKAD1:
             dec  a
             jr   nz,$-3
             ld   e,l
-            ret  
+            ret
 
 
-
-
-
-TKAD2:
+TKAD2
             push af
             ld   a,b
             ld   (MASK),a
@@ -1046,50 +1050,50 @@ TKAD2:
 
             and  7
             sub  #08
-            neg  
+            neg
             ld   c,#80
             rlc  c
             dec  a
             jr   nz,$-3
             ld   a,(MASK)
             ld   b,a
-            ret  
-TAKECRD:
-;  ПОДСЧЕТ X=SQR(R^2-Y^2)
-;d=r,a=Y
-;reta=X
+            ret
+
+CircleHalfWidth   ; orig: TAKECRD
+; X = sqrt(r^2 - Y^2) для окружности
+;  Подсчет X=sqr(r^2-Y^2)
+; d=r,a=Y
+; reta=X
             push bc
             push de
             push hl
             push af
             ld   a,d
-            call XQUAD
+            call Square
             ld   h,d
             ld   l,e
             pop  af
-            call XQUAD
+            call Square
             sbc  hl,de
             ld   b,#80
             xor  a
             ld   (VAR1),hl
-L8AE3:
+.L8AE3
             ld   hl,(VAR1)
             add  a,b
-            call XQUAD
+            call Square
             sbc  hl,de
             jr   nc,$+3
             sub  b
             srl  b
-            jr   nc,L8AE3
+            jr   nc,.L8AE3
             pop  hl
             pop  de
             pop  bc
-            ret  
+            ret
 
 
-
-
-LINUP:
+LINUP
             push hl
             ld   a,l
             and  #E0
@@ -1100,7 +1104,7 @@ LINUP:
             ld   e,a
             pop  hl
 
-            jr   z,E_O1
+            jr   z,.E_O1
             ld   a,h
             dec  h
             and  7
@@ -1115,20 +1119,15 @@ LINUP:
             ld   a,h
             add  a,8
             ld   h,a
-            ret  
-E_O1:
+            ret
+.E_O1
             pop  af
             ld   sp,(STK_L)
             pop  af
-            ret  
+            ret
 
 
-
-
-
-
-
-LINDOWN:
+LINDOWN
             inc  h
             ld   a,h
             and  7
@@ -1153,27 +1152,24 @@ LINDOWN:
             pop  af
             ld   sp,(STK_L)
             pop  af
-            ret  
+            ret
 
 
-
-
-
-
-ADLOW:      ld   a,l
+ADLOW
+            ld   a,l
             and  #E0
-SL3:        or   #01
+SL3
+            or   #01
             ld   e,a
             ld   c,#01
             ld   b,#80
-            ret  
+            ret
 
 
-
-
-MISLNUP:
-;a-Y
-;b-КОЛ. СТРОК ПРОПУСТИТЬ ВВЕРХ
+SkipRowsUp   ; orig: MISLNUP
+; Пропустить строки сверху
+; a-Y
+; b-кол. строк пропустить вверх
             ld   c,a
             ld   a,c
             push af
@@ -1184,7 +1180,8 @@ MISLNUP:
             ld   b,(hl)
             inc  h
             ld   a,(hl)
-SH3:        or   0
+SH3
+            or   0
             ld   l,a
             ld   h,b
 
@@ -1193,17 +1190,19 @@ SH3:        or   0
             push bc
             dec  b
             inc  b
-            jr   z,L901C
-L9014:
+            jr   z,.L901C
+.L9014
             ld   a,h
             dec  h
             and  7
-            jr   z,L902B
-L901A:      djnz L9014
-L901C:      pop  bc
+            jr   z,.L902B
+.L901A
+            djnz .L9014
+.L901C
+            pop  bc
             pop  af
-            ret  
-L902B:
+            ret
+.L902B
             inc  h
             push hl
             ld   a,l
@@ -1212,7 +1211,7 @@ L902B:
             ld   de,(ADL)
             SUB_DE
             pop  hl
-            jr   z,L901C
+            jr   z,.L901C
 
             dec  h
             ld   a,l
@@ -1223,22 +1222,14 @@ L902B:
             add  a,8
             ld   h,a
 
-            djnz L9014
-            jr   L901C
+            djnz .L9014
+            jr   .L901C
 
 
-
-
-
-
-
-
-
-
-
-MISLNDN:
-;a-Y
-;b-КОЛ. СТРОК ПРОПУСТИТЬ ВНИЗ
+SkipRowsDown   ; orig: MISLNDN
+; Пропустить строки снизу
+; a-Y
+; b-кол. строк пропустить вниз
             ld   c,a
             ld   a,c
             push af
@@ -1249,7 +1240,8 @@ MISLNDN:
             ld   b,(hl)
             inc  h
             ld   a,(hl)
-SH4:        or   0
+SH4
+            or   0
             ld   l,a
             ld   h,b
 
@@ -1258,19 +1250,21 @@ SH4:        or   0
             push bc
             dec  b
             inc  b
-            jr   z,L904A
+            jr   z,.L904A
 
 
-L9042:
+.L9042
             inc  h
             ld   a,h
             and  7
-            jr   z,L904D
-L9048:      djnz L9042
-L904A:      pop  bc
+            jr   z,.L904D
+.L9048
+            djnz .L9042
+.L904A
+            pop  bc
             pop  af
-            ret  
-L904D:
+            ret
+.L904D
             NEXTZNAK
 
             push hl
@@ -1280,22 +1274,16 @@ L904D:
             ld   de,(ADH)
             SUB_DE
             pop  hl
-            jr   z,L904A
+            jr   z,.L904A
 
-            djnz L9042
-            jr   L904A
-
-
+            djnz .L9042
+            jr   .L904A
 
 
-
-
-
-
-
-XQUAD:
-;  БЕРЕМ КВАДРАТ ОТ "A"
-;retinde= a^2
+Square   ; orig: XQUAD
+; Квадрат числа A: DE = A^2
+;  Берем квадрат от "A"
+; retinde= a^2
             push hl
             ld   h,high(LBE00)
             ld   l,a
@@ -1303,138 +1291,126 @@ XQUAD:
             inc  h
             ld   d,(hl)
             pop  hl
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-
-
-KK_1:
-            exx  
+KK_1
+            exx
             ld   hl,#0000
             ld   d,h
             ld   b,#FF
-            exx  
+            exx
             ld   a,#01
             ld   (UPDWN),a
-            ret  
-KK_0:
-            exx  
+            ret
+KK_0
+            exx
             ld   hl,#0000
             ld   d,h
             ld   b,#FF
-            exx  
+            exx
             xor  a
             ld   (UPDWN),a
-            ret  
+            ret
 
 
-OUTLD:      push af
+OUTLD
+            push af
             call KK_1
             jp   OUTL
 
 
-
-OUTLU:      push af
+OUTLU
+            push af
             call KK_0
             jp   OUTL
 
 
-
-OUTRD:      push af
+OUTRD
+            push af
             call KK_1
             jp   OUTR
 
 
-
-OUTRU:      push af
+OUTRU
+            push af
             call KK_0
             jp   OUTR
 
 
-
-OUTFD:      push af
+OUTFD
+            push af
             call KK_1
             jp   OUTFULL
 
 
-
-OUTFU:      push af
+OUTFU
+            push af
             call KK_0
             jp   OUTFULL
-
-
-
-
 
 
 ; ────────────────────────────────────────
-NAME:
-;  ГЕНЕРАЦИЯ ИМЕНИ СИСТЕМЫ
-;hl,de-ДАННЫЕ СИСТЕМЫ
-;  В TNAME-ИМЯ 0-КОНЕЦ
+NAME
+;  Генерация имени системы
+; hl,de-данные системы
+;  В TNAME-имя 0-конец
             ld   a,e
             and  #0F
-            exx  
-;  ДЕЛАЕМ ВЫБОР ИЗ НАЗВАНИЙ ГРЕЧЕСКИХ БУКВ
+            exx
+;  Делаем выбор из названий греческих букв
             ld   hl,NAMTAB
-            call FLIST
+            call FindTextByIndex
             ld   de,TNAME
-            ldi  
+            ldi
             ld   a,(hl)
             cp   ET
             jr   nz,$-5
             ld   a,"-"
             ld   (de),a
             inc  de
-            exx  
+            exx
             ld   a,e
             and  #F0
             ld   e,a
             ld   a,h
             and  #0F
             or   e
-            exx  
-            call NUMTXT
+            exx
+            call .NUMTXT
             ld   a,"/"
             ld   (de),a
             inc  de
-            exx  
+            exx
             ld   a,h
             and  #F0
             ld   h,a
             ld   a,d
             and  #0F
             or   h
-            exx  
-            call NUMTXT
+            exx
+            call .NUMTXT
             ld   a,"-"
             ld   (de),a
             inc  de
-            exx  
+            exx
             ld   a,d
             and  #F0
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             add  a,128
-            exx  
+            exx
             ld   (de),a
             inc  de
             ld   a,ET
             ld   (de),a
-            ret  
+            ret
 
-;  ПЕРЕВОД ЧИСЛА ДО 3 ЗНАКОВ В ТЕКСТ В de
-;  ЧИСЛО В a
-NUMTXT:
+;  Перевод числа до 3 знаков в текст в de
+;  Число в a
+.NUMTXT
             ld   b,#FF
             inc  b
             sub  100
@@ -1464,47 +1440,45 @@ NUMTXT:
             add  a,"0"
             ld   (de),a
             inc  de
-            ret  
+            ret
 
 
 NAMTAB:     include "gen/NAMTAB.inc"   ; GENERATED from assets/text/star_names.txt
 
 
-
-
-
-GOSTA:
-;  НАЙТИ В КАКОМ ГОС. НАХОДИТСЯ КАРТА
-;hl-КООРД. КАРТЫ
-;reta-НОМЕР ГОСУДАРСТВА
-;0-ГАЛАКТИЧ. ФЕДЕРАЦИЯ
-;1-КОНФ.ПЕРВЫХ
-;2-СОДРУЖ.МИРОВ
-;3-СВОБОДН.ЗЕМЛИ
+FindStateAtMap   ; orig: GOSTA
+; Номер государства по координатам карты
+;  Найти в каком гос. находится карта
+; hl-коорд. карты
+; Reta-номер государства
+; 0-Галактич. федерация
+; 1-Конф.первых
+; 2-Содруж.миров
+; 3-Свободн.земли
             ld   a,h
             cp   74
-            jr   c,NGF1
+            jr   c,.NGF1
             cp   78
-            jr   nc,NGF1
+            jr   nc,.NGF1
             ld   a,l
             cp   54
-            jr   c,NGF1
+            jr   c,.NGF1
             cp   58
-            ld   a,0                ;ГАЛАКТ. ФЕДЕР.
+            ld   a,0                ; Галакт. федер.
             ret  c
-NGF1:
+.NGF1
             ld   a,h
             cp   71
-            jr   c,NGF2
+            jr   c,.NGF2
             cp   74
-            jr   nc,NGF2
+            jr   nc,.NGF2
             ld   a,l
             cp   52
-            jr   c,NGF2
+            jr   c,.NGF2
             cp   56
-            ld   a,1                ;СОДР. МИРОВ
+            ld   a,1                ; Содр. миров
             ret  c
-NGF2:
+.NGF2
             ld   a,h
             cp   71
             ld   a,3
@@ -1519,64 +1493,60 @@ NGF2:
             ret  c
             ld   a,l
             cp   59
-            ld   a,2                ;КОНФ.ПЕРВЫХ
+            ld   a,2                ; Конф.первых
             ret  c
             ld   a,3
-            ret  
+            ret
 
 
-
-
-
-
-
-FARER:
-;  ИЗМЕРЕНИЕ РАССТОЯНИЯ ОТ ЗВЕЗДЫ
-;  В de,bcДО ЗВЕЗДЫ
+StarDistance   ; orig: FARER
+; Расстояние от звезды
+;  Измерение расстояния от звезды
+;  В de,всдо звезды
 ;  В DE',BC'
-;a-РЕЗУЛЬТАТ
-;FZ-ON ТАЖА ЗВЕЗДА
+; a-результат
+; FZ-on тажа звезда
             push hl
             push ix
             push iy
-            exx  
+            exx
             push hl
-            exx  
+            exx
             ld   a,b
             ld   b,e
             ld   e,a
-            exx  
+            exx
             ld   a,c
-            exx  
+            exx
             ld   l,a
-            exx  
+            exx
             ld   a,e
-            exx  
+            exx
             ld   h,a
             SUB_BC
             jp   p,$+10
             NEGHL
             ld   b,h
             ld   c,l
-;bc-DX
-            exx  
+; bc-DX
+            exx
             ld   a,b
-            exx  
+            exx
             ld   l,a
-            exx  
+            exx
             ld   a,d
-            exx  
+            exx
             ld   h,a
             SUB_DE
             jp   p,$+10
             NEGHL
-;hl-DY
+; hl-DY
             ld   a,l
             or   h
             or   c
             or   b
 
-            jr   z,EXM1             ;ЕСЛИ НУЛЬ
+            jr   z,.EXM1             ; Если нуль
 
             push bc
             ld   d,h
@@ -1585,7 +1555,7 @@ FARER:
             pop  bc
             ld   a,l
             or   h
-            jr   nz,NOF
+            jr   nz,.NOF
             push de
             ld   d,b
             ld   e,c
@@ -1595,9 +1565,9 @@ FARER:
             ld   a,l
             or   h
             pop  hl
-            jr   nz,NOF
+            jr   nz,.NOF
             add  hl,de
-            jr   c,NOF
+            jr   c,.NOF
 
             xor  a
             ld   a,h
@@ -1609,38 +1579,35 @@ FARER:
             call DIvv
 
             EXD
-            call KORNI
+            call .KORNI
             or   a
             jr   nz,$+3
             inc  a
-EXM1:
-            exx  
+.EXM1
+            exx
             pop  hl
-            exx  
+            exx
             pop  iy
             pop  ix
             pop  hl
-            ret  
-NOF:        ld   a,#FF
-            jr   EXM1
+            ret
+.NOF
+            ld   a,#FF
+            jr   .EXM1
 
 
-
-
-
-
-KORNI:
-;de-СТАРШАЯ ЧАСТЬ ЧИСЛА
-;reta-MEAN
+.KORNI
+; de-старшая часть числа
+; reta-MEAN
             ld   a,d
             and  a
-            jr   z,Kor
+            jr   z,.Kor
             ld   l,a
             ld   h,high(Korn)
             ld   a,(hl)
             inc  h
             ld   c,a
-            cpl  
+            cpl
             ex   af,af'
             ld   b,#FF
             inc  bc
@@ -1663,14 +1630,14 @@ KORNI:
             add  hl,bc
             ret  nc
             inc  a
-            ret  
+            ret
 
 
-Kor:
-;  ПOДcЧET KOPHЯ БE3 TAБЛИЦЫ, ДЛЯ MAЛEHЬK
-;  ИX ДAHHЫX
-;de-DATA <2116
-;a-MEAN
+.Kor
+;  Подсчет корня без таблицы, для маленьк
+;  Их данных
+; de-DATA <2116
+; a-MEAN
             EXD
             ld   bc,0-1
             xor  a
@@ -1684,29 +1651,24 @@ Kor:
             add  hl,bc
             ret  nc
             inc  a
-            ret  
-
-
+            ret
 
 
             ADRXX00
-LBE00:
-            incbin "0E0200.d";#200
+LBE00
+            incbin "0E0200.d"; #200
 
-Korn:
-            incbin "KORNI.d" ;#300
-
-
-
-TBXX2_:     equ  $
-KR1:        equ  TBXX2_+#400
-KR2:        equ  KR1+#100
-KR3:        equ  KR2+#100
-KR4:        equ  KR3+#100
-DOTB:       equ  KR4+#100           ;200
-DOTCO:      equ  DOTB+#200
-DOTCLP:     equ  DOTCO+#100
-
-END_K:      equ  DOTCLP+#100
+Korn
+            incbin "KORNI.d" ; #300
 
 
+TBXX2_      equ  $
+KR1         equ  TBXX2_+#400
+KR2         equ  KR1+#100
+KR3         equ  KR2+#100
+KR4         equ  KR3+#100
+DOTB        equ  KR4+#100           ; 200
+DOTCO       equ  DOTB+#200
+DOTCLP      equ  DOTCO+#100
+
+END_K       equ  DOTCLP+#100

@@ -1,221 +1,230 @@
-; Команды▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+;==============================================================================
+; LANG - интерпретатор языка сценариев Paradox v1.0 (оверлей LANG.C)
+;
+; Где живёт: LANG.C, ORG #C000, страница PGLANG (#16).
+;
+; Вход: PARADOX (ix = программа CHECK_SCENARY из rules.paradox, OPERATION = номер операции торговли).
+; Язык: команды _IF/_THAN/_ELSE/_NEXT/_CHANGE/..., аргументы (U_*/S_* - свойства на борту/на станции),
+; операции (_PLUS, _EQUALLY...), таблицы символов CODE, CODE2..CODE15 с количествами KCOMn.
+; Выполняет правила торговли и полиции при каждой сделке; результат - состояние окна/ошибки.
+; Служебные: ReadNumber, ReadArgument, ReadOperator, JumpBySymbol, FindSymbol, PutWord/PutByte.
+; Ниже сохранена легенда команд исходного файла. См. GAME_DESIGN 1.2, 4.4-4.5.
+;==============================================================================
+
+; Команды
 ; │_IF│_THAN│_ELSE│_NEXT│_CHANGE│_OVER
 ; │_ON│_OFF │_OPEN│_EXIT│_CLOSE │_MESSAGE
-; │_TONN    │_mESSAGE   │_WYDWOR│▒▒▒▒▒▒▒▒▒
-; Операнды переключения▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+; │_TONN    │_mESSAGE   │_WYDWOR│
+; Операнды переключения
 ; │T_TXT │T_HAPP│T_QUES│T_PERS│T_SKM│T_KRB
-; │T_MISS│▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-; Аргументы▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+; │T_MISS│
+; Аргументы
 ; │S_SHIP│U_WSKM│_MISSION│S_SKIMMER │_YES
 ; │U_SHIP│U_WKRB│_PERSTXT│U_SKIMMER │_NO
 ; │_TONAJ│U_SUMM│_HAPPAND│_STATUS   │_TXT
-; │_MASSA│S_WKRB│U_CARGO │_NUMBER   │▒▒▒▒▒
-; │_SKOBA│S_WSKM│S_CARGO │_OPERATION│▒▒▒▒▒
-; │P_PLANET│R_PLANET│P_SYSTEM│R_SYSTEM▒▒▒▒
-; Свойства▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+; │_MASSA│S_WKRB│U_CARGO │_NUMBER   │
+; │_SKOBA│S_WSKM│S_CARGO │_OPERATION│
+; │P_PLANET│R_PLANET│P_SYSTEM│R_SYSTEM
+; Свойства
 ; │_SWKRB_C │_SWKRB_V │_UWKRB_S │_UCARGO_C
 ; │_SWKRB_S │_SWKRB_K │_SWSKM_C │_SCARGO_C
 ; │_SWSKM_V │_UWSKM_S │_SWSKM_S │_SCARGO_S
 ; │_SWSKM_K │_UWSKM_N │_SHIP_C  │_SKIMER_V
-; │_UKWRB_N │_SCARGO_M│_SHIP_S  │_SKIMER_C
+; │_Ukwrb_n │_SCARGO_M│_SHIP_S  │_SKIMER_C
 ; │_SHIP_T  │_PLANET_S│_PLANET_C│_PLANET_U
-; │_SYSTEM_P│_SYSTEM_G│▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-; Процедуры▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-; │TAKENUM │TARGTURN  │JUMPSYMB  │TAKETON
-; │TAKEARG │TAKEJARG  │TAKEMEDARG│RUN
-; │OBRARGU │FINDSYMB  │FINDINTREE│T_NWKRB
-; │T_NWSKM │T_NTWR    │PUTWORD   │PUTBYTE
-; │TAKE_PINFO│▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-; Операции▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-; │_PLUS │_EQUALLY│_LESS│_LESSEQ│_MORE▒▒▒▒
+; │_SYSTEM_P│_SYSTEM_G│
+; Процедуры
+; │ReadNumber │ReadJumpAddress  │JumpBySymbol  │CountTonnage
+; │ReadArgument │ReadHandlerAddress  │ReadOperator│RUN
+; │ProcessArgument │FindSymbol  │FindTextInTree│T_NWKRB
+; │T_NWSKM │T_NTWR    │PutWord   │PutByte
+; │TakePlanetInfo│
+; Операции
+; │_PLUS │_EQUALLY│_LESS│_LESSEQ│_MORE
 ; │_MULTI│_MOREEQ │_OR  │_MINUS │_AND│_SET
-; Операнды Изменения значения▒▒▒▒▒▒▒▒▒▒▒▒▒
+; Операнды Изменения значения
 ; │STATU_S │GRU_z│GRU_Z│WKR_B│WSK_M │SUM_M
-; │TONA_J  │▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+; │TONA_J  │
 
 
 ; ────────────────────────────────────────
 ;           Paradox v1.0        13.11.99
 ; ────────────────────────────────────────
 ; ИДЕЯ:
-; ЧИТАЕМ ПО ОЧЕРЕДНО ПЕРВЫЙ АРГУМЕНТ
-; МЕЖ_АРГУМЕНТ (ОПЕРАЦИЯ) И ВТОРОЙ
-; АРГУМЕНТ
-; СОХРАНЯЕМ ВСЕ ЭТО В БУФЕРЕ В ВИДЕ
-; ЧИСЕЛ (ДЛЯ АРГУМЕНТОВ) И АДРЕСОВ
-; ОПЕРАЦИЙ (ДЛЯ МЕЖ_АРГУМЕНТОВ)
-; ПОСЛЕ ПРОЧТЕНИЯ ВСЕГО ВЫШЕ ОПИСАНОГО
-; ПРОИСХОДИТ ВЫПОЛНЕНИЕ ОПЕРАЦИИ ОСВОБОЖ-
-; ДАЕМ БУФЕР НА ДВА ЗНАЧЕНИЯ (УБИРАЕМ
-; МЕЖ_АРГУМЕНТ И ВТОРОЙ АРГУМЕНТ)
-; РЕЗУЛЬТАТ ОСТАЕТСЯ НА ПЕРВОМ МЕСТЕ
-; ДАЛЕЕ ИДЕТ ЧТЕНИЕ МЕЖ_АРГУМЕНТА И ОПЯТЬ
-; УЖЕ ВТОРОГО АРГУМЕНТА И Т.Д.
-; РЕЗУЛЬТАТ ВСЕГДА БУДЕТ ПЕРВЫМ ДАННЫМ В
-; БУФЕРЕ. РАЗЛИЧИЙ МЕЖДУ ЛОГИЧЕСКИМИ
-; ДАННЫМИ И ЧИСЛОВЫМИ НИКАКОГО ЛОГ. 0,1
-; ЧИСЛОВЫЕ 0-65535 БЕЗ ЗНАКА.
+; Читаем по очередно первый аргумент
+; Меж_аргумент (операция) и второй
+; Аргумент
+; Сохраняем все это в буфере в виде
+; Чисел (для аргументов) и адресов
+; Операций (для меж_аргументов)
+; После прочтения всего выше описаного
+; Происходит выполнение операции освобож-
+; Даем буфер на два значения (убираем
+; Меж_аргумент и второй аргумент)
+; Результат остается на первом месте
+; Далее идет чтение меж_аргумента и опять
+; Уже второго аргумента и т.д.
+; Результат всегда будет первым данным в
+; Буфере. различий между логическими
+; Данными и числовыми никакого лог. 0,1
+; Числовые 0-65535 без знака.
 
 
-
-; ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-; ОСНОВНОЙ КОД
-
+;
+; Основной код
 
 
-; СТРУКТУРА, ПРОЦЕДУРЫ ЯЗЫКА ПАРАДОКС
+; Структура, процедуры языка парадокс
 
 
-PARADOX:
+PARADOX
             ld   ix,CHECK_SCENARY
-            ld   (STKMEM+1),sp
-; ВЫКЛ. ФЛАГ ВЫХОДА НА СЛЕД. #0D
+            ld   (ParadoxSavedSP+1),sp
+; Выкл. флаг выхода на след. #0D
             xor  a
-            ld   (F_EXIT+1),a
-; ixТЕКСТ
-ZP1:
-            ld   sp,(STKMEM+1)
+            ld   (ParadoxExitFlag+1),a
+; Iхтекст
+ZP1
+            ld   sp,(ParadoxSavedSP+1)
             ld   a,(ix)
             or   a
             ret  z
             inc  ix
             cp   " "
             jr   nz,ZP2
-; КОМЕНТАРИЙ
-; ИЩЕМ СЛЕД. СТРОКУ, Т.Е. СИМВОЛ #0D
-ZP3:
-STKMEM:     ld   sp,0
+; Коментарий
+; Ищем след. строку, т.е. символ #0D
+ZP3
+
+ParadoxSavedSP   ; orig: STKMEM
+; Сохранённый SP интерпретатора
+            ld   sp,0
             ld   a,(ix)
             inc  ix
             cp   #0D
             jr   nz,ZP3+3
-ZP29:
-F_EXIT:     ld   a,0
+ZP29
+
+ParadoxExitFlag   ; orig: F_EXIT
+; Флаг выхода из языка
+            ld   a,0
             or   a
             jr   z,ZP1+4
-            ret  
-ZP2:
+            ret
+ZP2
             cp   #0D
             jr   z,ZP29
 
             ld   hl,CODE-3
             ld   b,KCOM
 
-            jp   JUMPSYMB
+            jp   JumpBySymbol
 
 
+;
+; Команды
 
 
+_IF
+; Проверка условия
+; Iхслед. символ за командой
+; Установим HL' на буфер строки аргументов
 
+            exx
+            ld   hl,ParadoxArgBuf
+            exx
 
-
-
-
-
-; ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-; КОМАНДЫ
-
-
-_IF:
-; ПРОВЕРКА УСЛОВИЯ
-; ixСЛЕД. СИМВОЛ ЗА КОМАНДОЙ
-; УСТАНОВИМ HL' НА БУФЕР СТРОКИ АРГУМЕНТОВ
-
-            exx  
-            ld   hl,ARG
-            exx  
-
-; ЧИТАЕМ ПЕРВЫЙ АРГУМЕНТ
-            call TAKEARG
-ZP8:
-; ЧИТАЕМ МЕЖ_АРГУМЕНТ
-            call TAKEMEDARG
-; ЧИТАЕМ ВТОРОЙ АРГУМЕНТ
-            call TAKEARG
+; Читаем первый аргумент
+            call ReadArgument
+.ZP8
+; Читаем меж_аргумент
+            call ReadOperator
+; Читаем второй аргумент
+            call ReadArgument
             call RUN
 
             ld   a,(ix)
             cp   ":"
             jr   z,ZP1
             cp   "@"
-            jr   nz,ZP8
+            jr   nz,.ZP8
             jr   ZP1
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_THAN:
-            exx  
+; ----------------------------------------------------------
+_THAN
+            exx
             dec  hl
             ld   a,(hl)
             dec  hl
             or   (hl)
             inc  hl
             inc  hl
-            exx  
+            exx
             jr   nz,ZP1
-ZP27:
-; ПОИСК СКОБОК ЕСЛИ ТАКОВЫЕ ЕСТЬ
-; И ПРЫЖОК ЧЕРЕЗ НИХ
+ZP27
+; Поиск скобок если таковые есть
+; И прыжок через них
             ld   a,(ix)
             cp   "{"
-; ЕСЛИ ПЕРВ. "{"
-            jr   z,ZP28
+; Если перв. "{"
+            jr   z,.ZP28
 
             cp   #0D
             jr   nz,ZP3
-; ЕСЛИ СНАЧАЛА #0D
+; Если сначала #0D
             ld   a,(ix+1)
             cp   "{"
             jr   nz,ZP3
-; А ПОТОМ "{"
+; А потом "{"
             inc  ix
 ; ИЩЕМ "}"
-ZP28:
+.ZP28
             inc  ix
             ld   a,(ix)
             cp   "}"
-            jr   nz,ZP28
+            jr   nz,.ZP28
             jr   ZP3
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_ELSE:
-            exx  
+; ----------------------------------------------------------
+_ELSE
+            exx
             dec  hl
             ld   a,(hl)
             dec  hl
             or   (hl)
             inc  hl
             inc  hl
-            exx  
+            exx
             jp   z,ZP1
             jr   ZP27
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_NEXT:
+; ----------------------------------------------------------
+_NEXT
             jp   ZP1
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_ON:
+; ----------------------------------------------------------
+_ON
             ld   a,1
-ZP26:
+ZP26
             ld   l,a
             ex   af,af'
             ld   a,l
             ex   af,af'
-            call TARGTURN
+            call ReadJumpAddress
             jp   ZP1
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_OFF:
+; ----------------------------------------------------------
+_OFF
             xor  a
             jr   ZP26
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_CHANGE:
-; УСТАНОВИМ HL' НА ДОПОЛНИТЕЛЬНЫЙ БУФЕР
-            exx  
+; ----------------------------------------------------------
+_CHANGE
+; Установим HL' на дополнительный буфер
+            exx
             push hl
-            ld   hl,ARGD
-            exx  
-            call TAKEJARG
-            call TAKEMEDARG
-            call TAKEARG
-            ld   hl,ZP30
+            ld   hl,ParadoxArgBuf2
+            exx
+            call ReadHandlerAddress
+            call ReadOperator
+            call ReadArgument
+            ld   hl,.ZP30
             push hl
-            exx  
+            exx
             ld   de,0-6
             add  hl,de
             ld   e,(hl)
@@ -223,9 +232,9 @@ _CHANGE:
             ld   d,(hl)
             inc  hl
             push de
-            exx  
+            exx
             pop  hl
-            exx  
+            exx
             ld   e,(hl)
             inc  hl
             ld   d,(hl)
@@ -237,140 +246,133 @@ _CHANGE:
             push de
             ld   de,0-5
             add  hl,de
-; УКАЗАТЕЛЬ БУФЕРА НА ПЕРВЫЙ АРГУМЕНТ
-            exx  
+; Указатель буфера на первый аргумент
+            exx
             pop  bc
-; В СТЕКЕ АДРЕС  ОПЕРАЦИИ
-;bc-ВТОРОЙ АРГУМЕНТ
-;hl-ПРОЦЕДУРА СЧИТЫВАНИЯ ПЕРВОГО
-; АРГУМЕНТА И ЗАПОМИНАНИЕ РЕЗУЛЬТАТА
-; ПОСЛЕ ОБРАБОТКИ ОПЕРАЦИИ
+; В стеке адрес  операции
+; bc-второй аргумент
+; hl-процедура считывания первого
+; Аргумента и запоминание результата
+; После обработки операции
             jp   (hl)
-ZP30:
-            exx  
+.ZP30
+            exx
             pop  hl
-            exx  
+            exx
             jp   ZP1
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_OPEN:
-; СКОБА ОТКРЫТА
+; ----------------------------------------------------------
+_OPEN
+; Скоба открыта
             jp   ZP1
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_CLOSE:
-; СКОБА ЗАКРЫТА
+; ----------------------------------------------------------
+_CLOSE
+; Скоба закрыта
             jp   ZP1
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_TONN:
-; ПОДСЧЕТ ТОНАЖА И ЕГО СТОРИНГ
+; ----------------------------------------------------------
+_TONN
+; Подсчет тонажа и его сторинг
             ld   de,-TWRI
-            call TAKETON
+            call CountTonnage
             ld   (TONN),a
             jp   ZP1
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_EXIT:
-; ПРОСТО ВЫХОД ИЗ ЯЗЫКА
-            ld   sp,(STKMEM+1)
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_MESSAGE:
-; ВКЛЮЧИМ ФЛАГ ВЫХОДА НА СЛЕД. #0D
+; ----------------------------------------------------------
+_EXIT
+; Просто выход из языка
+            ld   sp,(ParadoxSavedSP+1)
+            ret
+; ----------------------------------------------------------
+_MESSAGE
+; Включим флаг выхода на след. #0D
             ld   a,1
-            ld   (F_EXIT+1),a
-            call TAKENUM
+            ld   (ParadoxExitFlag+1),a
+            call ReadNumber
             dec  l
             ld   a,l
-; ВЫВЕСТИ СООБЩЕНИЕ ПО НОМЕРУ В a
+; Вывести сообщение по номеру в a
             push ix
-            call OPENER_L
+            call OpenErrorWindowLang
             pop  ix
             jp   ZP1
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_mESSAGE:
-; ВЫВОД СООБЩЕНИЯ О ОШИБКЕ ОПЕРАЦИИ
-; НО БЕЗ ВЫХОДА ИЗ ЯЗЫКА НА СЛЕД. СТРОКЕ
+; ----------------------------------------------------------
+_mESSAGE
+; Вывод сообщения о ошибке операции
+; Но без выхода из языка на след. строке
             jp   _MESSAGE+5
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_WYDWOR:
+; ----------------------------------------------------------
+_WYDWOR
             ld   a,255
-            ld   (WYDWOR+1),a
+            ld   (ExpelTimer+1),a
             jp   ZP1
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_OVER:
+; ----------------------------------------------------------
+_OVER
 
-;??????????
+; ??????????
             jp   ZP1
-;??????????
-;            ld   sp,(STKMEM+1)
+; ??????????
+;            ld   sp,(ParadoxSavedSP+1)
 ;            pop  af
-;            jp   GAMEOVER
+;            Jp   gameover
 
 
+;
+; Операнды команды переключения
+; Вход с A'-0(выкл),1(вкл)
 
 
-
-
-
-
-
-; ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-; ОПЕРАНДЫ КОМАНДЫ ПЕРЕКЛЮЧЕНИЯ
-; ВХОД С A'-0(ВЫКЛ),1(ВКЛ)
-
-
-T_TXT:
-; ВКЛЮЧЕНИЕ И ПОКАЗ ТЕКСТА
+T_TXT
+; Включение и показ текста
             ex   af,af'
             or   a
             ret  z
-            call TAKENUM
+            call ReadNumber
             push hl
 
-; СТРУКТУРА РАЗДЕЛИТЕЛЯ:
+; Структура разделителя:
 ; _p23s8t1
 
-; ИЩЕМ НАЧАЛА ТЕСТОВ ПО РАЗДЕЛИТЕЛЮ "_"
+; Ищем начала тестов по разделителю "_"
             ld   hl,TXTES
-ZP33:
+.ZP33
             ld   bc,0
             ld   a,"_"
-            cpir 
+            cpir
             inc  hl
-; ПРОПУСТИЛИ БУКВУ "p"
-; БЕРЕМ НОМЕР
+; Пропустили букву "p"
+; Берем номер
             push ix
             push hl
             pop  ix
-            call TAKENUM
+            call ReadNumber
             ld   c,l
             push ix
             pop  hl
             pop  ix
-; НОМЕР ТЕКУЩЕГО ПЕРСОНАЖА
+; Номер текущего персонажа
             ld   a,(PERSONAJ)
             cp   c
-            jp   nz,ZP33
-; НЕ ТОТ ПЕРСОНАЖ
+            jp   nz,.ZP33
+; Не тот персонаж
             inc  hl
-; ПРОПУСТИЛИ БУКВУ "s"
-; НОМЕР СЦЕНЫ
+; Пропустили букву "s"
+; Номер сцены
             push ix
             push hl
             pop  ix
-            call TAKENUM
+            call ReadNumber
             ld   c,l
             push ix
             pop  hl
             pop  ix
             ld   a,(SCENA)
             cp   c
-            jp   nz,ZP33
+            jp   nz,.ZP33
             inc  hl
-; ПРОПУСТИЛИ БУКВУ "t"
-; НОМЕР ТЕКСТА
+; Пропустили букву "t"
+; Номер текста
             push ix
             push hl
             pop  ix
-            call TAKENUM
+            call ReadNumber
             ld   c,l
             push ix
             pop  hl
@@ -379,214 +381,213 @@ ZP33:
             push de
             ld   a,e
             cp   c
-            jp   nz,ZP33
+            jp   nz,.ZP33
             pop  de
 
             ld   a,(hl)
             inc  hl
             cp   CR
             jr   nz,$-4
-; ПРОПУСТИЛИ РАЗДЕЛИТЕЛЬ СТРОК КАК #0D
-;hlАДРЕС ТЕКСТА
-;deНОМЕР ТЕКСТА
+; Пропустили разделитель строк как #0D
+; Нlадрес текста
+; Dеномер текста
 
             ld   a,(PERSONAJ)
             ld   bc,(SCENA-1)
             push hl
-            call FINDINTREE
+            call FindTextInTree
             ld   (hl),1
             pop  hl
 
-; ВЫЗОВ ПРОЦЕДУРЫ ВЫВОДА ТЕКСТА
-            ret  
+; Вызов процедуры вывода текста
+            ret
 
 
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-T_PERS:
-; ВКЛ. ПЕРСОНАЖЕЙ
-            call TAKENUM
+; ----------------------------------------------------------
+T_PERS
+; Вкл. персонажей
+            call ReadNumber
             ld   de,t_PERS-1
-ZP31:
+ZP31
             add  hl,de
             ex   af,af'
             ld   (hl),a
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-T_QUES:
-; В. ВОПРОСЫ
-            call TAKENUM
+            ret
+; ----------------------------------------------------------
+T_QUES
+; В. вопросы
+            call ReadNumber
             ld   de,t_QUES-1
             jr   ZP31
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-T_MISS:
-; В. МИССИИ
-            call TAKENUM
+; ----------------------------------------------------------
+T_MISS
+; В. миссии
+            call ReadNumber
             ld   de,t_MISS-1
             jr   ZP31
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-T_HAPP:
-; В. СОБЫТИЯ
-            call TAKENUM
+; ----------------------------------------------------------
+T_HAPP
+; В. события
+            call ReadNumber
             ld   de,t_HAPP-1
             jr   ZP31
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-T_KRB:
-; В. КОРАБЛЕЙ
-            call NUMSHIP
+; ----------------------------------------------------------
+T_KRB
+; В. кораблей
+            call SelectedShipNumber
             ex   af,af'
             or   a
             ld   a,c
             jr   nz,$+4
             ld   a,#FF
             ld   (SHIP),a
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-T_SKM:
-; В. СКИМЕРОВ
-            call NUMSHIP
+            ret
+; ----------------------------------------------------------
+T_SKM
+; В. скимеров
+            call SelectedShipNumber
             ex   af,af'
             or   a
             ld   a,c
             jr   nz,$+4
             ld   a,#FF
             ld   (SKIMMER),a
-            ret  
+            ret
 
 
+;
+; Аргументы
 
 
-
-
-
-; ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-; АРГУМЕНТЫ
-
-
-U_SUMM:
+U_SUMM
             ld   de,(SUMM)
-PUTWORD:
+
+PutWord   ; orig: PUTWORD
+; Положить слово в буфер аргументов
             push de
-            exx  
+            exx
             pop  de
             ld   (hl),e
             inc  hl
             ld   (hl),d
             inc  hl
-            exx  
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-U_WKRB:
+            exx
+            ret
+; ----------------------------------------------------------
+U_WKRB
             call ZP21
-            jp   PUTWORD
-ZP21:
-            exx  
+            jp   PutWord
+ZP21
+            exx
             ld   b,KCOM4
-            exx  
+            exx
             ld   de,CODE4-3
             call T_NWKRB
             ld   hl,$+6
-            jp   OBRARGU
-; ПРОЦЕДУРА ЧТЕНИЯ ЗНАЧЕНИЯ
-; СЮДА БУДЕТ ПЕРЕХОД, ЕСЛИ АРГУМЕНТ БЕЗ
-; ВЫБОРА СВОЙСТВА, С НОМЕРОМ ИЛИ БЕЗ
-;hl-ИНДЕКС
+            jp   ProcessArgument
+; Процедура чтения значения
+; Сюда будет переход, если аргумент без
+; Выбора свойства, с номером или без
+; hl-индекс
             ld   de,WKRBI
-ZP38:
+ZP38
             add  hl,de
             ld   a,(hl)
             or   a
             jp   p,$+4
-            cpl  
+            cpl
             ld   e,a
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-U_WSKM:
+            ret
+; ----------------------------------------------------------
+U_WSKM
             call ZP22
-            jp   PUTWORD
-ZP22:
-            exx  
+            jp   PutWord
+ZP22
+            exx
             ld   b,KCOM5
-            exx  
+            exx
             ld   de,CODE5-3
             call T_NWSKM
             ld   hl,$+6
-            jp   OBRARGU
+            jp   ProcessArgument
             ld   de,WSKMI
             jr   ZP38
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-U_SHIP:
+; ----------------------------------------------------------
+U_SHIP
             call $+6
-            jp   PUTWORD
+            jp   PutWord
             ld   bc,(SHIP)
             ld   b,0
-            exx  
+            exx
             ld   b,KCOM10
-            exx  
+            exx
             ld   de,CODE10-3
             ld   hl,$+6
-            jp   OBRARGU
+            jp   ProcessArgument
             ld   de,(SHIP)
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-U_SKIMMER:
+            ret
+; ----------------------------------------------------------
+U_SKIMMER
             call $+6
-            jp   PUTWORD
+            jp   PutWord
             ld   bc,(SKIMMER)
             ld   b,0
-            exx  
+            exx
             ld   b,KCOM12
-            exx  
+            exx
             ld   de,CODE12-3
             ld   hl,$+6
-            jp   OBRARGU
+            jp   ProcessArgument
             ld   de,(SKIMMER)
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_MASSA:
+            ret
+; ----------------------------------------------------------
+_MASSA
             ld   a,(TONN)
-PUTBYTE:
-            exx  
+
+PutByte   ; orig: PUTBYTE
+; Положить байт в буфер аргументов
+            exx
             ld   (hl),a
             inc  hl
             ld   (hl),0
             inc  hl
-            exx  
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_TONAJ:
+            exx
+            ret
+; ----------------------------------------------------------
+_TONAJ
             ld   a,(TONN+1)
-            jp   PUTBYTE
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_YES:
+            jp   PutByte
+; ----------------------------------------------------------
+_YES
             ld   a,1
-            jp   PUTBYTE
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_NO:
+            jp   PutByte
+; ----------------------------------------------------------
+_NO
             xor  a
-            jp   PUTBYTE
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_OPERATION:
+            jp   PutByte
+; ----------------------------------------------------------
+_OPERATION
             ld   a,(OPERATION)
-            jp   PUTBYTE
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_STATUS:
+            jp   PutByte
+; ----------------------------------------------------------
+_STATUS
             ld   a,(STATUS)
-            jp   PUTBYTE
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-S_CARGO:
+            jp   PutByte
+; ----------------------------------------------------------
+S_CARGO
             call ZP24
-            jp   PUTWORD
-ZP24:
-            exx  
+            jp   PutWord
+ZP24
+            exx
             ld   b,KCOM9
-            exx  
+            exx
             ld   de,CODE9-3
             call T_NTWR
             ld   hl,$+6
-            jp   OBRARGU
+            jp   ProcessArgument
             add  hl,hl
             ld   de,TWRS
             add  hl,de
@@ -594,27 +595,27 @@ ZP24:
             and  #7F
             ld   e,a
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-S_WKRB:
-; ПРОВЕРИТЬ ПРИСУТСТВИЕ ОСНАЩЕНИЯ НА
-; ЭТОЙ СТАНЦИИ С ЭТИМ УРОВНЕМ РАЗВИТИЯ
+            ret
+; ----------------------------------------------------------
+S_WKRB
+; Проверить присутствие оснащения на
+; Этой станции с этим уровнем развития
             call $+6
-            jp   PUTWORD
-            exx  
+            jp   PutWord
+            exx
             ld   b,KCOM6
-            exx  
+            exx
             ld   de,CODE6-3
             call T_NWKRB
             ld   hl,$+6
-            jp   OBRARGU
+            jp   ProcessArgument
             ld   de,TONNS
-ZP16:
+ZP16
             add  hl,hl
             add  hl,de
             ld   a,(hl)
             push af
-            call PINFOL2
+            call PlanetInfoHereLang
             ld   a,l
             pop  hl
             cp   h
@@ -623,205 +624,198 @@ ZP16:
             inc  a
             ld   e,a
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-S_WSKM:
+            ret
+; ----------------------------------------------------------
+S_WSKM
             call $+6
-            jp   PUTWORD
-            exx  
+            jp   PutWord
+            exx
             ld   b,KCOM7
-            exx  
+            exx
             ld   de,CODE7-3
             call T_NWSKM
             ld   hl,$+6
-            jp   OBRARGU
+            jp   ProcessArgument
             ld   de,TONSS
             jr   ZP16
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-S_SHIP:
+; ----------------------------------------------------------
+S_SHIP
             call $+6
-            jp   PUTWORD
-            call NUMSHIP
-            exx  
+            jp   PutWord
+            call SelectedShipNumber
+            exx
             ld   b,KCOM10
-            exx  
+            exx
             ld   de,CODE10-3
             ld   hl,$+6
-            jp   OBRARGU
-; КОРАБЛЕЙ НА СТАНЦИИ НЕМЕРЕНО
+            jp   ProcessArgument
+; Кораблей на станции немерено
             ld   de,#7F
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-S_SKIMMER:
+            ret
+; ----------------------------------------------------------
+S_SKIMMER
             call $+6
-            jp   PUTWORD
-            call NUMSHIP
-            exx  
+            jp   PutWord
+            call SelectedShipNumber
+            exx
             ld   b,KCOM12
-            exx  
+            exx
             ld   de,CODE12-3
             ld   hl,$+6
-            jp   OBRARGU
+            jp   ProcessArgument
             ld   de,#7F
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-U_CARGO:
+            ret
+; ----------------------------------------------------------
+U_CARGO
             call ZP23
-            jp   PUTWORD
-ZP23:
-            exx  
+            jp   PutWord
+ZP23
+            exx
             ld   b,KCOM8
-            exx  
+            exx
             ld   de,CODE8-3
             call T_NTWR
             ld   hl,$+6
-            jp   OBRARGU
+            jp   ProcessArgument
             add  hl,hl
             ld   de,TWRI
             add  hl,de
             ld   e,(hl)
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_NUMBER:
+            ret
+; ----------------------------------------------------------
+_NUMBER
             dec  ix
-            call TAKENUM
+            call ReadNumber
             EXD
-            jp   PUTWORD
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SKOBA:
-            call TAKEARG
+            jp   PutWord
+; ----------------------------------------------------------
+_SKOBA
+            call ReadArgument
 
-            call TAKEMEDARG
-            call TAKEARG
+            call ReadOperator
+            call ReadArgument
             call RUN
             ld   a,(ix)
             cp   ")"
             jr   nz,_SKOBA+3
             inc  ix
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_HAPPAND:
-            call TAKENUM
+            ret
+; ----------------------------------------------------------
+_HAPPAND
+            call ReadNumber
             ld   de,t_HAPP
-ZP37:
+ZP37
             add  hl,de
             ld   a,(hl)
-            jp   PUTBYTE
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_MISSION:
-            call TAKENUM
+            jp   PutByte
+; ----------------------------------------------------------
+_MISSION
+            call ReadNumber
             ld   de,t_MISS
             jr   ZP37
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_TXT:
-; ЧТЕНИЕ СОСТОЯНИЯ ТЕКСТА ПЕРСОНАЖА И
-; СЦЕНЫ КОРОТКИЙ ВАРИАНТ ЗАПИСИ. БЕЗ
-; НОМЕРА ПЕРСОНАЙА И СЦЕНЫ
-            call TAKENUM
+; ----------------------------------------------------------
+_TXT
+; Чтение состояния текста персонажа и
+; Сцены короткий вариант записи. без
+; Номера персонайа и сцены
+            call ReadNumber
             EXD
             ld   a,(PERSONAJ)
             ld   bc,(SCENA-1)
             jr   ZP36
 
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_PERSTXT:
-; ЧТЕНИЕ СОСТОЯНИЯ ТЕКСТА ПЕРСОНАЖА И
-; СЦЕНЫ
-            call TAKENUM
+; ----------------------------------------------------------
+_PERSTXT
+; Чтение состояния текста персонажа и
+; Сцены
+            call ReadNumber
             ld   h,l
             push hl
             inc  ix
-            call TAKENUM
+            call ReadNumber
             ld   h,l
             push hl
             inc  ix
-            call TAKENUM
+            call ReadNumber
             EXD
             pop  bc
             pop  af
-ZP36:
-            call FINDINTREE
+ZP36
+            call FindTextInTree
             ld   a,(hl)
-            jp   PUTBYTE
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-P_PLANET:
-; ПЛАНЕТА ПРЕБЫВАНИЯ
+            jp   PutByte
+; ----------------------------------------------------------
+P_PLANET
+; Планета пребывания
             call $+6
-            jp   PUTWORD
-            exx  
+            jp   PutWord
+            exx
             ld   b,KCOM11
-            exx  
+            exx
             ld   c,0
             ld   de,CODE11-3
             ld   hl,$+6
-            jp   OBRARGU
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-R_PLANET:
-; ПЛАНЕТА ПЕРЕЛЕТА
+            jp   ProcessArgument
+            ret
+; ----------------------------------------------------------
+R_PLANET
+; Планета перелета
             call $+6
-            jp   PUTWORD
-            exx  
+            jp   PutWord
+            exx
             ld   b,KCOM11
-            exx  
+            exx
             ld   c,1
             ld   de,CODE11-3
             ld   hl,$+6
-            jp   OBRARGU
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-P_SYSTEM:
-; СИСТЕМА ПРЕБЫВАНИЯ
+            jp   ProcessArgument
+            ret
+; ----------------------------------------------------------
+P_SYSTEM
+; Система пребывания
             call $+6
-            jp   PUTWORD
-            exx  
+            jp   PutWord
+            exx
             ld   b,KCOM13
-            exx  
+            exx
             ld   c,0
             ld   de,CODE13-3
             ld   hl,$+6
-            jp   OBRARGU
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-R_SYSTEM:
-; СИСТЕМА ПЕРЕЛЕТА
+            jp   ProcessArgument
+            ret
+; ----------------------------------------------------------
+R_SYSTEM
+; Система перелета
             call $+6
-            jp   PUTWORD
-            exx  
+            jp   PutWord
+            exx
             ld   b,KCOM13
-            exx  
+            exx
             ld   c,1
             ld   de,CODE13-3
             ld   hl,$+6
-            jp   OBRARGU
-            ret  
+            jp   ProcessArgument
+            ret
 
 
+;
+; Операции
+; Вход de-первый аргумент
+;    bc-второй аргумент
+; retde-РЕЗУЛЬТАТ
 
 
-
-
-
-
-
-; ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-; ОПЕРАЦИИ
-; ВХОД de-ПЕРВЫЙ АРГУМЕНТ
-;    bc-ВТОРОЙ АРГУМЕНТ
-;retde-РЕЗУЛЬТАТ
-
-
-_EQUALLY:
+_EQUALLY
             EXD
             SUB_BC
             ld   de,1
             ret  z
             dec  de
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_MULTI:
-;de=bc*de
+            ret
+; ----------------------------------------------------------
+_MULTI
+; de=bc*de
             ld   hl,0
             rept 3
             sla  c
@@ -829,7 +823,7 @@ _MULTI:
             jr   nc,$+3
             add  hl,de
             add  hl,hl
-            jp   c,ZP32
+            jp   c,.ZP32
             endr
             rept 12
             sla  c
@@ -837,114 +831,105 @@ _MULTI:
             jr   nc,$+3
             add  hl,de
             add  hl,hl
-            jr   c,ZP32
+            jr   c,.ZP32
             endr
             sla  c
             rl   b
             jr   nc,$+3
             add  hl,de
             ex   de,hl
-            ret  
-ZP32:
+            ret
+.ZP32
             ld   de,#FFFF
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_PLUS:
+            ret
+; ----------------------------------------------------------
+_PLUS
             EXD
             add  hl,bc
             jr   nc,$+5
             ld   hl,#FFFF
             EXD
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_MINUS:
+            ret
+; ----------------------------------------------------------
+_MINUS
             EXD
             SUB_BC
             jr   nc,$+5
             ld   hl,0
             EXD
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_LESS:
+            ret
+; ----------------------------------------------------------
+_LESS
             EXD
             SUB_BC
             ld   de,1
             ret  c
             dec  de
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_MORE:
+            ret
+; ----------------------------------------------------------
+_MORE
             EXD
             SUB_BC
             ld   de,0
             ret  z
             ret  c
             inc  de
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_LESSEQ:
+            ret
+; ----------------------------------------------------------
+_LESSEQ
             EXD
             SUB_BC
             ld   de,1
             ret  c
             ret  z
             dec  de
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_MOREEQ:
+            ret
+; ----------------------------------------------------------
+_MOREEQ
             EXD
             SUB_BC
             ld   de,0
             ret  c
             inc  de
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_AND:
+            ret
+; ----------------------------------------------------------
+_AND
             ld   a,d
             and  b
             ld   d,a
             ld   a,e
             and  c
             ld   e,a
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_OR:
+            ret
+; ----------------------------------------------------------
+_OR
             ld   a,d
             or   b
             ld   d,a
             ld   a,e
             or   c
             ld   e,a
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SET:
+            ret
+; ----------------------------------------------------------
+_SET
             ld   d,b
             ld   e,c
-            ret  
+            ret
 
 
+;
+; Свойства
+
+; Вход с hl=#ffff !!! в стеке !!!, значит
+; Аргумент был без номера, т.е. тот на
+; Котором стоит курсор
+; Если <>#ffff, то аргумент с номером
 
 
-
-
-
-
-
-
-
-; ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-; СВОЙСТВА
-
-; ВХОД С hl=#FFFF !!! В СТЕКЕ !!!, ЗНАЧИТ
-; АРГУМЕНТ БЫЛ БЕЗ НОМЕРА, Т.Е. ТОТ НА
-; КОТОРОМ СТОИТ КУРСОР
-; ЕСЛИ <>#FFFF, ТО АРГУМЕНТ С НОМЕРОМ
-
-
-_SWKRB_C:
-; ЦЕНА ОСН.КОРАБЛЯ
+_SWKRB_C
+; Цена осн.корабля
             ld   de,CENS
-ZP13:
+ZP13
             pop  hl
             ld   h,0
             add  hl,hl
@@ -952,62 +937,63 @@ ZP13:
             ld   e,(hl)
             inc  hl
             ld   d,(hl)
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SWKRB_V:
-; ВЕС ОСН.КОРАБЛЯ
+            ret
+; ----------------------------------------------------------
+_SWKRB_V
+; Вес осн.корабля
             ld   de,TONNS+1
-ZP14:
+ZP14
             pop  hl
             ld   h,0
             add  hl,hl
             add  hl,de
             ld   e,(hl)
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_UWKRB_S:
-; СВОЙСТВО ПРОВЕРЯЕТ ВСЕ ВООРУЖЕНИЕ НА
-; ПРИСУТСТВИЕ НА ЭТОМ УРОВНЕ
+            ret
+; ----------------------------------------------------------
+_UWKRB_S
+; Свойство проверяет все вооружение на
+; Присутствие на этом уровне
             pop  hl
-            call PINFOL2
+            call PlanetInfoHereLang
             ld   a,l
             ld   (ZP17+1),a
             ld   hl,TONNS
             ld   de,WKRBI
             ld   b,WKKOL
-ZP18:
+ZP18
             ld   a,(de)
             or   a
             jp   p,$+4
-            cpl  
+            cpl
             or   a
             jr   z,ZP19
-ZP17:       ld   a,0
+ZP17
+            ld   a,0
             cp   (hl)
             ld   a,0
             jr   c,ZP20
-ZP19:
+ZP19
             inc  hl
             inc  hl
             inc  de
             djnz ZP18
             ld   a,1
-ZP20:
+ZP20
             ld   e,a
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_UWKRB_N:
-; СВОЙСТВО ПРОВЕРЯЕТ ВООРУЖЕНИЕ
-; НА ПОВТОРЯЕМОСТЬ ПОДОБНЫХ ВИДОВ
+            ret
+; ----------------------------------------------------------
+_UWKRB_N
+; Свойство проверяет вооружение
+; На повторяемость подобных видов
             ld   bc,WKII
             ld   de,WKRBI
-ZP12:
+ZP12
             pop  hl
             ld   h,0
             ld   a,l
-; ТАБЛ. СВЯЗИ ТИПОВ ВООРУЖ.
+; Табл. связи типов вооруж.
             add  hl,de
             EXD
             push de
@@ -1019,45 +1005,45 @@ ZP12:
             ld   a,(de)
             ld   c,a
             dec  c
-ZP50:
+.ZP50
             inc  c
-            jr   z,ZP49
+            jr   z,.ZP49
             dec  hl
             ld   a,(hl)
             or   a
             jp   p,$+4
-            cpl  
+            cpl
             or   a
-            jr   z,ZP50
+            jr   z,.ZP50
             pop  hl
-            jr   ZP52
-ZP49:
+            jr   .ZP52
+.ZP49
             pop  hl
             inc  de
             ld   a,(de)
             ld   c,a
             inc  c
-ZP51:
+.ZP51
             dec  c
-            jr   z,ZP52
+            jr   z,.ZP52
             inc  hl
             ld   a,(hl)
             or   a
             jp   p,$+4
-            cpl  
+            cpl
             or   a
-            jr   z,ZP51
-ZP52:
+            jr   z,.ZP51
+.ZP52
             ld   de,0
             ret  z
             inc  de
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SWKRB_S:
-; ПРОВЕРИТЬ СООТВЕТСВИЯ ОСНАЩЕНИЯ КОРАБЛЮ
+            ret
+; ----------------------------------------------------------
+_SWKRB_S
+; Проверить соответсвия оснащения кораблю
             ld   a,(SHIP)
             ld   de,KRBARM
-ZP11:
+ZP11
             pop  hl
             ld   h,0
             ADDHLHL 2
@@ -1065,18 +1051,18 @@ ZP11:
             rept 3
             cp   (hl)
             inc  hl
-            jr   z,ZP10
+            jr   z,.ZP10
             endr
             cp   (hl)
-ZP10:
+.ZP10
             ld   de,0
             ret  z
             inc  de
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SWKRB_K:
+            ret
+; ----------------------------------------------------------
+_SWKRB_K
             ld   de,WKRBI
-ZP15:
+ZP15
             pop  hl
             ld   h,0
             add  hl,de
@@ -1086,49 +1072,49 @@ ZP15:
             ld   a,1
             ld   e,a
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SWSKM_C:
+            ret
+; ----------------------------------------------------------
+_SWSKM_C
             ld   de,CENS1
             jp   ZP13
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SWSKM_V:
+; ----------------------------------------------------------
+_SWSKM_V
             ld   de,TONSS+1
             jp   ZP14
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_UWSKM_S:
+; ----------------------------------------------------------
+_UWSKM_S
             pop  hl
-            call PINFOL2
+            call PlanetInfoHereLang
             ld   a,l
             ld   (ZP17+1),a
             ld   de,TONSS
             ld   hl,WSKMI
             ld   b,WSKOL
             jp   ZP18
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_UWSKM_N:
+; ----------------------------------------------------------
+_UWSKM_N
             ld   bc,WSII
             ld   de,WSKMI
             jp   ZP12
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SWSKM_S:
+; ----------------------------------------------------------
+_SWSKM_S
             ld   de,SKMARM
             ld   a,(SKIMMER)
             jp   ZP11
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SWSKM_K:
+; ----------------------------------------------------------
+_SWSKM_K
             ld   de,WSKMI
             jp   ZP15
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_UCARGO_C:
+; ----------------------------------------------------------
+_UCARGO_C
             ld   de,TWRI+1
             jp   ZP14
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SCARGO_C:
+; ----------------------------------------------------------
+_SCARGO_C
             ld   de,TWRS+1
             jp   ZP14
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SCARGO_S:
+; ----------------------------------------------------------
+_SCARGO_S
             pop  hl
             ld   h,0
             ld   de,TWRS
@@ -1140,24 +1126,24 @@ _SCARGO_S:
             inc  a
             ld   e,a
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SCARGO_M:
-; ОСОБЕННОСТЬ:
-; ДАННАЯ СВОЙСТВО ДАЕТ ПОЛНЫЙ ПОДСЧЕТ
-; ТОНАЖА ВСЕГО КОРАБЛЯ + СКИМЕР
-; И ДОБАВЛЯЕТ ЕДЕНИЦУ ТЕКУЩЕГО ИЛИ
-; НУМЕРОВАННОГО ТОВАРА
+            ret
+; ----------------------------------------------------------
+_SCARGO_M
+; Особенность:
+; Данная свойство дает полный подсчет
+; Тонажа всего корабля + скимер
+; И добавляет еденицу текущего или
+; Нумерованного товара
             pop  hl
             ld   h,0
-            call TAKETON
+            call CountTonnage
             ld   e,a
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SHIP_C:
+            ret
+; ----------------------------------------------------------
+_SHIP_C
             ld   de,CNKR+1
-ZP40:
+ZP40
             pop  hl
             ld   h,0
             push hl
@@ -1168,11 +1154,11 @@ ZP40:
             ld   e,(hl)
             inc  hl
             ld   d,(hl)
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SHIP_T:
+            ret
+; ----------------------------------------------------------
+_SHIP_T
             ld   de,CNKR
-ZP39:
+ZP39
             pop  hl
             ld   h,0
             push hl
@@ -1182,67 +1168,65 @@ ZP39:
             add  hl,de
             ld   e,(hl)
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SHIP_S:
+            ret
+; ----------------------------------------------------------
+_SHIP_S
             ld   de,CNKR+4
             jp   ZP39
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SKIMER_C:
+; ----------------------------------------------------------
+_SKIMER_C
             ld   de,CNSK+1
             jp   ZP40
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SKIMER_V:
+; ----------------------------------------------------------
+_SKIMER_V
             ld   de,CNSK+4
             jp   ZP39
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_PLANET_S:
+; ----------------------------------------------------------
+_PLANET_S
             pop  bc
-            call TAKE_PINFO
+            call TakePlanetInfo
             ld   e,h
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_PLANET_C:
+            ret
+; ----------------------------------------------------------
+_PLANET_C
             pop  bc
-            call TAKE_PINFO
+            call TakePlanetInfo
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_PLANET_U:
+            ret
+; ----------------------------------------------------------
+_PLANET_U
             pop  bc
-            call TAKE_PINFO
+            call TakePlanetInfo
             EXD
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SYSTEM_P:
+            ret
+; ----------------------------------------------------------
+_SYSTEM_P
             pop  bc
-            call TAKE_PINFO
+            call TakePlanetInfo
             ld   e,a
             ld   d,0
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-_SYSTEM_G:
+            ret
+; ----------------------------------------------------------
+_SYSTEM_G
             pop  bc
-            call TAKE_PINFO
+            call TakePlanetInfo
             ld   e,d
             ld   d,0
-            ret  
+            ret
 
 
+;
+; Операнды команды изменения значения
+; Неразрешается операнду быть со свойством
 
 
-; ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-; ОПЕРАНДЫ КОМАНДЫ ИЗМЕНЕНИЯ ЗНАЧЕНИЯ
-; НЕРАЗРЕШАЕТСЯ ОПЕРАНДУ БЫТЬ СО СВОЙСТВОМ
-
-
-; В СТЕКЕ ПРИХОДИТ АДРЕС ОПЕРАЦИИ
-;bc-ВТОРОЙ АРГУМЕНТ
-SUM_M:
+; В стеке приходит адрес операции
+; bc-второй аргумент
+SUM_M
             ld   de,$+6
-            jp   PUTWORD
+            jp   PutWord
             pop  de
             ld   hl,$+9
             push hl
@@ -1250,11 +1234,11 @@ SUM_M:
             EXD
             jp   (hl)
             ld   (SUMM),de
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-STATU_S:
+            ret
+; ----------------------------------------------------------
+STATU_S
             ld   de,$+6
-            jp   PUTWORD
+            jp   PutWord
             pop  de
             ld   hl,$+11
             push hl
@@ -1264,11 +1248,11 @@ STATU_S:
             jp   (hl)
             ld   a,e
             ld   (STATUS),a
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-TONA_J:
+            ret
+; ----------------------------------------------------------
+TONA_J
             ld   de,$+6
-            jp   PUTWORD
+            jp   PutWord
             pop  de
             ld   hl,$+11
             push hl
@@ -1278,18 +1262,19 @@ TONA_J:
             jp   (hl)
             ld   a,e
             ld   (TONN+1),a
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-GRU_z:
+            ret
+; ----------------------------------------------------------
+GRU_z
             call ZP23
-ZP25:
+ZP25
             ld   a,e
-            ld   (ZP54+1),hl
-            ld   (ZP54+4),a
+            ld   (.ZP54+1),hl
+            ld   (.ZP54+4),a
             ld   de,$+6
-            jp   PUTWORD
+            jp   PutWord
             pop  de
-ZP54:       ld   hl,0
+.ZP54
+            ld   hl,0
             ld   a,0
             push hl
             ld   hl,$+9
@@ -1310,21 +1295,22 @@ ZP54:       ld   hl,0
             and  #80
             or   e
             ld   (hl),a
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-GRU_Z:
+            ret
+; ----------------------------------------------------------
+GRU_Z
             call ZP24
             jp   ZP25
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-WKR_B:
+; ----------------------------------------------------------
+WKR_B
             call ZP21
-ZP9:
-            ld   (ZP53+1),hl
-            ld   (ZP53+4),a
+ZP9
+            ld   (.ZP53+1),hl
+            ld   (.ZP53+4),a
             ld   de,$+6
-            jp   PUTWORD
+            jp   PutWord
             pop  de
-ZP53:       ld   hl,0
+.ZP53
+            ld   hl,0
             ld   a,0
             push hl
             ld   hl,$+9
@@ -1337,66 +1323,61 @@ ZP53:       ld   hl,0
             bit  7,(hl)
             ld   a,e
             jr   z,$+3
-            cpl  
+            cpl
             ld   (hl),a
-            ret  
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-WSK_M:
+            ret
+; ----------------------------------------------------------
+WSK_M
             call ZP22
             jp   ZP9
 
 
+;
+; Доп. процедуры
 
 
+; Распознать число в нlиз данных в ix
+; ix-на первую цифру числа
 
-
-
-
-
-; ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-; ДОП. ПРОЦЕДУРЫ
-
-
-; РАСПОЗНАТЬ ЧИСЛО В hlИЗ ДАННЫХ В ix
-;ix-НА ПЕРВУЮ ЦИФРУ ЧИСЛА
-TAKENUM:
+ReadNumber   ; orig: TAKENUM
+; Распознать число из ix
             inc  ix
             ld   a,(ix)
             ld   b,1
             cp   "0"
-            jr   c,ZP5
+            jr   c,.ZP5
             cp   "9"+1
-            jr   nc,ZP5
+            jr   nc,.ZP5
             inc  ix
             ld   a,(ix)
             inc  b
             cp   "0"
-            jr   c,ZP5
+            jr   c,.ZP5
             cp   "9"+1
-            jr   nc,ZP5
+            jr   nc,.ZP5
             inc  ix
             ld   a,(ix)
             inc  b
             cp   "0"
-            jr   c,ZP5
+            jr   c,.ZP5
             cp   "9"+1
-            jr   nc,ZP5
+            jr   nc,.ZP5
             inc  ix
             ld   a,(ix)
             inc  b
             cp   "0"
-            jr   c,ZP5
+            jr   c,.ZP5
             cp   "9"+1
-            jr   nc,ZP5
+            jr   nc,.ZP5
             inc  b
             inc  ix
-ZP5:
+.ZP5
             ld   a,(ix-1)
             sub  48
             ld   l,a
             ld   h,0
             djnz $+3
-            ret  
+            ret
 
             EXD
             ld   a,(ix-2)
@@ -1412,7 +1393,7 @@ ZP5:
             add  hl,de
             ld   b,a
             djnz $+3
-            ret  
+            ret
 
             EXD
             ld   a,(ix-3)
@@ -1430,7 +1411,7 @@ ZP5:
             add  hl,de
             ld   b,a
             djnz $+3
-            ret  
+            ret
 
             EXD
             ld   a,(ix-4)
@@ -1454,7 +1435,7 @@ ZP5:
             add  hl,de
             ld   b,a
             djnz $+3
-            ret  
+            ret
 
             EXD
             ld   a,(ix-5)
@@ -1473,63 +1454,71 @@ ZP5:
             add  hl,bc
             ADDHLHL 4
             add  hl,de
-            ret  
+            ret
 
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-TAKEMEDARG:
-; ЧИТАЕМ МЕЖ_АРГУМЕНТ
+; ----------------------------------------------------------
+
+ReadOperator   ; orig: TAKEMEDARG
+; Прочесть межаргумент (операцию)
+; Читаем меж_аргумент
             ld   a,(ix)
             inc  ix
             ld   hl,CODE3-3
             ld   b,KCOM3
-            call FINDSYMB
+            call FindSymbol
             inc  hl
             ld   e,(hl)
             inc  hl
             ld   d,(hl)
-;deАДРЕС ОБРАБОТКИ МЕЖ АРГУМЕНТА
+; Dеадрес обработки меж аргумента
             push de
-            exx  
+            exx
             pop  de
             ld   (hl),e
             inc  hl
             ld   (hl),d
             inc  hl
-            exx  
-            ret  
+            exx
+            ret
 
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-TARGTURN:
-; ПРОЧЕСТЬ АДРЕС ПЕРЕКЛЮЧАТЕЛЯ ПОЛОЖЕНИЯ
-; ВКЛ./ВЫКЛ.
-;rethlАДРЕС ПЕРЕКЛЮЧАТЕЛЯ
+; ----------------------------------------------------------
+
+ReadJumpAddress   ; orig: TARGTURN
+; Прочесть адрес переключателя положения
+; Вкл./выкл.
+; Rетнlадрес переключателя
             ld   a,(ix)
             inc  ix
             ld   hl,CODE15-3
             ld   b,KCOM15
-            jp   JUMPSYMB
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-TAKEJARG:
-; ПРОЧЕСТЬ АДРЕС ОБРАБОТЧИКА ЧТЕНИЯ
-; АРГУМЕНТА И ЕГО ЗАПОМИНАНИЕ И ПОМЕСТИМ
-; ЕГО В БУФЕР
+            jp   JumpBySymbol
+; ----------------------------------------------------------
+
+ReadHandlerAddress   ; orig: TAKEJARG
+; Прочесть адрес обработчика чтения
+; Аргумента и его запоминание и поместим
+; Его в буфер
             ld   a,(ix)
             inc  ix
             ld   hl,CODE14-3
             ld   b,KCOM14
-            jp   JUMPSYMB
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-; ПРОЧЕСТЬ АРГУМЕНТ
-TAKEARG:
+            jp   JumpBySymbol
+; ----------------------------------------------------------
+; Прочесть аргумент
+
+ReadArgument   ; orig: TAKEARG
+; Прочесть аргумент
             ld   a,(ix)
             inc  ix
             ld   hl,CODE2-3
             ld   b,KCOM2
-JUMPSYMB:
-;a-СИМВОЛ
-;hl-ТАБЛИЦА ОБРАБОТЧИКОВ СИМВОЛОВ
-;b-КОЛИЧЕСТВО СИМВОЛОВ В ТАБЛИЦЕ
-            call FINDSYMB
+
+JumpBySymbol   ; orig: JUMPSYMB
+; Переход по таблице обработчиков символов
+; a-символ
+; hl-таблица обработчиков символов
+; b-количество символов в таблице
+            call FindSymbol
             inc  hl
             ld   a,(hl)
             inc  hl
@@ -1538,84 +1527,82 @@ JUMPSYMB:
             jp   (hl)
 
 
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-FINDSYMB:
-; ПОИСК АДРЕСА В ТБЛИЦЕ ПО СИМВОЛУ В a
-;hlТАБЛИЦА
-;b КОЛ.ПУНКТОВ ПОИСКА
-;retFZ-ON ЕСЛИ НАШЛИ
-; АВТОМАТОМ ПЕРЕХОДИТ В $P3 ЕСЛИ НИЧЕГО НЕ
-; НАШЛИ !!!
+; ----------------------------------------------------------
+
+FindSymbol   ; orig: FINDSYMB
+; Поиск символа в таблице
+; Поиск адреса в тблице по символу в a
+; Нlтаблица
+; b кол.пунктов поиска
+; Retfz-on если нашли
+; Автоматом переходит в $P3 если ничего не
+; Нашли !!!
             ld   de,3
             add  hl,de
             cp   (hl)
             ret  z
-            djnz FINDSYMB+3
+            djnz FindSymbol+3
             jp   ZP3
 
 
+; ----------------------------------------------------------
 
-
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-OBRARGU:
-; ОБРАБОТЧИК АРГУМЕНТОВ, СЧИТЫВАНИЕ ИХ
-; СО СВОЙСТВАМИ И БЕЗ
-;ix-ТЕКСТ СЛЕД. ЗА СИМВОЛОМ АРГУМЕНТА
-;bc-НОМЕР ПУНКТА ГДЕ СТОИТ КУРСОР С 0
-;hl-ПРОЦЕДУРА ЧТЕНИЯ ЗНАЧЕНИЯ ИЗ ТАБЛИЦЫ
-;de-ТАБЛИЦА СВОЙСТВ АРГУМЕНТА-3
-;B'-КОЛ.ЭЛЕМЕНТОВ ТАБЛИЦЫ
-            ld   (ZP7+1),hl
-; МАРКЕР ТОГО ЧТО АРГУМЕНТ БЕЗ ЧИСЛА
-; НУЖНО ДЛЯ ОБРАБОТКИ ВЫБОРА СО СВОЙСТВОМ
+ProcessArgument   ; orig: OBRARGU
+; Обработчик аргументов, считывание их
+; Со свойствами и без
+; ix-текст след. за символом аргумента
+; bc-номер пункта где стоит курсор с 0
+; hl-процедура чтения значения из таблицы
+; de-таблица свойств аргумента-3
+; B'-кол.элементов таблицы
+            ld   (.ZP7+1),hl
+; Маркер того что аргумент без числа
+; Нужно для обработки выбора со свойством
             ld   l,c
             ld   h,0
             ld   a,(ix)
             cp   "."
-            jr   z,ZP4
+            jr   z,.ZP4
             cp   "0"
             jr   c,$+6
             cp   "9"+1
-            jr   c,ZP6
-; ЧИСТЫЙ "АРГУМЕНТ", ПРОСТО КОЛИЧЕСТВО
-ZP7:
+            jr   c,.ZP6
+; Чистый "аргумент", просто количество
+.ZP7
             jp   0
-; С ЧИСЛОМ
-ZP6:
+; С числом
+.ZP6
             push bc
             push de
-            call TAKENUM
+            call ReadNumber
             pop  de
             pop  bc
             dec  hl
             ld   a,(ix)
             cp   "."
-; ЕСЛИ С ЧИСЛОМ И С ВЫБОРОМ СВОЙСТВА,
-; ЧИСЛО В hl
-            jr   nz,ZP7
-; С ВЫБОРОМ СВОЙСТВА
-ZP4:
+; Если с числом и с выбором свойства,
+; Число в hl
+            jr   nz,.ZP7
+; С выбором свойства
+.ZP4
             inc  ix
             inc  ix
             push hl
             EXD
-            exx  
+            exx
             ld   a,b
-            exx  
+            exx
             ld   b,a
             ld   a,(ix-1)
-            jp   JUMPSYMB
+            jp   JumpBySymbol
 
 
-
-
-
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-RUN:
-; ИСПОЛНЕНИЕ ОПЕРАЦИИ
-            ld   hl,PUTWORD
+; ----------------------------------------------------------
+RUN
+; Исполнение операции
+            ld   hl,PutWord
             push hl
-            exx  
+            exx
             ld   de,0-6
             add  hl,de
             ld   e,(hl)
@@ -1623,111 +1610,108 @@ RUN:
             ld   d,(hl)
             inc  hl
             push de
-            exx  
+            exx
             pop  de
-            exx  
+            exx
             ld   e,(hl)
             inc  hl
             ld   d,(hl)
             inc  hl
             push de
-            exx  
+            exx
             pop  hl
-            exx  
+            exx
             ld   e,(hl)
             inc  hl
             ld   d,(hl)
             push de
             ld   de,0-5
             add  hl,de
-; УКАЗАТЕЛЬ БУФЕРА НА ПЕРВЫЙ АРГУМЕНТ
-            exx  
+; Указатель буфера на первый аргумент
+            exx
             pop  bc
-;hl-АДРЕС  ОПЕРАЦИИ
-;de-ПЕРВЫЙ АРГУМЕНТ
-;bc-ВТОРОЙ АРГУМЕНТ
+; hl-адрес  операции
+; de-первый аргумент
+; bc-второй аргумент
             jp   (hl)
-;de-РЕЗУЛЬТАТ
+; de-результат
 
 
-
-
-
-
-FINDINTREE:
-; ИЩЕМ ИДЕНТИФИКАТОР ТЕКСТА ПО ДЕРЕВУ В
-; ЗАВИСИМОСТИ ОТ НОМЕРА ПЕРСОНАЖА И СЦЕНЫ
-;a-ПЕРСОНАЖ
-;b-СЦЕНА
-;de-ТЕКСТ
-;rethl-АДРЕС ИДЕНТИФИКАТОРА ТЕКСТА
-            ld   (_PERSONAJ+1),a
+FindTextInTree   ; orig: FINDINTREE
+; Поиск идентификатора текста по дереву персонажа и сцены
+; Ищем идентификатор текста по дереву в
+; Зависимости от номера персонажа и сцены
+; a-персонаж
+; b-сцена
+; de-текст
+; Rethl-адрес идентификатора текста
+            ld   (._PERSONAJ+1),a
             ld   a,b
-            ld   (_SCENA+1),a
+            ld   (._SCENA+1),a
 
             ld   hl,t_TREE
             ld   a,#FF
-_PERSONAJ:  ld   b,0
-; ПОИСК ПЕРСОНАЖА ПО НОМЕРУ
-ZP34:
+._PERSONAJ
+            ld   b,0
+; Поиск персонажа по номеру
+.ZP34
             push bc
             ld   bc,0
-            cpir 
+            cpir
             pop  bc
-            djnz ZP34
+            djnz .ZP34
             dec  a
-_SCENA:     ld   b,0
-; ПОИСК СЦЕНЫ ПО НОМЕРУ
-ZP35:
+._SCENA
+            ld   b,0
+; Поиск сцены по номеру
+.ZP35
             push bc
             ld   bc,0
-            cpir 
+            cpir
             pop  bc
-            djnz ZP35
-; НАЗАД НА ИДЕНТИФИКАТОР СЦЕНЫ Т.К. НОМЕРА
-; ТЕКСТОВ С 1, И ПРИБАВИМ НОМЕР ТЕКСТА
-; В СЦЕНЕ К АДРЕСУ НАЧАЛА И БУДЕМ НА
-; НУЖНОМ ИДЕНТИФИКАТОРЕ СЦЕНЫ
+            djnz .ZP35
+; Назад на идентификатор сцены т.к. номера
+; Текстов с 1, и прибавим номер текста
+; В сцене к адресу начала и будем на
+; Нужном идентификаторе сцены
             dec  hl
             add  hl,de
-            ret  
+            ret
 
 
+; ----------------------------------------------------------
 
-
-
-
-
-; ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-TAKETON:
-; ПОДСЧЕТ ОБЩЕГО ВЕСА ВСЕГО ГРУЗА
-;hl-ИНДЕКС ТОГО ПУНКТА ТОВАРА
-; КОТОРЫЙ БУДЕТ УВЕЛИЧЕН НА ЕДЕНИЦУ ДЛЯ
-; ПРОВЕРКИ ПОКУПАЕМОСТИ ПО ТОНАЖУ
-; ДЛЯ ТОВАРА
-;hl=0-TWRI ПРОСТАЯ ПРОВЕРКА ТОНАЖА
-;reta- КОЛИЧЕСТВО ТОНН ГРУЗА
+CountTonnage   ; orig: TAKETON
+; Подсчёт общего веса
+; Подсчет общего веса всего груза
+; hl-индекс того пункта товара
+; Который будет увеличен на еденицу для
+; Проверки покупаемости по тонажу
+; Для товара
+; hl=0-twri простая проверка тонажа
+; Reta- количество тонн груза
             add  hl,hl
             ld   de,TWRI
             add  hl,de
-; ЗАПОМНИМ АДРЕСА ВО ВСЕХ ГРУППАХ НАКОПЛЕНИЯ
-; ВЕСА, ТОЛЬКО В ОДНОЙ ИЗ НИХ СРАБОТАЕТ
-; УВЕЛИЧЕНИЕ НА ЕДЕНИЦУ КОМПОНЕНТА ГРУЗА
-; ИЛИ ОСНАЩЕНИЯ
-            ld   (ZP43+1),hl
-; ТАБЛИЦА ПОКАЗАТЕЛЕЙ ВЕСА ТОВАРОВ
-;0-ТОННА
-;1-ЧЕЛОВЕК 1/16тн
-;2-ДР.        0тн
+; Запомним адреса во всех группах накопления
+; Веса, только в одной из них сработает
+; Увеличение на еденицу компонента груза
+; Или оснащения
+            ld   (.ZP43+1),hl
+; Таблица показателей веса товаров
+; 0-Тонна
+; 1-Человек 1/16тн
+; 2-ДР.        0тн
             ld   hl,TWRM
             ld   a,TKOL
             ld   c,0
-ZP42:
+.ZP42
             ex   af,af'
             ld   a,(de)
             and  #7F
             push hl
-ZP43:       ld   hl,0
+.ZP43
+            ld   hl,0
             SUB_DE
             pop  hl
             jr   nz,$+3
@@ -1737,133 +1721,136 @@ ZP43:       ld   hl,0
             ld   b,(hl)
             inc  hl
             dec  b
-            jp   m,ZP41
+            jp   m,.ZP41
             rept 4
-            rrca 
+            rrca
             endr
             and  #0F
             dec  b
-            jp   m,ZP41
+            jp   m,.ZP41
             xor  a
-ZP41:
+.ZP41
             add  a,c
             ld   c,a
             ex   af,af'
             dec  a
-            jp   nz,ZP42
+            jp   nz,.ZP42
 
             ld   hl,TONNS+1
             ld   de,WKRBI
             ld   a,WKKOL
-ZP44:
+.ZP44
             ex   af,af'
             ld   a,(de)
             inc  de
             or   a
             jp   p,$+4
-            cpl  
-            ld   (ZP45+1),a
+            cpl
+            ld   (.ZP45+1),a
             ld   b,(hl)
             inc  hl
             inc  hl
             xor  a
-ZP45:       add  a,0
+.ZP45
+            add  a,0
             djnz $-2
             add  a,c
             ld   c,a
             ex   af,af'
             dec  a
-            jp   nz,ZP44
+            jp   nz,.ZP44
 
             ld   hl,TONSS+1
             ld   de,WSKMI
             ld   a,WSKOL
-ZP46:
+.ZP46
             ex   af,af'
             ld   a,(de)
             inc  de
             or   a
             jp   p,$+4
-            cpl  
-            ld   (ZP47+1),a
+            cpl
+            ld   (.ZP47+1),a
             ld   b,(hl)
             inc  hl
             inc  hl
             xor  a
-ZP47:       add  a,0
+.ZP47
+            add  a,0
             djnz $-2
             add  a,c
             ld   c,a
             ex   af,af'
             dec  a
-            jp   nz,ZP46
+            jp   nz,.ZP46
 
             ld   a,(SKIMMER)
             inc  a
-            jr   z,ZP48
+            jr   z,.ZP48
             dec  a
             ld   e,a
-            rlca 
-            rlca 
+            rlca
+            rlca
             add  a,e
             ld   e,a
             ld   d,0
             ld   hl,CNSK+4
             add  hl,de
             ld   a,(hl)
-ZP48:
+.ZP48
             add  a,c
-            ret  
+            ret
 
 
-
-; БЕРУТ ТЕКУЩИЙ НОМЕР ПУНКТА
-T_NWKRB:
+; Берут текущий номер пункта
+T_NWKRB
             ld   a,(NWKRB+1)
             ld   c,a
             ld   a,(IWKRB+1)
             add  a,c
             ld   c,a
             ld   b,0
-            ret  
-T_NWSKM:
+            ret
+T_NWSKM
             ld   a,(NWSKM+1)
             ld   c,a
             ld   a,(IWSKM+1)
             add  a,c
             ld   c,a
             ld   b,0
-            ret  
-T_NTWR:
+            ret
+T_NTWR
             ld   a,(NTWR+1)
             ld   c,a
             ld   a,(ITWR+1)
             add  a,c
             ld   c,a
             ld   b,0
-            ret  
+            ret
 
 
-; БЕРЕТ ИНФО О СИСТЕМЕ ПЕРЕЛЕТА ИЛИ
-; НАХОЖДЕНИЯ В ЗАВ. ОТ РЕГ. c
-;c=1 СИСТЕМА ПЕРЕЛЕТА
-TAKE_PINFO:
+; Берет инфо о системе перелета или
+; Нахождения в зав. от рег. c
+; c=1 система перелета
+
+TakePlanetInfo   ; orig: TAKE_PINFO
+; Данные планеты/системы по региону
             dec  c
-            jp   nz,PINFOL2
+            jp   nz,PlanetInfoHereLang
             ld   hl,(WHERE)
             ld   de,(WHERE+2)
             ld   a,(WPLANET)
-            jp   PINFOL
+            jp   PlanetInfoLang
 
 
-; ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-; ТАБЛИЦЫ, ДАННЫЕ
+;
+; Таблицы, данные
 
 
-; КОМАНДЫ
-; КОЛИЧЕСТВО КОМАНД
-; ТАБЛИЦА СИМВОЛОВ И АДРЕСОВ КОМАНД
-CODE:
+; Команды
+; Количество команд
+; Таблица символов и адресов команд
+CODE
             db   "?"
             dw   _IF
             db   ":"
@@ -1894,10 +1881,10 @@ CODE:
             dw   _OVER
             db   "W"
             dw   _WYDWOR
-KCOM:       equ  ($-CODE)/3
+KCOM        equ  ($-CODE)/3
 
-; МЕЖ_АРГУМЕНТЫ
-CODE3:
+; Меж_аргументы
+CODE3
             db   "="
             dw   _EQUALLY
             db   "*"
@@ -1920,10 +1907,10 @@ CODE3:
             dw   _OR
             db   ":"
             dw   _SET
-KCOM3:      equ  ($-CODE3)/3
+KCOM3       equ  ($-CODE3)/3
 
-; АРГУМЕНТЫ
-CODE2:
+; Аргументы
+CODE2
             db   "c"
             dw   U_SUMM
             db   "o"
@@ -1996,38 +1983,37 @@ CODE2:
             dw   P_SYSTEM
             db   "y"
             dw   R_SYSTEM
-KCOM2:      equ  ($-CODE2)/3
+KCOM2       equ  ($-CODE2)/3
 
 
+; Таблицы обработки свойств для каждого
+; Вида аргументов вход с HL'=#ffff, значит
+; Аргумент был без номера, т.е. тот на
+; Котором стоит курсор
+; Если <>#ffff, то аргумент с номером
 
-; ТАБЛИЦЫ ОБРАБОТКИ СВОЙСТВ ДЛЯ КАЖДОГО
-; ВИДА АРГУМЕНТОВ ВХОД С HL'=#FFFF, ЗНАЧИТ
-; АРГУМЕНТ БЫЛ БЕЗ НОМЕРА, Т.Е. ТОТ НА
-; КОТОРОМ СТОИТ КУРСОР
-; ЕСЛИ <>#FFFF, ТО АРГУМЕНТ С НОМЕРОМ
-
-; СВОЙСТВА ДЛЯ ВООРУЖЕНИЯ КОРАБЛЯ НА БОРТЕ
-; СВОЙСТВО "s" ПРОВЕРЯЕТ ВСЕ ВООРУЖЕНИЕ
-CODE4:
+; Свойства для вооружения корабля на борте
+; Свойство "s" проверяет все вооружение
+CODE4
             db   "s"
-            dw   _UWKRB_S           ;СТАТУС
+            dw   _UWKRB_S           ; Статус
             db   "n"
             dw   _UWKRB_N
-KCOM4:      equ  ($-CODE4)/3
+KCOM4       equ  ($-CODE4)/3
 
 
-; СВОЙСТВА ДЛЯ ВООРУЖЕНИЯ СКИМЕРА НА БОРТЕ
-; СВОЙСТВО "s" ПРОВЕРЯЕТ ВСЕ ВООРУЖЕНИЕ
-CODE5:
+; Свойства для вооружения скимера на борте
+; Свойство "s" проверяет все вооружение
+CODE5
             db   "s"
             dw   _UWSKM_S
             db   "n"
             dw   _UWSKM_N
-KCOM5:      equ  ($-CODE5)/3
+KCOM5       equ  ($-CODE5)/3
 
 
-; СВОЙСТВА ДЛЯ ВООРУЖЕНИЯ КОРАБЛЯ НА СТАНЦ
-CODE6:
+; Свойства для вооружения корабля на станц
+CODE6
             db   "c"
             dw   _SWKRB_C
             db   "v"
@@ -2036,11 +2022,11 @@ CODE6:
             dw   _SWKRB_S
             db   "k"
             dw   _SWKRB_K
-KCOM6:      equ  ($-CODE6)/3
+KCOM6       equ  ($-CODE6)/3
 
 
-; СВОЙСТВА ДЛЯ ВООРУЖЕНИЯ СКИМЕРА НА СТАНЦ
-CODE7:
+; Свойства для вооружения скимера на станц
+CODE7
             db   "c"
             dw   _SWSKM_C
             db   "v"
@@ -2049,71 +2035,69 @@ CODE7:
             dw   _SWSKM_S
             db   "k"
             dw   _SWSKM_K
-KCOM7:      equ  ($-CODE7)/3
+KCOM7       equ  ($-CODE7)/3
 
 
-; СВОЙСТВА ГРУЗОВ НА БОРТЕ
-CODE8:
+; Свойства грузов на борте
+CODE8
             db   "c"
             dw   _UCARGO_C
-KCOM8:      equ  ($-CODE8)/3
+KCOM8       equ  ($-CODE8)/3
 
 
-; СВОЙСТВА ГРУЗОВ НА СТАНЦИИ
-CODE9:
+; Свойства грузов на станции
+CODE9
             db   "c"
             dw   _SCARGO_C
             db   "s"
             dw   _SCARGO_S
             db   "m"
             dw   _SCARGO_M
-KCOM9:      equ  ($-CODE9)/3
+KCOM9       equ  ($-CODE9)/3
 
 
-; СВОЙСТВА КОРАБЛЯ
-CODE10:
+; Свойства корабля
+CODE10
             db   "c"
             dw   _SHIP_C
             db   "t"
-            dw   _SHIP_T            ;ТОНАЖ
+            dw   _SHIP_T            ; Тонаж
             db   "s"
             dw   _SHIP_S
-KCOM10:     equ  ($-CODE10)/3
+KCOM10      equ  ($-CODE10)/3
 
 
-; СВОЙСТВА ПЛАНЕТ
-CODE11:
+; Свойства планет
+CODE11
             db   "s"
             dw   _PLANET_S
             db   "c"
             dw   _PLANET_C
             db   "u"
             dw   _PLANET_U
-KCOM11:     equ  ($-CODE11)/3
+KCOM11      equ  ($-CODE11)/3
 
 
-; СВОЙСТВА СИСТЕМ
-CODE13:
+; Свойства систем
+CODE13
             db   "p"
             dw   _SYSTEM_P
             db   "g"
             dw   _SYSTEM_G
-KCOM13:     equ  ($-CODE13)/3
+KCOM13      equ  ($-CODE13)/3
 
 
-; СВОЙСТВА СКИМЕРА
-CODE12:
+; Свойства скимера
+CODE12
             db   "c"
             dw   _SKIMER_C
             db   "v"
             dw   _SKIMER_V
-KCOM12:     equ  ($-CODE12)/3
+KCOM12      equ  ($-CODE12)/3
 
 
-
-
-; ОПЕРАНДЫ КОМАНДЫ "ИЗМЕНЕНИЕ ЗНАЧЕНИЯ"
-CODE14:
+; Операнды команды "изменение значения"
+CODE14
             db   "c"
             dw   SUM_M
             db   "u"
@@ -2128,11 +2112,11 @@ CODE14:
             dw   WSK_M
             db   "J"
             dw   TONA_J
-KCOM14:     equ  ($-CODE14)/3
+KCOM14      equ  ($-CODE14)/3
 
 
-; ОПЕРАНДЫ КОМАНДЫ ПЕРЕКЛЮЧЕНИЯ
-CODE15:
+; Операнды команды переключения
+CODE15
             db   "t"
             dw   T_TXT
             db   "p"
@@ -2147,35 +2131,29 @@ CODE15:
             dw   T_KRB
             db   "R"
             dw   T_SKM
-KCOM15:     equ  ($-CODE15)/3
+KCOM15      equ  ($-CODE15)/3
 
 
+; Буфер аргументов и операций
 
-; БУФЕР АРГУМЕНТОВ И ОПЕРАЦИЙ
-
-; БУФЕР ИСПОЛЬЗУЕТСЯ ТАК:
-; ЗАНОСИТСЯ ПЕРВЫЙ АРГУМЕНТ,ОПЕРАЦИЯ
-; ВТОРОЙ АРГУМЕНТ, ПОТОМ ИДЕТ ВЫЧИСЛЕНИЕ
-; И ВЕСЬ РЕЗУЛЬТАТ ПОПАДАЕТ НА ПЕРВЫЙ
-; АРГУМЕНТ, ДАЛЕЕ ЗАНОСИМ СЛЕДУЮЩУЮ
-; ОПЕРАЦИЮ И ТРЕТИЙ АРГУМЕНТ
-; ЕСЛИ СКОБКИ, ТО БУФЕР ПРОДЛИВАЕТСЯ
-ARG:        ds   20
-
+; Буфер используется так:
+; Заносится первый аргумент,операция
+; Второй аргумент, потом идет вычисление
+; И весь результат попадает на первый
+; Аргумент, далее заносим следующую
+; Операцию и третий аргумент
+; Если скобки, то буфер продливается
+ParadoxArgBuf         ds   20   ; orig: ARG
 
 
-; ДОПОЛНИТЕЛЬНЫЙ БУФЕР
-ARGD:       ds   20
+; Дополнительный буфер
+ParadoxArgBuf2        ds   20   ; orig: ARGD
 
 
-CHECK_SCENARY:
+CHECK_SCENARY
             incbin "gen/C_SCENAR.t"   ; GENERATED from assets/text/rules.paradox
             db   0
 
 
-
-; ТЕКСТЫ СЦЕНАРИЯ, КОНВЕРТНУТЫЕ
-TXTES:
-
-
-
+; Тексты сценария, конвертнутые
+TXTES

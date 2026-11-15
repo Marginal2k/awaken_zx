@@ -7,6 +7,21 @@ NAMED = {'stop': 1, 'tab1': 2, 'tab2': 3, 'tab3': 4, 'tab4': 5, 'tab5': 6, 'nbsp
 REV = {1: '{stop}', 2: '{tab1}', 3: '{tab2}', 4: '{tab3}', 5: '{tab4}', 6: '{tab5}', 255: '{nbsp}'}
 ET = 10
 CR = 13
+VARS = {}
+
+
+def load_vars(root):
+    """numbers for {=ships.N.speed} etc.: assets/data/ships.csv, skimmers.csv.  For ships the printed value is shown_<column> when that is filled in, else the column."""
+    import csv, os
+    VARS.clear()
+    for name, cols in (('ships', ('price', 'speed', 'tonnage', 'weight')), ('skimmers', ('price', 'speed', 'weight'))):
+        path = os.path.join(root, 'assets', 'data', name + '.csv')
+        rows = csv.DictReader([l for l in open(path, encoding='utf-8').read().split(chr(10)) if l.strip() and not l.startswith('#')])
+        for r in rows:
+            for c in cols:
+                v = (r.get('shown_' + c) or '').strip() or (r.get(c) or '').strip()
+                if v:
+                    VARS['%s.%s.%s' % (name, r['id'], c)] = int(v)
 
 
 def b2t(bs):
@@ -72,6 +87,12 @@ def t2b(s, where=''):
                 out.append(NAMED[tag])
             elif re.fullmatch(r'x[0-9A-Fa-f]{2}', tag):
                 out.append(int(tag[1:], 16))
+            elif tag.startswith('='):
+                # {=ships.2.price} = a number taken from assets/data/ships.csv / skimmers.csv (see VARS / load_vars)
+                try:
+                    out += list(str(VARS[tag[1:]]).encode('cp866'))
+                except KeyError:
+                    raise ValueError('unknown value {%s} in %s (known: %s ...)' % (tag, where, ', '.join(sorted(VARS)[:4])))
             else:
                 raise ValueError('bad tag {%s} in %s' % (tag, where))
         else:

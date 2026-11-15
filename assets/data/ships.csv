@@ -1,12 +1,15 @@
 # The 7 ships in purchase order (id 1..7; the last one is the illegal starting ship, not sold).  Names / descriptions: text/ships.txt, 3D models: station OBJX.
 # tonnage : capacity in tons          price : credits          speed : max speed shown in the viewer text (not read from here by the flight)
 # legal   : 1 = legal (can be sold), 0 = illegal and unsellable
-# NB: ship.tok / NAMSH in assets/text/ships.txt repeat the price and the speed as plain text; keep them in sync by hand.
-id,tonnage,price,speed,legal,orig_comment
-1,100,64000,130,1,
-2,90,44000,120,1,
-3,60,40000,140,1,
-4,70,35000,110,1,
-5,72,34000,90,1,
-6,80,27000,100,1,
-7,50,12000,70,0,
+# weight : printed only in the viewer text ("Вес"), not read by any code.
+# shown_price / shown_speed / shown_tonnage : the number that the texts print (the viewer description in ships.txt, the purchase list) when it differs
+#     from the real value of the column in the original game (the developers' texts disagree with their tables for the ships listed); empty = the same as the real column.
+#     To make the texts consistent clear these cells.  The texts take every number from here ({=ships.N.price} ... in text/ships.txt): one source of truth.
+id,tonnage,price,speed,legal,weight,shown_price,shown_speed,shown_tonnage,orig_comment
+1,100,64000,130,1,28,,,,
+2,90,44000,120,1,29,,110,120,
+3,60,40000,140,1,20,,,,
+4,70,35000,110,1,25,,,75,
+5,72,34000,90,1,32,,,90,
+6,80,27000,100,1,30,,,110,
+7,50,12000,70,0,33,13000,60,,

@@ -44,13 +44,13 @@ TABLES = {
         'The 7 ships in purchase order (id 1..7; the last one is the illegal starting ship, not sold).  Names / descriptions: text/ships.txt, 3D models: station OBJX.',
         'tonnage : capacity in tons          price : credits          speed : max speed shown in the viewer text (not read from here by the flight)',
         'legal   : 1 = legal (can be sold), 0 = illegal and unsellable',
-        'NB: ship.tok / NAMSH in assets/text/ships.txt repeat the price and the speed as plain text; keep them in sync by hand.'], labels=[
+        'The texts in assets/text/ships.txt take price / speed / tonnage / weight from this file ({=ships.N.price} ...).'], labels=[
         ('CNKR', [('tonnage', 'b', 'd'), ('price', 'w', 'd'), ('speed', 'b', 'd'), ('legal', 'b', 'd')], []),
     ]),
     'skimmers': dict(csv='skimmers.csv', rows=4, first_id=1, title=[
         'The 4 skimmers (id 1..4).  Names / descriptions: text/ships.txt.',
         'unused : always 0 (a skimmer has no tonnage of its own)   price : credits   speed : shown in the viewer text   weight : weight in tons added to the ship load',
-        'NB: skim.tok / NAMSK in assets/text/ships.txt repeat price/speed/weight as plain text; keep them in sync by hand.'], labels=[
+        'The texts in assets/text/ships.txt take price / speed / weight from this file ({=skimmers.N.price} ...).'], labels=[
         ('CNSK', [('unused', 'b', 'd'), ('price', 'w', 'd'), ('speed', 'b', 'd'), ('weight', 'b', 'd')], []),
     ]),
     'shipdat': dict(csv='shipdat.csv', rows=16, first_id=1, title=[

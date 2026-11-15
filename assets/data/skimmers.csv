@@ -1,6 +1,6 @@
 # The 4 skimmers (id 1..4).  Names / descriptions: text/ships.txt.
 # unused : always 0 (a skimmer has no tonnage of its own)   price : credits   speed : shown in the viewer text   weight : weight in tons added to the ship load
-# NB: skim.tok / NAMSK in assets/text/ships.txt repeat price/speed/weight as plain text; keep them in sync by hand.
+# The texts (skim.tok viewer description, NAMSK purchase list in text/ships.txt) take price, speed and weight from here ({=skimmers.N.price} ...): one source of truth.
 id,unused,price,speed,weight,orig_comment
 1,0,30000,170,5,
 2,0,27000,150,4,

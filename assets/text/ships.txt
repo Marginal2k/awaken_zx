@@ -6,63 +6,64 @@
 [ship.tok first=1]
 # Ship descriptions for the 3D viewer: items 1..7 = the 7 ships in the order of assets/data/ships.csv.  Layout of an item:
 # name "\n\n" story "\n\n" "Characteristics:" "\n" "Speed N" "\n" "Armour N" "\n" "Weight N" -- the numbers are plain text here and
-# are NOT read from ships.csv (keep them in sync by hand).
+# taken from assets/data/ships.csv: {=ships.N.speed} {=ships.N.tonnage} {=ships.N.weight} (the cells shown_* of the csv hold the numbers of the original
+# text where they differ from the real values).
 1 | Доминион.\n
     | \n
     | Был создан в 97 году новейшей эры по кореанскому летоисчислению. Самый новый и современный корабль для высшей аристократии трех миров.\n
     | \n
     | Характеристики:\n
-    | Скорость 130\n
-    | Тоннаж 100\n
-    | Вес 28
+    | Скорость {=ships.1.speed}\n
+    | Тоннаж {=ships.1.tonnage}\n
+    | Вес {=ships.1.weight}
 2 | Софист.\n
     | \n
     | Был создан в 72 году новейшей эры по кореанскому летоисчислению. Очень неплохой корабль для аристократии, пользующейся услугами орбитальных станций и великого космоса.\n
     | \n
     | Характеристики:\n
-    | Скорость 110\n
-    | Тоннаж 120\n
-    | Вес 29
+    | Скорость {=ships.2.speed}\n
+    | Тоннаж {=ships.2.tonnage}\n
+    | Вес {=ships.2.weight}
 3 | Мемфис.\n
     | \n
     | Был создан в 64 году новейшей эры по кореанскому летоисчислению. Один из лучших кораблей в среднем классе. Также это один из самых быстрых кораблей имеющийся на вооружении трех миров.\n
     | \n
     | Характеристики:\n
-    | Скорость 140\n
-    | Тоннаж 60\n
-    | Вес 20
+    | Скорость {=ships.3.speed}\n
+    | Тоннаж {=ships.3.tonnage}\n
+    | Вес {=ships.3.weight}
 4 | Фирс.\n
     | \n
     | Был создан в 49 году новейшей эры по кореанскому летоисчислению. Удобный по всем характеристикам корабль для представительского среднего класса. Неплохая скорость и грузоподъемность. О всех его возможностях говорит его цена.\n
     | \n
     | Характеристики:\n
-    | Скорость 110\n
-    | Тоннаж 75\n
-    | Вес 25
+    | Скорость {=ships.4.speed}\n
+    | Тоннаж {=ships.4.tonnage}\n
+    | Вес {=ships.4.weight}
 5 | Орсан.\n
     | \n
     | Был создан в 23 году новейшей эры по кореанскому летоисчислению. Одна из лучших, хоть и старых, моделей кораблей для низших классов трех миров.\n
     | \n
     | Характеристики:\n
-    | Скорость 90\n
-    | Тоннаж 90\n
-    | Вес 32
+    | Скорость {=ships.5.speed}\n
+    | Тоннаж {=ships.5.tonnage}\n
+    | Вес {=ships.5.weight}
 6 | Барос.\n
     | \n
     | Был создан в 50 году новейшей эры по кореанскому летоисчислению. Лучший торговый корабль. По всем своим характеристикам стоит на первых местах торгового флота трех миров.\n
     | \n
     | Характеристики:\n
-    | Скорость 100\n
-    | Тоннаж 110\n
-    | Вес 30
+    | Скорость {=ships.6.speed}\n
+    | Тоннаж {=ships.6.tonnage}\n
+    | Вес {=ships.6.weight}
 7 | Карэн.\n
     | \n
     | Был создан в 9981 году прошлой эры по кореанскому летоисчислению. Очень старая модель. Почти не встречающаяся в просторах великого космоса. Многое новейшее оснащение не может быть установлено на его борт.\n
     | \n
     | Характеристики:\n
-    | Скорость 60\n
-    | Тоннаж 50\n
-    | Вес 33{sp}
+    | Скорость {=ships.7.speed}\n
+    | Тоннаж {=ships.7.tonnage}\n
+    | Вес {=ships.7.weight}{sp}
 
 [skim.tok first=1]
 # Skimmer descriptions for the 3D viewer: items 1..4 = the 4 skimmers, same layout as ship.tok (Speed, Weight).
@@ -71,62 +72,62 @@
     | Был создан в 89 году новейшей эры по кореанскому летоисчислению. Лучший по всем характеристикам скимер для высших аристократов.\n
     | \n
     | Характеристики:\n
-    | Скорость 170\n
-    | Вес 5
+    | Скорость {=skimmers.1.speed}\n
+    | Вес {=skimmers.1.weight}
 2 | Кридон.\n
     | \n
     | Был создан в 74 году новейшей эры по кореанскому летоисчислению. Очень не плохой скимер для мелкой и средней аристократии.\n
     | \n
     | Характеристики:\n
-    | Скорость 150\n
-    | Вес 4
+    | Скорость {=skimmers.2.speed}\n
+    | Вес {=skimmers.2.weight}
 3 | Протос.\n
     | \n
     | Был создан в 58 году новейшей эры по кореанскому летоисчислению. Хороший скимер для среднего и даже для низшего классов.\n
     | \n
     | Характеристики:\n
-    | Скорость 130\n
-    | Вес 3
+    | Скорость {=skimmers.3.speed}\n
+    | Вес {=skimmers.3.weight}
 4 | Алгол.\n
     | \n
     | Был создан в 36 году новейшей эры по кореанскому летоисчислению. Оптимальная модель для низших классов.\n
     | \n
     | Характеристики:\n
-    | Скорость 100\n
-    | Вес 2{sp}
+    | Скорость {=skimmers.4.speed}\n
+    | Вес {=skimmers.4.weight}{sp}
 
 [NAMSH]
-# Ship purchase list (ships 1..6, legal): one line per ship "\nName{tab1}price".  The price is plain text (not read from ships.csv: keep in sync).
+# Ship purchase list (ships 1..6, legal): one line per ship "\nName{tab1}price".  The price comes from assets/data/ships.csv ({=ships.N.price}).
 # The list is split in two sections because the label TD1 (end of the "legal" list) lies between them.
 0 ~ \n
     # line 1
-    | Доминион{tab1}64000\n
+    | Доминион{tab1}{=ships.1.price}\n
     # line 2
-    | Софист{tab1}44000\n
+    | Софист{tab1}{=ships.2.price}\n
     # line 3
-    | Мемфис{tab1}40000\n
+    | Мемфис{tab1}{=ships.3.price}\n
     # line 4
-    | Фирс{tab1}35000\n
+    | Фирс{tab1}{=ships.4.price}\n
     # line 5
-    | Орсан{tab1}34000\n
+    | Орсан{tab1}{=ships.5.price}\n
     # line 6
-    | Барос{tab1}27000
+    | Барос{tab1}{=ships.6.price}
 
 [NAMSH7]
 # The seventh ship (illegal, sold only on some stations): "Name{tab1}price".
-0 | Карэн{tab1}13000
+0 | Карэн{tab1}{=ships.7.price}
 
 [NAMSK]
-# Skimmer purchase list (4 skimmers): one line per skimmer "\nName{tab1}price" (price plain text, keep in sync with ships.csv).
+# Skimmer purchase list (4 skimmers): one line per skimmer "\nName{tab1}price" (price from assets/data/skimmers.csv).
 0 | \n
     # line 1
-    | Фервест{tab1}30000\n
+    | Фервест{tab1}{=skimmers.1.price}\n
     # line 2
-    | Кридан{tab1}27000\n
+    | Кридан{tab1}{=skimmers.2.price}\n
     # line 3
-    | Протос{tab1}24000\n
+    | Протос{tab1}{=skimmers.3.price}\n
     # line 4
-    | Алгол{tab1}18000
+    | Алгол{tab1}{=skimmers.4.price}
 
 [TSHIP]
 # Header of the purchase list: "Model" {tab1} "Price", then a blank row ({nbsp*31}).

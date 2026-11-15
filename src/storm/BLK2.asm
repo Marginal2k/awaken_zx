@@ -7,8 +7,8 @@ Newrokt
         ld   a,(hl)
         cp   #80
         jr   nz,.Rkn12
-        ld   hl,Eff13
-        ld   (Sfxa+1),hl
+        ld   hl,SfxEff13
+        ld   (SfxChannelA+1),hl
         ld   a,8                ; Цель потеряна
         call Mesags
         and  a
@@ -115,7 +115,7 @@ Enrok   ld   (hl),0             ; Энергия
         ld   (de),a             ; Номер ракеты b списке
         scf
         ret
-Repanel
+RedrawPanel                     ; orig: Repanel
         ; Вывод индикаторов панели , a так же вр
         ; Емени
         ld   bc,PORT_PAGE
@@ -123,13 +123,13 @@ Repanel
         ld   a,Pgnorm
         out  (c),a
         ld   a,1
-        ld   (Fspeed+1),a
-        ld   (Ffire+1),a
-        ld   (Fshild+1),a
+        ld   (DrawSpeed+1),a
+        ld   (DrawFire+1),a
+        ld   (DrawShield+1),a
         ld   (Fhigh+1),a
         ld   (Ftempe+1),a
-        ld   (Ffuel+1),a
-        call Datalin            ; Индикаторы
+        ld   (DrawFuel+1),a
+        call DrawStatusLine     ; Индикаторы
         pop  bc
         ld   a,Pgstar
         out  (c),a
@@ -515,8 +515,8 @@ Shut
         ld   hl,0
         ld   (Shut+1),hl
         ; 3Вук попадания
-        ld   hl,Eff21
-        ld   (Sfxa+1),hl
+        ld   hl,SfxEff21
+        ld   (SfxChannelA+1),hl
         ld   a,c
         cp   PLAYER_INDEX
         ret  z                  ; Если пред. был игрок
@@ -568,11 +568,11 @@ Pstli   add  a,50
         sub  2
         ld   (Peregrv+1),a
         ld   a,1
-        ld   (Ffire+1),a
+        ld   (DrawFire+1),a
         xor  a
         ld   (Fll+1),a
-        ld   hl,Eff2
-        ld   (Sfxa+1),hl
+        ld   hl,SfxEff2
+        ld   (SfxChannelA+1),hl
         ld   hl,#38A9
         ld   a,Ld1l&L_
         ld   (L91+#4E),hl
@@ -737,40 +737,43 @@ Datal_
         ld   a,Pgcontr
         out  (c),a
         ex   af,af
-        call Datal
+        call DrawGauge
         ld   bc,PORT_PAGE
         ld   a,Pgnorm
         out  (c),a
         ret
 
-Datalin
+DrawStatusLine                  ; orig: Datalin
 ; Вывод данных O 3ащите энергии и др.инф
 ; O b виде статус линии
-Fshild  ld   a,0
+DrawShield                      ; orig: Fshild
+        ld   a,0
         and  a
-        jr   z,Ffuel
+        jr   z,DrawFuel
         ld   a,(Shild)
         ld   hl,#49A1
         call Datal_
         xor  a
-        ld   (Fshild+1),a
+        ld   (DrawShield+1),a
 
-Ffuel   ld   a,0
+DrawFuel                        ; orig: Ffuel
+        ld   a,0
         and  a
-        jr   z,Ffire
+        jr   z,DrawFire
         call Afuel
         rra
         ld   hl,#49E1
         call Datal_
 
-Ffire   ld   a,0
+DrawFire                        ; orig: Ffire
+        ld   a,0
         and  a
         jr   z,Ftempe
         ld   a,(Peregrv+1)
         ld   hl,#5121
         call Datal_
         xor  a
-        ld   (Ffire+1),a
+        ld   (DrawFire+1),a
 Ftempe  ld   a,0
         and  a
         jr   z,Fhigh
@@ -787,11 +790,12 @@ High_   ld   a,0
         call Datal_
         xor  a
         ld   (Fhigh+1),a
-Fspeed  ld   a,0
+DrawSpeed                       ; orig: Fspeed
+        ld   a,0
         and  a
         jr   z,Fspd
         xor  a
-        ld   (Fspeed+1),a
+        ld   (DrawSpeed+1),a
         ld   hl,(Speed)
         bit  7,h
         jr   z,$+9

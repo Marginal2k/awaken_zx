@@ -21,11 +21,12 @@ def asm(src, cwd, extra=()):
 
 def generate_assets():
     """assets/ (human-editable) -> build/gen/ (game form: db/inc/bin files that the sources include).  tools/assets/*.py"""
-    import gen_text, gen_tables
+    import gen_text, gen_tables, gen_gfx
     shutil.rmtree(B + '/gen', ignore_errors=True)
     os.makedirs(B + '/gen', exist_ok=True)
     gen_text.generate(ROOT, B + '/gen')
     gen_tables.generate(ROOT, B + '/gen')
+    gen_gfx.generate(ROOT, B + '/gen')
 
 
 TEST = '--test-return' in sys.argv
@@ -61,7 +62,7 @@ def main():
       code(ROOT + '/assets/MUZ1.C', 'MUZ1', 0xDB00)
       # stscr = 16 packed pictures one after another (239 sectors, SECTAB in station/LOADER.asm); like the demo the catalogue
       # length is that of the first picture only (3230) while the sector count covers the whole file.
-      d.add_file('stscr', 'C', open(ROOT + '/assets/stscr.C', 'rb').read(), start=0xC000, length=3230)
+      d.add_file('stscr', 'C', open(B + '/gen/stscr.C', 'rb').read(), start=0xC000, length=int(open(B + '/gen/stscr.len').read().split()[0]))
       # save slots SAVE0..SAVE5 (512-byte state records, same layout as the TIME block): initial state of a new game.  The game
       # overwrites them in place (common/disk.asm DiskSlotSave), so the files only have to exist with 2 sectors each.
       time_addr = [int(l.split('0x')[1], 16) for l in open(B + '/station.sym') if l.startswith('TIME:')][0]
@@ -75,7 +76,7 @@ def main():
       code(B + '/flight/CONTROL0.C', 'CONTROL0', 0xC000)
       code(B + '/flight/CONTROL.C', 'CONTROL', 0xE013)
       code(B + '/flight/OBJECT3D.C', 'OBJECT3D', 0xC000)
-      code(ROOT + '/assets/PANEL.C', 'PANEL', 0x6373)
+      code(B + '/gen/PANEL.C', 'PANEL', 0x6373)
       code(ROOT + '/assets/FINALF.C', 'FINALF', 0x6000)     # ending (self-contained); started by LaunchEnding in the station
       d.save(B + '/' + out)
       print('OK build/' + out)

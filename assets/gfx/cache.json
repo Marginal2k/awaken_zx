@@ -1,0 +1,74 @@
+{
+ "intro_logo.png": {
+  "orig": "orig/intro_logo.scr",
+  "pixels": "3c0171d6c5f8894c9d2ec51885a2d9f4a0d5c123f5fbc51b380f022b4dd13fac"
+ },
+ "panel.png": {
+  "orig": "orig/panel.hr",
+  "pixels": "6fe758483f99ff5054f1365ed21c14dc585f30a96fdddb0cb9a92adfcbed2737"
+ },
+ "station_bg_01.png": {
+  "orig": "orig/station_bg_01.hr",
+  "pixels": "0846d70adcc97d113b9b5dab92e2f72626fcab510b41b6179a5219d6c4534ed9"
+ },
+ "station_bg_02.png": {
+  "orig": "orig/station_bg_02.hr",
+  "pixels": "c26d10dc33b7ec46933a1a85d083e18e1a329a28a07cd8b082588d6aba5e5a87"
+ },
+ "station_bg_03.png": {
+  "orig": "orig/station_bg_03.hr",
+  "pixels": "909ba9db2c7f151a0b009725acb5a99a50f81c0749b459c422b81fd8ce1fbc15"
+ },
+ "station_bg_04.png": {
+  "orig": "orig/station_bg_04.hr",
+  "pixels": "72a93ff29868108881faeeac6c89b03c5046f982316adf807a70a23abae4d5a3"
+ },
+ "station_bg_05.png": {
+  "orig": "orig/station_bg_05.hr",
+  "pixels": "eb02b5095e4fff339a376dda3f2f44086cbca88aaa1efd54b4747b5957219dc8"
+ },
+ "station_bg_06.png": {
+  "orig": "orig/station_bg_06.hr",
+  "pixels": "607fed690d01c547d44d1c94c67dfefe0436e739425a4529d46453c8ccd85f03"
+ },
+ "station_bg_07.png": {
+  "orig": "orig/station_bg_07.hr",
+  "pixels": "e71073591990ba617a1392a0ecb0b8594933f2f72e7de2363a6ed07b07f47305"
+ },
+ "station_bg_08.png": {
+  "orig": "orig/station_bg_08.hr",
+  "pixels": "f5a3517c5f09a7c1b21c980b2a2afdd41db5de26db6508c561b64ca165fec0a5"
+ },
+ "station_bg_09.png": {
+  "orig": "orig/station_bg_09.hr",
+  "pixels": "c8ee7b7035bb5b0e1ffb0a8fe2eaf0511e31af8c4e4db07eca07e0e06c93e891"
+ },
+ "station_bg_10.png": {
+  "orig": "orig/station_bg_10.hr",
+  "pixels": "d366182c8374b0695b85b492c0ddb95a1bb48376e428be2a81ea66c39531dfb4"
+ },
+ "station_bg_11.png": {
+  "orig": "orig/station_bg_11.hr",
+  "pixels": "ed3b7e6e1c2023f62d07e2d84696b45032ebc3e450c283b95735f04d3f7800f2"
+ },
+ "station_bg_12.png": {
+  "orig": "orig/station_bg_12.hr",
+  "pixels": "647e391b5c0eb6449ced235a0799fc56171457bfd34e9dd4d9d48e8ea88ff5f2"
+ },
+ "station_bg_13.png": {
+  "orig": "orig/station_bg_13.hr",
+  "pixels": "34dc4b990d26c8b2c30ebf1eb77718a30c4163bbc0b06177206e3b04b4e831e9"
+ },
+ "station_bg_14.png": {
+  "orig": "orig/station_bg_14.hr",
+  "pixels": "499a1273c5e632ee2ac00e77b610c1bed0549b3ad77368473af7057ef9910667"
+ },
+ "station_bg_15.png": {
+  "orig": "orig/station_bg_15.hr",
+  "pixels": "de25df561f99ab697b3bb61ab6cfb0650acf746d2683d64e5fd23e2760423395"
+ },
+ "station_bg_16.png": {
+  "orig": "orig/station_bg_16.hr",
+  "pixels": "85c8c8aae83950eac1a87e8c543f814b03a3c10fddd8b283da864e5c212c9847"
+ }
+}

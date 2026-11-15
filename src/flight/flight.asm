@@ -171,7 +171,7 @@ JL2:        equ  $-JL1
 
 ; ШРИФТ
 FONT:
-            incbin "FONT.f"
+            incbin "gen/FONT.f"   ; GENERATED from assets/gfx/panel_font.png
 
 
 ; ОБРАБОТКА ЗВЕЗД

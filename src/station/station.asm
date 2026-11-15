@@ -7,7 +7,7 @@
 
 ; КУРСОРЫ
             org  #6000
-            incbin "KSPOplus.s"
+            incbin "gen/KSPOplus.s"   ; GENERATED from assets/gfx/cursors.png
 
             org  #6300
             ; ent $   (ZASM entry point marker)
@@ -21,7 +21,7 @@
 END1:
 ; РАЗМЕР,ШРИФТ
             org  SZTB
-            incbin "PRO.f"
+            incbin "gen/PRO.f"   ; GENERATED from assets/gfx/pro_font.png + pro_font_widths.csv
 
             include "DATA_M.asm"
 LDAT:       equ  $-DATAM

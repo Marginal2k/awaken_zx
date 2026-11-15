@@ -6,8 +6,16 @@ game form into `build/gen/` (generated, never edit), and the sources `include` /
 
     assets/text/*.txt          texts (UTF-8)                       -> tools/assets/gen_text.py   -> build/gen/<LABEL>.inc, *.tok, C_SCENAR.t
     assets/data/*.csv          numeric tables                      -> tools/assets/gen_tables.py -> build/gen/<LABEL>.inc
-    assets/gfx/*.png (+csv)    pictures, fonts, cursors            -> tools/assets/gen_gfx.py    -> build/gen/*.C *.scr *.f *.s SECTAB.inc
-    assets/*.d *.v *.c *.C ... binary blobs that stay binary (see "What stays binary")
+    assets/gfx/*.png (+csv)    pictures, fonts, cursors, sprites   -> tools/assets/gen_gfx.py    -> build/gen/*.C *.scr *.f *.s *.bin SECTAB.inc
+                                                                   tools/assets/gen_flight.py (radar sprites) -> build/gen/RADAR_*.inc
+    assets/models/*/*.txt      one text file per 3D model          -> tools/assets/gen_models.py -> build/gen/OBJECTS*.inc OBJX.inc
+    assets/data/spawn_*.csv, ship_choice.csv, newgame_flight.csv, map_rings.txt
+                               flight / map data                   -> tools/assets/gen_flight.py, gen_math.py -> build/gen/*.inc, ways.d
+    assets/sound/effects.txt   AY sound effects of the flight      -> tools/assets/gen_flight.py -> build/gen/EFFECTS.inc
+    assets/music/              station music: station.pt3 (standard PT3 module) + pt3player.bin -> tools/assets/gen_music.py -> build/gen/MUZ1.C
+    assets/ending/             code of the ending (the 3 ending pictures are gfx/ending_*.png) -> gen_gfx.py -> build/gen/FINALF.C
+    (math tables)              computed by tools/assets/gen_math.py: 0E0200.d CSTB.d D9200.d station_D9200.d (no files in assets/)
+    assets/*.d *.v *.c ... binary blobs that stay binary (see "What stays binary")
     tools/assets/extract_*.py  one-time extractors used to create the files above (documentation of how they were made; not run by the build)
 
 ## Text notation (assets/text/*.txt)
@@ -61,7 +69,27 @@ signed bytes may be negative.  Row counts are fixed (`TKOL`, `WKKOL`, `WSKOL` in
 | settings_env.csv, settings_game.csv | SETSD SETSI, SETGD SETGI | 13, 43 | defaults of the two settings windows (ports, masks, key letters) |
 | newgame.csv | TIME ... ABONS | 23 fields | the new-game state record (also the content of the SAVE0..5 slots) |
 
-The prices and speeds are also written as plain text in `text/ships.txt` (viewer text, purchase list): keep them equal by hand.
+The numbers printed in `text/ships.txt` (viewer text: speed, tonnage, weight; purchase lists: price) are NOT typed there: they are tags `{=ships.N.speed}` ... that the
+text generator fills from `ships.csv` / `skimmers.csv` (one source of truth).  The original game printed some numbers that differ from the table values (ship 2 speed 110 vs 120, ...);
+those are kept in the csv columns `shown_price / shown_speed / shown_tonnage` (empty = same as the real column; clear the cells to make the texts consistent); `weight` of ships is print-only.
+
+### Flight data tables
+| file | feeds | content |
+|--|--|--|
+| spawn_types.csv | VERTAB | cumulative spawn thresholds per government (pirates, traders, police, military, hunters, harmless pirates, ufo, hostile ufo, hermits) |
+| spawn_government.csv, spawn_level.csv | STROYTAB, LEVLTAB | per-government offsets and per-planet-level formula of the 15 flight parameters PLANDICTAT (formula in the csv header) |
+| ship_choice.csv | TPIRAT TTRADER TARMY TPOLICE THUNTER TUFO TOTSHEL KREYSERS | which model (symbolic index) a new object gets, 8 weighted slots per type |
+| newgame_flight.csv | NDATA | the OLD 215-byte new-game record of the flight; only used by dead code (RETSTT), field order differs from the real 512-byte record, see assets/data/newgame.csv for the real new game (names match: TIME PLACE WHERE PLANET WPLANET SHIP SKIMMER STATUS SUMM TONN ...) |
+| map_rings.txt | ways.d (PWAYS) | six dotted rings (x y offsets) around the map markers; the code addresses them at fixed offsets |
+
+`sound/effects.txt`: AY effects as frames `tone_lo tone_hi mixer volume` (format in the file header).  `gfx/radar_sprites.png` (+csv): the 3x3 radar blips, compass markers and the two 8x8 target highlights;
+only the shape is stored, the 8 pre-shifted copies are generated.
+
+### 3D models (assets/models)
+`models/flight/*.txt` (103 flight objects: ships far/near versions, stations, rockets, asteroids ...) and `models/station/*.txt` (10 models of the 3D viewer): one text file per model,
+`index.txt` of each directory lists the files in memory order (the labels are those of the old sources, the code and `3DTABS.asm` refer to them).  Format (documented in `tools/assets/models.py`):
+`radius`, `scale`, `group x y z mirror=xy` (a point plus its mirror copies, numbered v0, v1 ... in the order of the groups), `poly <fill 0..7> v v v` (polygon), `line <flags> v v` (polyline), `label NAME`
+before a face that the program patches at run time (engine flicker).  Limit: at most 51 vertices per model.  Edit a coordinate and rebuild: the object changes in the game.
 
 ## Graphics (assets/gfx)
 
@@ -70,6 +98,9 @@ The prices and speeds are also written as plain text in `text/ships.txt` (viewer
 | station_bg_01..16.png | stscr (16 Hrust-packed station backgrounds, loaded one at a time to a bank at #C000) | 256x192 RGB, ZX palette (normal 205 / bright 255 levels), at most 2 colours per 8x8 cell, normal or bright per cell (not mixed). The depacked data is **cell-linear** (8 bytes = one 8x8 cell, cells row by row, then 768 attribute bytes; the station code copies it cell by cell to the screen), the PNG shows the picture as the game displays it |
 | panel.png | PANEL (flight HUD, unpacked by the flight at load) | same rules, normal ZX screen byte order |
 | intro_logo.png | boot intro "Awaken" logo (raw screen, bitmap in the lower third) | white ink on black; the game uses only the bitmap bits and overwrites the attribute bytes, so colours are not editable |
+| intro_closing.png | intro closing picture "Awaken - Second Breeze" | 256x192, ZX colours, 2 per 8x8 cell; original packed blob while unchanged, else own RLE packer (compressed size at most 6912 bytes, long runs pack well); verified: matches the running intro 100 %, an edited picture appears in the game |
+| ending_1_spas_mir.png, ending_2_sdelal_eto.png, ending_3_galaxy.png | the three 256x192 1-bit screens of the ending (FINALF) | white = ink, black = paper; colours (red cycling) are set by the code; the texts "ТЫ СПАС МИР", "ТЫ СДЕЛАЛ ЭТО" are part of the pictures; build = round trip checked, not run in the emulator after an edit |
+| radar_sprites.png, radar_sprites.csv | radar blips / compass markers / target frames of the flight panel | 8x8 cells, 3x3 blips, see the csv |
 | pro_font.png, pro_font_widths.csv | PRO.f station proportional font | 128x128, 16x16 cells of 8x8, black = ink, code = row*16+column; width per code in the csv (advance in pixels) |
 | panel_font.png | FONT.f flight panel font | 4x6 glyphs, cell 5x7, 16 per row, codes 32..239 |
 | cursors.png | KSPOplus.s mouse cursors | 12 cursors of 16x16, RGBA: transparent = see-through, white = ink, black = paper |
@@ -86,16 +117,17 @@ Verified in the emulator (work/assets_tech2): the unchanged PNGs equal the scree
 
 | file | why |
 |--|--|
-| MUZ1.C | PT3 player + a third-party tune (Virtual Aggression compilation by Mast/FtL): code and module in one blob; split into player + .pt3 not done |
-| FINALF.C | the ending: one program with its own code and bitmap texts ("ТЫ СДЕЛАЛ ЭТО" ...) in one self-contained 19 KB image, no string table, graphics interleaved with code; needs a disassembly first |
-| intro_depack.bin | intro depacker (code, a different packer from Hrust: no `HR` header) + the packed closing picture "Awaken - Second Breeze"; its format was not reconstructed |
+| music/pt3player.bin | the 3617-byte PT3 player (Nick of GDC, v1.0): machine code with its tables and the module address #E921 built in; not disassembled (needs a data/code analysis of self-modifying code).  The tune itself is `music/station.pt3` (a normal PT3 module, plays in any PT3 player) |
+| ending/finalf_code.bin | the 681 bytes of code of the ending (start-up, colour cycling, key wait; self-modifying, interleaved with stack tricks) + 1 trailing byte; the three pictures are `gfx/ending_*.png` |
+| gfx/orig/intro_depack.bin | the original intro blob: depacker + closing picture packed by the 1999 packer (undocumented, no compressor known).  Used while `gfx/intro_closing.png` is unchanged; an edited picture is packed by `tools/assets/rlepack.py` (own RLE, own 41-byte depacker, max 6912 bytes) |
 | EFF.c | compiled (generated) hyperjump effect procedure = machine code |
 | EXPLOSIO.v, HIPERJMP.v, VOX.d | voxel sprite data of the flight effects, format only known to the STORM code |
-| D9000.d, D9200.d, CSTB.d, ATAGTAB.d, KORNI.d, 0E0200.d, station_D9200.d | math tables (sine / multiplication / atan / square root); could be generated by a script (not done) and are not meant to be edited |
-| ways.d | dotted-line pattern bytes of route lines on the map |
+| D9000.d | not a table: the initial memory image of the 3D variable area (L90/L91, rubbish from the developer's memory); the engine overwrites it |
+| KORNI.d, ATAGTAB.d | square-root / arctangent tables with irregular values that no formula reproduces exactly (KORNI page 1 even holds a scrambled hybrid); kept as data, not meant to be edited |
 | unused/ | files of the developer disks that no build uses |
-| flight: OBJECTS*.asm, 3DTABS, panel radar sprites (`%` lines), AY sound effects, spawn tables (SETHJRET/OBJGENER), NDATA | still `db` blocks in the asm sources (models = vertex/face data; the others are small data tables) - not yet converted |
-| station OBJX.asm (10 viewer models), KARTA.asm star sprites (generated drawing code) | models / code |
+| KARTA.asm star sprites | generated drawing code, not data |
+
+Computed instead of stored (`tools/assets/gen_math.py`, formulas in its header): `0E0200.d` (squares), `CSTB.d` (14-bit cosine), `D9200.d` / `station_D9200.d` (quarter-square multiplication table, sine, square-root page with two irregular values listed in the script).
 
 ## Round trip test (done)
 Text: changing one letter of a help line (`Контракты` -> `Контракта` in help.txt) changes exactly one byte of HELP.C; reverting restores every output.

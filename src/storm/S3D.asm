@@ -1,13 +1,28 @@
+;==============================================================================
+; S3D - 3D-движок объектов (станция/полёт/посадка)
+;
+; Страница #11 (PAGE_3D). Таблица переходов по #FF00: Init3d, OutAll3d, NextObject,
+; ObjectIndexTab, Moveon, SetCoordsByMove, ClearMoves, Fline (в EQUS - ENG3D_*).
+; Код и таблицы с #C000: D9000/D9200 (маски текстур, умножение, синус), корни (korni),
+; затем XR2 (полигоны), XCLP (клиппинг), XR1 (цикл вида/объектов), BLOK1 (управление),
+; OBJX (вершины и грани объектов: деревья, дом, Sturm/Istr/Turi/Trad).
+; Промежутки выравнивания (ORG $^) содержат в исходном файле мусор памяти.
+; Сборка: make_S3D.asm -> S3D.bin (16151 байт, совпадает с awk2/S3D.C).
+;
+; Часть набора STORM (прототип Awaken 1997/98), не входит в основную игру. Подробности: docs/STORM.md,
+; таблица переименований меток: docs/STORM_LABELS.md. Собирается sjasmplus (см. make_*.asm).
+;==============================================================================
+
         include "EQUS.asm"
 
         org  #FF00
-        jp   INIT_              ; Инит 3d
-        jp   OUTAL2_            ; Вывод 3d
-        jp   NXTO_              ; Для выхода из вокселей
-        dw   ADI3D_             ; Таблица адресов объект
+        jp   Init3d             ; Инит 3d
+        jp   OutAll3d           ; Вывод 3d
+        jp   NextObject         ; Для выхода из вокселей
+        dw   ObjectIndexTab     ; Таблица адресов объект
         jp   Moveon             ; Вычисл. прираш. измен
-        jp   Precord            ; Изм. коорд. объектов
-        jp   Nulmove            ; Очист.приращения изм.
+        jp   SetCoordsByMove    ; Изм. коорд. объектов
+        jp   ClearMoves         ; Очист.приращения изм.
         jp   Fline              ; Рисовать лазер игрока
 
         org  #C000
@@ -290,7 +305,7 @@ Indt2   db   0
         include "XCLP.asm"
         include "XR1.asm"
 
-OUTAL2_
+OutAll3d                        ; orig: OUTAL2_
         ld   a,(Cmode+1)
         or   a
         jr   nz,.OO1
@@ -310,8 +325,8 @@ OUTAL2_
         ld   a,(Eye_b)
         add  a,c
         ld   (Eye_b),a
-        call Moveu
-        call Ren3d
+        call MoveObjects
+        call Render3d
         call MERZ
         ret
 
@@ -319,10 +334,10 @@ OUTAL2_
 ; Ение его
 ; Столкновений
 
-Moveu
+MoveObjects                     ; orig: Moveu
         call Touch              ; Going through sta
         ; T objects
-        jp   Calcstp
+        jp   CalcSteps
 Touch
 Cmode   ld   a,0
         dec  a
@@ -363,11 +378,11 @@ NEGHL   ld   a,l
         ret
 
 ; Your turns
-Calcstp
+CalcSteps                       ; orig: Calcstp
         ld   a,(Sm_13+1)
         ld   de,(Speed)
         ld   ix,$+7
-        jp   MULL
+        jp   MulADE
         ld   (XPL+1),hl
         bit  7,h
         ld   de,(XXP)
@@ -382,7 +397,7 @@ Calcstp
         ld   a,(Sm_23+1)
         ld   de,(Speed)
         ld   ix,$+7
-        jp   MULL
+        jp   MulADE
         ld   (YPL+1),hl
         bit  7,h
         ld   de,(YYP)
@@ -397,7 +412,7 @@ Calcstp
         ld   a,(Sm_33+1)
         ld   de,(Speed)
         ld   ix,$+7
-        jp   MULL
+        jp   MulADE
         ld   (ZPL+1),hl
         bit  7,h
         ld   de,(ZZP)
@@ -411,7 +426,7 @@ Calcstp
         ld   (ZZP+1),a
         ret
 
-Korni
+SquareRootTab                   ; orig: Korni
         ; De-старшая часть числа
         ; Ret a-MEAN
         ld   a,d
@@ -466,7 +481,7 @@ Kor
         inc  a
         ret
 
-Vsline
+VisibleLine                     ; orig: Vsline
         ; Check wisibility of line
         ; Cords of line in cordline bufer
         ld   hl,+(L9c*256)+1
@@ -522,7 +537,7 @@ Ld85    inc  l
         ld   (hl),c
         jp   Ld83
 
-Shmtrx
+ShipMatrix                      ; orig: Shmtrx
 ; Calc SHIP matrix vector
 Eyea_   ld   a,0
         ld   h,Sintb
@@ -644,7 +659,7 @@ Eyeg_   ld   a,0
 ; ------------------------
 ; Вывод линии b 3d пространстве
 ; ------------------------
-Outline
+DrawLine3d                      ; orig: Outline
         ; De-z1,hl-Y1,bc-X1
         ; De'-z2,hl'-y2,bc'-x2
         call Clc2d3d
@@ -657,7 +672,7 @@ Outline
         ld   ((L9c*256)+5),hl
         ld   ((L9c*256)+7),de
         exx
-        call Vsline
+        call VisibleLine
         ret  z
         ld   b,a
         cpl
@@ -665,14 +680,14 @@ Outline
         ret  nz
         ld   a,b
         and  #0F
-        ld   hl,Masklin
-        jp   nz,Drwpol
-        jp   Drwpol2            ; Draw poly.
-Masklin
+        ld   hl,LineMask
+        jp   nz,DrawPolygon
+        jp   DrawPolygonAlt     ; Draw poly.
+LineMask                        ; orig: Masklin
         db   %10110010, 0, 5, 0
 
 ; И3меняем координаты,3ави. движения
-Precord
+SetCoordsByMove                 ; orig: Precord
         ld   (Stk1+1),sp
         ld   l,(ix+Indi)
         ld   h,high(L97)
@@ -780,7 +795,7 @@ Exes
         ret
 
 ; Задание смещений в 0
-Nulmove
+ClearMoves                      ; orig: Nulmove
         ld   hl,0
         ld   (Stpx_+1),hl
         ld   (Stpy_+1),hl
@@ -790,26 +805,26 @@ Nulmove
         include "BLOK1.asm"
 
 ; Индексная таблица объектов
-ADI3D_
-        dw   Sturm
-        dw   Sturm
-        dw   Istr
-        dw   Istr
-        dw   Turi
-        dw   Turi
-        dw   Trad
-        dw   Trad
+ObjectIndexTab                  ; orig: ADI3D_
+        dw   ObjSturm
+        dw   ObjSturm
+        dw   ObjIstr
+        dw   ObjIstr
+        dw   ObjTuri
+        dw   ObjTuri
+        dw   ObjTrad
+        dw   ObjTrad
 
-        org  ADI3D_+#80
-        dw   DREVO1
-        dw   DREVO1
-        dw   DREVO2
-        dw   DREVO2
-        dw   DOM1
-        dw   DOM1
+        org  ObjectIndexTab+#80
+        dw   ObjTree1
+        dw   ObjTree1
+        dw   ObjTree2
+        dw   ObjTree2
+        dw   ObjHouse1
+        dw   ObjHouse1
 
 ; Данные объектов
-Objcts
+ObjectData                      ; orig: Objcts
         include "OBJX.asm"
 
 END_

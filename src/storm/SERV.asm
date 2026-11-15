@@ -1,219 +1,217 @@
-; SERV -- restored from awk2/SERV.C (1417 bytes, STORM tokenized)
-; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
-;MOUSE DRIVER FROM ZX-FORMAT
-Directz DB 0 ;FIRE
-        DB 0 ;UP
-        DB 0 ;DOWN
-        DB 0 ;RIGHT
-        DB 0 ;LEFT
-        DB 0 ;CANCEL
-        DB 0 ;MEDIUM
-;УCTAHABЛИBAЮTCЯ B 1 ECЛИ HAЖATO
-Mports  DW 0 ;CORDS MЫXИ
-Nondef  AND 3
-        JR Z,Mdrv4
-        CP 1
-        JR Z,Nondef_
-        XOR A
-        LD (Mdrv3+2),A
-        LD A,5
-        LD (Mdrv2+2),A
-Nondef_ LD HL,0
-        LD (Mdrv1),HL
-        POP IX
-;MAIN
+; MOUSE driver from zx-format
+Directz db   0                  ; Fire
+        db   0                  ; UP
+        db   0                  ; DOWN
+        db   0                  ; RIGHT
+        db   0                  ; LEFT
+        db   0                  ; Cancel
+        db   0                  ; Medium
+; Устанавливаются b 1 если нажато
+Mports  dw   0                  ; Cords мыхи
+Nondef  and  3
+        jr   z,Mdrv4
+        cp   1
+        jr   z,Nondef_
+        xor  a
+        ld   (Mdrv3+2),a
+        ld   a,5
+        ld   (Mdrv2+2),a
+Nondef_ ld   hl,0
+        ld   (Mdrv1),hl
+        pop  ix
+; Main
 Servms
-        LD A,0
-        AND A
-        RET NZ
-        PUSH IX
-        LD HL,Directz
-        PUSH HL
-        POP IX
-        XOR A
-        LD (HL),A
-        INC HL
-        LD (HL),A
-        INC HL
-        LD (HL),A
-        INC HL
-        LD (HL),A
-        INC HL
-        LD (HL),A
-        INC HL
-        LD (HL),A
-        INC HL
-        LD (HL),A
-        LD BC,#FADF
-        IN A,(C)
-        CPL
-Mdrv1   JR Nondef
-        RRA
-Mdrv2   RL (IX+0)
-        RRA
-Mdrv3   RL (IX+5)
-        RRA
-        RL (IX+6)
-Mdrv4   LD HL,(Mcoord)
-        LD DE,(Mports)
-        LD BC,#FBDF
-        IN A,(C)
-        LD (Mports),A
-        SUB E
-        JR Z,Mdrv9
-        JP P,Mdrv6
-        LD (IX+4),1
-Zcm3    ADD A,A
-        ADD A,L
-        JR C,Mdrv5
-        XOR A
-Mdrv5   LD L,A
-        JR Mdrv9
+        ld   a,0
+        and  a
+        ret  nz
+        push ix
+        ld   hl,Directz
+        push hl
+        pop  ix
+        xor  a
+        ld   (hl),a
+        inc  hl
+        ld   (hl),a
+        inc  hl
+        ld   (hl),a
+        inc  hl
+        ld   (hl),a
+        inc  hl
+        ld   (hl),a
+        inc  hl
+        ld   (hl),a
+        inc  hl
+        ld   (hl),a
+        ld   bc,#FADF
+        in   a,(c)
+        cpl
+Mdrv1   jr   Nondef
+        rra
+Mdrv2   rl   (ix+0)
+        rra
+Mdrv3   rl   (ix+5)
+        rra
+        rl   (ix+6)
+Mdrv4   ld   hl,(Mcoord)
+        ld   de,(Mports)
+        ld   bc,#FBDF
+        in   a,(c)
+        ld   (Mports),a
+        sub  e
+        jr   z,Mdrv9
+        jp   p,Mdrv6
+        ld   (ix+4),1
+Zcm3    add  a,a
+        add  a,l
+        jr   c,.Mdrv5
+        xor  a
+.Mdrv5  ld   l,a
+        jr   Mdrv9
 Mdrv6
-Zcm4    ADD A,A
-        ADD A,L
-        LD (IX+3),1
-        JR C,Mdrv7
-        CP #FE
-        JR C,Mdrv8
-Mdrv7   LD A,#FE
-Mdrv8   LD L,A
-Mdrv9   LD B,#FF
-        IN A,(C)
-        LD (Mports+1),A
-        SUB D
-        JR Z,Mdrv14
-        NEG
-        JP P,Mdrv11
-        LD (IX+1),1
-Zcm1    ADD A,A
-        ADD A,H
-        JR C,Mdrv10
-        XOR A
-Mdrv10  LD H,A
-        JR Mdrv14
+Zcm4    add  a,a
+        add  a,l
+        ld   (ix+3),1
+        jr   c,.Mdrv7
+        cp   #FE
+        jr   c,.Mdrv8
+.Mdrv7  ld   a,#FE
+.Mdrv8  ld   l,a
+Mdrv9   ld   b,#FF
+        in   a,(c)
+        ld   (Mports+1),a
+        sub  d
+        jr   z,Mdrv14
+        neg
+        jp   p,Mdrv11
+        ld   (ix+1),1
+Zcm1    add  a,a
+        add  a,h
+        jr   c,.Mdrv10
+        xor  a
+.Mdrv10 ld   h,a
+        jr   Mdrv14
 Mdrv11
-Zcm2    ADD A,A
-        ADD A,H
-        LD (IX+2),1
-        JR C,Mdrv12
-        CP #BF
-        JR C,Mdrv13
-Mdrv12  LD A,#BF
-Mdrv13  LD H,A
-Mdrv14  LD (Mcoord),HL
-        POP IX
-        RET
+Zcm2    add  a,a
+        add  a,h
+        ld   (ix+2),1
+        jr   c,.Mdrv12
+        cp   #BF
+        jr   c,.Mdrv13
+.Mdrv12 ld   a,#BF
+.Mdrv13 ld   h,a
+Mdrv14  ld   (Mcoord),hl
+        pop  ix
+        ret
 Servkj
-;SERVICE KEMPSTON JOYSTIC
-        LD A,0 ;FLAG
-        AND A
-        RET NZ
-        IN A,(#1F)
-        JP Gomove
+        ; SERVICE kempston joystic
+        ld   a,0                ; Flag
+        and  a
+        ret  nz
+        in   a,(#1F)
+        jp   Gomove
 
 Servqa
-;SERVICE QAOP SP
-        LD E,0
-        LD C,#FE
-        LD HL,(KUP)
-        LD B,L
-        IN A,(C)
-        AND H
-        JR NZ,$+4
-        SET 3,E ;UP
-        LD HL,(KDOWN)
-        LD B,L
-        IN A,(C)
-        AND H
-        JR NZ,$+4
-        SET 2,E ;DOWN
-        LD HL,(KLEFT)
-        LD B,L
-        IN A,(C)
-        AND H
-        JR NZ,$+4
-        SET 1,E ;LEFT
-        LD HL,(KRIGHT)
-        LD B,L
-        IN A,(C)
-        AND H
-        JR NZ,$+4
-        SET 0,E ;RIGHT
-        LD HL,(KFIRE)
-        LD B,L
-        IN A,(C)
-        AND H
-        JR NZ,$+4
-        SET 4,E ;FIRE
-        LD HL,(KCANCEL)
-        LD B,L
-        IN A,(C)
-        AND H
-        JR NZ,$+4
-        SET 5,E ;CANCEL
-        LD A,E
+        ; SERVICE qaop sp
+        ld   e,0
+        ld   c,#FE
+        ld   hl,(KUP)
+        ld   b,l
+        in   a,(c)
+        and  h
+        jr   nz,$+4
+        set  3,e                ; UP
+        ld   hl,(KDOWN)
+        ld   b,l
+        in   a,(c)
+        and  h
+        jr   nz,$+4
+        set  2,e                ; DOWN
+        ld   hl,(KLEFT)
+        ld   b,l
+        in   a,(c)
+        and  h
+        jr   nz,$+4
+        set  1,e                ; LEFT
+        ld   hl,(KRIGHT)
+        ld   b,l
+        in   a,(c)
+        and  h
+        jr   nz,$+4
+        set  0,e                ; RIGHT
+        ld   hl,(KFIRE)
+        ld   b,l
+        in   a,(c)
+        and  h
+        jr   nz,$+4
+        set  4,e                ; Fire
+        ld   hl,(KCANCEL)
+        ld   b,l
+        in   a,(c)
+        and  h
+        jr   nz,$+4
+        set  5,e                ; Cancel
+        ld   a,e
 Gomove
-;BЫ3OB ПPOЦ. И3MEHEHИЯ KOOPДИHATЫ B 3AB
-;ИC
-;MOCTИ OT HAЖATOЙ KHOПKИ
+; Вы3ов проц. и3менения координаты b 3ав
+; Ис
+; Мости от нажатой кнопки
 
-;И3MEHЯЮTCЯ ПEPEMEHHЫE COCTOЯHИЯ HAЖATИЯ
-;KAKИX ЛИБO KЛABИШ LEFT,RIHGT,UP,DOWN,F
-;IRE,CANCEL
-        LD E,A
-        LD HL,Directj
-        XOR A
-        LD D,A
-        RRC E
-        ADC A,A
-        OR (HL)
-        LD (HL),A
-        INC HL
-        XOR A
-        RRC E
-        ADC A,A
-        OR (HL)
-        LD (HL),A
-        INC HL
-        XOR A
-        RRC E
-        ADC A,A
-        OR (HL)
-        LD (HL),A
-        INC HL
-        XOR A
-        RRC E
-        ADC A,A
-        OR (HL)
-        LD (HL),A
-        INC HL
-        XOR A
-        RRC E
-        ADC A,A
-        OR (HL)
-        LD (HL),A
-        INC HL
-        XOR A
-        RRC E
-        ADC A,A
-        OR (HL)
-        LD (HL),A
+        ; И3меняются переменные состояния нажатия
+        ; Каких либо клавиш LEFT,rihgt,UP,DOWN,F
+        ; Ire,cancel
+        ld   e,a
+        ld   hl,Directj
+        xor  a
+        ld   d,a
+        rrc  e
+        adc  a,a
+        or   (hl)
+        ld   (hl),a
+        inc  hl
+        xor  a
+        rrc  e
+        adc  a,a
+        or   (hl)
+        ld   (hl),a
+        inc  hl
+        xor  a
+        rrc  e
+        adc  a,a
+        or   (hl)
+        ld   (hl),a
+        inc  hl
+        xor  a
+        rrc  e
+        adc  a,a
+        or   (hl)
+        ld   (hl),a
+        inc  hl
+        xor  a
+        rrc  e
+        adc  a,a
+        or   (hl)
+        ld   (hl),a
+        inc  hl
+        xor  a
+        rrc  e
+        adc  a,a
+        or   (hl)
+        ld   (hl),a
 
 Cler
-;ЦБPOCИTЬ COCTOЯHИЯ ПPEДЫДУЩEГO ДEЙCTBИЯ
-        LD HL,Directj
-        XOR A
-        DUP 5
-            LD (HL),A
-            INC HL
-        EDUP
-        LD (HL),A
-        RET
+        ; Цбросить состояния предыдущего действия
+        ld   hl,Directj
+        xor  a
+        dup  5
+        ld   (hl),a
+        inc  hl
+        edup
+        ld   (hl),a
+        ret
 Directj
-        DB 0 ;RIGHT
-        DB 0 ;LEFT
-        DB 0 ;DOWN
-        DB 0 ;UP
-        DB 0 ;FIRE
-        DB 0 ;CANCEL
+        db   0                  ; RIGHT
+        db   0                  ; LEFT
+        db   0                  ; DOWN
+        db   0                  ; UP
+        db   0                  ; Fire
+        db   0                  ; Cancel

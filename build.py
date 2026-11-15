@@ -14,14 +14,14 @@ def die(msg):
 
 
 def asm(src, cwd, extra=()):
-    r = subprocess.run([SJ, '--nologo', '--msg=err', '-I', ROOT + '/assets', '-I', B] + list(extra) + [src], cwd=cwd, capture_output=True, text=True)
+    r = subprocess.run([SJ, '--nologo', '--msg=err', '-I', ROOT + '/assets', '-I', B, '-I', B + '/gen'] + list(extra) + [src], cwd=cwd, capture_output=True, text=True)
     if r.returncode != 0 or 'error' in (r.stdout + r.stderr).lower():
         print(r.stdout + r.stderr); die('sjasmplus failed on ' + src)
 
 
 def generate_assets():
     """assets/ (human-editable) -> build/gen/ (game form: db/inc/bin files that the sources include).  tools/assets/*.py"""
-    import gen_text, gen_tables, gen_gfx, gen_models, gen_flight
+    import gen_text, gen_tables, gen_gfx, gen_models, gen_flight, gen_math
     shutil.rmtree(B + '/gen', ignore_errors=True)
     os.makedirs(B + '/gen', exist_ok=True)
     gen_text.generate(ROOT, B + '/gen')
@@ -29,6 +29,7 @@ def generate_assets():
     gen_gfx.generate(ROOT, B + '/gen')
     gen_models.generate(ROOT, B + '/gen')
     gen_flight.generate(ROOT, B + '/gen')
+    gen_math.generate(ROOT, B + '/gen')
 
 
 TEST = '--test-return' in sys.argv

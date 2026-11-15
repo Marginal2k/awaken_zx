@@ -1,3 +1,20 @@
+;==============================================================================
+; VSPRITE - воксельный рендер: спрайты, ландшафт планеты, небо, ночь
+;
+; Страница #13 (PAGE_VOXEL), ORG #C000. Таблица переходов (9 x JP) в начале:
+; VoxDraw, SetSpeed, OutAll, NewPos, NewPos2, RETURN_, TurnRight, TurnLeft, D3D2_
+; (в EQUS соответствуют VOX_DRAW, VOX_TAKE_SPEED, VOX_OUT_ALL, VOX_NEW_POS, VOX_NEW_POS2,
+; VOX_RETURN, VOX_TURN_RIGHT, VOX_TURN_LEFT, VOX_DRAW_3D2).
+;
+; OutAll = ClearBuffer + DrawLand + DrawSky + ScrollBackground + DarkenSky. VoxDraw рисует
+; воксельный спрайт с масштабированием и прозрачностью (регистр I используется как флаг).
+; Включает VOXP, VOXL (развёрнутые внутренние циклы) и данные VOX/VOX2.
+; Сборка: make_VSPRITE.asm -> VSPRITE.bin (8056 байт, совпадает с awk2/VSPRIT.C).
+;
+; Часть набора STORM (прототип Awaken 1997/98), не входит в основную игру. Подробности: docs/STORM.md,
+; таблица переименований меток: docs/STORM_LABELS.md. Собирается sjasmplus (см. make_*.asm).
+;==============================================================================
+
 ; Процедура вывода вокс. спрайта с
 ; С масштабированием и прозрачностью
 ; Порит рег. i
@@ -5,25 +22,25 @@
         include "EQUS.asm"
 
         org  #C000
-        jp   Vox_
-        jp   TAKSPD_
-        jp   OUTALL_
-        jp   NEWPOS_
-        jp   NEWPSS_
+        jp   VoxDraw
+        jp   SetSpeed
+        jp   OutAll
+        jp   NewPos
+        jp   NewPos2
         jp   RETURN_
-        jp   RRT_
-        jp   RLT_
+        jp   TurnRight
+        jp   TurnLeft
         jp   D3D2_
 
-OUTALL_
-        call CLER
-        call LAND
-        call SKY
-        call MOVING
-        jp   NIGHT
+OutAll                          ; orig: OUTALL_
+        call ClearBuffer
+        call DrawLand
+        call DrawSky
+        call ScrollBackground
+        jp   DarkenSky
 
 ; Voxel
-Vox_
+VoxDraw                         ; orig: Vox_
         ; De'-adr of obj
         ; Hl'-real size sprite l-X,h-Y
         ; B-size Y,c-size X
@@ -440,7 +457,7 @@ Stkv    ld   sp,0
 V3      inc  d
         jp   V4
 
-LAND
+DrawLand                        ; orig: LAND
         ld   (Stkv_+1),sp
         ld   a,#20
         ld   (TYPE_+1),a
@@ -525,7 +542,7 @@ COM1    inc  h                  ; Inc/dec
 Stkv_   ld   sp,0
         ret
 
-SKY
+DrawSky                         ; orig: SKY
         ld   (Stkv_+1),sp
 
         ld   a,#60
@@ -546,17 +563,17 @@ SKY
         ld   hl,#8480
         jp   VXL3_
 
-NIGHT
+DarkenSky                       ; orig: NIGHT
         ; Затухание спрайтов для создания
         ; Эфекта  ночи
         ld   hl,1
         dec  hl
-        ld   (NIGHT+1),hl
+        ld   (DarkenSky+1),hl
         ld   a,l
         or   h
         ret  nz
         ld   hl,1000
-        ld   (NIGHT+1),hl
+        ld   (DarkenSky+1),hl
 
         ld   hl,(SKYS)
         ld   bc,#0C00
@@ -600,10 +617,10 @@ RETURN_
         ld   a,(UNGLE)
         or   a
         ret  z
-        jp   p,RLT_
-        jp   RRT_
+        jp   p,TurnLeft
+        jp   TurnRight
 
-RLT_
+TurnLeft                        ; orig: RLT_
         ld   a,(UNGLE)
         dec  a
         jp   p,$+7
@@ -642,7 +659,7 @@ RP4
         jp   nz,.RP44
         ret
 
-RRT_
+TurnRight                       ; orig: RRT_
         ; Поворот вправо экрана
         ld   a,(UNGLE)
         inc  a
@@ -652,7 +669,7 @@ RRT_
         ld   (UNGLE),a
         jp   RP4
 
-TAKSPD_
+SetSpeed                        ; orig: TAKSPD_
         ; Включить скорость
         or   a
         ld   c,a
@@ -671,7 +688,7 @@ TAKSPD_
         ld   (MDN+1),a
         ret
 
-MOVING
+ScrollBackground                ; orig: MOVING
         ld   a,(SPEED)
         or   a
         jp   z,NEBO2
@@ -785,7 +802,7 @@ NEBO
         jp   nz,.RP22
         ret
 
-CLER
+ClearBuffer                     ; orig: CLER
         ld   (STK1+1),sp
         ld   sp,#8680
         ld   hl,#00
@@ -930,10 +947,10 @@ STORED
         ld   (ix+#01),d
         pop  bc
         ret
-NEWPSS_
+NewPos2                         ; orig: NEWPSS_
         ld   ix,TSXS
         jr   $+6
-NEWPOS_
+NewPos                          ; orig: NEWPOS_
         ; Расчет таблиц прореживания
         ld   ix,TSX
         ld   a,13
@@ -1196,7 +1213,7 @@ D3D2__
         push hl
 
         bit  7,d
-        jp   nz,ED_
+        jp   nz,EmergencyExit
 
         exx
         ld   a,h
@@ -1437,13 +1454,13 @@ PP0
         ld   l,h
         ld   h,0
         sbc  hl,de
-        jp   nc,ED_
+        jp   nc,EmergencyExit
         add  hl,de
         rla
         adc  hl,hl
 PP3
         sbc  hl,de
-        jp   nc,ED_
+        jp   nc,EmergencyExit
         add  hl,de
         rla
         adc  hl,hl
@@ -1774,13 +1791,13 @@ O0
         ld   l,h
         ld   h,0
         sbc  hl,de
-        jp   nc,ED_
+        jp   nc,EmergencyExit
         add  hl,de
         rla
         adc  hl,hl
 O3
         sbc  hl,de
-        jp   nc,ED_
+        jp   nc,EmergencyExit
         add  hl,de
         rla
         adc  hl,hl
@@ -1870,7 +1887,7 @@ O9
         add  hl,bc
         pop  de
         ret
-ED_
+EmergencyExit                   ; orig: ED_
         ; Экстренный выход
         pop  hl
         ld   a,3

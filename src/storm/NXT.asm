@@ -1,664 +1,637 @@
-; NXT -- restored from awk2/NXT.C (4272 bytes, STORM tokenized)
-; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
 MULL
-        LD L,A
-        XOR D
-        EX AF,AF
-        BIT 7,D
-        JR Z,$+9
-        LD A,E
-        CPL
-        LD E,A
-        LD A,D
-        CPL
-        LD D,A
-        INC DE
-        LD A,L
-        AND A
-        JP P,$+5
-        NEG
-        LD C,#00
-        LD H,C
-        LD L,C
-        ADD A,A
-        ADD A,A
-        JR C,$+23
-        ADD A,A
-        JR C,$+26
-        ADD A,A
-        JR C,$+29
-        ADD A,A
-        JR C,$+32
-        ADD A,A
-        JR C,$+35
-        ADD A,A
-        JR C,$+38
-        ADD A,A
-        JR C,$+41
-        JP $+45
-        ADD HL,DE
-        ADC A,C
-        ADD HL,HL
-        ADC A,A
-        JR NC,$+4
-        ADD HL,DE
-        ADC A,C
-        ADD HL,HL
-        ADC A,A
-        JR NC,$+4
-        ADD HL,DE
-        ADC A,C
-        ADD HL,HL
-        ADC A,A
-        JR NC,$+4
-        ADD HL,DE
-        ADC A,C
-        ADD HL,HL
-        ADC A,A
-        JR NC,$+4
-        ADD HL,DE
-        ADC A,C
-        ADD HL,HL
-        ADC A,A
-        JR NC,$+4
-        ADD HL,DE
-        ADC A,C
-        ADD HL,HL
-        ADC A,A
-        JR NC,$+4
-        ADD HL,DE
-        ADC A,C
-        ADD HL,HL
-        ADC A,A
-        LD L,H
-        LD H,A
-        EX AF,AF
-        JP P,RET_
-        EX DE,HL
-        LD HL,#00
-        SBC HL,DE
-RET_    JP (IX)
-
-
+        ld   l,a
+        xor  d
+        ex   af,af
+        bit  7,d
+        jr   z,$+9
+        ld   a,e
+        cpl
+        ld   e,a
+        ld   a,d
+        cpl
+        ld   d,a
+        inc  de
+        ld   a,l
+        and  a
+        jp   p,$+5
+        neg
+        ld   c,#00
+        ld   h,c
+        ld   l,c
+        add  a,a
+        add  a,a
+        jr   c,$+23
+        add  a,a
+        jr   c,$+26
+        add  a,a
+        jr   c,$+29
+        add  a,a
+        jr   c,$+32
+        add  a,a
+        jr   c,$+35
+        add  a,a
+        jr   c,$+38
+        add  a,a
+        jr   c,$+41
+        jp   $+45
+        add  hl,de
+        adc  a,c
+        add  hl,hl
+        adc  a,a
+        jr   nc,$+4
+        add  hl,de
+        adc  a,c
+        add  hl,hl
+        adc  a,a
+        jr   nc,$+4
+        add  hl,de
+        adc  a,c
+        add  hl,hl
+        adc  a,a
+        jr   nc,$+4
+        add  hl,de
+        adc  a,c
+        add  hl,hl
+        adc  a,a
+        jr   nc,$+4
+        add  hl,de
+        adc  a,c
+        add  hl,hl
+        adc  a,a
+        jr   nc,$+4
+        add  hl,de
+        adc  a,c
+        add  hl,hl
+        adc  a,a
+        jr   nc,$+4
+        add  hl,de
+        adc  a,c
+        add  hl,hl
+        adc  a,a
+        ld   l,h
+        ld   h,a
+        ex   af,af
+        jp   p,RET_
+        ex   de,hl
+        ld   hl,#00
+        sbc  hl,de
+RET_    jp   (ix)
 
 Calcrc
-;ПOBEPHУTЬ KOOPДИHATHУЮ CИCTEMУ ПO MATP
-;ИЦE SM_XY
-;IY-RETURN ADR
-;ПOPTИT SP
-;HAЧAЛЬHЫE 3HAЧ. KOOPД. B DX,DY,DZ
-;KOHEЧHЫE B TX,TY,TZ
-Dx      LD DE,0
-Sm_11   LD A,0
-        LD IX,$+7
-        JP MULL
+; Повернуть координатную систему по матр
+; Ице sm_xy
+; Iy-RETURN adr
+; Портит sp
+; Начальные 3нач. коорд. b dx,dy,dz
+; Конечные b тх,ту,tz
+Dx      ld   de,0
+Sm_11   ld   a,0
+        ld   ix,$+7
+        jp   MULL
 
-        LD SP,HL
-Dy      LD DE,0
-Sm_21   LD A,0
-        LD IX,$+7
-        JP MULL
+        ld   sp,hl
+Dy      ld   de,0
+Sm_21   ld   a,0
+        ld   ix,$+7
+        jp   MULL
 
-        ADC HL,SP
-        JP PE,Exet1
-        LD SP,HL
-Dz_     LD DE,0
-Sm_31   LD A,0
-        LD IX,$+7
-        JP MULL
+        adc  hl,sp
+        jp   pe,Exet1
+        ld   sp,hl
+Dz_     ld   de,0
+Sm_31   ld   a,0
+        ld   ix,$+7
+        jp   MULL
 
-        ADC HL,SP
-        JP PE,Exet1
-        LD (Tx+1),HL
-        LD DE,(Dx+1) ;DX
-Sm_12   LD A,0
-        LD IX,$+7
-        JP MULL
+        adc  hl,sp
+        jp   pe,Exet1
+        ld   (Tx+1),hl
+        ld   de,(Dx+1)          ; Dx
+Sm_12   ld   a,0
+        ld   ix,$+7
+        jp   MULL
 
-        LD SP,HL
-        LD DE,(Dy+1) ;DY
-Sm_22   LD A,0
-        LD IX,$+7
-        JP MULL
+        ld   sp,hl
+        ld   de,(Dy+1)          ; Dy
+Sm_22   ld   a,0
+        ld   ix,$+7
+        jp   MULL
 
-        ADC HL,SP
-        JP PE,Exet1
-        LD SP,HL
-        LD DE,(Dz_+1) ;DZ
-Sm_32   LD A,0
-        LD IX,$+7
-        JP MULL
+        adc  hl,sp
+        jp   pe,Exet1
+        ld   sp,hl
+        ld   de,(Dz_+1)         ; Dz
+Sm_32   ld   a,0
+        ld   ix,$+7
+        jp   MULL
 
-        ADC HL,SP
-        JP PE,Exet1
-        LD (Ty+1),HL
-        LD DE,(Dx+1) ;DX
-Sm_13   LD A,0
-        LD IX,$+7
-        JP MULL
+        adc  hl,sp
+        jp   pe,Exet1
+        ld   (Ty+1),hl
+        ld   de,(Dx+1)          ; Dx
+Sm_13   ld   a,0
+        ld   ix,$+7
+        jp   MULL
 
-        LD SP,HL
-        LD DE,(Dy+1) ;DY
-Sm_23   LD A,0
-        LD IX,$+7
-        JP MULL
+        ld   sp,hl
+        ld   de,(Dy+1)          ; Dy
+Sm_23   ld   a,0
+        ld   ix,$+7
+        jp   MULL
 
-        ADC HL,SP
-        JP PE,Exet1
-        LD SP,HL
-        LD DE,(Dz_+1) ;DZ
-Sm_33   LD A,0
-        LD IX,$+7
-        JP MULL
+        adc  hl,sp
+        jp   pe,Exet1
+        ld   sp,hl
+        ld   de,(Dz_+1)         ; Dz
+Sm_33   ld   a,0
+        ld   ix,$+7
+        jp   MULL
 
-        ADC HL,SP
-        JP PE,Exet1
-        LD (Tz+1),HL
+        adc  hl,sp
+        jp   pe,Exet1
+        ld   (Tz+1),hl
 Exet1
-        JP (IY)
+        jp   (iy)
 
-
-
-
-
-
-;RENDER ALL 3D AND DRAW
+; Render all 3d and draw
 Ren3d
-;BEGIN AT CHOOSING OBJECT THAT IS VISIB
-;LE
+; BEGIN at choosing object that is visib
+; Le
 
-        LD HL,(Eye_a) ;EYE A,B
-        LD (Eyea),HL ;ALFA BETA
-        LD A,(Eye_g) ;EYE G
-        LD (Eyeg),A ;GAMA
+        ld   hl,(Eye_a)         ; Eye a,b
+        ld   (Eyea),hl          ; Alfa beta
+        ld   a,(Eye_g)          ; Eye G
+        ld   (Eyeg),a           ; Gama
 
-        CALL Matrx
+        call Matrx
 
-        LD HL,#01
-        LD (Indt1),HL
-        LD BC,Olen ;VECTOR LEN FOR CARS
-        LD HL,Carsb ;VECTOR CARS
-        LD (La294),SP
-        JR L9f04
+        ld   hl,#01
+        ld   (Indt1),hl
+        ld   bc,Olen            ; Vector LEN for cars
+        ld   hl,Carsb           ; Vector cars
+        ld   (La294),sp
+        jr   L9f04
 L9eed
-        LD A,L
-        AND A
-        JP M,La293 ;IF CARS WERE RENDERED
+        ld   a,l
+        and  a
+        jp   m,La293            ; If cars were rendered
 L9efc
-        EXX
-        ADD HL,BC ;NEXT VECTOR
+        exx
+        add  hl,bc              ; Next vector
 L9f04
-        LD SP,HL
+        ld   sp,hl
 
-;B VECADR+PX+1=#80 KAK MAPKИPOBKA OБЪEK
-;TA БE3 ПPOCЧИTAHHЫX
-;KOOPДИHAT B ПOBEPHУTOM ПPOCTPAHCTBE.
-        EX DE,HL
-        LD HL,Px+1
-        ADD HL,DE
-        LD A,#80
-        LD (HL),A
-        EX DE,HL
-        EXX
-        POP HL ;X
-        CP H
-        JR Z,L9eed ;END OF VECTOR TAB
-        LD (Objx),HL ;STORE X
+        ; B vecadr+рх+1=#80 как маркировка объек
+        ; Та бе3 просчитанных
+        ; Координат b повернутом пространстве.
+        ex   de,hl
+        ld   hl,Px+1
+        add  hl,de
+        ld   a,#80
+        ld   (hl),a
+        ex   de,hl
+        exx
+        pop  hl                 ; X
+        cp   h
+        jr   z,L9eed            ; End of vector tab
+        ld   (Objx),hl          ; Store X
 
-        LD A,H
-        AND A
-        JP P,$+4
-        CPL
-        CP Visibil ;LIMIT VISIBILETY
-        JR NC,L9efc ;UNVISIBLE
+        ld   a,h
+        and  a
+        jp   p,$+4
+        cpl
+        cp   Visibil            ; Limit visibilety
+        jr   nc,L9efc           ; Unvisible
 
-        LD (Dx+1),HL ;STORE DX
-        POP HL ;Y
-        LD (Objy),HL ;Y OBJ
+        ld   (Dx+1),hl          ; Store dx
+        pop  hl                 ; Y
+        ld   (Objy),hl          ; Y obj
 
-        LD A,H
-        AND A
-        JP P,$+4
-        CPL
-        CP Visibil ;LIMIT VISIBILETY
-        JR NC,L9efc ;UNVISIBLE
+        ld   a,h
+        and  a
+        jp   p,$+4
+        cpl
+        cp   Visibil            ; Limit visibilety
+        jr   nc,L9efc           ; Unvisible
 
-        LD (Dy+1),HL ;DY
-        POP HL ;Z
+        ld   (Dy+1),hl          ; Dy
+        pop  hl                 ; Z
 
-        LD (Objz),HL ;Z OBJ
+        ld   (Objz),hl          ; Z obj
 
-        LD A,H
-        AND A
-        JP P,$+4
-        CPL
-        CP Visibil ;LIMIT VISIBILETY
-        JR NC,L9efc ;UNVISIBLE
+        ld   a,h
+        and  a
+        jp   p,$+4
+        cpl
+        cp   Visibil            ; Limit visibilety
+        jr   nc,L9efc           ; Unvisible
 
-        LD (Dz_+1),HL ;DZ
-        POP HL ;UNGLE&INDEX
-        LD A,L ;INDEX
-        LD (Indx),A ;IND
-        LD A,H ;UNGLE
-        LD (Eyea),A ;ALFA
-        POP HL ;FOR CARS ANOTHER UNGLES
-        LD (Eyeb),HL ;BETA GAMA
+        ld   (Dz_+1),hl         ; Dz
+        pop  hl                 ; UNGLE&index
+        ld   a,l                ; Index
+        ld   (Indx),a           ; Ind
+        ld   a,h                ; UNGLE
+        ld   (Eyea),a           ; Alfa
+        pop  hl                 ; For cars another ungles
+        ld   (Eyeb),hl          ; Beta gama
 
-        LD IY,$+7
-        JP Calcrc ;ord;ПOBOPOT
-        JP PE,L9efc ;ПEPEПOЛHEHИE,BЫXOД
+        ld   iy,$+7
+        jp   Calcrc             ; Ord;поворот
+        jp   pe,L9efc           ; Переполнение,выход
 
+        ; Переносим просчитанные коорд. b вектор
+        ; Объкта тем самым
+        ; Стирая маркировку
+        exx
+        ld   a,l
+        exx
+        ld   l,a
+        exx
+        ld   a,h
+        exx
+        ld   h,a
+        ld   de,Pz+2
+        add  hl,de
+        ld   sp,hl
+        ld   de,(Tz+1)
+        push de
+        ld   hl,(Ty+1)
+        push hl
+        ld   hl,(Tx+1)
+        push hl
 
-;ПEPEHOCИM ПPOCЧИTAHHЫE KOOPД. B BEKTOP
-; OБЪKTA TEM CAMЫM
-;CTИPAЯ MAPKИPOBKУ
-        EXX
-        LD A,L
-        EXX
-        LD L,A
-        EXX
-        LD A,H
-        EXX
-        LD H,A
-        LD DE,Pz+2
-        ADD HL,DE
-        LD SP,HL
-        LD DE,(Tz+1)
-        PUSH DE
-        LD HL,(Ty+1)
-        PUSH HL
-        LD HL,(Tx+1)
-        PUSH HL
+        ld   a,h
+        or   a
+        jp   p,$+4
+        cpl
+        cp   Xvisibi            ; Visibility of X
+        jp   nc,L9efc
 
-
-        LD A,H
-        OR A
-        JP P,$+4
-        CPL
-        CP Xvisibi ;VISIBILITY OF X
-        JP NC,L9efc
-
-        LD A,D
-        OR A
-        JP M,L9efc
-        CP Detaliz ;BORDER FOR DETAILS
-        LD A,(Indx) ;IND
-        JP P,La0bc
-        ADD A,#02
-        LD (Indx),A ;IND
+        ld   a,d
+        or   a
+        jp   m,L9efc
+        cp   Detaliz            ; Border for details
+        ld   a,(Indx)           ; Ind
+        jp   p,La0bc
+        add  a,#02
+        ld   (Indx),a           ; Ind
 La0bc
 
-        LD H,high(L97)
-        LD A,(Indx) ;IND
-        LD L,A
-        LD SP,HL
-        POP HL
-        LD SP,HL
-        POP BC
-        LD A,6
-        SUB B
-        LD (Jmp1+1),A
-        LD (Jmp2+1),A
-        LD (Jmp3+1),A
-        LD L,C
-        LD H,0
-Jmp1    JR $
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-;IN HL-MIDLE SIZE OBJ
-        LD SP,(La294)
+        ld   h,high(L97)
+        ld   a,(Indx)           ; Ind
+        ld   l,a
+        ld   sp,hl
+        pop  hl
+        ld   sp,hl
+        pop  bc
+        ld   a,6
+        sub  b
+        ld   (Jmp1+1),a
+        ld   (Jmp2+1),a
+        ld   (Jmp3+1),a
+        ld   l,c
+        ld   h,0
+Jmp1    jr   $
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        ; In hl-midle size obj
+        ld   sp,(La294)
 
-
-        PUSH BC
-        PUSH HL
-        LD DE,(Dx+1) ;DX
-        BIT 7,D
-        JR Z,La108
-        ADC HL,DE
-        JP La10a
-La108   SBC HL,DE
-La10a   JP M,La121
-        POP HL
-        PUSH HL
-        LD DE,(Dz_+1) ;DZ
-        BIT 7,D
-        JR Z,La11c
-        ADC HL,DE
-        JP La11e
-La11c   SBC HL,DE
-La11e   JP M,La121
-        POP HL
-        PUSH HL
-        LD A,(Indx)
-        XOR #80
-        JP P,La121
-        DUP 2
-            SRL H
-            RR L
-        EDUP
-        LD DE,(Dy+1) ;DY
-        BIT 7,D
-        JR Z,La1c
-        ADC HL,DE
-        JP La121
-La1c    SBC HL,DE
+        push bc
+        push hl
+        ld   de,(Dx+1)          ; Dx
+        bit  7,d
+        jr   z,La108
+        adc  hl,de
+        jp   La10a
+La108   sbc  hl,de
+La10a   jp   m,La121
+        pop  hl
+        push hl
+        ld   de,(Dz_+1)         ; Dz
+        bit  7,d
+        jr   z,La11c
+        adc  hl,de
+        jp   La11e
+La11c   sbc  hl,de
+La11e   jp   m,La121
+        pop  hl
+        push hl
+        ld   a,(Indx)
+        xor  #80
+        jp   p,La121
+        dup  2
+        srl  h
+        rr   l
+        edup
+        ld   de,(Dy+1)          ; Dy
+        bit  7,d
+        jr   z,La1c
+        adc  hl,de
+        jp   La121
+La1c    sbc  hl,de
 La121
-        CALL P,Lm1
+        call p,Lm1
 
-        POP DE
-        POP BC
+        pop  de
+        pop  bc
 
+La13a   ld   hl,(Tz+1)
+        or   a
+        adc  hl,de
+        jp   m,L9efc
 
-La13a   LD HL,(Tz+1)
-        OR A
-        ADC HL,DE
-        JP M,L9efc
+        ; -
+        ld   hl,(Tz+1)
+        or   a
+        sbc  hl,de
+        ld   a,h
+        ex   af,af'
+; -
 
+        ld   ixl,c
+        ld   a,#48
+        ld   h,Multb
+        sra  a
+        ld   l,c
+        sra  l
+        sub  l
+        ld   l,a
+        add  a,c
+        ld   e,(hl)
+        ld   l,a
+        ld   a,(hl)
+        sub  e
+        ld   l,a
+        ld   h,#00
+Jmp2    jr   $
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        ex   de,hl
+        ld   hl,(Tz+1)
+        sra  h
+        rr   l
+        ld   bc,(Tx+1)
+        add  hl,bc
+        sra  h
+        rr   l
+        and  a
+        adc  hl,de
+        jp   m,L9efc
+        and  a
+        sbc  hl,bc
+        jp   m,L9efc
 
-;-
-        LD HL,(Tz+1)
-        OR A
-        SBC HL,DE
-        LD A,H
-        EX AF,AF'
-;-
+        ; -
+        and  a
+        sbc  hl,de
+        and  a
+        sbc  hl,de
+        ex   af,af'
+        or   h
+        add  hl,bc
+        or   h
+        ex   af,af'
+; -
 
-        LD IXL,C
-        LD A,#48
-        LD H,Multb
-        SRA A
-        LD L,C
-        SRA L
-        SUB L
-        LD L,A
-        ADD A,C
-        LD E,(HL)
-        LD L,A
-        LD A,(HL)
-        SUB E
-        LD L,A
-        LD H,#00
-Jmp2    JR $
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        EX DE,HL
-        LD HL,(Tz+1)
-        SRA H
-        RR L
-        LD BC,(Tx+1)
-        ADD HL,BC
-        SRA H
-        RR L
-        AND A
-        ADC HL,DE
-        JP M,L9efc
-        AND A
-        SBC HL,BC
-        JP M,L9efc
+        ld   c,ixl
+        ld   a,#42
+        ld   h,Multb
+        sra  a
+        ld   l,c
+        sra  l
+        sub  l
+        ld   l,a
+        add  a,c
+        ld   e,(hl)
+        ld   l,a
+        ld   a,(hl)
+        sub  e
+        ld   l,a
+        ld   h,#00
+Jmp3    jr   $
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        ex   de,hl
+        ld   hl,(Tz+1)
+        sra  h
+        rr   l
+        sra  h
+        rr   l
+        ld   bc,(Ty+1)
+        add  hl,bc
+        sra  h
+        rr   l
+        and  a
+        adc  hl,de
+        jp   m,L9efc
+        and  a
+        sbc  hl,bc
+        jp   m,L9efc
 
-;-
-        AND A
-        SBC HL,DE
-        AND A
-        SBC HL,DE
-        EX AF,AF'
-        OR H
-        ADD HL,BC
-        OR H
-        EX AF,AF'
-;-
-
-        LD C,IXL
-        LD A,#42
-        LD H,Multb
-        SRA A
-        LD L,C
-        SRA L
-        SUB L
-        LD L,A
-        ADD A,C
-        LD E,(HL)
-        LD L,A
-        LD A,(HL)
-        SUB E
-        LD L,A
-        LD H,#00
-Jmp3    JR $
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        EX DE,HL
-        LD HL,(Tz+1)
-        SRA H
-        RR L
-        SRA H
-        RR L
-        LD BC,(Ty+1)
-        ADD HL,BC
-        SRA H
-        RR L
-        AND A
-        ADC HL,DE
-        JP M,L9efc
-        AND A
-        SBC HL,BC
-        JP M,L9efc
-
-;-
-        AND A
-        SBC HL,DE
-        AND A
-        SBC HL,DE
-        EX AF,AF'
-        OR H
-        ADD HL,BC
-        OR H
-        LD HL,Sets
-        JP P,La1c7
-        RES 2,(HL)
-        JP La1c9
+        ; -
+        and  a
+        sbc  hl,de
+        and  a
+        sbc  hl,de
+        ex   af,af'
+        or   h
+        add  hl,bc
+        or   h
+        ld   hl,Sets
+        jp   p,La1c7
+        res  2,(hl)
+        jp   La1c9
 La1c7
-        SET 2,(HL)
+        set  2,(hl)
 La1c9
-;-
+; -
 
-
-
-
-;BПИCЫBAHИE ДAHHЫX OБЪEKTA B CПИCOK C C
-;OPTИPOBKOЙ ПO
-;ПPИБЛИЖEHИЮ
-        LD BC,(Tz+1)
-        LD DE,(Dy+1) ;DY
-        LD A,(Indt1)
-        CP #01
-        JR Z,La238
-        LD IXH,L9d
-        LD IXL,A
-;        LD A,(Sets)
-;        OR (IX+#01)
-;        JP M,La1f4
-        LD L,(IX+#0C)
-        LD H,(IX+#0D)
-        SBC HL,BC
-        JP M,La238
+        ; Вписывание данных объекта b список c c
+        ; Ортировкой по
+        ; Приближению
+        ld   bc,(Tz+1)
+        ld   de,(Dy+1)          ; Dy
+        ld   a,(Indt1)
+        cp   #01
+        jr   z,La238
+        ld   ixh,L9d
+        ld   ixl,a
+        ;        Ld a,(Sets)
+        ;        Or (ix+#01)
+        ;        Jp m,La1f4
+        ld   l,(ix+#0C)
+        ld   h,(ix+#0D)
+        sbc  hl,bc
+        jp   m,La238
 ;        JP La1ff
-;La1f4   LD L,(IX+#0C)
-;        LD H,(IX+#0D)
-;        SBC HL,DE
-;        JP M,La238
-La1ff   LD IYH,L9d
-La202   LD A,(IX+#00)
-        CP #01
-        JR Z,La24e
-        LD IYL,A
-;        LD A,(Sets)
-;        OR (IY+#01)
-;        JP M,La226
-        LD L,(IY+#0C)
-        LD H,(IY+#0D)
-        SBC HL,BC
-        JP M,La260
-        LD A,IYL
-        LD IXL,A
-        JP La202
-;La226   LD L,(IY+#0C)
-;        LD H,(IY+#0D)
-;        SBC HL,DE
-;        JP M,La260
-;        LD A,LY
-;        LD LX,A
-;        JP La202
-La238   LD A,(Indt2)
-        CP #FC
-        JP Z,La293
-        LD L,A
-        LD H,L9d
-        LD A,(Indt1)
-        LD (HL),A
-        LD A,L
-        LD (Indt1),A
-        JP La272
-La24e   LD A,(Indt2)
-        CP #FC
-        JR Z,La293
-        LD (IX+#00),A
-        LD L,A
-        LD H,L9d
-        LD (HL),#01
-        JP La272
-La260   LD A,(Indt2)
-        CP #FC
-        JR Z,La293
-        LD L,A
-        LD H,L9d
-        LD A,(IX+#00)
-        LD (IX+#00),L
-        LD (HL),A
-        LD A,L
-La272   ADD A,#0E
-        LD (Indt2),A
-        LD L,A
-        LD SP,HL
-;        PUSH DE
-        PUSH BC
-        LD HL,(Ty+1)
-        PUSH HL
-        LD HL,(Tx+1)
-        PUSH HL
-        LD A,(Eyeg) ;GAMA
-        PUSH AF
-        INC SP
-        LD HL,(Eyea) ;ALFA/BETA
-        PUSH HL
-        LD HL,(Sets)
-        PUSH HL
-        JP L9efc
-;CALLS CLIPPING AND DRAWING OBJECTS AND
-; HORIZONT
-La293   LD SP,#0000
-La294   EQU $-#0002
+; La1f4   ld l,(ix+#0C)
+;        Ld h,(ix+#0D)
+;        Sbc hl,de
+;        Jp m,La238
+La1ff   ld   iyh,L9d
+La202   ld   a,(ix+#00)
+        cp   #01
+        jr   z,La24e
+        ld   iyl,a
+        ;        Ld a,(Sets)
+        ;        Or (iy+#01)
+        ;        Jp m,La226
+        ld   l,(iy+#0C)
+        ld   h,(iy+#0D)
+        sbc  hl,bc
+        jp   m,La260
+        ld   a,iyl
+        ld   ixl,a
+        jp   La202
+; La226   ld l,(iy+#0C)
+;        Ld h,(iy+#0D)
+;        Sbc hl,de
+;        Jp m,La260
+;        Ld a,ly
+;        Ld lx,a
+;        Jp La202
+La238   ld   a,(Indt2)
+        cp   #FC
+        jp   z,La293
+        ld   l,a
+        ld   h,L9d
+        ld   a,(Indt1)
+        ld   (hl),a
+        ld   a,l
+        ld   (Indt1),a
+        jp   La272
+La24e   ld   a,(Indt2)
+        cp   #FC
+        jr   z,La293
+        ld   (ix+#00),a
+        ld   l,a
+        ld   h,L9d
+        ld   (hl),#01
+        jp   La272
+La260   ld   a,(Indt2)
+        cp   #FC
+        jr   z,La293
+        ld   l,a
+        ld   h,L9d
+        ld   a,(ix+#00)
+        ld   (ix+#00),l
+        ld   (hl),a
+        ld   a,l
+La272   add  a,#0E
+        ld   (Indt2),a
+        ld   l,a
+        ld   sp,hl
+        ;        Push de
+        push bc
+        ld   hl,(Ty+1)
+        push hl
+        ld   hl,(Tx+1)
+        push hl
+        ld   a,(Eyeg)           ; Gama
+        push af
+        inc  sp
+        ld   hl,(Eyea)          ; Alfa/beta
+        push hl
+        ld   hl,(Sets)
+        push hl
+        jp   L9efc
+; Calls clipping and drawing objects and
+; Horizont
+La293   ld   sp,#0000
+La294           equ $-#0002
 
-        LD A,(Indt1)
-        LD H,L9d
-        JP La33b
+        ld   a,(Indt1)
+        ld   h,L9d
+        jp   La33b
 
+; Cycle of drawing objects
+La2d8   push hl
+        ld   (La2fd),sp
+        inc  l
+        inc  l
+        inc  l
+        ld   sp,hl
+        pop  hl
+        ld   (Sets),hl          ; Bits/ind
+        pop  hl
+        ld   (Eyea),hl          ; Alfa/beta
+        dec  sp
+        pop  af
+        ld   (Eyeg),a           ; Gama
+        pop  hl
+        ld   (Tx+1),hl          ; Dx
+        pop  de
+        ld   (Ty+1),de          ; Dy
+        pop  bc
+        ld   (Tz+1),bc          ; Dz
 
+;        Pop hl
+;        Ld (Dy+1),hl
 
+        ld   sp,#0000
+La2fd           equ $-#0002
 
+        ld   a,(Sets+1)         ; Index
+        or   a
+        jp   m,VOXOBJ
 
-;CYCLE OF DRAWING OBJECTS
-La2d8   PUSH HL
-        LD (La2fd),SP
-        INC L
-        INC L
-        INC L
-        LD SP,HL
-        POP HL
-        LD (Sets),HL ;BITS/IND
-        POP HL
-        LD (Eyea),HL ;ALFA/BETA
-        DEC SP
-        POP AF
-        LD (Eyeg),A ;GAMA
-        POP HL
-        LD (Tx+1),HL ;DX
-        POP DE
-        LD (Ty+1),DE ;DY
-        POP BC
-        LD (Tz+1),BC ;DZ
+        call Renobj2
 
-;        POP HL
-;        LD (Dy+1),HL
+        ld   a,(Sets)
+        bit  2,a
+        jr   z,La326
+        call Drwpol2            ; Draw poly.
+        jp   NXTO_
 
-        LD SP,#0000
-La2fd   EQU $-#0002
+La326   call Vsmask
+        jr   z,NXTO_
+        ld   b,a
+        cpl
+        and  #F0
+        jr   nz,NXTO_
+        ld   a,b
+        and  #0F
+        jr   nz,$+8
+        call Drwpol2            ; Draw poly.
+        jp   $+6
+        call Drwpol             ; Draw polygon
+NXTO_   pop  hl
+        ld   a,(hl)
+La33b   cp   #01
+        ret  z
+        ld   l,a
+        jp   La2d8
 
-        LD A,(Sets+1) ;INDEX
-        OR A
-        JP M,VOXOBJ
-
-        CALL Renobj2
-
-        LD A,(Sets)
-        BIT 2,A
-        JR Z,La326
-        CALL Drwpol2 ;DRAW POLY.
-        JP NXTO_
-
-La326   CALL Vsmask
-        JR Z,NXTO_
-        LD B,A
-        CPL
-        AND #F0
-        JR NZ,NXTO_
-        LD A,B
-        AND #0F
-        JR NZ,$+8
-        CALL Drwpol2 ;DRAW POLY.
-        JP $+6
-        CALL Drwpol ;DRAW POLYGON
-NXTO_   POP HL
-        LD A,(HL)
-La33b   CP #01
-        RET Z
-        LD L,A
-        JP La2d8
-
-
-
-
-
-
-
-;MATPИЦA OTДEЛЬHOГO OБЪEKTA
+; Матрица отдельного объекта
 Matrx
-        LD A,(Eyeb) ;BETA
-        LD B,A
-        ADD A,#40
-        LD H,Sintb
-        LD L,A
-        LD A,(HL) ;COS
-        LD (Sm_11+1),A ;COS B
-        LD (Sm_33+1),A ;COS B
-        LD L,B
-        LD A,(HL) ;SIN
-        LD (Sm_13+1),A ;SIN B
-        NEG
-        LD (Sm_31+1),A ;-SIN B
-        XOR A
-        LD (Sm_12+1),A
-        LD (Sm_21+1),A
-        LD (Sm_23+1),A
-        LD (Sm_32+1),A
-        LD A,#7F
-        LD (Sm_22+1),A
-        RET
+        ld   a,(Eyeb)           ; Beta
+        ld   b,a
+        add  a,#40
+        ld   h,Sintb
+        ld   l,a
+        ld   a,(hl)             ; Cos
+        ld   (Sm_11+1),a        ; Cos b
+        ld   (Sm_33+1),a        ; Cos b
+        ld   l,b
+        ld   a,(hl)             ; Sin
+        ld   (Sm_13+1),a        ; Sin b
+        neg
+        ld   (Sm_31+1),a        ; -Sin b
+        xor  a
+        ld   (Sm_12+1),a
+        ld   (Sm_21+1),a
+        ld   (Sm_23+1),a
+        ld   (Sm_32+1),a
+        ld   a,#7F
+        ld   (Sm_22+1),a
+        ret

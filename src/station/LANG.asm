@@ -2169,7 +2169,7 @@ ARGD:       ds   20
 
 
 CHECK_SCENARY:
-            incbin "C_SCENAR.t"
+            incbin "gen/C_SCENAR.t"   ; GENERATED from assets/text/rules.paradox
             db   0
 
 

@@ -1,0 +1,136 @@
+# Awaken - ships and skimmers (viewer descriptions, purchase lists)
+# UTF-8.  Notation: see assets/README.md (section "Text notation").  In short: "ID | text", "\n" = new line in the game,
+# {stop}/{tab1..5}/{nbsp}/{sp}/{xNN} = control bytes, continuation lines start with "    |", lines starting with # are comments.
+# The IDs and the [LABEL] names are used by the code: do not rename or renumber.
+
+[ship.tok first=1]
+# Ship descriptions for the 3D viewer: items 1..7 = the 7 ships in the order of assets/data/ships.csv.  Layout of an item:
+# name "\n\n" story "\n\n" "Characteristics:" "\n" "Speed N" "\n" "Armour N" "\n" "Weight N" -- the numbers are plain text here and
+# are NOT read from ships.csv (keep them in sync by hand).
+1 | Доминион.\n
+    | \n
+    | Был создан в 97 году новейшей эры по кореанскому летоисчислению. Самый новый и современный корабль для высшей аристократии трех миров.\n
+    | \n
+    | Характеристики:\n
+    | Скорость 130\n
+    | Тоннаж 100\n
+    | Вес 28
+2 | Софист.\n
+    | \n
+    | Был создан в 72 году новейшей эры по кореанскому летоисчислению. Очень неплохой корабль для аристократии, пользующейся услугами орбитальных станций и великого космоса.\n
+    | \n
+    | Характеристики:\n
+    | Скорость 110\n
+    | Тоннаж 120\n
+    | Вес 29
+3 | Мемфис.\n
+    | \n
+    | Был создан в 64 году новейшей эры по кореанскому летоисчислению. Один из лучших кораблей в среднем классе. Также это один из самых быстрых кораблей имеющийся на вооружении трех миров.\n
+    | \n
+    | Характеристики:\n
+    | Скорость 140\n
+    | Тоннаж 60\n
+    | Вес 20
+4 | Фирс.\n
+    | \n
+    | Был создан в 49 году новейшей эры по кореанскому летоисчислению. Удобный по всем характеристикам корабль для представительского среднего класса. Неплохая скорость и грузоподъемность. О всех его возможностях говорит его цена.\n
+    | \n
+    | Характеристики:\n
+    | Скорость 110\n
+    | Тоннаж 75\n
+    | Вес 25
+5 | Орсан.\n
+    | \n
+    | Был создан в 23 году новейшей эры по кореанскому летоисчислению. Одна из лучших, хоть и старых, моделей кораблей для низших классов трех миров.\n
+    | \n
+    | Характеристики:\n
+    | Скорость 90\n
+    | Тоннаж 90\n
+    | Вес 32
+6 | Барос.\n
+    | \n
+    | Был создан в 50 году новейшей эры по кореанскому летоисчислению. Лучший торговый корабль. По всем своим характеристикам стоит на первых местах торгового флота трех миров.\n
+    | \n
+    | Характеристики:\n
+    | Скорость 100\n
+    | Тоннаж 110\n
+    | Вес 30
+7 | Карэн.\n
+    | \n
+    | Был создан в 9981 году прошлой эры по кореанскому летоисчислению. Очень старая модель. Почти не встречающаяся в просторах великого космоса. Многое новейшее оснащение не может быть установлено на его борт.\n
+    | \n
+    | Характеристики:\n
+    | Скорость 60\n
+    | Тоннаж 50\n
+    | Вес 33{sp}
+
+[skim.tok first=1]
+# Skimmer descriptions for the 3D viewer: items 1..4 = the 4 skimmers, same layout as ship.tok (Speed, Weight).
+1 | Фервест.\n
+    | \n
+    | Был создан в 89 году новейшей эры по кореанскому летоисчислению. Лучший по всем характеристикам скимер для высших аристократов.\n
+    | \n
+    | Характеристики:\n
+    | Скорость 170\n
+    | Вес 5
+2 | Кридон.\n
+    | \n
+    | Был создан в 74 году новейшей эры по кореанскому летоисчислению. Очень не плохой скимер для мелкой и средней аристократии.\n
+    | \n
+    | Характеристики:\n
+    | Скорость 150\n
+    | Вес 4
+3 | Протос.\n
+    | \n
+    | Был создан в 58 году новейшей эры по кореанскому летоисчислению. Хороший скимер для среднего и даже для низшего классов.\n
+    | \n
+    | Характеристики:\n
+    | Скорость 130\n
+    | Вес 3
+4 | Алгол.\n
+    | \n
+    | Был создан в 36 году новейшей эры по кореанскому летоисчислению. Оптимальная модель для низших классов.\n
+    | \n
+    | Характеристики:\n
+    | Скорость 100\n
+    | Вес 2{sp}
+
+[NAMSH]
+# Ship purchase list (ships 1..6, legal): one line per ship "\nName{tab1}price".  The price is plain text (not read from ships.csv: keep in sync).
+# The list is split in two sections because the label TD1 (end of the "legal" list) lies between them.
+0 ~ \n
+    # line 1
+    | Доминион{tab1}64000\n
+    # line 2
+    | Софист{tab1}44000\n
+    # line 3
+    | Мемфис{tab1}40000\n
+    # line 4
+    | Фирс{tab1}35000\n
+    # line 5
+    | Орсан{tab1}34000\n
+    # line 6
+    | Барос{tab1}27000
+
+[NAMSH7]
+# The seventh ship (illegal, sold only on some stations): "Name{tab1}price".
+0 | Карэн{tab1}13000
+
+[NAMSK]
+# Skimmer purchase list (4 skimmers): one line per skimmer "\nName{tab1}price" (price plain text, keep in sync with ships.csv).
+0 | \n
+    # line 1
+    | Фервест{tab1}30000\n
+    # line 2
+    | Кридан{tab1}27000\n
+    # line 3
+    | Протос{tab1}24000\n
+    # line 4
+    | Алгол{tab1}18000
+
+[TSHIP]
+# Header of the purchase list: "Model" {tab1} "Price", then a blank row ({nbsp*31}).
+# orig comment: ПУНКТЫ МЕНЮ ХЕЛПА
+# orig comment: ХЕДЕР ДЛЯ ПОКУП.КОРАБЛЯ
+0 | Модель{tab1}Цена\n
+    | {nbsp*31}

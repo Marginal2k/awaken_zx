@@ -3,6 +3,7 @@
 import os, sys, subprocess, shutil
 ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT + '/tools')
+sys.path.insert(0, ROOT + '/tools/assets')
 from trd import Trd
 SJ = shutil.which('sjasmplus') or r'C:\sjasmplus\sjasmplus.exe'
 B = ROOT + '/build'
@@ -13,9 +14,17 @@ def die(msg):
 
 
 def asm(src, cwd, extra=()):
-    r = subprocess.run([SJ, '--nologo', '--msg=err', '-I', ROOT + '/assets'] + list(extra) + [src], cwd=cwd, capture_output=True, text=True)
+    r = subprocess.run([SJ, '--nologo', '--msg=err', '-I', ROOT + '/assets', '-I', B] + list(extra) + [src], cwd=cwd, capture_output=True, text=True)
     if r.returncode != 0 or 'error' in (r.stdout + r.stderr).lower():
         print(r.stdout + r.stderr); die('sjasmplus failed on ' + src)
+
+
+def generate_assets():
+    """assets/ (human-editable) -> build/gen/ (game form: db/inc/bin files that the sources include).  tools/assets/*.py"""
+    import gen_text
+    shutil.rmtree(B + '/gen', ignore_errors=True)
+    os.makedirs(B + '/gen', exist_ok=True)
+    gen_text.generate(ROOT, B + '/gen')
 
 
 TEST = '--test-return' in sys.argv
@@ -23,6 +32,7 @@ TEST_END = '--test-ending' in sys.argv
 
 
 def main():
+    generate_assets()
     for sub in ('flight', 'station', 'boot'):          # clean the subdirectories (the top directory may be locked by an open shell on Windows)
         shutil.rmtree(B + '/' + sub, ignore_errors=True); os.makedirs(B + '/' + sub, exist_ok=True)
     # symbol files + listings go to build/ (used by tools/xp/szxinfo.py --sym)

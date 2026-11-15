@@ -1,0 +1,53 @@
+# Awaken - subscribers and news
+# UTF-8.  Notation: see assets/README.md (section "Text notation").  In short: "ID | text", "\n" = new line in the game,
+# {stop}/{tab1..5}/{nbsp}/{sp}/{xNN} = control bytes, continuation lines start with "    |", lines starting with # are comments.
+# The IDs and the [LABEL] names are used by the code: do not rename or renumber.
+
+[TABON1]
+# Header of the subscriber list: "Name" TAB "Star".  {tab1} = start of column 2.
+0 ~ Имя абонента:{tab1}Система:\n
+    | \n
+    | 
+
+[NABONS]
+# Subscribers (item 1..16): "Name{tab1}Home star\n".  Shown in the subscriber window and in the list.  Name max ~100 px.
+# The 16 portraits belong to these items (not in the build, see docs/GAME_DESIGN.md G10).
+0 |
+1 | Петр Грек{tab1}Миир\n
+    | 
+2 | Алексей Ворсин{tab1}Пика\n
+    | 
+3 | Николай Громов{tab1}Сули\n
+    | 
+4 | Борис Симонов{tab1}Лолэ\n
+    | 
+5 | Сергей Еремеев{tab1}Редиво\n
+    | 
+6 | Евгений Покровский{tab1}Каалис\n
+    | 
+7 | Григорий Опорский{tab1}Амиго\n
+    | 
+8 | Дмитрий Смирнов{tab1}Руокр\n
+    | 
+9 | Максим Руслов{tab1}Ювегацз\n
+    | 
+10 | Вадим Хлопотин{tab1}Пикасо\n
+    | 
+11 | Виталий Бордов{tab1}Тера\n
+    | 
+12 | Владимир Земерский{tab1}Аргона\n
+    | 
+13 | Денис Типовский{tab1}Цоки\n
+    | 
+14 | Павел Ворожин{tab1}Резера\n
+    | 
+15 | Кирил Риманов`{tab1}Рубина\n
+    | 
+16 ~ Иван Ефремов{tab1}Ипраби\n
+    | 
+
+[TNEWS]
+# News window.  Item 1 = no news, item 2 = the alien-invasion alert (the only real news).  Max 255 px, few lines.
+0 |
+1 | Новостей нет.
+2 | Внимание! На Галактическую Федерацию напала враждебная расса инопланетян! Призываем всех патриотов на защиту своего государства!

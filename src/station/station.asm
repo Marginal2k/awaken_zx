@@ -71,9 +71,9 @@ Eobj:
 TISHIP:
 ;  ОПИСАНИЕ ПУНКТОВ ХЕЛПА
             db   ET
-            incbin "ship.tok"
+            incbin "gen/ship.tok"      ; GENERATED from assets/text/ships.txt
 TISKIM:     equ  $-1
-            incbin "skim.tok"
+            incbin "gen/skim.tok"      ; GENERATED from assets/text/ships.txt
 
 END_3D:
 ; ▒▒▒▒▒▒▒▒▒▒▒▒

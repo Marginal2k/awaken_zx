@@ -1,0 +1,24 @@
+# Awaken - star name parts
+# UTF-8.  Notation: see assets/README.md (section "Text notation").  In short: "ID | text", "\n" = new line in the game,
+# {stop}/{tab1..5}/{nbsp}/{sp}/{xNN} = control bytes, continuation lines start with "    |", lines starting with # are comments.
+# The IDs and the [LABEL] names are used by the code: do not rename or renumber.
+
+[NAMTAB]
+# Greek letters / name parts used to build star names (item 1..16); a star name = part + number (see KARTA.asm).  Max ~60 px.
+0 |
+1 | Алфа
+2 | Бета
+3 | Гамма
+4 | Дельта
+5 | Эпсилон
+6 | Дзета
+7 | Эта
+8 | Тета
+9 | Иота
+10 | Каппа
+11 | Ламбда
+12 | Сигма
+13 | Омега
+14 | Кси
+15 | Пи
+16 | Пси

@@ -1,0 +1,215 @@
+# Awaken - flight computer messages (shown in the message line of the flight panel)
+# UTF-8.  Notation: see assets/README.md (section "Text notation").  In short: "ID | text", "\n" = new line in the game,
+# {stop}/{tab1..5}/{nbsp}/{sp}/{xNN} = control bytes, continuation lines start with "    |", lines starting with # are comments.
+# The IDs and the [LABEL] names are used by the code: do not rename or renumber.
+
+[_SYSTEMREADY]
+# Flight computer message _SYSTEMREADY: All systems ready.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Все системы готовы.\n
+    | 
+
+[_SYSTEMOK]
+# Flight computer message _SYSTEMOK: All systems work normally.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Все системы работают\n
+    | нормально.\n
+    | 
+
+[_MODEON]
+# Flight computer message _MODEON: Mode on.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Включен режим\n
+    | 
+
+[_MODEOFF]
+# Flight computer message _MODEOFF: Mode off.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Выключен режим\n
+    | 
+
+[_FREEFLY]
+# Flight computer message _FREEFLY: Free-flight system on.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | свободного полета.\n
+    | 
+
+[_GETTARGET]
+# Flight computer message _GETTARGET: Target acquired.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | наведения на цель.\n
+    | 
+
+[_FRONT]
+# Flight computer message _FRONT: Front view.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | переднего вида.\n
+    | 
+
+[_BACK]
+# Flight computer message _BACK: Rear view.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | заднего вида.\n
+    | 
+
+[_LOSTTARGET]
+# Flight computer message _LOSTTARGET: Target lost.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Цель потеряна.\n
+    | 
+
+[_ALLTARGET]
+# Flight computer message _ALLTARGET: All targets captured.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Все цели захвачены.\n
+    | 
+
+[_HAVE]
+# Flight computer message _HAVE: Left (followed by a number and _ROKET)
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Осталось{sp}
+
+[_ROKET]
+# Flight computer message _ROKET: rockets (continuation of _HAVE)
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | {sp}ракет.\n
+    | 
+
+[_NOROKET]
+# Flight computer message _NOROKET: Rockets are out.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Ракеты исчерпаны.\n
+    | 
+
+[_DESTROY]
+# Flight computer message _DESTROY: Target destroyed.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Цель уничтожена.\n
+    | 
+
+[_GAMEOVER]
+# Flight computer message _GAMEOVER: Ship destroyed, game over.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Корабль уничтожен.\n
+    | Конец игры.\n
+    | 
+
+[_NOTARGET]
+# Flight computer message _NOTARGET: Target not captured.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Цель не захвачена.\n
+    | 
+
+[_POWERRAY]
+# Flight computer message _POWERRAY: Power beam.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | силового луча.\n
+    | 
+
+[_ROKETGO]
+# Flight computer message _ROKETGO: Rocket launched.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Ракета ушла.\n
+    | 
+
+[_SYSTEMOFF]
+# Flight computer message _SYSTEMOFF: Switched off
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Выведена из строя\n
+    | система\n
+    | 
+
+[_SYSTEMSOFF]
+# Flight computer message _SYSTEMSOFF: Switched off (plural)
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Выведены из строя\n
+    | системы\n
+    | 
+
+[_ANTIROKET]
+# Flight computer message _ANTIROKET: Anti-rocket system activated.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Противоракетная система\n
+    | активирована.\n
+    | 
+
+[_TARGETOFF]
+# Flight computer message _TARGETOFF: Acquired targets forgotten.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Наведенные цели забыты.\n
+    | 
+
+[_TAKING]
+# Flight computer message _TAKING: Object picked up.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Объект подобран.\n
+    | 
+
+[_HIPER]
+# Flight computer message _HIPER: Hyperjump (3 lines)
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Разогрев реактора.\n
+    | Подготовка к совершению\n
+    | гипер прыжка.\n
+    | 
+
+[_DOCKING]
+# Flight computer message _DOCKING: Docking (3 lines)
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Корабль в зоне стыковки\n
+    | со станцией.\n
+    | Уменьшить скорость.\n
+    | 
+
+[_DROPCARGO]
+# Flight computer message _DROPCARGO: Cargo dropped.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Груз сброшен.\n
+    | 
+
+[_DROPMINE]
+# Flight computer message _DROPMINE: Mine dropped.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Мина сброшена.\n
+    | 
+
+[_NOMINE]
+# Flight computer message _NOMINE: No mines.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Нет мин.\n
+    | 
+
+[_NOCARGO]
+# Flight computer message _NOCARGO: No cargo.
+# Printed in the message line of the flight panel (panel font FONT.f); the message is
+# terminated by \n (new line) and the engine byte #0A.  Line width about 28 characters of the panel font.  Lines: one per \n.
+0 | Нет груза.\n
+    | 

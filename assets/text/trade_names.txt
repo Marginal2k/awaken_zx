@@ -1,0 +1,183 @@
+# Awaken - names of goods and equipment (the numbers are in assets/data/*.csv, paired by position)
+# UTF-8.  Notation: see assets/README.md (section "Text notation").  In short: "ID | text", "\n" = new line in the game,
+# {stop}/{tab1..5}/{nbsp}/{sp}/{xNN} = control bytes, continuation lines start with "    |", lines starting with # are comments.
+# The IDs and the [LABEL] names are used by the code: do not rename or renumber.
+
+[TTWR1]
+# Goods window header: column captions, {tab1}..{tab5} jump to the column starts set by the window.  Keep short (about 8 chars per column).
+0 | Наименование{tab1}Продажа{tab3}Наличие\n
+    | Товара{tab1}Кол{tab2}Цена{tab3}Кол{tab4}Цена{tab5}Ед\n
+    | {nbsp*31}
+
+[TTWR2]
+# The 30 goods: one line per good, "name{tab5}unit" (units: тн ton, кг kg, г g, чл persons, эк pieces).  Line index = good number
+# (1..30, line 0 is empty); pairs with assets/data/goods.csv by position.  Name max ~110 px before the {tab5} column.
+0 | \n
+    # line 1
+    | Текстиль{tab5}тн\n
+    # line 2
+    | С/Х Продукты{tab5}тн\n
+    # line 3
+    | С/Х Техника{tab5}тн\n
+    # line 4
+    | Стройматериалы{tab5}тн\n
+    # line 5
+    | Стройтехника{tab5}тн\n
+    # line 6
+    | Вода{tab5}тн\n
+    # line 7
+    | Спиртное{tab5}тн\n
+    # line 8
+    | Пиво{tab5}тн\n
+    # line 9
+    | Табак{tab5}тн\n
+    # line 10
+    | Медикаменты{tab5}тн\n
+    # line 11
+    | Оборудование{tab5}тн\n
+    # line 12
+    | Электроника{tab5}тн\n
+    # line 13
+    | Компьютеры{tab5}тн\n
+    # line 14
+    | Энергоносители{tab5}тн\n
+    # line 15
+    | Минералы{tab5}тн\n
+    # line 16
+    | Радиактивные Руды{tab5}тн\n
+    # line 17
+    | Черные Металлы{tab5}тн\n
+    # line 18
+    | Цветные Металлы{tab5}тн\n
+    # line 19
+    | Драгоценные Металлы{tab5}кг\n
+    # line 20
+    | Драгоценные Камни{tab5}г\n
+    # line 21
+    | Предметы Роскоши{tab5}кг\n
+    # line 22
+    | Легкое Вооружение{tab5}тн\n
+    # line 23
+    | Тяжелое Вооружение{tab5}тн\n
+    # line 24
+    | Наркотики{tab5}кг\n
+    # line 25
+    | Рабы{tab5}чл\n
+    # line 26
+    | Проститутки{tab5}чл\n
+    # line 27
+    | Трансплантанты{tab5}кг\n
+    # line 28
+    | Уникумы{tab5}чл\n
+    # line 29
+    | Технологии{tab5}эк\n
+    # line 30
+    | Артефакты{tab5}тн
+
+[TWKRB1]
+# Ship-equipment window header: column captions.
+0 | Наименование{tab1}Кол{tab2}Цена{tab3}Вес{tab4}Уст\n
+    | {nbsp*31}
+
+[TWKRB2]
+# The 33 ship equipment names: one line per item, line index = item number (1..33; line 0 empty); pairs with
+# assets/data/equipment_ship.csv and assets/text/equipment_docs.txt (TARMI items 1..33).  Max ~110 px.
+0 | \n
+    # line 1
+    | Топливо МРП\n
+    # line 2
+    | Топливо ЛНП\n
+    # line 3
+    | Ракета рп1\n
+    # line 4
+    | Ракета рп2\n
+    # line 5
+    | Мина\n
+    # line 6
+    | Лазер 'Ксоникс'\n
+    # line 7
+    | Лазер 'Корпс'\n
+    # line 8
+    | Лазер 'Динейел'\n
+    # line 9
+    | Лазер 'Милениал'\n
+    # line 10
+    | Лазер 'Эпик'\n
+    # line 11
+    | Противоракетная Система\n
+    # line 12
+    | Противоракетная Система п2\n
+    # line 13
+    | Система Защиты 'Дифёрт'\n
+    # line 14
+    | Система Защиты 'Сёрфейс'\n
+    # line 15
+    | Система Защиты 'Сейсмис'\n
+    # line 16
+    | Форсаж Движок 'Риал'\n
+    # line 17
+    | Форсаж Движок 'Вист'\n
+    # line 18
+    | Ремонтный Дроид 'Ситизан'\n
+    # line 19
+    | Ремонтный Дроид 'Ситрэн'\n
+    # line 20
+    | Ремонтный Дроид 'Эйлиас'\n
+    # line 21
+    | Силовой Луч\n
+    # line 22
+    | Система Наведения\n
+    # line 23
+    | Система 'Гиперслед'\n
+    # line 24
+    | Система Возврата\n
+    # line 25
+    | Система Свободного Полета\n
+    # line 26
+    | Система Забора Топлива\n
+    # line 27
+    | Система Распознавания\n
+    # line 28
+    | Идентификатор Целей\n
+    # line 29
+    | Маршрутизатор\n
+    # line 30
+    | Криогенный Модуль\n
+    # line 31
+    | Посадочный Модуль\n
+    # line 32
+    | Кибер Флот\n
+    # line 33
+    | Гипер Система 'Фостэр'
+
+[TWSKM1]
+# The 14 skimmer equipment names: line index 1..14; pairs with assets/data/equipment_skimmer.csv and TARMI items 34..47.  Max ~110 px.
+0 | \n
+    # line 1
+    | Топливо СМРП\n
+    # line 2
+    | Ракета срп1\n
+    # line 3
+    | Ракета срп2\n
+    # line 4
+    | Лазер 'Бейл'\n
+    # line 5
+    | Лазер 'Эксиал'\n
+    # line 6
+    | Лазер 'Фэйк'\n
+    # line 7
+    | Система Защиты 'Дьюорф'\n
+    # line 8
+    | Система Защиты 'Интенд'\n
+    # line 9
+    | Прыжковый Движок 'Плизант'\n
+    # line 10
+    | Прыжковый Движок 'Сэйкрид'\n
+    # line 11
+    | Противоракетная Система\n
+    # line 12
+    | Стыковочный Узел\n
+    # line 13
+    | Ходовой Модуль\n
+    # line 14
+    | Бомба

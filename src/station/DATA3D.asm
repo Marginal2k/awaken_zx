@@ -284,34 +284,16 @@ ALFA:       db   0,0,0
 
 
 
-NAMSH:
-            db   CR,132,174,172,168,173,168,174,173,2,"64000"
-            db   CR,145,174,228,168,225,226,2,"44000"
-            db   CR,140,165,172,228,168,225,2,"40000"
-            db   CR,148,168,224,225,2,"35000"
-            db   CR,142,224,225,160,173,2,"34000"
-            db   CR,129,160,224,174,225,2,"27000"
+; Ship / skimmer purchase lists and the list header.  GENERATED from assets/text/ships.txt (tools/assets/gen_text.py).
+NAMSH:      include "gen/NAMSH.inc"
 TD1:        db   ET
-            db   138,160,224,237,173,2,"13000"
-            db   ET
+            include "gen/NAMSH7.inc"
 
 
-NAMSK:
-            db   CR,148,165,224,162,165,225,226,2,"30000"
-            db   CR,138,224,168,164,160,173,2,"27000"
-            db   CR,143,224,174,226,174,225,2,"24000"
-            db   CR,128,171,163,174,171,2,"18000"
-            db   ET
+NAMSK:      include "gen/NAMSK.inc"
 
 
-
-TSHIP:
-;  œ”Õ “€ Ã≈Õﬁ ’≈Àœ¿
-;  ’≈ƒ≈– ƒÀﬂ œŒ ”œ. Œ–¿¡Àﬂ
-            db   "ÃÓ‰ÂÎ¸",2
-            db   "÷ÂÌ‡",CR
-            ds   31,255              ; 31 x CP866 #FF (non-breaking blank)
-            db   ET
+TSHIP:      include "gen/TSHIP.inc"
 
 
 

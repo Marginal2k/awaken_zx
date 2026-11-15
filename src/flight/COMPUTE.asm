@@ -569,101 +569,35 @@ PRNUM:
 
 
 
-_SYSTEMREADY:
-            db   130,225,165," ",225,168,225,226,165,172,235," ",163,174,226,174,162,235,".",CR,ED
-
-_SYSTEMOK:
-            db   130,225,165," ",225,168,225,226,165,172,235," ",224,160,161,174,226,160,238,226,CR
-            db   173,174,224,172,160,171,236,173,174,".",CR,ED
-
-_MODEON:
-            db   130,170,171,238,231,165,173," ",224,165,166,168,172,CR,ED
-
-_MODEOFF:
-            db   130,235,170,171,238,231,165,173," ",224,165,166,168,172,CR,ED
-
-_FREEFLY:
-            db   225,162,174,161,174,164,173,174,163,174," ",175,174,171,165,226,160,".",CR,ED
-
-_GETTARGET:
-            db   173,160,162,165,164,165,173,168,239," ",173,160," ",230,165,171,236,".",CR,ED
-
-_FRONT:
-            db   175,165,224,165,164,173,165,163,174," ",162,168,164,160,".",CR,ED
-
-_BACK:
-            db   167,160,164,173,165,163,174," ",162,168,164,160,".",CR,ED
-
-_LOSTTARGET:
-            db   150,165,171,236," ",175,174,226,165,224,239,173,160,".",CR,ED
-
-_ALLTARGET:
-            db   130,225,165," ",230,165,171,168," ",167,160,229,162,160,231,165,173,235,".",CR,ED
-
-_HAVE:
-            db   142,225,226,160,171,174,225,236," ",ED
-
-_ROKET:
-            db   " ",224,160,170,165,226,".",CR,ED
-
-_NOROKET:
-            db   144,160,170,165,226,235," ",168,225,231,165,224,175,160,173,235,".",CR,ED
-
-_DESTROY:
-            db   150,165,171,236," ",227,173,168,231,226,174,166,165,173,160,".",CR,ED
-
-_GAMEOVER:
-            db   138,174,224,160,161,171,236," ",227,173,168,231,226,174,166,165,173,".",CR
-            db   138,174,173,165,230," ",168,163,224,235,".",CR,ED
-
-_NOTARGET:
-            db   150,165,171,236," ",173,165," ",167,160,229,162,160,231,165,173,160,".",CR,ED
-
-_POWERRAY:
-            db   225,168,171,174,162,174,163,174," ",171,227,231,160,".",CR,ED
-
-_ROKETGO:
-            db   144,160,170,165,226,160," ",227,232,171,160,".",CR,ED
-
-_SYSTEMOFF:
-            db   130,235,162,165,164,165,173,160," ",168,167," ",225,226,224,174,239,CR
-            db   225,168,225,226,165,172,160,CR,ED
-
-_SYSTEMSOFF:
-            db   130,235,162,165,164,165,173,235," ",168,167," ",225,226,224,174,239,CR
-            db   225,168,225,226,165,172,235,CR,ED
-
-_ANTIROKET:
-            db   143,224,174,226,168,162,174,224,160,170,165,226,173,160,239," ",225,168,225,226,165,172,160,CR
-            db   160,170,226,168,162,168,224,174,162,160,173,160,".",CR,ED
-
-_TARGETOFF:
-            db   141,160,162,165,164,165,173,173,235,165," ",230,165,171,168," ",167,160,161,235,226,235,".",CR,ED
-
-_TAKING:
-            db   142,161,234,165,170,226," ",175,174,164,174,161,224,160,173,".",CR,ED
-
-_HIPER:
-            db   144,160,167,174,163,224,165,162," ",224,165,160,170,226,174,224,160,".",CR
-            db   143,174,164,163,174,226,174,162,170,160," ",170," ",225,174,162,165,224,232,165,173,168,238,CR
-            db   163,168,175,165,224," ",175,224,235,166,170,160,".",CR,ED
-
-_DOCKING:
-            db   138,174,224,160,161,171,236," ",162," ",167,174,173,165," ",225,226,235,170,174,162,170,168,CR
-            db   225,174," ",225,226,160,173,230,168,165,169,".",CR
-            db   147,172,165,173,236,232,168,226,236," ",225,170,174,224,174,225,226,236,".",CR,ED
-
-
-_DROPCARGO:
-            db   131,224,227,167," ",225,161,224,174,232,165,173,".",CR,ED
-
-_DROPMINE:
-            db   140,168,173,160," ",225,161,224,174,232,165,173,160,".",CR,ED
-
-_NOMINE:
-            db   141,165,226," ",172,168,173,".",CR,ED
-
-_NOCARGO:
-            db   141,165,226," ",163,224,227,167,160,".",CR,ED
+; Flight computer messages: GENERATED from assets/text/flight_messages.txt (tools/assets/gen_text.py), one include per message.
+_SYSTEMREADY: include "gen/_SYSTEMREADY.inc"
+_SYSTEMOK:    include "gen/_SYSTEMOK.inc"
+_MODEON:      include "gen/_MODEON.inc"
+_MODEOFF:     include "gen/_MODEOFF.inc"
+_FREEFLY:     include "gen/_FREEFLY.inc"
+_GETTARGET:   include "gen/_GETTARGET.inc"
+_FRONT:       include "gen/_FRONT.inc"
+_BACK:        include "gen/_BACK.inc"
+_LOSTTARGET:  include "gen/_LOSTTARGET.inc"
+_ALLTARGET:   include "gen/_ALLTARGET.inc"
+_HAVE:        include "gen/_HAVE.inc"
+_ROKET:       include "gen/_ROKET.inc"
+_NOROKET:     include "gen/_NOROKET.inc"
+_DESTROY:     include "gen/_DESTROY.inc"
+_GAMEOVER:    include "gen/_GAMEOVER.inc"
+_NOTARGET:    include "gen/_NOTARGET.inc"
+_POWERRAY:    include "gen/_POWERRAY.inc"
+_ROKETGO:     include "gen/_ROKETGO.inc"
+_SYSTEMOFF:   include "gen/_SYSTEMOFF.inc"
+_SYSTEMSOFF:  include "gen/_SYSTEMSOFF.inc"
+_ANTIROKET:   include "gen/_ANTIROKET.inc"
+_TARGETOFF:   include "gen/_TARGETOFF.inc"
+_TAKING:      include "gen/_TAKING.inc"
+_HIPER:       include "gen/_HIPER.inc"
+_DOCKING:     include "gen/_DOCKING.inc"
+_DROPCARGO:   include "gen/_DROPCARGO.inc"
+_DROPMINE:    include "gen/_DROPMINE.inc"
+_NOMINE:      include "gen/_NOMINE.inc"
+_NOCARGO:     include "gen/_NOCARGO.inc"
 
 

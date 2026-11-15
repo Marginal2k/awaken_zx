@@ -1,0 +1,431 @@
+# Awaken - station user interface (windows, buttons, messages, settings)
+# UTF-8.  Notation: see assets/README.md (section "Text notation").  In short: "ID | text", "\n" = new line in the game,
+# {stop}/{tab1..5}/{nbsp}/{sp}/{xNN} = control bytes, continuation lines start with "    |", lines starting with # are comments.
+# The IDs and the [LABEL] names are used by the code: do not rename or renumber.
+
+[MODELS]
+# Station models: item N is the name of the station model N (1..16); the name is used in WELCOME ("model <1>").
+# Each name ends with one blank (written {sp}) which is part of the text.  Max about 90 px.
+0 |
+1 | Гесмест{sp}
+2 | Аквадиз{sp}
+3 | Асфер{sp}
+4 | Квадокс{sp}
+5 | Рубирон{sp}
+6 | Иринекс{sp}
+7 | Сервест{sp}
+8 | Орегон{sp}
+9 | Глидер{sp}
+10 | Дистрой{sp}
+11 | Ретоер{sp}
+12 | Орфост{sp}
+13 | Фальварк{sp}
+14 | Мезатрон{sp}
+15 | Левиофан{sp}
+16 | Паралакс{sp}
+
+[WELCOME]
+# Greeting when docking.  {stop} marks the three places where the program inserts a value: the station model
+# (name from MODELS), the system (star) name and the hourly parking fee in credits; do not remove them.
+# One paragraph, justified over the window width.
+0 | Орбитальная станция, модель {stop}, системы {stop}, рада приветствовать Вас! Сообщаем Вам, что почасовая оплата услуг орбитальной станции составляет {stop} кредитов.
+
+[ERORS]
+# Messages M01..M16 shown by the trade-rules script (assets/text/rules.paradox: "M09" = item 9).  Item 0 is empty.
+# Shown in a message window (max 255 px wide, a few lines).  Items 10, 15, 16 contain "1000" / "50" credits: keep in sync with the script.
+0 |
+1 | Недостаточно кредитов!
+2 | В наличии уже имеется!
+3 | Превышение тоннажа!
+4 | Ваш корабль находится в розыске!
+5 | Отсутствует объект модернизации!
+6 | Превышено разрешённое количество!
+7 | Оснащение не может быть установлено!
+8 | В системе такой вид оснащения не реализуется!
+9 | Нет в наличии!
+10 | Сделка незаконна!\n
+    | Вы облагаетесь штрафом в 1000 кредитов!
+11 | Превышение максимальной разрешенной суммы!
+12 | Сделка прошла успешно!
+13 | Подобный тип оснащения уже имеется!
+14 | За неоплату стоянки, Вы выдворяетесь в открытый космос!
+15 | Вы находитесь в розыске!\n
+    | Все тяжёлое вооружение с вашего корабля будет демонтировано в пользу государства.\n
+    | Помимо всего, Вы будете оштрафованы на 1000 кредитов.
+16 | Галактическая полиция предупреждает Вас о том, что Вы уже числитесь как неблагоприятный гражданин.\n
+    | В целях предупреждения Вы будете оштрафованы на 50 кредитов.
+
+[TSOH1]
+# Names of the 5 save slots in the "Save" menu (one item, one line per slot).  Max about 120 px per line.
+0 | В позицию 1\n
+    # line 1
+    | В позицию 2\n
+    # line 2
+    | В позицию 3\n
+    # line 3
+    | В позицию 4\n
+    # line 4
+    | В позицию 5
+
+[TWOS1]
+# Names of the 5 save slots in the "Restore" menu (one item, one line per slot).  Max about 120 px per line.
+0 | С позиции 1\n
+    # line 1
+    | С позиции 2\n
+    # line 2
+    | С позиции 3\n
+    # line 3
+    | С позиции 4\n
+    # line 4
+    | С позиции 5
+
+[TSETS1]
+# Environment settings window: row labels.  Line 1.. in the order of SETSD/SETSI in assets/data/settings.csv
+# (mouse, joystick, music, inverse, 6 station keys, ink, paper, bright).  Max about 110 px.
+0 | \n
+    # line 1
+    | Мышка\n
+    # line 2
+    | Джойстик\n
+    # line 3
+    | Музыка\n
+    # line 4
+    | Инверсия\n
+    # line 5
+    | Вверх\n
+    # line 6
+    | Вниз\n
+    # line 7
+    | Влево\n
+    # line 8
+    | Вправо\n
+    # line 9
+    | Выбор\n
+    # line 10
+    | Отмена\n
+    # line 11
+    | Ink объектов\n
+    # line 12
+    | Paper объектов\n
+    # line 13
+    | Bright объектов
+
+[TSETG1]
+# Game settings window: row labels, line 1.. = 28 controls of the ship (flight) followed by 15 controls of the skimmer;
+# order = assets/data/settings.csv (SETGD).  Max about 110 px.
+# orig comment: для скиммера
+0 | \n
+    # line 1
+    | Мышка\n
+    # line 2
+    | Вверх\n
+    # line 3
+    | Вниз\n
+    # line 4
+    | Влево\n
+    # line 5
+    | Вправо\n
+    # line 6
+    | Влево крен\n
+    # line 7
+    | Вправо крен\n
+    # line 8
+    | Лазер\n
+    # line 9
+    | Набор скорости\n
+    # line 10
+    | Сброс скорости\n
+    # line 11
+    | Бортовой компьютер\n
+    # line 12
+    | Наведение ракеты\n
+    # line 13
+    | Забыть наведения\n
+    # line 14
+    | Пуск ракеты 1\n
+    # line 15
+    | Пуск ракеты 2\n
+    # line 16
+    | Пуск ракеты 3\n
+    # line 17
+    | Форсаж\n
+    # line 18
+    | Система свободного полета\n
+    # line 19
+    | Система наведения\n
+    # line 20
+    | Система возврата\n
+    # line 21
+    | Силовой лучь\n
+    # line 22
+    | Противоракетная система\n
+    # line 23
+    | Сброс контейнера\n
+    # line 24
+    | Сброс мины\n
+    # line 25
+    | Гипер прыжок, +CS к звезде\n
+    # line 26
+    | Выпуск дроида\n
+    # line 27
+    | Выпуск флота\n
+    # line 28
+    | Передний и задний вид\n
+    # line 29
+    | Вверх, далее для скиммера\n
+    # line 30
+    | Вниз\n
+    # line 31
+    | Влево\n
+    # line 32
+    | Вправо\n
+    # line 33
+    | Лазер\n
+    # line 34
+    | Набор скорости\n
+    # line 35
+    | Сброс скорости\n
+    # line 36
+    | Бортовой компьютер\n
+    # line 37
+    | Наведение ракеты\n
+    # line 38
+    | Забыть наведение\n
+    # line 39
+    | Пуск ракеты\n
+    # line 40
+    | Прыжок\n
+    # line 41
+    | Противоракетная система\n
+    # line 42
+    | Стыковка с объектом\n
+    # line 43
+    | Сброс бомбы
+
+[THIDE]
+# System menu (key M on an empty background): 8 lines.  Line order is the order of the handlers in OBR.asm: do not reorder.
+0 ~ Скрыть все\n
+    # line 1
+    | Закрыть все\n
+    # line 2
+    | Запомнить среду\n
+    # line 3
+    | Расставить\n
+    # line 4
+    | Установки среды\n
+    # line 5
+    | Установки игры\n
+    # line 6
+    | Восстановиться\n
+    # line 7
+    | Сохраниться
+
+[Wintxt]
+# Window titles, item = window type number (OBJECT.asm).  Item 0/1 empty.  Max about 100 px (title bar).
+# orig comment: НАЗВАНИЯ ОКОШЕК
+# orig comment: 0-ОЙ-ТЕКСТ ПУСТОЙ
+# orig comment: ВСЕ НАЗВАНИЯ С 1
+0 |
+1 |
+2 | Вызов абонента
+3 | Новости галактики
+4 | Карта галактики
+5 | Контракт
+6 | Товар
+7 | Оснащение корабля
+8 | Оснащение скиммера
+9 | Корабль
+10 | Скиммер
+11 | Установки среды
+12 | Установки игры
+13 | Документация оснащения
+14 | Инфо о системе
+15 | Карта системы
+16 | Индекс
+17 | Описание
+18 | Корабли
+19 | Информация
+20 | 3D обзор
+21 | Внимание!
+22 ~ Добро пожаловать!
+
+[Buttxt]
+# Button tooltips, item = button type number (OBJECT.asm).  Format: title "\n" description.  Title lines are short buttons
+# (max ~60 px, up to 3 lines: "Продать\nвсе\n" style), the description is justified over the tooltip width (<= 255 px).
+# Items 24..40 are unused (empty), 41 = "Перелет" (travel, the description is empty).
+# orig comment: ТЕКСТЫ КАК ХЕЛПЫ К КНОПКАМ
+# orig comment: ET- РАЗДЕЛИТЕЛЬ
+# orig comment: 23
+# orig comment: 40 внутренние кнопки
+0 |
+1 | Абонент\n
+    | Вызов абонента с последующей интерактивной связью.
+2 | Новости\n
+    | Просмотр галактических новостей.
+3 | Карта\n
+    | Просмотр галактической карты.
+4 | Контракт\n
+    | Просмотр предложений торговых контрактов, а так же ваших, уже выбранных.
+5 | Товар\n
+    | Совершение покупки или продажи товаров.
+6 | Оснащение\n
+    | корабля\n
+    | Совершение покупки или продажи оснащения для корабля.
+7 | Оснащение\n
+    | скиммера\n
+    | Совершение покупки или продажи оснащения для скиммера.
+8 | Корабль\n
+    | Совершение покупки или продажи корабля.
+9 | Скиммер\n
+    | Совершение покупки или продажи скиммера.
+10 | Вылет\n
+    | Отстыковка от станции. Выход в открытый космос.
+11 | Продажа\n
+    | Войти в режим продажи.
+12 | Покупка\n
+    | Войти в режим покупки.
+13 | Продать\n
+    | все\n
+    | Продать все товары
+14 | Продать\n
+    | товар\n
+    | Продать только маркированный товар
+15 | Память\n
+    | Запоминает или забывает звезду в памяти. Память расчитана на 10 систем.
+16 | Маршрут\n
+    | Включить или исключить звезду из прокладываемого маршрута. Маршрут прокладывается от системы где установлена позиция маршрута. Память маршрутизатора расчитана на 10 систем.
+17 | Стереть\n
+    | маршрут\n
+    | Полностью стирается весь маршрут.
+18 | Листать\n
+    | звезды\n
+    | Переходит к следующей звезде в  памяти.
+19 | Позиция\n
+    | Переводит точку создания маршрута на текущую звезду, если она находится на линии маршрута.
+20 | Центр\n
+    | Центрует изображение картыотносительно звезды нахождения.
+21 | Абонент\n
+    | Центрует изображение картыотносительно звезды следующего доступного абонента.
+22 | ?\n
+    | Открывает систему интерактивной помощи при работе в системе.
+23 | Сделка\n
+    | Совершение сделки по продаже или покупке.
+24 |
+25 |
+26 |
+27 |
+28 |
+29 |
+30 |
+31 |
+32 |
+33 |
+34 |
+35 |
+36 |
+37 |
+38 |
+39 |
+40 |
+41 | Перелет\n
+    | 
+42 |
+
+[Tstatus]
+# Legal status of the player: 1 clean, 2 suspect, 3 wanted, 4 convicted.  Max ~80 px (shown after "Status:" in the status line).
+0 |
+1 | Чистый
+2 | Подозреваемый
+3 | Розыскиваемый
+4 | Приговоренный
+
+[Txt]
+# Placeholder shown by the contract windows ("This is a prototype of the interface").
+0 ~ Это есть прототип интерфейса
+
+[Lintxt]
+# Status line captions: 1 "Status: ", 2 " Credits: ", 3 " Tonnage: ".  Leading/trailing blanks ({sp}) belong to the text.
+# orig comment: хедер окна информации о системе
+0 |
+1 | Статус:{sp}
+2 | {sp}Кредов:{sp}
+3 | {sp}Тоннаж:{sp}
+
+[TINFS1]
+# System info window: the line captions (fuel, distance, planet ..., one line per row).  Line breaks are fixed,
+# {nbsp*31} = a blank row of 31 non-breaking blanks.  Max ~110 px per caption (values are printed to the right).
+0 | Топлива на:         сл\n
+    # line 1
+    | Расстояние:         сл\n
+    # line 2
+    | {nbsp*31}\n
+    # line 3
+    | Система перелета:\n
+    # line 4
+    | \n
+    # line 5
+    | \n
+    # line 6
+    | Планета:\n
+    # line 7
+    | Строй:\n
+    # line 8
+    | Тип:\n
+    # line 9
+    | Уровень:\n
+    # line 10
+    | Планеты системы:\n
+    # line 11
+    | \n
+    # line 12
+    | \n
+    # line 13
+    | {nbsp*31}\n
+    # line 14
+    | Система пребывания:\n
+    # line 15
+    | \n
+    # line 16
+    | \n
+    # line 17
+    | Планета:\n
+    # line 18
+    | Строй:\n
+    # line 19
+    | Тип:\n
+    # line 20
+    | Уровень:
+
+[TINFS2]
+# System info window: header of the planet list.
+0 ~ Планет нет.
+
+[STROY]
+# Political system of a star system: 1 Democracy, 2 Dictatorship, 3 Anarchy, 4 Uninhabited, 5 Unknown.  Max ~110 px.
+0 |
+1 | Демократия
+2 | Диктатура
+3 | Анархия
+4 | Необитаемая
+5 ~ Неизвестный
+
+[TYPE]
+# Economy type of a system: 1 agricultural, 2 cultural, 3 technological, 4 general.  Max ~110 px.
+0 |
+1 | агрокультурная
+2 | культурная
+3 | технологическая
+4 | общая
+
+[TMISS1]
+# Header of the contract list (no code uses it; the contract window is a placeholder).
+0 | Доставка грузов ко времени\n
+    | Звезда:{tab1}Планета:{tab2}Вес:{tab3}Время:{tab4}Цена:
+
+[TGOST]
+# The four states (powers) of the galaxy, used by the system-info window: 1..4.  Max ~120 px.
+0 |
+1 | Федерация Галактики
+2 | Конфедерация Первых
+3 | Содружество Миров
+4 | Свободные Земли

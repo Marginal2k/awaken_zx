@@ -1,695 +1,690 @@
-; BLK7 -- restored from awk2/BLK7.C (3902 bytes, STORM tokenized)
-; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
 Vsline
-;CHECK WISIBILITY OF LINE
-;CORDS OF LINE IN CORDLINE BUFER
-        LD HL,+(L9c*256)+1
-        XOR A
-        EX AF,AF
-        LD B,10
-Ld84    LD C,#00
-        LD A,(HL)
-        INC L
-        INC L
-        CP #80
-        JR Z,Ld85
-        JR NC,$+9
-        AND A
-        JP NZ,$+11
-        JP $+10
-        SET 1,C
-        JP $+5
-        SET 0,C
-        LD A,(HL)
-        AND A
-        JP M,$+16
-        JP NZ,$+18
-        DEC L
-        LD A,(HL)
-        INC L
-        CP Yend+1
-        JR NC,$+10
-        JP $+10
-        SET 3,C
-        JP $+5
-        SET 2,C
-        INC L
-        LD A,C
-        RLCA
-        RLCA
-        RLCA
-        RLCA
-        XOR #F0
-        OR C
-        LD (HL),A
-        EX AF,AF
-        OR (HL)
-        EX AF,AF
-Ld83    INC L
-        LD A,L
-        INC L
-        CP B
-        JP NZ,Ld84
-        EX AF,AF
-        RET
-Ld85    INC L
-        LD (HL),C
-        JP Ld83
+        ; Check wisibility of line
+        ; Cords of line in cordline bufer
+        ld   hl,+(L9c*256)+1
+        xor  a
+        ex   af,af
+        ld   b,10
+Ld84    ld   c,#00
+        ld   a,(hl)
+        inc  l
+        inc  l
+        cp   #80
+        jr   z,Ld85
+        jr   nc,$+9
+        and  a
+        jp   nz,$+11
+        jp   $+10
+        set  1,c
+        jp   $+5
+        set  0,c
+        ld   a,(hl)
+        and  a
+        jp   m,$+16
+        jp   nz,$+18
+        dec  l
+        ld   a,(hl)
+        inc  l
+        cp   Yend+1
+        jr   nc,$+10
+        jp   $+10
+        set  3,c
+        jp   $+5
+        set  2,c
+        inc  l
+        ld   a,c
+        rlca
+        rlca
+        rlca
+        rlca
+        xor  #F0
+        or   c
+        ld   (hl),a
+        ex   af,af
+        or   (hl)
+        ex   af,af
+Ld83    inc  l
+        ld   a,l
+        inc  l
+        cp   b
+        jp   nz,Ld84
+        ex   af,af
+        ret
+Ld85    inc  l
+        ld   (hl),c
+        jp   Ld83
 
 Shmtrx
-;CALC SHIP MATRIX VECTOR
-Eyea_   LD A,0
-        LD H,Sintb
-        LD L,A
-        LD B,(HL) ;SIN A
-        ADD A,#40
-        LD L,A
-        LD C,(HL) ;COS A
-Eyeb_   LD A,0
-        LD L,A
-        LD A,(HL) ;SIN B
-        LD IXL,A
-        LD A,L
-        ADD A,#40
-        LD L,A
-        LD A,(HL) ;COS B
-        LD IYL,A
-Eyeg_   LD A,0
-        LD L,A
-        LD A,(HL) ;SIN G
-        LD D,A
-        LD A,L
-        ADD A,#40
-        LD L,A
-        LD E,(HL) ;COS G
-        LD H,Multb
-        LD A,IXL
-        SRA A
-        LD L,E
-        SRA L
-        SUB L
-        LD L,A
-        ADD A,E
-        LD E,(HL)
-        LD L,A
-        LD A,(HL)
-        SUB E
-        LD (Hm_13+1),A
-        LD A,IYL
-        SRA A
-        LD L,B
-        SRA L
-        SUB L
-        LD L,A
-        ADD A,B
-        LD E,(HL)
-        LD L,A
-        LD A,(HL)
-        SUB E
-        LD IXH,A
-        LD A,IXL
-        SRA A
-        LD L,C
-        SRA L
-        SUB L
-        LD L,A
-        ADD A,C
-        LD E,(HL)
-        LD L,A
-        LD A,(HL)
-        SUB E
-        SRA A
-        LD L,D
-        SRA L
-        SUB L
-        LD L,A
-        ADD A,D
-        LD E,(HL)
-        LD L,A
-        LD A,(HL)
-        SUB E
-        SUB IXH
-        JP PO,$+9
-        NEG
-        JP PO,$+4
-        DEC A
-        LD (Hm_23+1),A
-        LD A,IYL
-        SRA A
-        LD L,C
-        SRA L
-        SUB L
-        LD L,A
-        ADD A,C
-        LD E,(HL)
-        LD L,A
-        LD A,(HL)
-        SUB E
-        LD IXH,A ;CB*CA
-        LD A,IXL
-        SRA A
-        LD L,B
-        SRA L
-        SUB L
-        LD L,A
-        ADD A,B
-        LD E,(HL)
-        LD L,A
-        LD A,(HL)
-        SUB E
-        SRA A
-        LD L,D
-        SRA L
-        SUB L
-        LD L,A
-        ADD A,D
-        LD E,(HL)
-        LD L,A
-        LD A,(HL)
-        SUB E
-        ADD A,IXH
-        JP PO,$+9
-        NEG
-        JP PO,$+4
-        DEC A
-        LD (Hm_33+1),A
-        RET
+; Calc SHIP matrix vector
+Eyea_   ld   a,0
+        ld   h,Sintb
+        ld   l,a
+        ld   b,(hl)             ; Sin a
+        add  a,#40
+        ld   l,a
+        ld   c,(hl)             ; Cos a
+Eyeb_   ld   a,0
+        ld   l,a
+        ld   a,(hl)             ; Sin b
+        ld   ixl,a
+        ld   a,l
+        add  a,#40
+        ld   l,a
+        ld   a,(hl)             ; Cos b
+        ld   iyl,a
+Eyeg_   ld   a,0
+        ld   l,a
+        ld   a,(hl)             ; Sin G
+        ld   d,a
+        ld   a,l
+        add  a,#40
+        ld   l,a
+        ld   e,(hl)             ; Cos G
+        ld   h,Multb
+        ld   a,ixl
+        sra  a
+        ld   l,e
+        sra  l
+        sub  l
+        ld   l,a
+        add  a,e
+        ld   e,(hl)
+        ld   l,a
+        ld   a,(hl)
+        sub  e
+        ld   (Hm_13+1),a
+        ld   a,iyl
+        sra  a
+        ld   l,b
+        sra  l
+        sub  l
+        ld   l,a
+        add  a,b
+        ld   e,(hl)
+        ld   l,a
+        ld   a,(hl)
+        sub  e
+        ld   ixh,a
+        ld   a,ixl
+        sra  a
+        ld   l,c
+        sra  l
+        sub  l
+        ld   l,a
+        add  a,c
+        ld   e,(hl)
+        ld   l,a
+        ld   a,(hl)
+        sub  e
+        sra  a
+        ld   l,d
+        sra  l
+        sub  l
+        ld   l,a
+        add  a,d
+        ld   e,(hl)
+        ld   l,a
+        ld   a,(hl)
+        sub  e
+        sub  ixh
+        jp   po,$+9
+        neg
+        jp   po,$+4
+        dec  a
+        ld   (Hm_23+1),a
+        ld   a,iyl
+        sra  a
+        ld   l,c
+        sra  l
+        sub  l
+        ld   l,a
+        add  a,c
+        ld   e,(hl)
+        ld   l,a
+        ld   a,(hl)
+        sub  e
+        ld   ixh,a              ; Cb*ca
+        ld   a,ixl
+        sra  a
+        ld   l,b
+        sra  l
+        sub  l
+        ld   l,a
+        add  a,b
+        ld   e,(hl)
+        ld   l,a
+        ld   a,(hl)
+        sub  e
+        sra  a
+        ld   l,d
+        sra  l
+        sub  l
+        ld   l,a
+        add  a,d
+        ld   e,(hl)
+        ld   l,a
+        ld   a,(hl)
+        sub  e
+        add  a,ixh
+        jp   po,$+9
+        neg
+        jp   po,$+4
+        dec  a
+        ld   (Hm_33+1),a
+        ret
 
 Findobj
-;ПOИCK ПEPBOГO ПO TИПУ B D
-;FZ-ON IF NOT FOUND
-        LD IY,Carsb-Olen
-        LD BC,Olen
+        ; Поиск первого по типу b d
+        ; Fz-on if not found
+        ld   iy,Carsb-Olen
+        ld   bc,Olen
 Find2
-        CALL Findob
-        RET Z
-        LD A,(IY+Type)
-        CP D
-        JP NZ,Find2
-        INC A
-        RET
+        call Findob
+        ret  z
+        ld   a,(iy+Type)
+        cp   d
+        jp   nz,Find2
+        inc  a
+        ret
 Fobj
-;FIND OBJECT
-;RET HL-OBJ AD+1
-;FZ-ON NO IN BUF OBJS
-;FZ-OFF FOUND
-        LD HL,+(Carsb-Olen)+1
-        LD BC,Olen
-        JR $+8
-        DEC L
-        LD A,(HL)
-        CP #80
-        RET Z
-        INC L
-        ADD HL,BC
-        LD A,(HL)
-        CP #80
-        JR Z,$-10
-        RET
+        ; Find object
+        ; Ret hl-obj ad+1
+        ; Fz-on no in buf objs
+        ; Fz-off found
+        ld   hl,+(Carsb-Olen)+1
+        ld   bc,Olen
+        jr   $+8
+        dec  l
+        ld   a,(hl)
+        cp   #80
+        ret  z
+        inc  l
+        add  hl,bc
+        ld   a,(hl)
+        cp   #80
+        jr   z,$-10
+        ret
 Fndfree
-;FIND FREE SPACE
-;RET FZ-ON IF NOT FOUND
-        LD HL,+(Carsb-Olen)+1
-        LD DE,Olen
+        ; Find free space
+        ; Ret fz-on if not found
+        ld   hl,+(Carsb-Olen)+1
+        ld   de,Olen
 Hhh3
-        ADD HL,DE
-        LD A,(HL)
-        CP #80
-        JR NZ,$-4
-        DEC L
-        LD A,(HL)
-        CP #80
-        RET Z
-        LD A,L
-        ADD A,Setup
-        LD L,A
-        LD A,(HL)
-        LD (HL),0
-        INC A
-        EX AF,AF
-        LD A,L
-        SUB Setup-1
-        LD L,A
-        EX AF,AF
-        JR Z,Hhh3
-        EX AF,AF
-        DEC L
-        EX AF,AF
-        RET
-;3AДATЬ ДAHHЫE O B3PЫBE И OCKOЛKAX OБЪE
-;KTA
-;makeexplo
-        LD L,(IX+Indi)
-        LD H,L97
-        LD A,(HL)
-        INC L
-        LD H,(HL)
-        LD L,A
-        INC HL
-        LD A,(HL)
-        AND 7
-        EX AF,AF
-        LD L,(IX+0)
-        LD H,(IX+1)
-        LD E,(IX+2)
-        LD D,(IX+3)
-        LD C,(IX+4)
-        LD B,(IX+5)
-        LD A,#10
-        EXX
-        LD HL,Nwvos
-        CALL Newvspr
-        LD A,1
-        LD (Expl+1),A
-        LD A,(Cex+1)
-        CP #10
-        JR NC,$+7
-        LD A,#10
-        LD (Cex+1),A
-        LD A,(IX+Type)
-        CP #10
-        JP NC,Jj11
-        LD HL,+(Carsb-Olen)+1
-        LD A,3
-Jj12
-        EX AF,AF
-        LD DE,Olen
-        ADD HL,DE
-        LD A,(HL)
-        CP #80
-        JP NZ,$-4
-        DEC HL
-        LD A,(HL)
-        CP #80
-        JP Z,Jj11
-        LD D,IXH
-        LD E,IXL
-        EX DE,HL
-        LDI
-        LDI
-        LDI
-        LDI
-        LDI
-        LDI
-        LD A,Ioskol
-        LD (DE),A
-        INC E
-        INC E
-        INC E
-        INC E
-        LD A,4
-        LD (DE),A
-        INC E
-        INC E
-        XOR A
-        LD (DE),A
-        INC E
-        LD A,R
-        LD C,A
-        LD B,0
-        LD A,(BC)
-        LD (DE),A
-        INC E
-        INC BC
-        LD A,(BC)
-        LD (DE),A
-        INC E
-        INC E
-        LD A,R
-        RLCA
-        OR #E0
-        LD (DE),A ;SPEED
-        INC E
-        INC E
-        LD A,#10
-        LD (DE),A ;TYPE
-        INC E
-        LD (DE),A ;ENERGY
-        INC E
-        LD A,#FF
-        LD (DE),A
-        INC E
-        LD (DE),A
-        XOR A
-        INC E
-        LD (DE),A
-        LD BC,+(0-Omode)+1
-        EX DE,HL
-        ADD HL,BC
-        EX AF,AF
-        DEC A
-        JP NZ,Jj12
-Jj11
-        LD (IX+0),0
-        LD (IX+1),#80
-        LD (IX+Setup),#FF ;ECЛИ TOЛЬKO
-;УБИЛИ
-;EXPLOSION
-        LD HL,Eff0
-        LD (Sfxb+1),HL
-        RET
+        add  hl,de
+        ld   a,(hl)
+        cp   #80
+        jr   nz,$-4
+        dec  l
+        ld   a,(hl)
+        cp   #80
+        ret  z
+        ld   a,l
+        add  a,Setup
+        ld   l,a
+        ld   a,(hl)
+        ld   (hl),0
+        inc  a
+        ex   af,af
+        ld   a,l
+        sub  Setup-1
+        ld   l,a
+        ex   af,af
+        jr   z,Hhh3
+        ex   af,af
+        dec  l
+        ex   af,af
+        ret
+        ; 3Адать данные O в3рыве и осколках объе
+        ; Кта
+        ; makeexplo
+        ld   l,(ix+Indi)
+        ld   h,L97
+        ld   a,(hl)
+        inc  l
+        ld   h,(hl)
+        ld   l,a
+        inc  hl
+        ld   a,(hl)
+        and  7
+        ex   af,af
+        ld   l,(ix+0)
+        ld   h,(ix+1)
+        ld   e,(ix+2)
+        ld   d,(ix+3)
+        ld   c,(ix+4)
+        ld   b,(ix+5)
+        ld   a,#10
+        exx
+        ld   hl,Nwvos
+        call Newvspr
+        ld   a,1
+        ld   (Expl+1),a
+        ld   a,(Cex+1)
+        cp   #10
+        jr   nc,$+7
+        ld   a,#10
+        ld   (Cex+1),a
+        ld   a,(ix+Type)
+        cp   #10
+        jp   nc,.Jj11
+        ld   hl,+(Carsb-Olen)+1
+        ld   a,3
+.Jj12
+        ex   af,af
+        ld   de,Olen
+        add  hl,de
+        ld   a,(hl)
+        cp   #80
+        jp   nz,$-4
+        dec  hl
+        ld   a,(hl)
+        cp   #80
+        jp   z,.Jj11
+        ld   d,ixh
+        ld   e,ixl
+        ex   de,hl
+        ldi
+        ldi
+        ldi
+        ldi
+        ldi
+        ldi
+        ld   a,Ioskol
+        ld   (de),a
+        inc  e
+        inc  e
+        inc  e
+        inc  e
+        ld   a,4
+        ld   (de),a
+        inc  e
+        inc  e
+        xor  a
+        ld   (de),a
+        inc  e
+        ld   a,r
+        ld   c,a
+        ld   b,0
+        ld   a,(bc)
+        ld   (de),a
+        inc  e
+        inc  bc
+        ld   a,(bc)
+        ld   (de),a
+        inc  e
+        inc  e
+        ld   a,r
+        rlca
+        or   #E0
+        ld   (de),a             ; SPEED
+        inc  e
+        inc  e
+        ld   a,#10
+        ld   (de),a             ; Type
+        inc  e
+        ld   (de),a             ; Energy
+        inc  e
+        ld   a,#FF
+        ld   (de),a
+        inc  e
+        ld   (de),a
+        xor  a
+        inc  e
+        ld   (de),a
+        ld   bc,+(0-Omode)+1
+        ex   de,hl
+        add  hl,bc
+        ex   af,af
+        dec  a
+        jp   nz,.Jj12
+.Jj11
+        ld   (ix+0),0
+        ld   (ix+1),#80
+        ld   (ix+Setup),#FF     ; Если только
+        ; Убили
+        ; Explosion
+        ld   hl,Eff0
+        ld   (Sfxb+1),hl
+        ret
 Rastoy
-;B3ЯTЬ PACTOЯHИE KPATHOE #100 OT OДHOГO
-; OБЪEKTA B IX ДO ДP. B IY
-;RET IN A
-        LD E,(IX+0)
-        LD D,(IX+1)
-        LD L,(IY+0)
-        LD H,(IY+1)
-        AND A
-        SBC HL,DE
-        JP P,$+10
-        LD A,L
-        CPL
-        LD L,A
-        LD A,H
-        CPL
-        LD H,A
-        INC HL
-        PUSH HL
-        LD E,(IX+2)
-        LD D,(IX+3)
-        LD L,(IY+2)
-        LD H,(IY+3)
-        AND A
-        SBC HL,DE
-        JP P,$+10
-        LD A,L
-        CPL
-        LD L,A
-        LD A,H
-        CPL
-        LD H,A
-        INC HL
-        PUSH HL
-        LD E,(IX+4)
-        LD D,(IX+5)
-        LD L,(IY+4)
-        LD H,(IY+5)
-        AND A
-        SBC HL,DE
-        JP P,$+10
-        LD A,L
-        CPL
-        LD L,A
-        LD A,H
-        CPL
-        LD H,A
-        INC HL
-        POP DE
-        LD A,H
-        CP D
-        JR NC,$+3
-        LD A,D
-        POP DE
-        CP D
-        RET NC
-        LD A,D
-        RET
+        ; В3ять растояние кратное #100 от одного
+        ; Объекта b ix до др. b iy
+        ; Ret in a
+        ld   e,(ix+0)
+        ld   d,(ix+1)
+        ld   l,(iy+0)
+        ld   h,(iy+1)
+        and  a
+        sbc  hl,de
+        jp   p,$+10
+        ld   a,l
+        cpl
+        ld   l,a
+        ld   a,h
+        cpl
+        ld   h,a
+        inc  hl
+        push hl
+        ld   e,(ix+2)
+        ld   d,(ix+3)
+        ld   l,(iy+2)
+        ld   h,(iy+3)
+        and  a
+        sbc  hl,de
+        jp   p,$+10
+        ld   a,l
+        cpl
+        ld   l,a
+        ld   a,h
+        cpl
+        ld   h,a
+        inc  hl
+        push hl
+        ld   e,(ix+4)
+        ld   d,(ix+5)
+        ld   l,(iy+4)
+        ld   h,(iy+5)
+        and  a
+        sbc  hl,de
+        jp   p,$+10
+        ld   a,l
+        cpl
+        ld   l,a
+        ld   a,h
+        cpl
+        ld   h,a
+        inc  hl
+        pop  de
+        ld   a,h
+        cp   d
+        jr   nc,$+3
+        ld   a,d
+        pop  de
+        cp   d
+        ret  nc
+        ld   a,d
+        ret
 
-;------------------------
-;BЫBOД ЛИHИИ B 3D ПPOCTPAHCTBE
-;------------------------
+; ------------------------
+; Вывод линии b 3d пространстве
+; ------------------------
 Outline
-;DE-Z1,HL-Y1,BC-X1
-;DE'-Z2,HL'-Y2,BC'-X2
-        CALL Clc2d3d
-        RET NZ
-        LD (L9c*256),HL
-        LD ((L9c*256)+2),DE
-        EXX
-        CALL Clc2d3d
-        RET NZ
-        LD ((L9c*256)+5),HL
-        LD ((L9c*256)+7),DE
-        EXX
-        CALL Vsline
-        RET Z
-        LD B,A
-        CPL
-        AND #F0
-        RET NZ
-        LD A,B
-        AND #0F
-        LD HL,Masklin
-        JP NZ,Drwpol
-        JP Drwpol2 ;DRAW POLY.
+        ; De-z1,hl-Y1,bc-X1
+        ; De'-z2,hl'-y2,bc'-x2
+        call Clc2d3d
+        ret  nz
+        ld   (L9c*256),hl
+        ld   ((L9c*256)+2),de
+        exx
+        call Clc2d3d
+        ret  nz
+        ld   ((L9c*256)+5),hl
+        ld   ((L9c*256)+7),de
+        exx
+        call Vsline
+        ret  z
+        ld   b,a
+        cpl
+        and  #F0
+        ret  nz
+        ld   a,b
+        and  #0F
+        ld   hl,Masklin
+        jp   nz,Drwpol
+        jp   Drwpol2            ; Draw poly.
 Masklin
-        DB %10110010, 0, 5, 0
+        db   %10110010, 0, 5, 0
 
-
-
-
-;ПЛEЙEP CEMПЛEB
-; NOTE2
-; "sfx"-IS A LOOP, WHICH CONTAINS
-; IS A ADDRESS OF THE SOUND EFFECT
+; Плейер семплев
+; Note2
+; "Sfx"-is a loop, which contains
+; Is a address of the sound effect
 ;
 Sfxa
-        LD HL,0
-        LD A,H
-        OR A
-        JR Z,Sfxb
-        LD BC,#FFFD
-        XOR A
-        OUT (C),A
-        LD B,#BF
-        OUTI
-        LD B,#FF
-        LD A,1
-        OUT (C),A
-        LD B,#BF
-        OUTI
-        LD B,#FF
-        LD A,7
-        OUT (C),A
-        IN A,(C)
-        AND %11110110
-        OR (HL)
-        LD B,#BF
-        OUT (C),A
-        INC HL
-        LD A,8
-        LD B,#FF
-        OUT (C),A
-        LD B,#BF
-        OUTI
-        LD (Sfxa+1),HL
-        LD A,(HL)
-        OR A
-        JR NZ,Sfxb
-        LD (Sfxa+2),A
-        LD B,#FF
-        LD A,7
-        OUT (C),A
-        IN A,(C)
-        OR %00001001
-        LD B,#BF
-        OUT (C),A
+        ld   hl,0
+        ld   a,h
+        or   a
+        jr   z,Sfxb
+        ld   bc,#FFFD
+        xor  a
+        out  (c),a
+        ld   b,#BF
+        outi
+        ld   b,#FF
+        ld   a,1
+        out  (c),a
+        ld   b,#BF
+        outi
+        ld   b,#FF
+        ld   a,7
+        out  (c),a
+        in   a,(c)
+        and  %11110110
+        or   (hl)
+        ld   b,#BF
+        out  (c),a
+        inc  hl
+        ld   a,8
+        ld   b,#FF
+        out  (c),a
+        ld   b,#BF
+        outi
+        ld   (Sfxa+1),hl
+        ld   a,(hl)
+        or   a
+        jr   nz,Sfxb
+        ld   (Sfxa+2),a
+        ld   b,#FF
+        ld   a,7
+        out  (c),a
+        in   a,(c)
+        or   %00001001
+        ld   b,#BF
+        out  (c),a
 Sfxb
-        LD HL,0
-        LD A,H
-        OR A
-        JR Z,Sfxn
-        LD BC,#FFFD
-        LD A,2
-        OUT (C),A
-        LD B,#BF
-        OUTI
-        LD B,#FF
-        LD A,3
-        OUT (C),A
-        LD B,#BF
-        OUTI
-        LD B,#FF
-        LD A,7
-        OUT (C),A
-        IN A,(C)
-        AND %11101101
-        LD B,A
-        LD A,(HL)
-        RLCA
-        OR B
-        LD B,#BF
-        OUT (C),A
-        INC HL
-        LD A,9
-        LD B,#FF
-        OUT (C),A
-        LD B,#BF
-        OUTI
-        LD (Sfxb+1),HL
-        LD A,(HL)
-        OR A
-        JR NZ,Sfxn
-        LD (Sfxb+2),A
-        LD B,#FF
-        LD A,7
-        OUT (C),A
-        IN A,(C)
-        OR %00010010
-        LD B,#BF
-        OUT (C),A
+        ld   hl,0
+        ld   a,h
+        or   a
+        jr   z,Sfxn
+        ld   bc,#FFFD
+        ld   a,2
+        out  (c),a
+        ld   b,#BF
+        outi
+        ld   b,#FF
+        ld   a,3
+        out  (c),a
+        ld   b,#BF
+        outi
+        ld   b,#FF
+        ld   a,7
+        out  (c),a
+        in   a,(c)
+        and  %11101101
+        ld   b,a
+        ld   a,(hl)
+        rlca
+        or   b
+        ld   b,#BF
+        out  (c),a
+        inc  hl
+        ld   a,9
+        ld   b,#FF
+        out  (c),a
+        ld   b,#BF
+        outi
+        ld   (Sfxb+1),hl
+        ld   a,(hl)
+        or   a
+        jr   nz,Sfxn
+        ld   (Sfxb+2),a
+        ld   b,#FF
+        ld   a,7
+        out  (c),a
+        in   a,(c)
+        or   %00010010
+        ld   b,#BF
+        out  (c),a
 Sfxn
-        LD C,#FD
-        LD B,#FF
-        LD A,5
-        OUT (C),A
-        LD B,#BF
-        LD A,#0C
-        OUT (C),A
-        LD B,#FF
-        LD A,7
-        OUT (C),A
-        LD A,R
-        CP #20
-        JR C,$+4
-        LD A,#20
-        AND %00100000
-        LD L,A
-        IN A,(C)
-        AND %11011011
-        OR L
-        LD B,#BF
-        OUT (C),A
-        LD A,6
-        LD B,#FF
-        OUT (C),A
-        LD B,#BF
-        LD A,5
-        OUT (C),A
-        LD A,10
-        LD B,#FF
-        OUT (C),A
-        LD B,#BF
-Nunu    LD A,0
-        SRL A
-        CP 4
-        JR NC,$+4
-        LD A,4
-        OUT (C),A
-        RET
+        ld   c,#FD
+        ld   b,#FF
+        ld   a,5
+        out  (c),a
+        ld   b,#BF
+        ld   a,#0C
+        out  (c),a
+        ld   b,#FF
+        ld   a,7
+        out  (c),a
+        ld   a,r
+        cp   #20
+        jr   c,$+4
+        ld   a,#20
+        and  %00100000
+        ld   l,a
+        in   a,(c)
+        and  %11011011
+        or   l
+        ld   b,#BF
+        out  (c),a
+        ld   a,6
+        ld   b,#FF
+        out  (c),a
+        ld   b,#BF
+        ld   a,5
+        out  (c),a
+        ld   a,10
+        ld   b,#FF
+        out  (c),a
+        ld   b,#BF
+Nunu    ld   a,0
+        srl  a
+        cp   4
+        jr   nc,$+4
+        ld   a,4
+        out  (c),a
+        ret
 Roka
-        DB 20, 2, %00001000, 11
-        DB 1, 1, %00001000, 10
-        DB 20, 2, %00001000, 9
-        DB 1, 1, %00001000, 10
-        DB 20, 2, %00001000, 11
-        DB 1, 1, %00001000, 10, 0
+        db   20, 2, %00001000, 11
+        db   1, 1, %00001000, 10
+        db   20, 2, %00001000, 9
+        db   1, 1, %00001000, 10
+        db   20, 2, %00001000, 11
+        db   1, 1, %00001000, 10, 0
 Eff13
-        DB 20, 0, %00000000, 10
-        DB 10, 0, %00000000, 9
-        DB 20, 0, %00000000, 8
-        DB 10, 0, %00000000, 7
-        DB 20, 0, %00000000, 6
-        DB 10, 0, %00000000, 5, 0
+        db   20, 0, %00000000, 10
+        db   10, 0, %00000000, 9
+        db   20, 0, %00000000, 8
+        db   10, 0, %00000000, 7
+        db   20, 0, %00000000, 6
+        db   10, 0, %00000000, 5, 0
 Eff19
-        DB 80, 1, %00001000, 8
-        DB 70, 1, %00001000, 8
-        DB 60, 1, %00001000, 8
-        DB 80, 1, %00001000, 8
-        DB 70, 1, %00001000, 9
-        DB 60, 1, %00001000, 9
-        DB 80, 1, %00001000, 9
-        DB 70, 1, %00001000, 10
-        DB 60, 1, %00001000, 10
-        DB 80, 1, %00001000, 10
-        DB 70, 1, %00001000, 11
-        DB 60, 1, %00001000, 11
-        DB 80, 1, %00001000, 11
-        DB 70, 1, %00001000, 12
-        DB 60, 1, %00001000, 13
-        DB 70, 1, %00001000, 13, 0
+        db   80, 1, %00001000, 8
+        db   70, 1, %00001000, 8
+        db   60, 1, %00001000, 8
+        db   80, 1, %00001000, 8
+        db   70, 1, %00001000, 9
+        db   60, 1, %00001000, 9
+        db   80, 1, %00001000, 9
+        db   70, 1, %00001000, 10
+        db   60, 1, %00001000, 10
+        db   80, 1, %00001000, 10
+        db   70, 1, %00001000, 11
+        db   60, 1, %00001000, 11
+        db   80, 1, %00001000, 11
+        db   70, 1, %00001000, 12
+        db   60, 1, %00001000, 13
+        db   70, 1, %00001000, 13, 0
 Eff1
-        DB 40, 0, %00000000, 10
-        DB 50, 0, %00000000, 9
-        DB 40, 0, %00000000, 8
-        DB 50, 0, %00000000, 7
-        DB 40, 0, %00000000, 6
-        DB 50, 0, %00000000, 5, 0
+        db   40, 0, %00000000, 10
+        db   50, 0, %00000000, 9
+        db   40, 0, %00000000, 8
+        db   50, 0, %00000000, 7
+        db   40, 0, %00000000, 6
+        db   50, 0, %00000000, 5, 0
 Eff14
-        DB 20, 1, %00000000, 10
-        DB 10, 1, %00000000, 9
-        DB 20, 1, %00000000, 8
-        DB 10, 1, %00000000, 7
-        DB 20, 1, %00000000, 6
-        DB 10, 1, %00000000, 5, 0
+        db   20, 1, %00000000, 10
+        db   10, 1, %00000000, 9
+        db   20, 1, %00000000, 8
+        db   10, 1, %00000000, 7
+        db   20, 1, %00000000, 6
+        db   10, 1, %00000000, 5, 0
 Eff2
-;SHOOT1
-        DB #10, 1, %00001000, 12
-        DB #40, 1, %00001000, 11
-        DB #70, 1, %00001000, 10
-        DB #20, 2, %00001000, 9
-        DB #E0, 2, %00001000, 8
-        DB #20, 3, %00001000, 7, 0
+        ; Shoot1
+        db   #10, 1, %00001000, 12
+        db   #40, 1, %00001000, 11
+        db   #70, 1, %00001000, 10
+        db   #20, 2, %00001000, 9
+        db   #E0, 2, %00001000, 8
+        db   #20, 3, %00001000, 7, 0
 
 Eff0
-;EXPLOSION
-        DB #10, 8, %00001000, 15
-        DB #10, 8, %00001001, 15
-        DB #10, 8, %00000000, 15
-        DB #80, 8, %00000000, 15
-        DB #10, 8, %00000001, 15
-        DB #80, 7, %00001001, 15
-        DB #80, 7, %00000001, 15
-        DB #80, 5, %00000001, 15
-        DB #80, 4, %00000000, 14
-        DB #80, 3, %00000001, 14
-        DB 1, 0, %00000001, 14
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000000, 13
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000000, 13
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000001, 13
-        DB 1, 0, %00000001, 11
-        DB 1, 0, %00000001, 11
-        DB 1, 0, %00000001, 11
-        DB 1, 0, %00000001, 11
-        DB 1, 0, %00000001, 11
-        DB 1, 0, %00000001, 11
-        DB 1, 0, %00000001, 11
-        DB 1, 0, %00000001, 12
-        DB 1, 0, %00000001, 12
-        DB 1, 0, %00000001, 12
-        DB 1, 0, %00000001, 12
-        DB 1, 0, %00000001, 12
-        DB 1, 0, %00000001, 11
-        DB 1, 0, %00000001, 10
-        DB 1, 0, %00000001, 9
-        DB 1, 0, %00000001, 8
-        DB 1, 0, %00000001, 8
-        DB 1, 0, %00000001, 8
-        DB 1, 0, %00000001, 8
-        DB 1, 0, %00000001, 7
-        DB 1, 0, %00000001, 6
-        DB 1, 0, %00000001, 5
-        DB 1, 0, %00000001, 4
-        DB 1, 0, %00000001, 3, 0
+        ; Explosion
+        db   #10, 8, %00001000, 15
+        db   #10, 8, %00001001, 15
+        db   #10, 8, %00000000, 15
+        db   #80, 8, %00000000, 15
+        db   #10, 8, %00000001, 15
+        db   #80, 7, %00001001, 15
+        db   #80, 7, %00000001, 15
+        db   #80, 5, %00000001, 15
+        db   #80, 4, %00000000, 14
+        db   #80, 3, %00000001, 14
+        db   1, 0, %00000001, 14
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000000, 13
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000000, 13
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000001, 13
+        db   1, 0, %00000001, 11
+        db   1, 0, %00000001, 11
+        db   1, 0, %00000001, 11
+        db   1, 0, %00000001, 11
+        db   1, 0, %00000001, 11
+        db   1, 0, %00000001, 11
+        db   1, 0, %00000001, 11
+        db   1, 0, %00000001, 12
+        db   1, 0, %00000001, 12
+        db   1, 0, %00000001, 12
+        db   1, 0, %00000001, 12
+        db   1, 0, %00000001, 12
+        db   1, 0, %00000001, 11
+        db   1, 0, %00000001, 10
+        db   1, 0, %00000001, 9
+        db   1, 0, %00000001, 8
+        db   1, 0, %00000001, 8
+        db   1, 0, %00000001, 8
+        db   1, 0, %00000001, 8
+        db   1, 0, %00000001, 7
+        db   1, 0, %00000001, 6
+        db   1, 0, %00000001, 5
+        db   1, 0, %00000001, 4
+        db   1, 0, %00000001, 3, 0
 
 Eff11
-        DB 100, 2, 4, 9
-        DB 100, 3, 4, 7
-        DB 100, 2, 4, 5
-        DB 100, 3, 4, 4
-        DB 100, 2, 4, 2
-        DB 100, 3, 4, 1, 0
+        db   100, 2, 4, 9
+        db   100, 3, 4, 7
+        db   100, 2, 4, 5
+        db   100, 3, 4, 4
+        db   100, 2, 4, 2
+        db   100, 3, 4, 1, 0
 
 Eff21
-        DB 200, 1, 32, 12
-        DB 2, 0, 0, 11
-        DB 50, 0, 0, 12
-        DB 50, 0, 4, 7
-        DB 50, 0, 4, 1, 0
+        db   200, 1, 32, 12
+        db   2, 0, 0, 11
+        db   50, 0, 0, 12
+        db   50, 0, 4, 7
+        db   50, 0, 4, 1, 0

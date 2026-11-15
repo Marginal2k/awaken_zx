@@ -194,22 +194,22 @@ SM3         macro:sli l:rl h:endm
 
 
 HIDEM       macro
- ldd,(hl):dech:lde,(hl):dech:pushde
- ldd,(hl):dech:lde,(hl):dech:pushde
- ldd,(hl):dech:lde,(hl):dech:pushde
- ldd,(hl):dech:lde,(hl):dech:pushde
- ldd,(hl):dech:lde,(hl):dech:pushde
- ldd,(hl):dech:lde,(hl):dech:pushde
- ldd,(hl):dech:lde,(hl):dech:pushde
- ldd,(hl):dech:lde,(hl):dech:pushde
- ldd,(hl):dech:lde,(hl):dech:pushde
- ldd,(hl):dech:lde,(hl):dech:pushde
- ldd,(hl):dech:lde,(hl):dech:pushde
- ldd,(hl):dech:lde,(hl):dech:pushde
- ldd,(hl):dech:lde,(hl):dech:pushde
- ldd,(hl):dech:lde,(hl):dech:pushde
- ldd,(hl):dech:lde,(hl):dech:pushde
- ldd,(hl):dech:lde,(hl):pushde
+ ld d,(hl):dec h:ld e,(hl):dec h:push de
+ ld d,(hl):dec h:ld e,(hl):dec h:push de
+ ld d,(hl):dec h:ld e,(hl):dec h:push de
+ ld d,(hl):dec h:ld e,(hl):dec h:push de
+ ld d,(hl):dec h:ld e,(hl):dec h:push de
+ ld d,(hl):dec h:ld e,(hl):dec h:push de
+ ld d,(hl):dec h:ld e,(hl):dec h:push de
+ ld d,(hl):dec h:ld e,(hl):dec h:push de
+ ld d,(hl):dec h:ld e,(hl):dec h:push de
+ ld d,(hl):dec h:ld e,(hl):dec h:push de
+ ld d,(hl):dec h:ld e,(hl):dec h:push de
+ ld d,(hl):dec h:ld e,(hl):dec h:push de
+ ld d,(hl):dec h:ld e,(hl):dec h:push de
+ ld d,(hl):dec h:ld e,(hl):dec h:push de
+ ld d,(hl):dec h:ld e,(hl):dec h:push de
+ ld d,(hl):dec h:ld e,(hl):push de
             endm
 
 ADDHLHL     macro

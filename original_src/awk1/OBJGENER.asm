@@ -267,9 +267,9 @@ DOPGEN
             or   c
             jrnz DGN2
 
- ld   a,l:cpSPACEBS:jrncDGN2
- ld   a,e:cpSPACEBS:jrncDGN2
- ld   a,b:cpSPACEBS:jrncDGN2
+ ld   a,l:cp SPACEBS:jrnc DGN2
+ ld   a,e:cp SPACEBS:jrnc DGN2
+ ld   a,b:cp SPACEBS:jrnc DGN2
 
             jp   STATGEN_
 

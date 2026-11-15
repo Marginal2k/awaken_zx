@@ -48,8 +48,11 @@ def main():
     refmap = {'AwakenV0.2Demo.trd/Awakenv02.trd': 'v02', 'AwakenV0.1Demo.trd/AWAKEN_D.TRD': 'v01',
               'AWAKEN_D/AWAKEN_D.SCL': 'awaken_d', 'AWAK_SDC/AWAK_SDC.SCL': 'awak_sdc',
               'SPACE/SPACE.SCL': 'space', 'SWH_000/SWH_000.SCL': 'swh_000'}
-    for k, v in refmap.items():
-        disks[v] = ROOT + '/reference/' + k
+    for k, v in refmap.items():       # the released demos (zxart.ee) are optional: not in the repository
+        if os.path.exists(ROOT + '/reference/' + k):
+            disks[v] = ROOT + '/reference/' + k
+        else:
+            print('note: reference/%s not present (demo releases are optional, see README)' % k)
     allcat = {}
     for dn, p in disks.items():
         img, kind = load_image(p)

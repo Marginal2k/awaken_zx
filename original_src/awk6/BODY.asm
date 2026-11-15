@@ -443,7 +443,7 @@ OCOLOR      ld   c,0
             jp   Nbs1
 Nbs3
             ld   a,d:exa
- rept7:lda,(bc):incc:ld(de),a:incd:endr
+ rept 7:ld a,(bc):inc c:ld (de),a:inc d:endr
 
             ld   a,(bc)
             inc  bc

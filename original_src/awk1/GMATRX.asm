@@ -458,7 +458,7 @@ MULS6
             ld   c,a
             ld   h,c
             ld   l,c
- rept7:rlb:jrnc$+4:addhl,de:adca,c:addhl,hl:adca,a:endr
+ rept 7:rl b:jrnc $+4:add hl,de:adc a,c:add hl,hl:adc a,a:endr
             rl   b
             jrnc $+4
             add  hl,de
@@ -469,7 +469,7 @@ MULS6
             ld   h,c
             adc  hl,hl
 ANBY2       ld   a,0
- rept6:rla:jrnc$+6:addiy,de:adchl,bc:ADDIYIY:adchl,hl:endr
+ rept 6:rla:jrnc $+6:add iy,de:adc hl,bc:ADDIYIY:adc hl,hl:endr
             ld   a,yh
             add  a,a
             adc  hl,hl

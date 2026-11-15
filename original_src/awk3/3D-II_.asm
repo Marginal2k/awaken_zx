@@ -1491,10 +1491,10 @@ LDA7A       equ  $-#0002
             rla:jrc $+36
             rla:jp $+39
             add  hl,de:adc a,c
- rept6:addhl,hl:rla:jrnc$+4:addhl,de:adca,c:endr
+ rept 6:add hl,hl:rla:jrnc $+4:add hl,de:adc a,c:endr
             ld   c,a:ld a,b
             ld   b,c:ld c,0
- rept8:addhl,hl:rla:jrnc$+4:addhl,de:adca,c:endr
+ rept 8:add hl,hl:rla:jrnc $+4:add hl,de:adc a,c:endr
             ld   e,a:ld d,b
             EXD
 XFBE1_1
@@ -1543,10 +1543,10 @@ XFBE1_1
             rla:jrc $+36
             rla:jp $+39
             add  hl,de:adc a,c
- rept6:addhl,hl:rla:jrnc$+4:addhl,de:adca,c:endr
+ rept 6:add hl,hl:rla:jrnc $+4:add hl,de:adc a,c:endr
             ld   c,a:ld a,b
             ld   b,c:ld c,0
- rept8:addhl,hl:rla:jrnc$+4:addhl,de:adca,c:endr
+ rept 8:add hl,hl:rla:jrnc $+4:add hl,de:adc a,c:endr
             ld   e,a:ld d,b
             EXD
             exa
@@ -1629,42 +1629,42 @@ LD030_1
             jp   XFBE1_1
 
             ld   h,a
- rept7:addhl,de:addhl,hl:jrnc$+3:endr
+ rept 7:add hl,de:add hl,hl:jrnc $+3:endr
             add  hl,de
             EXD
             ld   l,h
             jp   XFBE1_1
 
             ld   h,a
- rept6:addhl,de:addhl,hl:jrnc$+3:endr
+ rept 6:add hl,de:add hl,hl:jrnc $+3:endr
             add  hl,de
             EXD
             ld   l,h
             jp   XFBE1_1
 
             ld   h,a
- rept5:addhl,de:addhl,hl:jrnc$+3:endr
+ rept 5:add hl,de:add hl,hl:jrnc $+3:endr
             add  hl,de
             EXD
             ld   l,h
             jp   XFBE1_1
 
             ld   h,a
- rept4:addhl,de:addhl,hl:jrnc$+3:endr
+ rept 4:add hl,de:add hl,hl:jrnc $+3:endr
             add  hl,de
             EXD
             ld   l,h
             jp   XFBE1_1
 
             ld   h,a
- rept3:addhl,de:addhl,hl:jrnc$+3:endr
+ rept 3:add hl,de:add hl,hl:jrnc $+3:endr
             add  hl,de
             EXD
             ld   l,h
             jp   XFBE1_1
 
             ld   h,a
- rept2:addhl,de:addhl,hl:jrnc$+3:endr
+ rept 2:add hl,de:add hl,hl:jrnc $+3:endr
             add  hl,de
             EXD
             ld   l,h
@@ -1765,7 +1765,7 @@ LD030_2
             ret
 _1
             ld   h,a
- rept7:addhl,de:addhl,hl:jrnc$+3:endr
+ rept 7:add hl,de:add hl,hl:jrnc $+3:endr
             add  hl,de
             EXD
             ld   l,h
@@ -1784,7 +1784,7 @@ _1
             ret
 _2
             ld   h,a
- rept6:addhl,de:addhl,hl:jrnc$+3:endr
+ rept 6:add hl,de:add hl,hl:jrnc $+3:endr
             add  hl,de
             EXD
             ld   l,h
@@ -1803,7 +1803,7 @@ _2
             ret
 _3
             ld   h,a
- rept5:addhl,de:addhl,hl:jrnc$+3:endr
+ rept 5:add hl,de:add hl,hl:jrnc $+3:endr
             add  hl,de
             EXD
             ld   l,h
@@ -1822,7 +1822,7 @@ _3
             ret
 _4
             ld   h,a
- rept4:addhl,de:addhl,hl:jrnc$+3:endr
+ rept 4:add hl,de:add hl,hl:jrnc $+3:endr
             add  hl,de
             EXD
             ld   l,h
@@ -1841,7 +1841,7 @@ _4
             ret
 _5
             ld   h,a
- rept3:addhl,de:addhl,hl:jrnc$+3:endr
+ rept 3:add hl,de:add hl,hl:jrnc $+3:endr
             add  hl,de
             EXD
             ld   l,h
@@ -1860,7 +1860,7 @@ _5
             ret
 _6
             ld   h,a
- rept2:addhl,de:addhl,hl:jrnc$+3:endr
+ rept 2:add hl,de:add hl,hl:jrnc $+3:endr
             add  hl,de
             EXD
             ld   l,h

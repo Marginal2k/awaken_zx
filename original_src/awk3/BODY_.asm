@@ -210,14 +210,14 @@ OHIDE
             ld   hl,#4020
             ld   b,#0C
 OH1
- ldsp,hl:inch:exx:ldh,b:HIDEM:exx
- ldsp,hl:inch:exx:ldh,b:incl:HIDEM:exx
- ldsp,hl:inch:exx:ldh,b:incl:HIDEM:exx
- ldsp,hl:inch:exx:ldh,b:incl:HIDEM:exx
- ldsp,hl:inch:exx:ldh,b:incl:HIDEM:exx
- ldsp,hl:inch:exx:ldh,b:incl:HIDEM:exx
- ldsp,hl:inch:exx:ldh,b:incl:HIDEM:exx
- ldsp,hl:inch:exx:ldh,b:incl:HIDEM:incl:exx
+ ld sp,hl:inc h:exx:ld h,b:HIDEM:exx
+ ld sp,hl:inc h:exx:ld h,b:inc l:HIDEM:exx
+ ld sp,hl:inc h:exx:ld h,b:inc l:HIDEM:exx
+ ld sp,hl:inc h:exx:ld h,b:inc l:HIDEM:exx
+ ld sp,hl:inc h:exx:ld h,b:inc l:HIDEM:exx
+ ld sp,hl:inc h:exx:ld h,b:inc l:HIDEM:exx
+ ld sp,hl:inc h:exx:ld h,b:inc l:HIDEM:exx
+ ld sp,hl:inc h:exx:ld h,b:inc l:HIDEM:inc l:exx
             dec  hl
             ld a,l:add a,32:ld l,a
             inc  hl

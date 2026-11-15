@@ -3,7 +3,7 @@
 
 MOVEU:
             call TOUCH
-            call SETCONTROL
+            call ControlsHandler
 
 CALCSTEP:   ld   a,(SM_13+1)
 BFC1:       dw   0
@@ -67,7 +67,7 @@ LM1:
             ret
 
 
-SETCONTROL:
+ControlsHandler:                ; orig: SETCONTROL - управление полётом: опрос клавиш
 
 ; УПРАВЛЕНИЕ ПОЛЕТОМ
 ; ВЫЗОВ ПРОЦЕДУР ОБРАБОТКИ КЛАВИШ УПРАВЛЕН
@@ -122,9 +122,9 @@ JFLAG2:     ld   c,0
             jr   nz,.JFG
             cp   c
             jr   nc,.JFG
-            call KILLTRASH
+            call KillTrash
             ld   hl,MXSPD
-            ld   (MAXSPEED+1),hl
+            ld   (SetMaxSpeed+1),hl
             ld   hl,MXSPD
             ld   (Speed),hl
             ld   a,1
@@ -222,32 +222,32 @@ KL6:
 
 
 ADCON:
-            dw   UPP                ;Вверх
-            dw   DOWNN              ;Вниз
-            dw   LEFTF              ;Влево
-            dw   RIGHTF             ;Вправо
-            dw   LEFTT              ;Влево крен
-            dw   RIGHTT             ;Вправо крен
-            dw   FLINE2             ;Лазер
-            dw   GAZ                ;Набор скорости
-            dw   TORMOZ             ;Сброс скорости
+            dw   PitchUp                ;Вверх
+            dw   PitchDown              ;Вниз
+            dw   TurnLeft              ;Влево
+            dw   TurnRight             ;Вправо
+            dw   RollLeft              ;Влево крен
+            dw   RollRight             ;Вправо крен
+            dw   FireButton             ;Лазер
+            dw   Throttle                ;Набор скорости
+            dw   Brake             ;Сброс скорости
             dw   BORT               ;Бортовой компьютер
-            dw   NAVOD              ;Наведение ракеты
-            dw   CLRMARK            ;Забыть наведения
-            dw   LAUNG1             ;Пуск ракеты 1
-            dw   LAUNG2             ;Пуск ракеты 2
-            dw   LAUNG3             ;Пуск ракеты 3
-            dw   JUMPDRIVE          ;Форсаж
-            dw   FREECONTROL        ;Система свободного полета
-            dw   TURNLIGHTER        ;Система подсветки
-            dw   RETURNSYS          ;Система возврата
-            dw   ZAHWAT             ;Силовой лучь
-            dw   UNROKET            ;Противоракетная система
-            dw   DROPCR             ;Сброс контейнера
-            dw   DROPMINE           ;Сброс мины
-            dw   HIPER              ;Гипер прыжок, +CS к звезде
+            dw   MissileGuidanceMode              ;Наведение ракеты
+            dw   CancelTargets            ;Забыть наведения
+            dw   LaunchMissile1             ;Пуск ракеты 1
+            dw   LaunchMissile2             ;Пуск ракеты 2
+            dw   LaunchMissile3             ;Пуск ракеты 3
+            dw   PlayerAfterburner          ;Форсаж
+            dw   FreeFlightControl        ;Система свободного полета
+            dw   ToggleLight        ;Система подсветки
+            dw   ReturnSystem          ;Система возврата
+            dw   TargetLockToggle             ;Силовой лучь
+            dw   AntiMissile            ;Противоракетная система
+            dw   DropCargoKey             ;Сброс контейнера
+            dw   DropMineKey           ;Сброс мины
+            dw   HyperJump              ;Гипер прыжок, +CS к звезде
             dw   DROPDROID          ;Выпуск дроида
-            dw   FRONTBACK          ;Передний и задний вид
+            dw   FrontBackView          ;Передний и задний вид
 
 
 ;---------------------------------------
@@ -260,7 +260,7 @@ DROPDROID:
 ;-------------------------
 ; БЛОК ОБРАБОТКИ РАКЕТ
 
-LAUNG1:
+LaunchMissile1:                 ; orig: LAUNG1 - пуск ракеты 1
 ; ПУСК РАКЕТЫ 1
 ; ЕСЛИ ПАУСА ЕЩЕ НЕ ПРОЩЛА
             ret  nz
@@ -275,7 +275,7 @@ LAUNG1:
 RTN2:
             ld   hl,EFF13
             ld   (SFXA+1),hl
-            call NEWROKET
+            call NewMissile
 ; ЕСЛИ НЕТ ЦЕЛИ ИЛИ
             ret  nc
             ld   hl,0-SUBJ+TYPE
@@ -285,7 +285,7 @@ RTN2:
             call AROKS
             jp   RAIN
 
-LAUNG2:
+LaunchMissile2:                 ; orig: LAUNG2 - пуск ракеты 2
 ; ПУСК РАКЕТЫ 1
             ret  nz
             ld   a,(ROKETN2)
@@ -297,7 +297,7 @@ LAUNG2:
             ld   (ROKETN2),a
             jr   RTN2
 
-LAUNG3:
+LaunchMissile3:                 ; orig: LAUNG3 - пуск ракеты 3
 ; ПУСК РАКЕТЫ 1
             ret  nz
             ld   a,(ROKETN3)
@@ -309,14 +309,14 @@ LAUNG3:
             ld   (ROKETN3),a
             jr   RTN2
 
-NOCELS:
+ShowNoTarget:                   ; orig: NOCELS - сообщение "нет цели"
 ; ВЫВОД СООБЩЕНИЯ "НЕТ ЦЕЛИ"
             MESAG _NOTARGET
             ret
 RTN1:
 ; ПРОВЕРКА НА НЕТРОКЕТ И НА НЕТ ЦЕЛИ
             inc  a
-            jr   z,NOCELS
+            jr   z,ShowNoTarget
             ld   a,5
             ld   (COUNTER+1),a
             call AROKS
@@ -340,7 +340,7 @@ RAIN:
 ; ОСТАЛОСЬ
             MESAG _HAVE
             call AROKS
-            call MNUMS_
+            call PrintNumbersInOrder
 ; РАКЕТ
             MESAG _ROKET
             ret
@@ -358,7 +358,7 @@ AROKS:
 ;----------------------------
 
 
-HIPER:
+HyperJump:                      ; orig: HIPER - вызов гиперпрыжка
 ; ВЫЗОВ ГИПЕР ПРЫЖКА
 ; ПРОВЕРКА ПРЫЖКА НА СИСТЕМУ НАХОЖДЕНИЯ
             ld   hl,(FUEL)
@@ -428,7 +428,7 @@ HIPER:
             ret
 
 
-UNROKET:
+AntiMissile:                    ; orig: UNROKET - противоракетная система
 ; ПРОТИВОРАКЕТНАЯ СИСТЕМА
             ld   a,(COUNTER+1)
             and  a
@@ -504,7 +504,7 @@ STU1:
             ret
 
 
-CLRMARK:
+CancelTargets:                  ; orig: CLRMARK - отмена захвата целей
 ; ОТМЕНИТЬ ЗАХВАТ ЦЕЛЕЙ
             ld   a,(COUNTER+1)
             and  a
@@ -521,7 +521,7 @@ CLRMARK:
             ret
 
 
-NAVOD:
+MissileGuidanceMode:            ; orig: NAVOD - режим наведения ракеты
 ; РЕЖИМ НАВЕДЕНИЯ РАКЕТЫ
             ld   a,(COUNTER+1)
             and  a
@@ -544,16 +544,16 @@ NAVOD_:
             ret
 
 
-FLINE2:
+FireButton:                     ; orig: FLINE2 - кнопка FIRE в разных режимах
 ; КНОПКА FIRE В РАЗНЫХ РЕЖИМАХ
             ld   a,0
             and  a
-            jp   z,FLINE
+            jp   z,DrawPlayerLaser
 ; ЗАХВАТ
             ld   a,(ROKETN1)
             or   a
             ret  m
-            call GETADR
+            call ObjAddrFromIndex
             inc  l
             ld   a,(hl)
             cp   #80
@@ -735,7 +735,7 @@ TNN:
             db   0                  ;TN
 
 
-ZAHWAT:
+TargetLockToggle:               ; orig: ZAHWAT - вкл/выкл режим захвата цели
 ; ВКЛ/ВЫКЛ РЕЖИМ ЗАХВАТА ОБЪЕКТА
             ld   a,(COUNTER+1)
             and  a
@@ -747,9 +747,9 @@ ZAHWAT:
             ret  z
             ld   hl,EFF13
             ld   (SFXA+1),hl
-            ld   a,(FLINE2+1)
+            ld   a,(FireButton+1)
             xor  1
-            ld   (FLINE2+1),a
+            ld   (FireButton+1),a
             ld   a,#FF
             ld   (ROKETN1),a
             ld   (ROKETN2),a
@@ -765,7 +765,7 @@ ZAHWAT:
             jp   NAVOD_
 
 
-TURNLIGHTER:
+ToggleLight:                    ; orig: TURNLIGHTER - переключение подсветки
 ; ПЕРЕКЛЮЧЕНИЕ ПОДСВЕТКИ
             ld   a,(COUNTER+1)
             and  a
@@ -786,7 +786,7 @@ TURNLIGHTER:
             ret
 
 
-JUMPDRIVE:
+PlayerAfterburner:              ; orig: JUMPDRIVE - форсаж двигателя игрока
 ; ФОРСАЖ ДВИГАТЕЛЯ
             ld   a,(CALCSTEP)
             cp   #C9
@@ -841,7 +841,7 @@ JUMPDRIVE:
 ; МИН. РАССТОЯНИЕ ДЛЯ ДЖАМПА
             cp   JMIN
             jp   nc,.JJD1
-            jp   KILLTRASH
+            jp   KillTrash
 AFUEL:
             ld   hl,FUEL
             ld   a,(hl)
@@ -854,7 +854,7 @@ FUEL_:
             call AFUEL
             ld   c,a
             dec  c
-            jp   m,KILLTRASH
+            jp   m,KillTrash
             ld   a,0
             inc  a
             ld   ($-2),a
@@ -878,9 +878,9 @@ FUEL_:
             ld   a,#88
             rrca
             ld   ($-2),a
-            call c,TRASHINI
+            call c,InitTrash
             ld   hl,#1000
-            ld   (MAXSPEED+1),hl
+            ld   (SetMaxSpeed+1),hl
             ld   b,#10
             push bc
             call GAZ_
@@ -889,7 +889,7 @@ FUEL_:
             ret
 
 
-FREECONTROL:
+FreeFlightControl:              ; orig: FREECONTROL - свободный полёт
 ; СВОБОДНЫЙ ПЛЕТ
             ld   a,(COUNTER+1)
             and  a
@@ -899,7 +899,7 @@ FREECONTROL:
             ld   a,(SSWPOL)
             inc  a
             ret  z
-            ld   hl,(MAXSPEED+1)
+            ld   hl,(SetMaxSpeed+1)
             ld   bc,MXSPD
             SUB_BC
 ; ЕСЛИ В РЕЖИМЕ ДЖАМП
@@ -922,7 +922,7 @@ FREECONTROL:
             ret
 
 
-DROPCR:
+DropCargoKey:                   ; orig: DROPCR - сброс груза
 ; СБРОС ГРУЗА
             ld   a,(COUNTER+1)
             and  a
@@ -946,12 +946,12 @@ DROPCR:
             add  hl,de
 ;a-TONNS,l-NUMBER OF TOWAR
             ld   ix,PLAYER
-            call NEWCARGO
+            call SpawnCargo
             MESAG _DROPCARGO
             ret
 
 
-DROPMINE:
+DropMineKey:                    ; orig: DROPMINE - сброс мины
 ; СБРОС МИНЫ
             ld   a,(COUNTER+1)
             and  a
@@ -968,7 +968,7 @@ DROPMINE:
             ld   a,1
             ld   l,#80
             ld   ix,PLAYER
-            call NEWCARGO
+            call SpawnCargo
             MESAG _DROPMINE
             ret
 .DM1
@@ -976,7 +976,7 @@ DROPMINE:
             ret
 
 
-RETURNSYS:
+ReturnSystem:                   ; orig: RETURNSYS - система возврата
 ; СИСТЕМА ВОЗВРАТА
             ld   a,(COUNTER+1)
             and  a
@@ -994,10 +994,10 @@ RETURNSYS:
             ld   (WHERE),hl
             ld   hl,(PLACE+2)
             ld   (WHERE+2),hl
-            jp   HIPER
+            jp   HyperJump
 
 
-FRONTBACK:
+FrontBackView:                  ; orig: FRONTBACK - задний/передний виды
 ; ЗАДНИЙ ПЕРЕДНИЙ ВИДЫ
             ld   a,(COUNTER+1)
             and  a
@@ -1006,8 +1006,8 @@ FRONTBACK:
             ld   (SFXA+1),hl
             ld   a,20
             ld   (COUNTER+1),a
-            call TURNMATR
-            call GGALD
+            call TurnMatrix
+            call GenAllStars
             ld   a,(BFC1)
             and  a
             jr   z,.BK1
@@ -1028,7 +1028,7 @@ FRONTBACK:
             ret
 
 
-GAZ:
+Throttle:                       ; orig: GAZ - прибавить газ
             ld   a,(JFLAG2+1)
             or   a
             ret  nz
@@ -1039,7 +1039,7 @@ GAZ_:
             ld   hl,(Speed)         ;SPEED
             ld   de,8
             add  hl,de
-MAXSPEED:   ld   de,MXSPD
+SetMaxSpeed:   ld   de,MXSPD  ; orig: MAXSPEED - максимальная скорость
             SUB_DE
             add  hl,de
             ret  p
@@ -1049,7 +1049,7 @@ MAXSPEED:   ld   de,MXSPD
             ret
 
 
-TORMOZ:
+Brake:                          ; orig: TORMOZ - торможение
             ld   a,(CALCSTEP)
             cp   #3A
             ret  nz
@@ -1070,7 +1070,7 @@ TORMOZ:
             ret
 
 
-LEFTT:
+RollLeft:                       ; orig: LEFTT - поворот влево
             ld   a,1
             ld   (KL6+1),a
 LET1:       ld   a,0
@@ -1089,7 +1089,7 @@ LET1:       ld   a,0
             ret
 
 
-RIGHTT:
+RollRight:                      ; orig: RIGHTT - поворот вправо
             ld   a,1
             ld   (KL6+1),a
 RIT1:       ld   a,0
@@ -1108,7 +1108,7 @@ RIT1:       ld   a,0
             ret
 
 
-LEFTF:
+TurnLeft:                       ; orig: LEFTF - вращение влево
             ld   a,1
             ld   (NOPWR2+1),a
 LEF1:       ld   a,0
@@ -1127,7 +1127,7 @@ LEF1:       ld   a,0
             ret
 
 
-RIGHTF:
+TurnRight:                      ; orig: RIGHTF - вращение вправо
             ld   a,1
             ld   (NOPWR2+1),a
 RIF1:       ld   a,0
@@ -1146,7 +1146,7 @@ RIF1:       ld   a,0
             ret
 
 
-UPP:
+PitchUp:                        ; orig: UPP - вверх
             ld   a,1
             ld   (KL3+1),a
 UPP1:       ld   a,0
@@ -1165,7 +1165,7 @@ UPP1:       ld   a,0
             ret
 
 
-DOWNN:
+PitchDown:                      ; orig: DOWNN - вниз
             ld   a,1
             ld   (KL3+1),a
 DWN1:       ld   a,0

@@ -1,4 +1,4 @@
-MNUMS_:
+PrintNumbersInOrder:            ; orig: MNUMS_ - вывод номеров по порядку
             ex   af,af'
             PAGE_ CONTR
             ex   af,af'
@@ -7,13 +7,13 @@ MNUMS_:
             ret
 
 
-PNUM:
+PrintNumScroll:                 ; orig: PNUM - вывод числа в компе со скроллом
 ; ВЫВОД ЧИСЛА В КОМПЕ СО СКРОЛОМ
 ; В a-ЧИСЛО
             ex   af,af'
             PAGE_ CONTR
             ex   af,af'
-            call PRINTNUM
+            call PrintNumber
             call SCROLL
 
             ld   hl,(CORD)
@@ -21,13 +21,13 @@ PNUM:
             ld   (hl),0
             PAGE___NOARG
             ret
-PNUM2:
+PrintNumNoScroll:               ; orig: PNUM2 - вывод числа в компе без скролла
 ; ВЫВОД ЧИСЛА В КОМПЕ БЕЗ СКРОЛА
 ; А-ЧИСЛО
             ex   af,af'
             PAGE_ CONTR
             ex   af,af'
-            call PRINTNUM
+            call PrintNumber
 
             ld   hl,(CORD)
             inc  hl
@@ -51,7 +51,7 @@ MESAG_:
             ret
 
 
-GAMEOVER:
+GameOver:                       ; orig: GAMEOVER - конец игры (гибель)
 ; АУТРО ПО ГАМОВЕРУ
             MESAG _GAMEOVER
             ld   hl,EFF0
@@ -95,11 +95,11 @@ GAMEOVER:
             jr   .EBEG
 
 
-NEWROKET:
+NewMissile:                     ; orig: NEWROKET - создать ракету
 ; ИНИТ РАКЕТЫ
 ; В c-ОБЪЕКТ АТАКИ
             ld   a,c
-            call GETADR
+            call ObjAddrFromIndex
             inc  l
             ld   a,(hl)
             cp   #80
@@ -116,7 +116,7 @@ NEWROKET:
             ld   d,h
             ld   e,l
             ld   bc,400
-            call RECORD
+            call ToShipCoords
             exx
             pop  bc
             ld   a,1
@@ -128,7 +128,7 @@ NEWROKET:
             jr   z,$+4
             ld   a,MAXREN
             ld   b,SPLAYER
-RKN11:
+InitMissile:                    ; orig: RKN11 - инициализация ракеты
 ; ИНИТ РАКЕТЫ
 ;HL'-X,DE'-Y,BC'-Z
 ;c-SUBJECT
@@ -137,7 +137,7 @@ RKN11:
             ld   (ENROK+3),a
 
             push bc
-            call FINDFREE
+            call FindFreeSlot
             pop  bc
             ret  z
 
@@ -172,21 +172,21 @@ ENROK:      ld   (iy+ENERGY),0
 ; ПРЕДУПРЕЖДЕНИЕ ОБЪЕКТА АТАКИ О РАКЕТНОМ
 ; УДАРЕ
             ld   a,c
-            call GETADR
+            call ObjAddrFromIndex
             ld   a,l
             add  a,ACTN
             ld   l,a
             set  1,(hl)
             dec  l
             EXD
-            call GETINDY
+            call ObjIndexFromIY
 ; НОМЕР РАКЕТЫ В СПИСКЕ
             ld   (de),a
             scf
             ret
 
 
-REPANEL:
+RedrawPanel:                    ; orig: REPANEL - перерисовка индикаторов панели
 ; ВЫВОД ИНДИКАТОРОВ ПАНЕЛ
             PAGE___NOARG
             ld   a,1
@@ -197,7 +197,7 @@ REPANEL:
             ld   (FTEMPE+1),a
             ld   (FFUEL+1),a
 ; ДАТАЛИНИИ
-            call DATALINES
+            call DrawDataLines
             PAGE_ CONTR
             ld   hl,(TIME+2)
             ld   de,(TIME)
@@ -206,18 +206,18 @@ REPANEL:
             jp   ZEROUT
 
 
-KILLTRASH:
+KillTrash:                      ; orig: KILLTRASH - убрать весь мусор форсажа
 ; УБРТЬ ВСЕ ТРЕШИ
             ld   d,#14
-            call FINDOBJ
+            call FindObjectByType
             ret  z
             call DEATHY
-            jr   KILLTRASH
+            jr   KillTrash
 
 
-TRASHINI:
+InitTrash:                      ; orig: TRASHINI - инициализация мусора при ускорении
 ; ИНИТ МУСОР ПРИ УСКОРЕНИИ
-            call FINDFREE
+            call FindFreeSlot
             ret  z
             call RNDL1
             xor  a
@@ -250,7 +250,7 @@ TRASHINI:
             ld   bc,30000
             jr   z,$+5
             ld   bc,0-30000
-            call RECORD
+            call ToShipCoords
             ld   (iy+0),l
             ld   (iy+1),h
             ld   (iy+2),e
@@ -273,7 +273,7 @@ TRASHINI:
             ld   (iy+MSPD),2
             ret
 
-RNDTURN:
+RandomTurns:                    ; orig: RNDTURN - случайные повороты
 ; СЛУЧАЙНЫЕ ПОВОРТЫ
             call RND
             ld   a,h
@@ -314,7 +314,7 @@ RNDTURN:
             ret
 
 
-ONWAY:
+AimAtObject:                    ; orig: ONWAY - наведение носа объекта на другой объект
 ; НАВЕДЕНИЕ НОСА ОБЪЕКТА НА ДР. ОБЪЕКТ
 ;hl,bc,de-X2,Y1,X1
 ;HL',BC',DE'-Y2,Z1,Z2
@@ -324,11 +324,11 @@ ONWAY:
             push de
             push bc
             ld   a,(ix+SUBJ)
-            call GETADRY
+            call ObjAddrFromIndexIY
             ld   a,(iy+1)
             cp   #80
             jr   z,.NONW
-            call RASTOY
+            call DistanceHigh
 ; РАССТОЯНИЕ ДЛЯ СВОРАЧИВАНИЯ
             cp   MINRAS
             jr   c,TURNUP
@@ -337,7 +337,7 @@ ONWAY:
             pop  de
             pop  hl
 ONWAY2:
-            call WAYUNGLE
+            call AimAngles
             ld   a,(ix+BETA)
             ld   d,a
             sub  b
@@ -398,7 +398,7 @@ TURNUP:
             ret
 
 
-CHNPOL:
+CheckPolicePair:                ; orig: CHNPOL - не менее двух полицейских на нападающего
 ; ПРОВЕРКА НА НАЛИЧИЕ НЕ МЕНЕЕ ДВУХ
 ; ПОЛИЦЕЙСКИХ НА НАПАДАЮЩЕГО
             ld   b,0
@@ -447,7 +447,7 @@ CHNPOL:
             ret
 
 
-CHARCO:
+MoveMissiles:                   ; orig: CHARCO - изменение координат ракет
 ; ИЗМЕНЕНИЕ КООРДИНАТ РАКЕТ
             SUB_BC
             ld   d,h
@@ -481,13 +481,13 @@ CHARCO:
             exx
             ret
 
-STABL:
+HitStatusTable:                 ; orig: STABL - таблица индексирования статуса при попадании
 ; ТАБЛИЦА ИНДЕКСИРОВАНИЕ СТАТУСА ПРИ
 ; ПОПАДАНИИ В ОПР. ОБЪЕКТ
             db   #FA,10,15,18,9,#FA,#FA,#FA,6
             ds   7,0
 
-SHUT:
+PlayerHit:                      ; orig: SHUT - регистрация попадания игрока в объект
 ; РЕГИСТРАЦИЯ ПОПАДАНИЯ ИГРОКА В ОБЪЕКТ
 ;  АДРЕС ОБЪЕКТА
             ld   hl,0
@@ -510,7 +510,7 @@ SHUT:
 ; ТИП ОБЪЕКТА
             ld   b,(hl)
             ld   hl,0
-            ld   (SHUT+1),hl
+            ld   (PlayerHit+1),hl
 ; ЗВУК ПОПАДАНИЯ
             ld   hl,EFF21
             ld   (SFXA+1),hl
@@ -526,12 +526,12 @@ CHSTAT_:
             ret  nc
             ld   l,b
             ld   h,0
-            ld   bc,STABL
+            ld   bc,HitStatusTable
             add  hl,bc
             ld   c,(hl)
 ; ПО ТИПУ ИЗ ТАБЛИЦЫ ВЗЯЛИ ИНДЕКСИРОВАНИЕ
 ; СТАТУСА
-CHSTATUS:
+ChangeStatus:                   ; orig: CHSTATUS - смена статуса игрока
             ld   a,(STATGEN)
             and  a
             jr   z,$+10
@@ -558,7 +558,7 @@ CHSTATUS:
             ret
 
 
-FLINE:
+DrawPlayerLaser:                ; orig: FLINE - рисование лазера игрока
 ; РИСОВАНИЕ ЛАЗЕРА ИГРОКА
             ld   a,0
 PSTLI:      add  a,50
@@ -609,7 +609,7 @@ PSTLI:      add  a,50
             jp   DRAWL1
 
 
-DROPCARGO:
+DropCargo:                      ; orig: DROPCARGO - бросить груз
 ; БРОСИТЬ ГРУЗ
             ld   a,(ix+SETUP)
             ld   c,a
@@ -641,12 +641,12 @@ DROPCARGO:
             inc  a                  ;TONS
 
 
-NEWCARGO:
+SpawnCargo:                     ; orig: NEWCARGO - создать контейнер с грузом или мину
 ;a-TONNS,l(0-6 BITS)-TYPE OF TOWAR
 ;7 bitl- 1-MINA, 0-CARGO
             ld   b,l
             ex   af,af'
-            call FINDFREE
+            call FindFreeSlot
             ret  z
             exx
             ld   l,(ix+0)
@@ -699,7 +699,7 @@ NEWCARGO:
             ld   (iy+TOWR),b
 
 ; ЗАНОСИМ ГРУЗЫ В ОТД. БУФЕР
-            call GETIND
+            call ObjIndexFromHL
             ld   e,a
             ld   hl,CARGS-1
 .NXTCA
@@ -715,7 +715,7 @@ NEWCARGO:
 .CHCA
 ; ПРОВЕРКА ГРУЗА НА СУЩЕСТВОВАНИЕ
             exx
-            call GETADR
+            call ObjAddrFromIndex
             inc  l
             ld   a,(hl)
             cp   #80
@@ -724,7 +724,7 @@ NEWCARGO:
             ld   (hl),e
             ret
 
-NEWORD:
+NewOrder:                       ; orig: NEWORD - новое задание в зависимости от типа
 ; НОВОЕ ЗАДАНИЕ В ЗАВИСИМОСТИ ОТ ТИПА
             ld   a,(ix+TYPE)
             sla  a
@@ -784,7 +784,7 @@ ARMY_:
 TOUFO:
             call TOSUBJ
             ret  nz
-            call FINDUFO
+            call FindUfo
             ret  z
             ld   (ix+SUBJ),a
             ret
@@ -796,7 +796,7 @@ UFO__:
             ld   (ix+MODE),C_FIGHT
             ld   (ix+SUBJ),#FF
             ret  c
-            call FINDALL
+            call FindAnyNotUfo
             ret  z
             ld   (ix+SUBJ),a
             ret
@@ -833,7 +833,7 @@ HUNTE:
             ld   (ix+MODE),C_FIGHT
             ld   (ix+SUBJ),#FF
             ret  c
-            call FINDPIRAT
+            call FindPirate
             ret  z
             ld   (ix+SUBJ),a
             ret
@@ -857,7 +857,7 @@ PWNPP:      cp   6
             ld   (ix+MODE),C_FIGHT
             ld   (ix+SUBJ),#FF
             jr   c,.POLIC2
-            call FINDPIRAT
+            call FindPirate
             ret  z
             ld   (ix+SUBJ),a
             ret
@@ -886,7 +886,7 @@ PWNPM:      cp   #70
 TOPEACE:
             ld   (ix+SUBJ),#FF
             ret  c
-            call FINDPEACE
+            call FindPeaceful
             ret  z
             ld   (ix+SUBJ),a
             ld   (ix+MODE),C_FIGHT
@@ -913,7 +913,7 @@ DATAL_:
             PAGE___NOARG
             ret
 
-DATALINES:
+DrawDataLines:                  ; orig: DATALINES - вызов рисования даталиний
 ; ВЫЗОВ РИСОВАНИЯ ДАТАЛИНИЙ
 FSHILD:     ld   a,0
             and  a
@@ -1022,7 +1022,7 @@ MVSTT:
             ret
 
 
-NWSUN:
+NewSun:                         ; orig: NWSUN - новое солнце
 ;NEW SUN
             ld   a,(NOSUN)
             cp   2
@@ -1036,7 +1036,7 @@ NWSUN:
             ld   a,#FF
             ld   (GNUM+1),a
 
-BLACKSUN:
+MakeBlackHole:                  ; orig: BLACKSUN - генерация чёрной дыры
 ; ГЕНЕРАЦИЯ ЧЕРНОЙ ДЫРЫ
             call RNDL9
             ld   a,h
@@ -1054,7 +1054,7 @@ BLACKSUN:
             jp   MVPLN
 
 
-SUNB:
+BlackHoleControl:               ; orig: SUNB - управление чёрной дырой
 ; УПРАВЛЕНИЕ ЧЕРНОЙ ДЫРОЙ
             ld   hl,(SNX+1)
             ld   bc,0-#30
@@ -1069,7 +1069,7 @@ SUNB:
             jp   SSUN
 
 
-MVSUN:
+MoveSun:                        ; orig: MVSUN - управление звездой, изменение координат
 ; УПРАВЛЕНИЕ ЗВЕЗДОЙ ИЗМЕНЕНИЕ ЕЕ
 ; КООРДИНАТ
             ld   hl,#8000
@@ -1079,14 +1079,14 @@ MVSUN:
             jp   nc,MVPLN
 ; ЕСЛИ МОЖНО МЕНЯТЬ
             rr   h
-            ld   (MVSUN+1),hl
+            ld   (MoveSun+1),hl
             ld   a,(NOSUN)
             dec  a
 ; ЕСЛИ НА ГЕНЕРАЦИЮ ЧЕРНОЙ ДЫРЫ
-            jr   z,BLACKSUN
+            jr   z,MakeBlackHole
             dec  a
 ; ЕСЛИ ТЕКУЩАЯ ЗВЕЗДА ЧЕРНАЯ
-            jr   z,SUNB
+            jr   z,BlackHoleControl
 SSUN:
             ld   hl,(SNX)
             ld   a,(SNX+2)
@@ -1098,7 +1098,7 @@ SSUN:
             SUB_DE
             ld   (SNX),hl
             sbc  a,c
-            jp   pe,NWSUN
+            jp   pe,NewSun
             ld   (SNX+2),a
             ld   hl,(SNY)
             ld   a,(SNY+2)
@@ -1110,7 +1110,7 @@ SSUN:
             SUB_DE
             ld   (SNY),hl
             sbc  a,c
-            jp   pe,NWSUN
+            jp   pe,NewSun
             ld   (SNY+2),a
             ld   hl,(SNZ)
             ld   de,(STPZ+1)
@@ -1122,11 +1122,11 @@ SSUN:
             SUB_DE
             ld   (SNZ),hl
             sbc  a,c
-            jp   pe,NWSUN
+            jp   pe,NewSun
             ld   (SNZ+2),a
 ; МЕРИМ РАССТОЯНИЕ ДЛЯ ИЗМЕНЕНИЯ
 ; ТЕМПЕРАТУРЫ
-            call FARSUN
+            call NearestSunDistance
             ld   a,l
             and  a
 ; СЛИШКОМ ДАЛЕКО
@@ -1209,7 +1209,7 @@ MSL3:
             jp   c,MVPLN
             ld   a,(NOSUN)
             cp   2
-            jp   nz,NWSUN
+            jp   nz,NewSun
 
 ; ИЗМЕНЕНИЕ КООРДИНАТ ПЛАНЕТ
 MVPLN:
@@ -1309,7 +1309,7 @@ ssZ:        ld   de,0
 
 ; ИЗМЕНЕНИЕ ВЫСОТЫ К ПЛАНЕТЕ
 KP2:
-            call FAREAR
+            call PlanetDistance
             ld   a,l
             and  a
             jr   nz,.MSL2
@@ -1355,7 +1355,7 @@ SIMILARSYS:
             ret
 
 
-FARSUN:
+NearestSunDistance:             ; orig: FARSUN - наименьшее расстояние от игрока до солнца
 ; ВОЗВРАЩАЕТ В lНАИМЕНЬШЕЕ РАССТОЯНИЕ ОТ
 ; ИГРОКА ДО СОЛНЦА
             ld   a,(SNX+2)
@@ -1374,7 +1374,7 @@ FARSUN:
             ret
 
 
-FAREAR:
+PlanetDistance:                 ; orig: FAREAR - расстояние от игрока до ближайшей планеты
 ; ВОЗВРАЩАЕТ В lНАИБОЛЬШЕЕ РАССТОЯНИЕ ОТ
 ; ИГРОКА ДО БЛИЖАЙШЕЙ ПЛАНЕТЫ В СТАРШЕМ
 ; БАЙТЕ
@@ -1504,7 +1504,7 @@ VISPLAN:
 
 ; ПРОЦЕДУРА ПОДГОТОВКИ ВЫВОДА ПЛАНЕТЫ
 ; И ЗВЕЗДЫ
-OUTSUN:
+DrawSun:                        ; orig: OUTSUN - вывод солнца
             ld   hl,SNX
             ld   de,SUNX
             rept 9
@@ -1568,7 +1568,7 @@ STK9:       ld   sp,0
 
 ; ВЫВОД ПЛАНЕТЫ И НАСТРОЙКА КООРДИНАТ
 ; КОМПАСА ПЛАНЕТЫ НА ВЫБРАННУЮ
-OUTEAR:
+DrawPlanet:                     ; orig: OUTEAR - вывод планеты
             ld   a,#80
             ld   (ETX),a
             ld   (ETY),a
@@ -1757,7 +1757,7 @@ STK11:      ld   sp,0
             ret
 
 
-GGALD:
+GenAllStars:                    ; orig: GGALD - генерация всех звёзд
 ; ГЕНЕРИТЬ ВСЕ ЗВЕЗДЫ
             PAGE_ CONTR
             call GALD
@@ -1768,11 +1768,11 @@ GGALD:
 RETST:
 MTRK:       ld   de,0
             PAGE_ CONTR
-            call RETSTAT
+            call ReturnToStation
             PAGE___NOARG
             ret
 
-NEWVSPR:
+NewVoxelSprite:                 ; orig: NEWVSPR - занести в буфер данные о новом воксельном спрайте
 ; ЗАНЕСЕНИЕ В БУФЕР ДАННЫХ О НОВОМ
 ; ВОКСНИМАЦИИ
 ;hl,de,bc-CORDS
@@ -1790,14 +1790,14 @@ NEWVSPR:
             ret
 
 
-MOVEON:
+MoveShipsForward:               ; orig: MOVEON - сдвиг кораблей по движению вперёд
 ;MOVING SHIPS inFRONT
 ;de-SPEED
 ;EYEA_,EYEB_,EYEG_-UNGELS
 ;retinSTPX_,STPY_,STPZ_
             push ix
             push de
-            call SHMTRX
+            call ShipMatrix
             pop  de
 HM_13:      ld   a,0
             push de
@@ -1943,7 +1943,7 @@ STK7:       ld   sp,0
             jp   CX22
 
 
-GOSTA:
+GovernmentAt:                   ; orig: GOSTA - государство, в котором находится карта
 ; ОПРЕДЕЛЕНИЕ ГОСУДАРСТВА В КОТОРОМ
 ; НАХОДИТСЯ КАРТА
 ; В hl-КООРДИНАТЫ КАРТЫ

@@ -9,14 +9,14 @@ START:
             PAGE___NOARG
 
 ; УСТАНОВКА ИНДИКАТОРОВ И ВРЕМЕНИ ПАНЕЛИ
-            call REPANEL
+            call RedrawPanel
             PAGE_ CONTR
 ; СГЕНЕРИТЬ ТАБЛИЦЫ ВЕРОЯТНОСТЕЙ ДЛЯ
 ; ДАННОГО СТОЯ И УРОВНЯ ТЕКУЩЕЙ ПЛАНЕТЫ
             call SETIT
 
 ; ИНИЦИЯЛИЗАЦИЯ ВСЕХ ЗВЕЗД
-            call GGALD
+            call GenAllStars
 
 ; БОРТКОМПУТЕР СООБГАЕТ
             MESAG _SYSTEMREADY
@@ -40,7 +40,7 @@ COUNTER:    ld   a,0
 ; ВЫВОД ЗВЕЗД
             call STARS
 ; ЧАСЫ
-            call TIMER
+            call ShowTime
 
             PAGE___NOARG
 ; РАСЧЕТЫ И ВЫВОД 3D
@@ -90,14 +90,14 @@ PEREGREV:   ld   a,0
             ld   (FFIRE+1),a
 IIO32:
 ; ИНТЕЛЕКТ
-            call SHIPINTELEGENT
+            call ShipAI
             xor  a
             ld   (PLAYER+1),a
 
 ; ИЗМЕНЕНИЕ КООРДИНАТ СТАНЦИИ
             call MVSTT
 ; ИЗМЕНЕНИЕ КООРДИНАТ ЗВЕЗДЫ И ПЛАНЕТЫ
-            call MVSUN
+            call MoveSun
 ; ОБРАБОТЧИК ВОКС. АНИМАЦИИ
             call EXPL
 ; ИЗМЕНЕНИЕ КООРДИНАТ И ПРИРАЩЕНИЙ
@@ -107,7 +107,7 @@ IIO32:
             call MOVESTARS
             PAGE___NOARG
 ; РЕГИСТРАЦИЯ ПОПАДАНИЯ ЛАЗЕР ИГРОКА
-            call SHUT
+            call PlayerHit
 
 
 ; ПРОВЕРКИ ПОПАДАНИЯ ЛАЗЕРОМ, РАКЕТОЙ
@@ -282,7 +282,7 @@ PSRZI:      add  a,80
             PAGE___NOARG
 
 ; СТАТУС ИНДИКАТОРЫ ЭНЕРГИИ И Т.Д.
-            call DATALINES
+            call DrawDataLines
 ; ИНДИКАЦИЯ РЕЖИМА НАВЕДЕНИЯ РАКЕТ ИГРОКА
 FNAVOD:     ld   a,0
             and  a
@@ -302,7 +302,7 @@ PODSWET:
             call nz,LIGHTER
 
             call PRINT
-            call PRICEL
+            call DrawCrosshair
 ; ВЫВОД ТЕНЕВОГО СКРИНА
 
             call OHIDE
@@ -311,9 +311,9 @@ PODSWET:
             call PRINT
             call PRINT
             call PRINT
-            call COMPOS
+            call DrawCompass
 ; РАДАР
-            call RADAR
+            call DrawRadar
             PAGE___NOARG
 
 
@@ -342,7 +342,7 @@ EXIT:
 ;           include "RETASM.asm"
 
 
-SIZEOBJ:
+ObjectSize:                     ; orig: SIZEOBJ - размер объекта по индексу
 ; aИНДЕКС ОБЪЕКТА
             ld   l,a
             ld   h,L97
@@ -671,7 +671,7 @@ BORT:
 ; МАТЕМАТИКА
 
 
-RECORD:
+ToShipCoords:                   ; orig: RECORD - преобразование координат по обратной матрице
 ; ПРЕОБРАЗОВАНИЕ КООРДИНАТ ПО ОБРАТНОЙ
 ; МАТРИЦЕ ПРОСТРАНСТВА
 ;hl-X,de-Y,bc-z
@@ -682,12 +682,12 @@ RECORD:
             ld   (DX+1),hl
             ld   (DY+1),de
             ld   (DZ+1),bc
-            call PEREWOROT
+            call InvertMatrix
             ld   ($+12),sp
             ld   iy,$+7
             jp   CALCRCORD
             ld   sp,0
-            call PEREWOROT
+            call InvertMatrix
             ld   hl,(TX+1)
             ld   de,(TY+1)
             ld   bc,(TZ+1)
@@ -695,7 +695,7 @@ RECORD:
             pop  ix
             ret
 
-PEREWOROT:
+InvertMatrix:                   ; orig: PEREWOROT - сделать матрицу обратной
 ; СДЕЛАТЬ МАТРИЦУ ОБРАТНОЙ
             ld   hl,(SM_12+1)
             ld   de,(SM_21+1)
@@ -726,7 +726,7 @@ KORNI_:
             ret
 
 
-WAYUNGLE:
+AimAngles:                      ; orig: WAYUNGLE - точное определение двух углов наведения носа
 ; ТОЧНОЕ ОПРЕДЛЕНИЕ ДВУХ УГЛОВ ПОВОРОТА
 ; ОБЪКЕТА НОСОМ НА ДРУГОЙ
 
@@ -797,7 +797,7 @@ WAYUNGLE:
             pop  de
 ;de-DZ
             pop  hl
-            call ATAGDIV
+            call ArcTanDiv
             or   a
             jp   p,$+5
             neg
@@ -807,20 +807,20 @@ WAYUNGLE:
 ;hl-DY,de-DX
             add  a,#80
             push af
-            call ATAGDIV
+            call ArcTanDiv
             pop  bc
             ld   c,a
 
             pop  ix
             ret
-MMATRX:
+CallMatrix:                     ; orig: MMATRX - вызов расчёта матрицы пространства
 ; ВЫЗОВ РАСЧЕТА МАТРИЦЫ ПРОСТРАНСТВА
             PAGE_ VOXAL
             call GMATRX
             PAGE___NOARG
             ret
 
-CALC2D3D:
+Project3Dto2D:                  ; orig: CALC2D3D - перевод из 3D в 2D
 ; ИЗ 3D В 2D
 ;de-z,hl-Y,bc-X
 ;rethl-X,de-Y
@@ -830,7 +830,7 @@ CALC2D3D:
 ;z
             ABSDE
 ;Y
-            call FDIV
+            call FastDivide
             pop  de
             jp   c,.LD3
             bit  7,d
@@ -847,7 +847,7 @@ CALC2D3D:
 
             push de
             ABSDE
-            call FDIV
+            call FastDivide
             pop  de
             jp   c,.LD3
             bit  7,d
@@ -866,7 +866,7 @@ CALC2D3D:
             ret
 
 
-CALCUNGLE:
+CalcAngle:                      ; orig: CALCUNGLE - угол между объектами по плоскости
 ; ВЫЧИСЛИМ УГОЛ МЕЖДУ ДВУМЯ ОБЪЕКТАМИ ПО
 ; ЛЮБОЙ ИЗ ПЛОСКОСТЕЙ
 ;de-X1,hl-X2,bc-Y1,HL'-Y2
@@ -885,7 +885,7 @@ CALCUNGLE:
             SUB_BC
 ;z
 
-ATAGDIV:
+ArcTanDiv:                      ; orig: ATAGDIV - расчёт arctg(hl/de)
 ; РАСЧЕТ ATAG(HL/de)
 ;retina
             ld   a,d
@@ -893,7 +893,7 @@ ATAGDIV:
             push af
             push de
             ABSDE
-            call FDIV
+            call FastDivide
             pop  bc
             jr   c,.CUG1
             ABSHL
@@ -927,7 +927,7 @@ ATAGDIV:
             ld   a,#C0
             ret
 
-FDIV:
+FastDivide:                     ; orig: FDIV - быстрое деление со знаком
 ;FAST DIVISING
 ;h.L(SIGN)=hl(SIGN)/de(UNSIGN)
 ; ЕСЛИ FC-ON ТО АВАРИЙНЫЙ ВЫХОД ПЕРЕПОЛНЕН
@@ -1085,7 +1085,7 @@ RIX:        ld   ix,0
             jp   (iy)
 
 
-TURNMATR:
+TurnMatrix:                     ; orig: TURNMATR - преобразование матрицы пространства в обратную
 ; ПРЕОБРЗОВАНИЕ МАТРИЦЫ ПРОСТРАНСТВА
 ; В ОБРАТНУЮ
             ld   de,(LB13)
@@ -1113,7 +1113,7 @@ TURNMATR:
             SUB_DE
             ld   (LA31),hl
             ret
-SHMTRX:
+ShipMatrix:                     ; orig: SHMTRX - матрица-вектор корабля
 ;CALC SHIP MATRIX VECTOR
 EYEA_:      ld   a,0
             ld   h,SINTB

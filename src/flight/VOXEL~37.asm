@@ -961,7 +961,7 @@ JmP1:       jr   $
             add  hl,bc
 ;DIV
             push de
-            call FDIV
+            call FastDivide
             pop  de
             jr   c,ED_
 
@@ -985,7 +985,7 @@ JmP2:       jr   $
             add  hl,bc
 ;DIV
 
-            call FDIV
+            call FastDivide
             jr   c,ED_
 
             or   a

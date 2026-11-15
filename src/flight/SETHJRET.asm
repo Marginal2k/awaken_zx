@@ -87,7 +87,7 @@ SL_CON:     ld   b,0
 STK77:      ld   sp,0
             ld   a,CONTR
             out  (c),a
-            call CLRBUFS
+            call ClearBuffers
             ld   bc,#FFFD
             ld   a,7
             out  (c),a
@@ -217,7 +217,7 @@ RETSTT:
             ld   bc,#200
             ldir
             exx
-RETSTAT:
+ReturnToStation:                ; orig: RETSTAT - возврат на станцию
 ; ВОЗВРАТ НА СТАНЦИЮ
 ;de-MTRK
             exx
@@ -315,7 +315,7 @@ RNDD:
             ret
 
 
-CLRBUFS:
+ClearBuffers:                   ; orig: CLRBUFS - чистка буферов спрайтов и объектов
 ; ЧИСТИТЬ ВСЕ БУФЕРЫ СПРАЙТОВ И ОБЪЕКТОВ
             ld   a,(GDIABLO)
             inc  a
@@ -389,7 +389,7 @@ SETT:
             ld   hl,(PLACE)
             ld   de,(PLACE+2)
             ld   a,(PLANET)
-            call PINFO
+            call PlanetInfo
             ld   (KOLPLANET+1),a
             or   a
             jr   nz,$+4
@@ -482,7 +482,7 @@ SETT:
             ret
 
 
-PINFO:
+PlanetInfo:                     ; orig: PINFO - информация о планете системы
 ;  ДАЧА ИНФО О ПЛАНЕТЕ НА СИСТЕМЕ
 ;hl,de-ДАННЫЕ СИСТЕМЫ
 ;a-НОМЕР ПЛАНЕТЫ С 0
@@ -508,7 +508,7 @@ PINFO:
             inc  a
             ld   b,a
 
-            call GOSTA
+            call GovernmentAt
             ld   c,a
             ld   a,c
             cp   3

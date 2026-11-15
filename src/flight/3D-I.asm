@@ -34,7 +34,7 @@ RETPRI:     ld   a,0
             ld   (EYEA),hl
             ld   a,(EYE_G)
             ld   (EYEG),a
-            call MMATRX             ;ПPOCЧET MATPИЦЫ OБЩeГO ПPOCTPAHCTBA
+            call CallMatrix             ;ПPOCЧET MATPИЦЫ OБЩeГO ПPOCTPAHCTBA
 ; ПЕРЕНОС И КОРРЕКЦИЯ ЗНАЧЕНИЙ МАТРИЦЫ,
 ; ЕСЛИ СТАРШИЕ БАЙТЫ = #80 ТО ДЕЛАЕМ ИХ#81
             ld   a,(LA11+1)
@@ -85,8 +85,8 @@ RETPRI:     ld   a,0
 
             ld   a,(NOSUN)
             cp   1
-            call nz,OUTSUN
-            call OUTEAR
+            call nz,DrawSun
+            call DrawPlanet
 
             ld   hl,#0001
             ld   (INDT1),hl
@@ -230,7 +230,7 @@ L9F04:
             ld   (INDX),a           ;ind
 .LA0BC
             ld   sp,(END_1+1)
-            call SIZEOBJ
+            call ObjectSize
             ld   a,6
             sub  h
             ld   (Jmp1+1),a
@@ -381,7 +381,7 @@ MDSZ:       ld   hl,0
 ; РАЗМЕР ОБЪЕКТА ДЕЛИМ НА zКООРДИНАТУ
 ; ПОЛУЧИМ РЕАЛЬНЫЙ РАЗМЕР ПРИ ДАННОМ
 ; УДАЛЕНИИ
-            call FDIV
+            call FastDivide
             jp   c,LLLK
 
             sra  h
@@ -393,7 +393,7 @@ MDSZ:       ld   hl,0
             ld   de,(TZ+1)
             ld   hl,(TX+1)
 
-            call FDIV
+            call FastDivide
             jp   c,LLLK
 ; СО ЗНАКОМ
             ld   (MDXX+1),hl
@@ -406,7 +406,7 @@ MDSZ:       ld   hl,0
             ld   de,(TZ+1)
             ld   hl,(TY+1)
 
-            call FDIV
+            call FastDivide
             jp   c,LLLK
 
             ld   d,h
@@ -459,7 +459,7 @@ MDXX:       ld   de,0
             ld   a,1
             ld   (FLL+1),a
             exx
-            ld   (SHUT+1),hl
+            ld   (PlayerHit+1),hl
             exx
 LLLK2:
 ; НАВЕДЕНИЕ ПРИЦЕЛА

@@ -133,7 +133,7 @@ STATGEN_:
             ex   af,af'
             PAGE_ CONTR
             ex   af,af'
-            call PINFO
+            call PlanetInfo
             PAGE___NOARG
 
             dec  l
@@ -153,7 +153,7 @@ STATGEN_:
 ; ОТ УРОВНЯ РАЗВИТИЯ ПЛАНЕТЫ
 
 GS99:
-            call FINDFREE
+            call FindFreeSlot
             ret  z                  ;БУФEP ПOЛOH
             exx
             push hl
@@ -334,7 +334,7 @@ DOPC1:
             ld   a,T_PIRAT
             ld   (TYPERAID+3),a
 .DOPC_
-            call FINDFREE
+            call FindFreeSlot
 ; ЕСЛИ БУФЕР ПОЛОН
             ret  z
             push iy
@@ -352,7 +352,7 @@ FORRAID:    add  a,0                ;32
 ; ВЗЯТЬ МАСШТАБ ОБЪЕКТА
 ; В lДОЛЖЕН БЫТЬ УСТАНОВЛЕН ИНДЕКС
             ld   a,l
-            call SIZEOBJ
+            call ObjectSize
             ld   a,h
             push af
             call RNDK1
@@ -379,7 +379,7 @@ FORRAID:    add  a,0                ;32
             ld   a,26
             exx
             ld   hl,NWTEL
-            call NEWVSPR
+            call NewVoxelSprite
             ld   a,1
             ld   (EXPL+1),a
             ld   a,(CEX+1)
@@ -489,14 +489,14 @@ GNUM:       cp   #FD
             jp   c,DOPGEN
 ; ИШЕМ СВОБОДНОЕ МЕСТО В БУФЕРЕ
 
-            call FINDFREE
+            call FindFreeSlot
 ; ЕСЛИ БУФЕР ПОЛОН
             ret  z
             push iy
             pop  ix
             push hl
             call RNDL4
-            call FARSUN
+            call NearestSunDistance
             ld   a,l
             srl  a
             srl  a
@@ -624,7 +624,7 @@ VARPS:      equ  $-1
 .GSS99
 ; МАСШТАБНЫЙ КОЭФИЦИЕНТ ТИПА КОРАБЛЯ
             ld   a,l
-            call SIZEOBJ
+            call ObjectSize
             ld   a,h
             push af
 ; ОН СДЕЛАЛ ГИППЕР ПРЫЖОК СЮДА
@@ -654,7 +654,7 @@ VARPS:      equ  $-1
             exx
 ; СОЗДАЕМ СПРАЙТ ТЕЛЕПОРТА
             ld   hl,NWTEL
-            call NEWVSPR
+            call NewVoxelSprite
             ld   a,1
             ld   (EXPL+1),a
             ld   a,(CEX+1)
@@ -678,7 +678,7 @@ VARPS:      equ  $-1
             bit  1,a
             jp   z,.GSH1
 
-            call FINDOBJ
+            call FindObjectByType
             ld   a,(STATGEN)
             and  a
             jp   z,.GSH1
@@ -692,7 +692,7 @@ VARPS:      equ  $-1
 
 
             ld   d,T_STATION
-            call FINDOBJ
+            call FindObjectByType
             jr   z,.GSH1
 
             ld   l,(iy+0)
@@ -922,14 +922,14 @@ PMUEK:      ld   h,100
 
 TONEWORD:
             ld   a,(ix+INDI)
-            call SIZEOBJ
+            call ObjectSize
             ld   a,h
             cp   4
             ld   a,2
             jr   nz,$+3
             dec  a
             ld   (ix+SPT),a
-            jp   NEWORD
+            jp   NewOrder
 
 
 ; РАСЧЕТ УГЛОВ К БЛИЖАЙШЕЙ ПЛАНЕТЕ

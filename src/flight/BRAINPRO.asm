@@ -1,34 +1,34 @@
 ;SHIPINTELEGENT
 
 
-ITAB:
-            dw   STAY
-            dw   GOEAR
-            dw   FIGHT
-            dw   GOSUN
-            dw   FREEFLY
-            dw   DEFENCE
-            dw   JUMPOUT
-            dw   JUMPING
-            dw   NAVODROKET
-            dw   STYSTAT
-            dw   STATDEF
-            dw   STARTPOLICE
-            dw   BACKUP
-            dw   BACKAS
-            dw   GETCARGO
-            dw   GOAWAY
-            dw   OTLET
-            dw   TURNOUT
-            dw   GOASTER
-            dw   FORSAGE
-            dw   OBLET
-            dw   WOZWRAT
-NTH:
+AiModeTable:                    ; orig: ITAB - таблица обработчиков режимов ИИ (индекс = C_*)
+            dw   Stay
+            dw   GoToPlanet
+            dw   Fight
+            dw   GoToStar
+            dw   FlyFree
+            dw   Defence
+            dw   HyperJumpEnd
+            dw   HyperJumpStart
+            dw   MissileHoming
+            dw   StationStay
+            dw   StationDefence
+            dw   PoliceLaunch
+            dw   PoliceReturn
+            dw   ReturnToAsteroid
+            dw   PickUpCargo
+            dw   GoAwayNoCargo
+            dw   FlyAway
+            dw   TurnAway
+            dw   AsteroidDrift
+            dw   Afterburner
+            dw   FlyAroundPlayer
+            dw   ReturnAfterFlyAround
+AiModeNone:                     ; orig: NTH - пустой режим (ret)
             ret
 
 
-OBLET:
+FlyAroundPlayer:                ; orig: OBLET - C_FLYAROUND: облёт игрока, поворот на 20 градусов по BETA
 ; ОБЛЕТ ИГРОКА, ПОВОРОТ НА 20 ГРАДУСОВ ПО
 ; УГЛУ BETA
             ld   a,(ix+ALFA)
@@ -37,14 +37,14 @@ OBLET:
             ld   a,(ix+POWOR)
             dec  a
             ld   (ix+POWOR),a
-            jp   nz,GOSIMPLY
+            jp   nz,MoveStraight
 ; ВОЗВРАТ
             ld   (ix+MODE),C_RETURN
             ld   (ix+POWOR),TIMEOBL
-            jp   GOSIMPLY
+            jp   MoveStraight
 
 
-WOZWRAT:
+ReturnAfterFlyAround:           ; orig: WOZWRAT - C_RETURN: возврат после облёта, поворот назад
 ; ВОЗВРАТ ПОСЛЕ ОБЛЕТА, ПОВОРОТ НАЗАД 20гд
             ld   a,(ix+ALFA)
             sub  2
@@ -52,13 +52,13 @@ WOZWRAT:
             ld   a,(ix+POWOR)
             dec  a
             ld   (ix+POWOR),a
-            jp   nz,GOSIMPLY
+            jp   nz,MoveStraight
             ld   a,(ix+OMODE)
             ld   (ix+MODE),a
-            jp   GOSIMPLY
+            jp   MoveStraight
 
 
-FORSAGE:
+Afterburner:                    ; orig: FORSAGE - C_FORSAGE: форсаж объекта
 ; ФОРСАЖ ОБЪЕКТА
             ld   a,(ix+TYPE)
             cp   T_HERMIT
@@ -88,23 +88,23 @@ FORSAGE:
             jr   nc,$+3
             ld   a,c
             cp   JMIN_
-            jp   nc,GOSIMPLY
+            jp   nc,MoveStraight
 .FS4
             ld   a,(ix+OMODE)
             ld   (ix+MODE),a
             ld   (ix+FORSAG),0
-            jp   GOSIMPLY
+            jp   MoveStraight
 
 
 NOCARGO:
-            call NEWORD
-            jp   GOSIMPLY
+            call NewOrder
+            jp   MoveStraight
 
 
-GETCARGO:
+PickUpCargo:                    ; orig: GETCARGO - C_GETCARGO: подобрать груз
 ; ПОДОБРАТЬ ГРУЗ
             ld   a,(ix+SUBJ)
-            call GETADR
+            call ObjAddrFromIndex
 ; АДРЕС ГРУЗА hl
             inc  l
             ld   a,(hl)
@@ -126,7 +126,7 @@ GETCARGO:
             push hl
             pop  iy
 ; МЕРИМ РАССТОЯНИЕ
-            call RASTOY
+            call DistanceHigh
             cp   1
 ; ЕСЛИ ЕЩЕ ДАЛЕКО
             jp   nc,TOTHEALL
@@ -135,8 +135,8 @@ GETCARGO:
             call DEATHY
             jp   z,NOCARGO
 ; ВЗРЫВ, ПОДОБРАНА МИНА
-            call MAKEEXPLO
-            jp   GOSIMPLY
+            call MakeExplosion
+            jp   MoveStraight
 DEATHY:
             ld   (iy+1),#80
             ld   (iy+0),0
@@ -144,43 +144,43 @@ DEATHY:
             ret
 
 
-BACKAS:
+ReturnToAsteroid:               ; orig: BACKAS - C_BACKTOASTER: возврат на астероид
 ; ВОЗВРАТ НА АСТЕРОИД
             ld   a,(ix+BSUBJ)
-            call GETADRY
+            call ObjAddrFromIndexIY
             ld   a,(iy+1)
             cp   #80
-            jp   z,FINDASTER
+            jp   z,FindAsteroid
             ld   a,(iy+TYPE)
             cp   (ix+TSUBJ)
-            jp   nz,FINDASTER
-            call RASTOY
+            jp   nz,FindAsteroid
+            call DistanceHigh
             cp   LAUNGHFAR
             jr   nc,$+9
             res  2,(iy+SETUP)
             jp   DEATHX
             call TOTHEALL_
-            jp   GOSIMPLY
+            jp   MoveStraight
 
 
-SROKA:
+MissileAttackStation:           ; orig: SROKA - ракетная атака на станцию
 ; РАКЕТНАЯ АТАКА НА СТАНЦИЮ
             ld   (ix+MODE),C_DEFENCESTAT
             jp   SINT3
 
 
-GOAWAY:
+GoAwayNoCargo:                  ; orig: GOAWAY - C_GOAWAY: просто улететь, не беря груз
             call CHECKA2
             jr   GSUN1
 
 
-GOSUN:
+GoToStar:                       ; orig: GOSUN - C_GOSTAR: движение по заданному углу (к звезде)
 ; ДВИЖЕНИЕ ПО ЗАДАННОМУ УГЛУ НАПРАВЛЕНИЯ
 ; ПО ИДЕЕ НА СОЛНЦЕ
             call CHECKALL
-            jp   c,GOSIMPLY
+            jp   c,MoveStraight
 GSUN1:
-            call FAREAR
+            call PlanetDistance
             ld   a,l
             cp   4
             jr   nc,GOS1
@@ -198,20 +198,20 @@ Jjj1:       cp   40
             cp   #7F
             jr   nz,GOS1
             ld   (ix+MODE),C_JUMPOUT
-            jp   GOSIMPLY
+            jp   MoveStraight
 GOS1:
-            call FARSUN
+            call NearestSunDistance
             ld   a,l
             cp   4
-            jr   nc,GOSIMPLY
+            jr   nc,MoveStraight
 ; ЕСЛИ ЗВЕЗД БЛИЗКО
             ld   a,(ix+BETA)
             inc  a
             ld   (ix+BETA),a
-            jp   GOSIMPLY
+            jp   MoveStraight
 
 
-GOEAR:
+GoToPlanet:                     ; orig: GOEAR - C_GOPLANET: лететь на планету
             ld   b,(ix+PLAN)
             inc  b
             ld   iy,PLANETES-12
@@ -222,25 +222,25 @@ GOEAR:
 
 
             call CHECKALL
-            jp   c,GOSIMPLY
+            jp   c,MoveStraight
             ld   a,(STATGEN)
             and  a
-            jr   z,GOSIMPLY
+            jr   z,MoveStraight
             ld   a,(ix+TYPE)
             cp   T_PIRAT
-            jr   z,GOSIMPLY
+            jr   z,MoveStraight
             cp   T_PIRAT2
-            jr   nc,GOSIMPLY
+            jr   nc,MoveStraight
             call RNDL4
             ld   a,h
             cp   #41
-            jr   nz,GOSIMPLY
+            jr   nz,MoveStraight
             ld   a,l
             cp   VWZST
-            jr   c,GOSIMPLY
+            jr   c,MoveStraight
 ; ВОЗВРАТ НА СТАНЦИЮ
             ld   (ix+MODE),C_BACKPOLICE
-GOSIMPLY:
+MoveStraight:                   ; orig: GOSIMPLY - общий шаг движения по текущим углам
             ld   a,(ix+1)
             cp   #80
             ret  z
@@ -268,10 +268,10 @@ GOSIMPLY:
             ld   (ix+FORSAG),0
 .NNI1
             ld   d,(ix+FORSAG)
-            jp   MOVEON
+            jp   MoveShipsForward
 
 
-FIGHT:
+Fight:                          ; orig: FIGHT - C_FIGHT: нападение на объект
 ; РЕЖИМ НАПАДЕНИЯ НА ОБЪЕКТ
             ld   a,(ix+SUBJ)
             inc  a
@@ -279,24 +279,24 @@ FIGHT:
             ld   a,r
             cp   120
             jr   c,.FTT1
-            call YESCARGO
+            call HasCargoToTake
             jr   z,.FTT1
-            call NEARCARGO
+            call FindNearestCargo
             ld   (ix+MODE),C_GETCARGO
             ld   (ix+SUBJ),a
-            jp   GOSIMPLY
+            jp   MoveStraight
 .FTT1
-            call NEWORD
+            call NewOrder
             ld   a,(ix+SUBJ)
             inc  a
-            jp   nz,GOSIMPLY
+            jp   nz,MoveStraight
             ld   a,(ix+OMODE)
             cp   C_FIGHT
-            jp   z,GOSIMPLY
+            jp   z,MoveStraight
             sla  a
             ld   l,a
             ld   h,0
-            ld   de,ITAB
+            ld   de,AiModeTable
             add  hl,de
             ld   a,(hl)
             inc  hl
@@ -304,10 +304,10 @@ FIGHT:
             ld   l,a
             jp   (hl)
 .FGH7
-            call FLOTSTART
+            call FleetStart
             ld   a,(ix+TYPE)
             cp   T_HERMIT
-            jp   z,GOASTER
+            jp   z,AsteroidDrift
             ld   a,(ix+ENERGY)
             cp   35
             jr   nc,.FGT9
@@ -321,7 +321,7 @@ FIGHT:
             cp   T_MIKR
             jr   z,.FGH71
             ld   (ix+MODE),C_JUMPOUT
-            jp   GOSIMPLY
+            jp   MoveStraight
 .FGH71
             ld   a,c
             cp   50
@@ -336,18 +336,18 @@ FIGHT:
             bit  2,(ix+SETUP)
             jr   nz,.FGT9
 .DFN102
-            call DROPCARGO
+            call DropCargo
 ; РЕЖИМ СВОБОДНОГО ПОЛЕТА
             ld   a,(ix+TYPE)
             cp   T_HERMIT
-            jp   z,GOSIMPLY
+            jp   z,MoveStraight
             ld   (ix+MODE),C_GOAWAY
-            jp   GOSIMPLY
+            jp   MoveStraight
 .FGT9
-            call TESTSUBJ
+            call CheckSubjectGone
             jr   nz,.FGH1
             ld   (ix+SUBJ),#FF
-            jp   GOSIMPLY
+            jp   MoveStraight
 .FGH1
             call OPONE
             jp   c,FGHT1
@@ -370,10 +370,10 @@ DDZ:        ld   bc,0
 
 ; ОРГАНИЗАЦИЯ ОГНЯ ЛАЗЕРОМ ИЛИ РАКЕТАМИ
 ; ПЕРСОНАЖА ПО ПЕРСОНАЖУ
-NAVODFIRE:
+AimNose:                        ; orig: NAVODFIRE - наведение носа на цель
 
 ; НАВЕДЕНИЕ НОСА
-            call ONWAY
+            call AimAtObject
 
 ; НАЙТИ МАКСИМАЛЬНЫЙ УГОЛ, ВЗЯВ ЕГО ПО
 ; МОДУЛЮ И ПО ЧЕТВЕРТИ
@@ -384,31 +384,31 @@ NAVODFIRE:
             ld   a,l
 
             cp   VISUNGLE
-            jp   nc,GOSIMPLY
+            jp   nc,MoveStraight
             call RND
             ld   a,l
             cp   (ix+LZS)
-            jr   nc,FIROK
-            call FIREING
+            jr   nc,MissileAttack
+            call ShipFire
             jr   nc,$+5
 FGHT1:
-            call NEWORD
-            jp   GOSIMPLY
+            call NewOrder
+            jp   MoveStraight
 
 
-FIROK:
+MissileAttack:                  ; orig: FIROK - ракетная атака
 ; РАКЕТНЯ АТАКА
             cp   #F0
-            jp   nz,GOSIMPLY
+            jp   nz,MoveStraight
             ld   a,h
             cp   #5F
-            jp   c,GOSIMPLY
+            jp   c,MoveStraight
             ld   a,(ix+TYPE)
             cp   T_MIKR
-            jp   z,GOSIMPLY
+            jp   z,MoveStraight
             ld   a,(ix+RCO)
             and  a
-            jp   nz,GOSIMPLY
+            jp   nz,MoveStraight
             call FIROK22
             ld   c,(ix+TYPE)
             ld   b,0
@@ -416,10 +416,10 @@ FIROK:
             add  hl,bc
             ld   a,(hl)
             ld   (ix+RCO),a
-            jp   GOSIMPLY
+            jp   MoveStraight
 FIROK2:
             call FIROK22
-            jp   GOSIMPLY
+            jp   MoveStraight
 FIROK22:
             ld   c,(ix+SUBJ)
             exx
@@ -434,13 +434,13 @@ FIROK22:
             xor  a
             ex   af,af'
 ; НОМЕР ОБЪЕКТ КТО ПУСТИЛ РАКЕТУ
-            call GETINDX
+            call ObjIndexFromIX
             ld   b,a
             bit  3,(ix+SETUP)
             ld   a,MINREN
             jr   z,$+4
             ld   a,MAXREN
-            jp   RKN11
+            jp   InitMissile
 
 
 JTYPE:
@@ -457,7 +457,7 @@ JTYPE:
             db   40                 ;ОТШЕЛЬНИК
 
 
-DEFENCE:
+Defence:                        ; orig: DEFENCE - C_DEFENCE: защита от нападения
 ; РЕЖИМ ЗАЩИТЫ ОТ НАПАДЕНИЯ
             ld   a,(ix+SUBJ)
             inc  a
@@ -465,24 +465,24 @@ DEFENCE:
             ld   a,r
             cp   126
             jr   c,.DFC1
-            call YESCARGO
+            call HasCargoToTake
             jr   z,.DFC1
-            call NEARCARGO
+            call FindNearestCargo
             ld   (ix+MODE),C_GETCARGO
             ld   (ix+SUBJ),a
-            jp   GOSIMPLY
+            jp   MoveStraight
 .DFC1
-            call NEWORD
+            call NewOrder
             ld   a,(ix+SUBJ)
             inc  a
-            jp   nz,GOSIMPLY
+            jp   nz,MoveStraight
             ld   a,(ix+OMODE)
             cp   C_DEFENCE
-            jp   z,GOSIMPLY
+            jp   z,MoveStraight
             sla  a
             ld   l,a
             ld   h,0
-            ld   de,ITAB
+            ld   de,AiModeTable
             add  hl,de
             ld   a,(hl)
             inc  hl
@@ -503,7 +503,7 @@ DEFENCE:
             cp   T_MIKR
             jr   z,.DFN71
             ld   (ix+MODE),C_JUMPOUT
-            jp   GOSIMPLY
+            jp   MoveStraight
 .DFN71
             ld   a,c
             cp   40
@@ -518,17 +518,17 @@ DEFENCE:
             bit  2,(ix+SETUP)
             jr   nz,.DFN1
 .DFN101
-            call DROPCARGO
+            call DropCargo
             ld   a,(ix+TYPE)
             cp   T_HERMIT
-            jp   z,GOSIMPLY
+            jp   z,MoveStraight
             ld   (ix+MODE),C_GOAWAY
-            jp   GOSIMPLY
+            jp   MoveStraight
 .DFN1
-            call TESTSUBJ
+            call CheckSubjectGone
             jr   nz,.FGH11
             ld   (ix+SUBJ),#FF
-            jp   GOSIMPLY
+            jp   MoveStraight
 .FGH11
 
             ld   a,(ix+RCO)
@@ -537,12 +537,12 @@ DEFENCE:
             ld   (ix+RCO),a
             jp   z,FIROK2
 
-            call FLOTSTART
+            call FleetStart
             ld   a,(ix+TYPE)
             cp   T_HERMIT
-            jp   z,GOASTER
+            jp   z,AsteroidDrift
 
-            call RNDTURN
+            call RandomTurns
 
             ld   de,(DX+1)
             ld   bc,(DY+1)
@@ -552,22 +552,22 @@ DEFENCE:
             ld   de,(DDZ+1)
             ld   bc,(DZ+1)
             exx
-            jp   NAVODFIRE
+            jp   AimNose
 
 
-BACKUP:
+PoliceReturn:                   ; orig: BACKUP - C_BACKPOLICE: возврат на станцию, стадия 2
 ; ВОЗВРАЩЕНИЕ НА СТАНЦИЮ, СТАДИЯ 2
 ; ДВИЖЕНИЕ В СТОРОНУ СТАНЦИИ
             ld   d,T_STATION
-            call FINDOBJ
-            jp   z,GOSIMPLY
+            call FindObjectByType
+            jp   z,MoveStraight
 BACKALL:
-            call RASTOY
+            call DistanceHigh
             cp   LAUNGHFAR
             jr   c,DEATHX
 TOTHEALL:
             call TOTHEALL_
-            jp   GOSIMPLY
+            jp   MoveStraight
 
 TOTHEALL_:
             exx
@@ -591,7 +591,7 @@ DEATHX:
             ld   (ix+SETUP),#FF
             ret
 
-TURNOUT:
+TurnAway:                       ; orig: TURNOUT - C_TURNOUT: повернуть в сторону
 ; ПОВОРОТ КУДАТО
             ld   a,(ix+POWOR)
             dec  a
@@ -604,13 +604,13 @@ TURNOUT:
             add  a,2
             ld   (ix+GAMA),a
             ex   af,af'
-            jp   nz,GOSIMPLY
+            jp   nz,MoveStraight
             ld   (ix+POWOR),TMOTLET
             ld   (ix+MODE),C_FLYAWAY
-            jp   GOSIMPLY
+            jp   MoveStraight
 
 
-OTLET:
+FlyAway:                        ; orig: OTLET - C_FLYAWAY: отлёт в заданном направлении
 ; ОТЛЕТ В ЗАДАННОМ НАПРАВЛЕНИИ СЕКУНДУ
 ; ДРУГУЮ
 ; В POWOR-ВРЕМЯ В КАДРАХ
@@ -621,19 +621,19 @@ OTLET:
             jr   nz,.OTLET2
             ld   a,(ix+PMODE)
             ld   (ix+MODE),a
-            jp   GOSIMPLY
+            jp   MoveStraight
 .OTLET2
-            call TESTSUBJ
-            jp   z,GOSIMPLY
+            call CheckSubjectGone
+            jp   z,MoveStraight
             call RND
             ld   a,l
             cp   (ix+LZS)
-            jp   nc,FIROK
-            call FIREING
-            jp   GOSIMPLY
+            jp   nc,MissileAttack
+            call ShipFire
+            jp   MoveStraight
 
 
-STARTPOLICE:
+PoliceLaunch:                   ; orig: STARTPOLICE - C_STARTPOLICE: пуск полиции из станции
 ; РЕЖИМ ПУСКА ПОЛИЦИИ ИЗ СТАНЦИИ
             ld   a,10
             inc  a
@@ -641,11 +641,11 @@ STARTPOLICE:
             ld   ($-4),a
             jp   nz,STAYSTATION
 ; ПОИСК СВОБОДНОГО МЕСТА
-            call FINDFREE
+            call FindFreeSlot
             jp   z,STAYSTATION
 
             ld   a,(ix+RAND)
-            call GETADR
+            call ObjAddrFromIndex
             inc  l
             ld   a,(hl)
             cp   #80
@@ -675,7 +675,7 @@ STARTPOLICE:
 ; ЗАДАНИЕ ВИДА ПОЛИЦИИ В ЗАВИСИМОСТИ ОТ
 ; ГОСУДАРСТВА
             ld   hl,(PLACE)
-            call GOSTA
+            call GovernmentAt
 
             rlca
             rlca
@@ -709,7 +709,7 @@ STARTPOLICE:
             jp   STAYSTATION
 
 
-STATDEF:
+StationDefence:                 ; orig: STATDEF - C_DEFENCESTAT: станция сбивает ракеты
 ; СТАНЦИЯ ЗАЩИЩАЕТСЯ
 ; УНИЧТОЖЕНИЕ ТРЕХ РАКЕТ НАПРАВЛЕННЫХ НА
 ; НЕЕ
@@ -757,7 +757,7 @@ STD1:
             jr   nz,STD1
             ld   a,b
             exx
-            call GETADR
+            call ObjAddrFromIndex
             ld   a,l
             add  a,TYPE
             ld   l,a
@@ -775,7 +775,7 @@ STD1:
             dec  l
             push hl
             pop  ix
-            call MAKEEXPLO
+            call MakeExplosion
             pop  ix
             pop  de
             pop  hl
@@ -786,7 +786,7 @@ STD1:
             jr   nz,STD1
 STD2:
 ; РЕЖИМ ВЫПУСК ПОЛИЦИИ НА НАПАДАЮЩЕГО
-            call CHNPOL
+            call CheckPolicePair
             jr   nc,STAYSTATION
 ;MODE START POLICE
             ld   (ix+MODE),C_STARTPOLICE
@@ -797,14 +797,14 @@ STD2:
             ld   a,(ix+RAND)
             cp   SPLAYER
             ld   c,32
-            call z,CHSTATUS
+            call z,ChangeStatus
             jp   STAYSTATION
 
 ; ПЕРЕХОД В РЕЖИМ STAYSTATION, ЧТО БЫ
 ; ЧАСТИ СТАНЦИИ СТОЯЛИ НА МЕСТЕ
 
 
-STYSTAT:
+StationStay:                    ; orig: STYSTAT - C_STAYSTAT: станция проверяет статус игрока
 ; ПРОВЕРИТЬ СТАТУС ИГРОКА, ЕСЛИ СТАТУС
 ; ПЛОХ, ТО ВЫЛЕТ ПОЛИЦИИ
             ld   a,r
@@ -820,31 +820,31 @@ STYSTAT:
             jr   nc,.STTT1
 .STTT9
             ld   d,0
-            call FINDOBJ
+            call FindObjectByType
             jr   z,.STTT2
-            call GETINDY
+            call ObjIndexFromIY
             jr   .STTT1
 .STTT2
             ld   d,7
-            call FINDOBJ
+            call FindObjectByType
             jr   z,.STTT3
-            call GETINDY
+            call ObjIndexFromIY
             jr   .STTT1
 .STTT3
             ld   d,5
-            call FINDOBJ
+            call FindObjectByType
             jr   z,STAYSTATION
-            call GETINDY
+            call ObjIndexFromIY
 .STTT1
 ; ИНИТ РЕЖИМА ПУСКА КОРАБЛЕЙ
             ex   af,af'
 ; ЕСЛИ ЕСТЬ ПОЛИЦИЯ В КОСМОСЕ
             ld   d,3
-            call FINDOBJ
+            call FindObjectByType
             jr   nz,STAYSTATION
 ; ПОИСК ЧАСТИ СТАНЦИИ
             ld   d,#12
-            call FINDOBJ
+            call FindObjectByType
             jr   z,STAYSTATION
             ld   (iy+MODE),C_STARTPOLICE
             ex   af,af'
@@ -858,16 +858,16 @@ STAYSTATION:
             ret
 
 
-NAVODROKET:
+MissileHoming:                  ; orig: NAVODROKET - C_NAVODROKET: ракета идёт по следу цели
 ; ДВИЖЕНИЕ РАКЕТЫ ПО СЛЕДУ ЦЕЛИ
             ld   a,(ix+MSPD)        ;SUBJ
-            call GETADRY
+            call ObjAddrFromIndexIY
 ; НАВЕДЕНА РАКЕТА
             set  1,(iy+ACTN)
             ld   a,(ix+RAND)
 ; КТО ПУСТИЛ РАКЕТУ
             ld   (iy+OSUBJ),a
-            call GETINDX
+            call ObjIndexFromIX
             ld   (iy+SUBJ),a
             ld   c,(iy+0)
             ld   a,(iy+1)
@@ -888,21 +888,21 @@ NAVODROKET:
             exx
             ld   l,(ix+0)
             ld   h,(ix+1)
-            call CHARCO
+            call MoveMissiles
             ld   (ix+0),l
             ld   (ix+1),h
             ld   c,(iy+2)
             ld   b,(iy+3)
             ld   l,(ix+2)
             ld   h,(ix+3)
-            call CHARCO
+            call MoveMissiles
             ld   (ix+2),l
             ld   (ix+3),h
             ld   c,(iy+4)
             ld   b,(iy+5)
             ld   l,(ix+4)
             ld   h,(ix+5)
-            call CHARCO
+            call MoveMissiles
             ld   e,iyl
             ld   d,iyh
             exx
@@ -927,7 +927,7 @@ NAVODROKET:
 .EXPLO1
 ; ПРОВЕРИМ ЕСЛИ ЭТО ИГРОК ПО МРКЕРУ
             ld   a,(ix+MSPD)
-            call GETADR
+            call ObjAddrFromIndex
             ld   a,l
             or   MODE
             ld   l,a
@@ -947,12 +947,12 @@ NAVODROKET:
             push ix
             ld   ixh,d
             ld   ixl,e
-            call MAKEEXPLO
+            call MakeExplosion
             pop  ix
             ret
 
 
-JUMPING:
+HyperJumpStart:                 ; orig: JUMPING - C_JUMPING: начало гиперперехода
 ; ПРЫЖОК В ГИПЕР ПРОСТРАНСТВО, ТЯНЕМ ВРЕМЯ
 ; НА ПРОПАДАНИЕ СПРАЙТА, А ПОТОМ ИСЧЕЗНЕТ
 ; КОРАБЛЬ
@@ -960,18 +960,18 @@ JUMPING:
             jp   z,DEATHX
             ld   a,(ix+RSPD)
             and  a
-            jp   z,GOSIMPLY
+            jp   z,MoveStraight
             srl  a
             ld   (ix+RSPD),a
-            jp   GOSIMPLY
-STAY:
+            jp   MoveStraight
+Stay:                           ; orig: STAY - C_STAY: стоять
             ld   a,(ix+RSPD)
             and  a
             jr   z,.SY1
             dec  a
             dec  a
             ld   (ix+RSPD),a
-            call GOSIMPLY
+            call MoveStraight
             ret
             jp   .SY2
 .SY1
@@ -985,10 +985,10 @@ STAY:
             ld   de,#F000
             SUB_DE
             ret  c
-            jp   NEWORD
+            jp   NewOrder
 
 
-FREEFLY:
+FlyFree:                        ; orig: FREEFLY - C_FLYFREE: полёт без управления с вращением
 ; СВОБОДНЫЙ ПОЛЕТ С ВРАЩЕНИЕМ
             inc  (ix+BETA)
             inc  (ix+BETA)
@@ -998,11 +998,11 @@ FREEFLY:
             jp   GA1
 
 
-GOASTER:
+AsteroidDrift:                  ; orig: GOASTER - C_GOASTER: движение астероида
 ; ДВИЖЕНИЕ ДЛЯ АСТЕРОИДА
-            call YESCARGO
+            call HasCargoToTake
             jr   z,GA1
-            call NEARCARGO
+            call FindNearestCargo
             ld   (ix+SUBJ),a
             ld   a,C_GETCARGO
             call FLOTSTART2
@@ -1017,13 +1017,13 @@ GA1:
             ld   (EYEG_+1),a
             ld   e,(ix+RSPD)
             ld   d,0
-            jp   MOVEON
+            jp   MoveShipsForward
 
 
-JUMPOUT:
+HyperJumpEnd:                   ; orig: JUMPOUT - C_JUMPOUT: конец гиперперехода
 ; ГИПЕР ПРЫЖОК КУДАТО ОТ СЮДА
             ld   a,(ix+INDI)
-            call SIZEOBJ
+            call ObjectSize
             ld   a,h
             ex   af,af'
             ld   l,(ix+0)
@@ -1035,7 +1035,7 @@ JUMPOUT:
             ld   a,26
             exx
             ld   hl,NWTEL
-            call NEWVSPR
+            call NewVoxelSprite
             ld   a,1
             ld   (EXPL+1),a
             ld   a,(CEX+1)
@@ -1054,7 +1054,7 @@ JUMPOUT:
 ; ЦЕНТР ОБРАБОТКИ ИНТЕЛЕКТА
 ;---------------------------------------
 
-SHIPINTELEGENT:
+ShipAI:                         ; orig: SHIPINTELEGENT - главный цикл ИИ: обход всех объектов, вызов обработчика режима
 ; СПИСОК ОБЪЕКТОВ
             ld   ix,CARSB-OLEN
             jr   $+8
@@ -1110,7 +1110,7 @@ SINT1:
 ; КТО НАПАЛ
             ld   (ix+RAND),a
 ; ЕСТЬ ЛИ ПОЛИЦИЯ УЖЕ В КОСМОСЕ?
-            call CHNPOL
+            call CheckPolicePair
             jp   nc,SINT3
 
 ; РЕЖИМ ВЫПУСКА
@@ -1126,7 +1126,7 @@ SINT1:
 
 ; ИЗМЕНЕНИЕ СТАТУСА ЕСЛИ НАПАЛ ИГРОК
             ld   c,8
-            call z,CHSTATUS
+            call z,ChangeStatus
             jp   SINT3
 
 ; ЕСЛИ НАПАЛ ИГРОК, ТО ОДНО ПРИРАЩЕНИЕ
@@ -1157,7 +1157,7 @@ SINT44:
 ; ЕСЛИ ЭНЕРГИЯ НЕ КОНЧИЛАСЬ
             jp   nc,SINT5
 ; ВЗРЫВ ОБЪЕКТА
-            call MAKEEXPLO
+            call MakeExplosion
             ld   (ix+ACTN),0
             jp   SINT1
 
@@ -1168,7 +1168,7 @@ ROKATAC:
             ld   a,(ix+TYPE)
             cp   T_STATION
 ; ЕСЛИ АТАКА НА СТАНЦИЮ
-            jp   z,SROKA
+            jp   z,MissileAttackStation
             cp   T_CHIP
 ; ЕСЛИ НЕ КОРАБЛЬ
             jr   nc,SINT3
@@ -1253,7 +1253,7 @@ SINT3:
             sla  a
             ld   l,a
             ld   h,0
-            ld   de,ITAB
+            ld   de,AiModeTable
             add  hl,de
             ld   a,(hl)
             inc  hl
@@ -1264,5 +1264,5 @@ SINT3:
             push de
             jp   (hl)
             pop  ix
-            call PRECORD
+            call ApplyPlayerMotion
             jp   SINT1

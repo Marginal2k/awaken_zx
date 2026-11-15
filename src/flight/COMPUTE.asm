@@ -104,7 +104,7 @@ ATBUF:      ld   hl,0
             ld   e,(hl)
             jr   nz,.ZJ61
             ld   a,e
-            call PRINTNUM
+            call PrintNumber
             ld   a,(CORD+1)
             inc  a
             ld   (CORD+1),a
@@ -136,7 +136,7 @@ ZJ59:
             jp   ADTT
 
 
-PRINTNUM:
+PrintNumber:                    ; orig: PRINTNUM - вывод числа
 ;a-NUMBER
             cp   100
             jr   c,.ZJ53
@@ -345,7 +345,7 @@ ZJ56:
             ret
 
 
-PRICEL:
+DrawCrosshair:                  ; orig: PRICEL - рисование прицела
 ; РИСОВАНИЕ ПРИЦЕЛА В ДАННЫХ КООРДИНАТАХ
 ; ВЫВОД НА ТЕНЕВОЙНСКРИН
             ld   bc,(PCORD)         ;#2B77
@@ -366,7 +366,7 @@ PRICEL:
             rla
             ld   l,a
             ld   h,0
-            ld   bc,MPRICEL
+            ld   bc,CrosshairSprite
             add  hl,bc
             EXD
             ld   bc,#0020
@@ -406,7 +406,7 @@ PRICEL:
             endr
             ret
 
-MPRICEL:
+CrosshairSprite:                ; orig: MPRICEL - спрайт прицела
 ; СПРАЙТ ПРИЦЕЛА
             db   %10000000
             db   %00011110,%00111100,%00000000
@@ -426,7 +426,7 @@ MPRICEL:
             db   %00000000,%00111100,%01111000
 
 
-TIMER:
+ShowTime:                       ; orig: TIMER - вывод и изменение времени на панели
 ; ВЫВОД И ИЗМЕНЕНИЕ ВРЕМЕНИ НА ПРИБОРНУЮ
 ; ПАНЕЛЬ
             ld   a,%10000000
@@ -467,50 +467,50 @@ ZEROTIME:
 ZEROUT:
             ld   a,l
             ld   c,#2F
-            call PRNUM
+            call PrintBcd
             ld   a,l
             rrca
             rrca
             rrca
             rrca
             ld   c,#2E
-            call PRNUM
+            call PrintBcd
             bit  0,b
             ret  z
             ld   a,h
             ld   c,#2C
-            call PRNUM
+            call PrintBcd
             ld   a,h
             rrca
             rrca
             rrca
             rrca
             ld   c,#2B
-            call PRNUM
+            call PrintBcd
             bit  1,b
             ret  z
             ld   a,e
             ld   c,#29
-            call PRNUM
+            call PrintBcd
             ld   a,e
             rrca
             rrca
             rrca
             rrca
             ld   c,#28
-            call PRNUM
+            call PrintBcd
             bit  2,b
             ret  z
             ld   a,d
             ld   c,#27
-            call PRNUM
+            call PrintBcd
             ld   a,d
             rrca
             rrca
             rrca
             rrca
             ld   c,#26
-PRNUM:
+PrintBcd:                       ; orig: PRNUM - печать числа в BCD из a
 ; ПЕЧАТЬ ЧИСЛА В BCD ИЗ РЕГ. a
 ; П c-КООРДИНАТА X
             exx

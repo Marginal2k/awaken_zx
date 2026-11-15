@@ -4,7 +4,7 @@
 ;LIGHTER
 
 
-COMPOS:
+DrawCompass:                    ; orig: COMPOS - компас (чистка и вывод)
             ld   (STK08+1),sp
 ; ЧИСТИМ ПОЛЕ КОМПАСА
             ld   hl,0
@@ -105,7 +105,7 @@ STK08:      ld   sp,0
             ld   de,VISUN
             jp   p,$+6
             ld   de,UVISUN
-            call MINISPRITE
+            call DrawMiniSprite
 .ECOMP
 ; ТОЖЕ С ПЛАНЕТОЙ
             ld   a,(ETX)
@@ -143,7 +143,7 @@ STK08:      ld   sp,0
             ld   de,VIEAR
             jp   p,$+6
             ld   de,UVIEAR
-            call MINISPRITE
+            call DrawMiniSprite
             ld   a,(NOSTAT)
             and  a
             ret  nz
@@ -174,7 +174,7 @@ STK08:      ld   sp,0
             ld   de,UVIEAR
 
 
-MINISPRITE:
+DrawMiniSprite:                 ; orig: MINISPRITE - вывод спрайта 3x3 (6 байт)
 ; ВЫВОД СПРАЙТА 3X3 6 BYTES
 ; В deАДРЕС НАБОРА СПРАЙТОВ (СДВИНУТЫХ)
 ; В bcКООРДИНАТЫ НА ЭКРАНЕ
@@ -258,7 +258,7 @@ ADDES:
             dw   LNPA*15+1+EXP2
 
 
-RADAR:
+DrawRadar:                      ; orig: RADAR - радар
             ld   ix,CARSB-OLEN
             ld   (STK4+1),sp
             ld   hl,(Speed)
@@ -599,9 +599,9 @@ RDR1:
             jr   nz,$+4
             ld   a,1
             sla  a
-            add  a,low(MOTAB)
+            add  a,low(RadarMotionTable)
             ld   l,a
-            ld   a,high(MOTAB)
+            ld   a,high(RadarMotionTable)
             adc  a,0
             ld   h,a
             ld   a,(hl)
@@ -675,7 +675,7 @@ RDR1:
             jp   RDR1
 
 
-MOTAB:
+RadarMotionTable:               ; orig: MOTAB - таблица радара
             dw   MPIRAT
             dw   MTRADER
             dw   MARMY
@@ -948,7 +948,7 @@ LIGHTER:
 ;           cp   XVISIBILITY-#20
 ;           jrnc $R6;ДАЛЕКО ПО Y
             ld   l,(ix+PY)
-            call CALC2D3D
+            call Project3Dto2D
             jr   nz,.ZR6             ;ПЕРЕПОЛНЕНИЕ
             ld   a,h
             and  a

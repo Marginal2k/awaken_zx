@@ -1,7 +1,7 @@
 ;VSLINE
 
 
-PRECORD:
+ApplyPlayerMotion:              ; orig: PRECORD - смещение координат всех объектов по движению игрока
 ; ИЗМЕНЯЕМ КООРДИНАТЫ В ЗАВИСИМОСТИ ОТ
 ; ДВИЖЕНИЯ
             ld   (STK1+1),sp
@@ -32,7 +32,7 @@ PRECORD:
             ld   (STPZ+1),hl
 .PD1
             ld   a,(ix+INDI)
-            call SIZEOBJ
+            call ObjectSize
             ld   a,#06
             sub  h
             ld   hl,200
@@ -98,7 +98,7 @@ STK1:       ld   sp,0
             and  a
             jp   z,REXE
             ld   d,#12
-            call FINDOBJ
+            call FindObjectByType
             jp   z,REXE
 ; НАХОДИМ САМУЮ БОЛЬШУЮ КООРДИНАТУ СТАНЦИИ
             ld   a,(iy+5)
@@ -143,7 +143,7 @@ EXES:
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
 .EXE2
-            call FINDOB
+            call FindAnyObject
             ret  z
             ld   a,(iy+TYPE)
             cp   T_STATION
@@ -164,18 +164,18 @@ RSTPZ:      ld   hl,0
             ret
 
 
-GETADRY:
+ObjAddrFromIndexIY:             ; orig: GETADRY - адрес вектора объекта по индексу, в iy
 ; ПОЛУЧЕНИЕ АДРЕСА ВЕКТОРА ИЗ ИНДЕКСА ЕГО
 ; В РЕГ. iy
             push hl
-            call GETADR
+            call ObjAddrFromIndex
             push hl
             pop  iy
             pop  hl
             ret
 
 
-GETADR:
+ObjAddrFromIndex:               ; orig: GETADR - адрес вектора объекта по индексу, в hl
 ; ПОЛУЧЕНИЕ АДРЕСА ВЕКТОРА ИЗ ИНДЕКСА ЕГО
 ;a-ИНДЕКС
 ;rethl-АДРЕС
@@ -189,31 +189,31 @@ GETADR:
             ret
 
 
-GETINDX:
+ObjIndexFromIX:                 ; orig: GETINDX - индекс объекта по адресу в ix
 ; ПОЛУЧЕНИЕ ИНДЕКСА ИЗ АДРЕСА В iy
 ;ix-АДРЕС
 ;reta-ИНДЕКС
             push hl
             push ix
             pop  hl
-            call GETIND
+            call ObjIndexFromHL
             pop  hl
             ret
 
 
-GETINDY:
+ObjIndexFromIY:                 ; orig: GETINDY - индекс объекта по адресу в iy
 ; ПОЛУЧЕНИЕ ИНДЕКСА ИЗ АДРЕСА В iy
 ;iy-АДРЕС
 ;reta-ИНДЕКС
             push hl
             push iy
             pop  hl
-            call GETIND
+            call ObjIndexFromHL
             pop  hl
             ret
 
 
-GETIND:
+ObjIndexFromHL:                 ; orig: GETIND - индекс объекта по адресу в hl
 ; ПОЛУЧЕНИЕ ИНДЕКСА ИЗ АДРЕСА В hl
 ;hl-АДРЕС
 ;reta-ИНДЕКС
@@ -230,7 +230,7 @@ GETIND:
 ; ПОИСКОВИКИ ЧЕГО ЛИБО
 ;----------------------
 
-FINDOB:
+FindAnyObject:                  ; orig: FINDOB - найти какой-нибудь объект
 ; НАЙТИ КАКОЙ НИБУДЬ ОБЪЕКТ
 ;iy-VECTOR-OLEN
 ;bc-OLEN
@@ -241,11 +241,11 @@ FINDOB:
             ret  nz
             ld   a,(iy)
             cp   #80
-            jp   nz,FINDOB
+            jp   nz,FindAnyObject
             ret
 
 
-FINDPEACE:
+FindPeaceful:                   ; orig: FINDPEACE - найти мирного
 ; НАЙТИ МИРНОГО
             call RNDL3
             ld   a,l
@@ -257,7 +257,7 @@ PWNPI:      cp   #A0
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
 .FP2L
-            call FINDOB
+            call FindAnyObject
             ret  z
             ld   e,(iy+TYPE)
             ld   a,e
@@ -267,17 +267,17 @@ PWNPI:      cp   #A0
             jr   z,$+6
             cp   T_CHIP
             jr   nc,.FP2L
-            call GETINDY
+            call ObjIndexFromIY
             inc  e                  ;cБPOC FZ
             ret
 
 
-FINDALL:
+FindAnyNotUfo:                  ; orig: FINDALL - найти любого, кроме УФО
 ; НАЙТИ ЛЮБОГО НО НЕ УФО
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
 .FP6L
-            call FINDOB
+            call FindAnyObject
             ret  z
             ld   e,(iy+TYPE)
             ld   a,e
@@ -285,17 +285,17 @@ FINDALL:
             jr   z,.FP6L
             cp   T_UFO2
             jr   z,.FP6L
-            call GETINDY
+            call ObjIndexFromIY
             inc  e                  ;cБPOC FZ
             ret
 
 
-FINDUFO:
+FindUfo:                        ; orig: FINDUFO - найти УФО
 ; НАЙТИ УФО
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
 .FP3L
-            call FINDOB
+            call FindAnyObject
             ret  z
             ld   e,(iy+TYPE)
             ld   a,e
@@ -303,17 +303,17 @@ FINDUFO:
             jr   z,$+6
             cp   T_UFO2
             jr   nz,.FP3L
-            call GETINDY
+            call ObjIndexFromIY
             inc  e
             ret
 
 
-FINDPIRAT:
+FindPirate:                     ; orig: FINDPIRAT - найти пирата
 ; НАЙТИ ПИРАТА
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
 .FP2
-            call FINDOB
+            call FindAnyObject
             ret  z
             ld   e,(iy+TYPE)
             ld   a,e
@@ -321,13 +321,13 @@ FINDPIRAT:
             jr   z,$+6
             cp   PIRAT
             jr   nz,.FP2
-            call GETINDY
+            call ObjIndexFromIY
             inc  e
             ret
 ;---------------------------------
 
 
-TESTSUBJ:
+CheckSubjectGone:               ; orig: TESTSUBJ - проверка, исчез ли субъект персонажа
 ; ТЕСТИРОВАНИЕ ПЕРСОНАЖА НА ПРЕДМЕТ ЕГО
 ; УЖЕ ИСЧЕЗНОВЕНИЯ
             ld   a,(ix+SUBJ)
@@ -337,7 +337,7 @@ TESTSUBJ:
             jr   .TS2
 .TS1
             dec  a
-            call GETADR
+            call ObjAddrFromIndex
 .TS2
             ld   (OPONE+2),hl
             inc  l
@@ -397,7 +397,7 @@ OPONE:      ld   iy,0
             ret
 
 
-FIREING:
+ShipFire:                       ; orig: FIREING - выстрел персонажа
 ; ОРГАНИЗАЦИЯ ВЫСТРЕЛА ПЕРСОНАЖА В КОГО
 ; ЛИБО, ВЫВДО ЛУЧА, ИНИЦИАЛИЗАЦИЯ ДАННЫХ
 ;SUBJ & ACTN
@@ -421,7 +421,7 @@ PWPPI:      cp   #4A
             push hl
             push ix
             pop  hl
-            call GETIND
+            call ObjIndexFromHL
             pop  hl
             ld   (iy+SUBJ),a
 FG1:
@@ -450,13 +450,13 @@ FG1:
             scf
             ret  pe
             push ix
-            call OUTLINE
+            call DrawLine3D
             pop  ix
             and  a
             ret
 
 
-FLOTSTART:
+FleetStart:                     ; orig: FLOTSTART - проверка условий и старт флота
 ; ПРОВЕРКИ НА СТАРТ ФЛОТА И ЕГО СТРАРТ
             ld   a,(ix+TYPE)
             cp   T_HERMIT
@@ -483,12 +483,12 @@ FLOTSTART2:
             ld   b,a
 FLT1:
             exx
-            call FINDFREE
+            call FindFreeSlot
 ; НЕТ СВОБОДНОГО МЕСТА В БУФЕРЕ
             ret  z
             push ix
             pop  hl
-            call GETIND
+            call ObjIndexFromHL
             ld   (iy+BSUBJ),a
 ; ТИП ОБЪЕКТА НА КОТОРЫЙ НУЖНО ВЕРНУТЬСЯ
 ; ОТШЕЛЬНИК
@@ -558,9 +558,9 @@ CHECKALL:
             ld   a,r
             cp   VTKCG
             jr   c,CHECKA2
-            call YESCARGO
+            call HasCargoToTake
             jr   z,CHECKA2
-            call NEARCARGO
+            call FindNearestCargo
             ld   (ix+MODE),C_GETCARGO
             ld   (ix+SUBJ),a
             scf
@@ -604,23 +604,23 @@ CHECKA2:
 
 
 ; ПОСИК АСТЕРОИДА
-FINDASTER:
+FindAsteroid:                   ; orig: FINDASTER - найти астероид
             ld   d,T_HERMIT
-            call FINDOBJ
-            jp   z,GOSIMPLY
-            call GETINDY
+            call FindObjectByType
+            jp   z,MoveStraight
+            call ObjIndexFromIY
             ld   (ix+BSUBJ),a
-            jp   GOSIMPLY
+            jp   MoveStraight
 
 
-FINDOBJ:
+FindObjectByType:               ; orig: FINDOBJ - поиск первого объекта по типу в d
 ; ПОИСК ПЕРВОГО ПО ТИПУ В "D"
 ;FZ-ON ЕСЛИ НЕ НАЙДЕН
 ;retiyАДРЕС ВЕКТОРА ОБЪЕКТА
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
 .FIND2
-            call FINDOB
+            call FindAnyObject
             ret  z
             ld   a,(iy+TYPE)
             cp   d
@@ -629,7 +629,7 @@ FINDOBJ:
             ret
 
 
-FINDFREE:
+FindFreeSlot:                   ; orig: FINDFREE - найти свободный вектор объекта
 ; НАЙТИ СВОБОДНЫЙ ВЕКТОР
 ;retFZ-ON ЕСЛИ НЕ НАДЕН
 ;retiyАДРЕС СВОБОДНОГО ВЕКТОРА
@@ -650,7 +650,7 @@ FINDFREE:
             ret
 
 
-NEARCARGO:
+FindNearestCargo:               ; orig: NEARCARGO - найти ближайший груз
 ; НАЙТИ САМЫЙ БЛИЖАЙШИЙ ГРУЗ
             ld   a,#FF
             ld   (NEARC+1),a
@@ -664,7 +664,7 @@ NXTCA2:
             jp   z,$-7
             dec  a
             exx
-            call GETADR
+            call ObjAddrFromIndex
             inc  l
             ld   a,(hl)
             cp   #80
@@ -672,7 +672,7 @@ NXTCA2:
             dec  l
             push hl
             pop  iy
-            call RASTOY
+            call DistanceHigh
 NEARC:      cp   #FF
             jr   nc,$+11
             ld   (NEARC+1),a
@@ -691,7 +691,7 @@ NRC1:
             ret
 
 
-CHECKOBJ:
+CanTakeCargo:                   ; orig: CHECKOBJ - флаг z: объект умеет брать грузы
 ; С ФЛАГОМ z-ON ПОКАЗАТЬ ТЕХ, КТО МОЖЕТ
 ; БРАТЬ ГРУЗЫ
             ld   a,(ix+TYPE)
@@ -709,12 +709,12 @@ CHECKOBJ:
             ret
 
 
-YESCARGO:
+HasCargoToTake:                 ; orig: YESCARGO - проверка наличия грузов для объекта
 ; ПРОВЕРКА ЕСТЬ ЛИ ГРУЗЫ
 ; ТАК ЖЕ ОТСЕИТЬ ТЕХ КТО НЕБЕРЕТ ГРУЗЫ
 ;retFZ-ON НЕТ
 ;FZ-OFF ЕСТЬ
-            call CHECKOBJ
+            call CanTakeCargo
             jr   z,$+4
             xor  a
             ret
@@ -728,7 +728,7 @@ YESCARGO:
             ret
 
 
-MAKEEXPLO:
+MakeExplosion:                  ; orig: MAKEEXPLO - данные о взрыве и осколках объекта
 ; ЗАДАТЬ ДАННЫЕ О ВЗРЫВЕ И ОСКОЛКАХ
 ; ОБЪЕКТА
 
@@ -742,7 +742,7 @@ MAKEEXPLO:
             ld   (OSKOLSPEED+1),a
 
             ld   a,(ix+INDI)
-            call SIZEOBJ
+            call ObjectSize
             ld   a,h
             ex   af,af'
             ld   l,(ix+0)
@@ -755,7 +755,7 @@ MAKEEXPLO:
             exx
             ld   hl,NWVOS
             push ix
-            call NEWVSPR
+            call NewVoxelSprite
             pop  ix
             ld   a,1
             ld   (EXPL+1),a
@@ -846,7 +846,7 @@ JJ11:
             jp   DEATHX
 
 
-RASTOY:
+DistanceHigh:                   ; orig: RASTOY - расстояние (кратное #100) между ix и iy
 ; ВЗЯТЬ РАССТОЯНИЕ КРАТНОЕ #100 ОТ ОДНОГО
 ; ОБЪЕКТА В ixДО ДРУГОГО  iy
 ;reta
@@ -888,20 +888,20 @@ RASTOY:
 ;------------------------
 ; ВЫВОД ЛИНИИ В 3D ПРОСТРАНСТВЕ
 ;------------------------
-OUTLINE:
+DrawLine3D:                     ; orig: OUTLINE - вывод линии по 3D-координатам
 ;de-Z1,hl-Y1,bc-X1
 ;DE'-Z2,HL'-Y2,BC'-X2
-            call CALC2D3D
+            call Project3Dto2D
             ret  nz
             ld   (L9C*256),hl
             ld   (L9C*256+2),de
             exx
-            call CALC2D3D
+            call Project3Dto2D
             ret  nz
             ld   (L9C*256+5),hl
             ld   (L9C*256+7),de
             exx
-            call VSLINE
+            call CheckLineVisible
             ret  z
             ld   b,a
             cpl
@@ -1070,7 +1070,7 @@ RNDO:
             ret
 
 
-VSLINE:
+CheckLineVisible:               ; orig: VSLINE - проверка видимости линии
 ; ПРОВЕРКА ВИДИМОСТИ ЛИНИИ
             ld   hl,(low(L9C)*256)+1
             xor  a

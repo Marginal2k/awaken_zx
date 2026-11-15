@@ -1,96 +1,94 @@
-; BLK3 -- restored from awk2/BLK3.C (357 bytes, STORM tokenized)
-; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
 Datal
-;HL-ADR ON SCREEN
-;A-MEAN
-        LD C,A
-        AND A
-        JR Z,Dln1 ;ECЛИ BOOБЩE = 0
-        CPL
-        AND 7
-        LD A,C
-        JR NZ,$+7
-        ADD A,8
-        AND %11111000
-        LD C,A
-        RRCA
-        RRCA
-        RRCA
-        AND 7
-        JR Z,Dln1
-        LD B,A
-        LD DE,#05AA
-        DUP 5
-            LD (HL),E
-            INC H
-        EDUP
-        LD (HL),E
-        LD A,H
-        SUB D
-        LD H,A
-        INC L
-        DJNZ $-15
+        ; Hl-adr on screen
+        ; A-MEAN
+        ld   c,a
+        and  a
+        jr   z,Dln1             ; Если вообще = 0
+        cpl
+        and  7
+        ld   a,c
+        jr   nz,$+7
+        add  a,8
+        and  %11111000
+        ld   c,a
+        rrca
+        rrca
+        rrca
+        and  7
+        jr   z,Dln1
+        ld   b,a
+        ld   de,#05AA
+        dup  5
+        ld   (hl),e
+        inc  h
+        edup
+        ld   (hl),e
+        ld   a,h
+        sub  d
+        ld   h,a
+        inc  l
+        djnz $-15
 Dln1
-        LD A,C
-        EX AF,AF
-        LD A,C
-        AND 7
-        JR Z,Dln2
-        LD C,A
-        LD B,0
-        EX DE,HL
-        LD HL,Tabr
-        ADD HL,BC
-        LD A,(HL)
-        DUP 5
-            LD (DE),A
-            INC D
-        EDUP
-        LD (DE),A
-        LD A,D
-        SUB 5
-        LD D,A
-        EX DE,HL
-        INC L
+        ld   a,c
+        ex   af,af
+        ld   a,c
+        and  7
+        jr   z,Dln2
+        ld   c,a
+        ld   b,0
+        ex   de,hl
+        ld   hl,Tabr
+        add  hl,bc
+        ld   a,(hl)
+        dup  5
+        ld   (de),a
+        inc  d
+        edup
+        ld   (de),a
+        ld   a,d
+        sub  5
+        ld   d,a
+        ex   de,hl
+        inc  l
 Dln2
-        EX AF,AF
-        LD C,A
-        AND 7
-        LD A,C
-        JR Z,$+4
-        ADD A,8
-        RRCA
-        RRCA
-        RRCA
-        AND 7
-        SUB 6
-        RET NC
-        NEG
-        LD B,A
-        LD DE,#0005
-        XOR A
-        LD (HL),D
-        INC H
-        LD (HL),D
-        INC H
-        LD (HL),D
-        INC H
-        LD (HL),D
-        INC H
-        LD (HL),D
-        INC H
-        LD (HL),D
-        LD A,H
-        SUB E
-        LD H,A
-        INC L
-        DJNZ $-15
-        RET
+        ex   af,af
+        ld   c,a
+        and  7
+        ld   a,c
+        jr   z,$+4
+        add  a,8
+        rrca
+        rrca
+        rrca
+        and  7
+        sub  6
+        ret  nc
+        neg
+        ld   b,a
+        ld   de,#0005
+        xor  a
+        ld   (hl),d
+        inc  h
+        ld   (hl),d
+        inc  h
+        ld   (hl),d
+        inc  h
+        ld   (hl),d
+        inc  h
+        ld   (hl),d
+        inc  h
+        ld   (hl),d
+        ld   a,h
+        sub  e
+        ld   h,a
+        inc  l
+        djnz $-15
+        ret
 Tabr
-        DB %10000000
-        DB %10000000
-        DB %10100000
-        DB %10100000
-        DB %10101000
-        DB %10101000
-        DB %10101010
+        db   %10000000
+        db   %10000000
+        db   %10100000
+        db   %10100000
+        db   %10101000
+        db   %10101000
+        db   %10101010

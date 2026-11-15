@@ -1,4 +1,14 @@
-MULL
+;==============================================================================
+; XR1 - цикл рендера: матрицы вида и объектов (часть S3D)
+;
+; Render3d обходит список объектов, считает матрицу (ObjectMatrix), вызывает клиппинг
+; и рисование. NextObject - выход из вокселей. Идентичен NXT.
+;
+; Часть набора STORM (прототип Awaken 1997/98), не входит в основную игру. Подробности: docs/STORM.md,
+; таблица переименований меток: docs/STORM_LABELS.md. Собирается sjasmplus (см. make_*.asm).
+;==============================================================================
+
+MulADE                          ; orig: MULL
         ld   l,a
         xor  d
         ex   af,af
@@ -80,20 +90,20 @@ RET_    jp   (ix)
 Calcrc
 ; Повернуть координатную систему по матр
 ; Ице sm_xy
-; Iy-RETURN adr
+; Iy-return adr
 ; Портит sp
 ; Начальные 3нач. коорд. b dx,dy,dz
 ; Конечные b тх,ту,tz
 Dx      ld   de,0
 Sm_11   ld   a,0
         ld   ix,$+7
-        jp   MULL
+        jp   MulADE
 
         ld   sp,hl
 Dy      ld   de,0
 Sm_21   ld   a,0
         ld   ix,$+7
-        jp   MULL
+        jp   MulADE
 
         adc  hl,sp
         jp   pe,Exet1
@@ -101,7 +111,7 @@ Sm_21   ld   a,0
 Dz_     ld   de,0
 Sm_31   ld   a,0
         ld   ix,$+7
-        jp   MULL
+        jp   MulADE
 
         adc  hl,sp
         jp   pe,Exet1
@@ -109,13 +119,13 @@ Sm_31   ld   a,0
         ld   de,(Dx+1)          ; Dx
 Sm_12   ld   a,0
         ld   ix,$+7
-        jp   MULL
+        jp   MulADE
 
         ld   sp,hl
         ld   de,(Dy+1)          ; Dy
 Sm_22   ld   a,0
         ld   ix,$+7
-        jp   MULL
+        jp   MulADE
 
         adc  hl,sp
         jp   pe,Exet1
@@ -123,7 +133,7 @@ Sm_22   ld   a,0
         ld   de,(Dz_+1)         ; Dz
 Sm_32   ld   a,0
         ld   ix,$+7
-        jp   MULL
+        jp   MulADE
 
         adc  hl,sp
         jp   pe,Exet1
@@ -131,13 +141,13 @@ Sm_32   ld   a,0
         ld   de,(Dx+1)          ; Dx
 Sm_13   ld   a,0
         ld   ix,$+7
-        jp   MULL
+        jp   MulADE
 
         ld   sp,hl
         ld   de,(Dy+1)          ; Dy
 Sm_23   ld   a,0
         ld   ix,$+7
-        jp   MULL
+        jp   MulADE
 
         adc  hl,sp
         jp   pe,Exet1
@@ -145,7 +155,7 @@ Sm_23   ld   a,0
         ld   de,(Dz_+1)         ; Dz
 Sm_33   ld   a,0
         ld   ix,$+7
-        jp   MULL
+        jp   MulADE
 
         adc  hl,sp
         jp   pe,Exet1
@@ -154,7 +164,7 @@ Exet1
         jp   (iy)
 
 ; Render all 3d and draw
-Ren3d
+Render3d                        ; orig: Ren3d
 ; BEGIN at choosing object that is visib
 ; Le
 
@@ -163,7 +173,7 @@ Ren3d
         ld   a,(Eye_g)          ; Eye G
         ld   (Eyeg),a           ; Gama
 
-        call Matrx
+        call ObjectMatrix
 
         ld   hl,#01
         ld   (Indt1),hl
@@ -585,27 +595,28 @@ La2fd           equ $-#0002
         or   a
         jp   m,VOXOBJ
 
-        call Renobj2
+        call RenderObject2
 
         ld   a,(Sets)
         bit  2,a
         jr   z,La326
-        call Drwpol2            ; Draw poly.
-        jp   NXTO_
+        call DrawPolygonAlt     ; Draw poly.
+        jp   NextObject
 
-La326   call Vsmask
-        jr   z,NXTO_
+La326   call VisibilityMask
+        jr   z,NextObject
         ld   b,a
         cpl
         and  #F0
-        jr   nz,NXTO_
+        jr   nz,NextObject
         ld   a,b
         and  #0F
         jr   nz,$+8
-        call Drwpol2            ; Draw poly.
+        call DrawPolygonAlt     ; Draw poly.
         jp   $+6
-        call Drwpol             ; Draw polygon
-NXTO_   pop  hl
+        call DrawPolygon        ; Draw polygon
+NextObject                      ; orig: NXTO_
+        pop  hl
         ld   a,(hl)
 La33b   cp   #01
         ret  z
@@ -613,7 +624,7 @@ La33b   cp   #01
         jp   La2d8
 
 ; Матрица отдельного объекта
-Matrx
+ObjectMatrix                    ; orig: Matrx
         ld   a,(Eyeb)           ; Beta
         ld   b,a
         add  a,#40

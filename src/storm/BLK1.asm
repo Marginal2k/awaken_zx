@@ -1,13 +1,23 @@
+;==============================================================================
+; BLK1 - управление объектом (старая раздельная версия движка)
+;
+; MoveObjects: управление кораблём, определение столкновений. Фрагмент: ссылается на
+; метки отсутствующих модулей, самостоятельно не линкуется.
+;
+; Часть набора STORM (прототип Awaken 1997/98), не входит в основную игру. Подробности: docs/STORM.md,
+; таблица переименований меток: docs/STORM_LABELS.md. Собирается sjasmplus (см. make_*.asm).
+;==============================================================================
+
 ; Процедуры управления кораблем, определ
 ; Ение его
 ; Столкновений
 
-Moveu
+MoveObjects                     ; orig: Moveu
         call Touch              ; Going through sta
         ; T objects
         call Setcont            ; Get control
         ; Settings
-        jp   Calcstp
+        jp   CalcSteps
 Touch
 Cmode   ld   a,0
         and  a
@@ -257,7 +267,7 @@ Setcont
         call z,Snarad
         bit  3,(ix+1)           ; F
         bit  1,(ix+0)           ; Z
-        ld   a,(Calcstp)
+        ld   a,(CalcSteps)
         cp   #3A
         jr   nz,.Nopwr
         ld   a,(Jflag+1)
@@ -488,7 +498,7 @@ Fline2
 
 Jumpdrv
         ; Форсировка двигателя
-        ld   a,(Calcstp)
+        ld   a,(CalcSteps)
         cp   #C9
         ret  z
         ld   a,1
@@ -623,7 +633,7 @@ Rif1    ld   a,0
         ret
 
 ; Your turns
-Calcstp
+CalcSteps                       ; orig: Calcstp
         ld   a,(Sm_13+1)
 Bfc1    dw   0
         ld   de,(Speed)

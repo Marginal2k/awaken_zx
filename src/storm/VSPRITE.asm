@@ -1,2100 +1,2036 @@
-; VSPRITE -- restored from awk2/VSPRITE.C (11466 bytes, STORM tokenized)
-; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
-;ПРОЦЕДУРА ВЫВОДА ВОКС. СПРАЙТА С
-;С МАСШТАБИРОВАНИЕМ И ПРОЗРАЧНОСТЬЮ
-;ПОРИТ РЕГ. I
+; Процедура вывода вокс. спрайта с
+; С масштабированием и прозрачностью
+; Порит рег. i
 
-        INCLUDE "EQUS.asm"
+        include "EQUS.asm"
 
-
-
-
-
-        ORG #C000
-        JP Vox_
-        JP TAKSPD_
-        JP OUTALL_
-        JP NEWPOS_
-        JP NEWPSS_
-        JP RETURN_
-        JP RRT_
-        JP RLT_
-        JP D3D2_
-
+        org  #C000
+        jp   Vox_
+        jp   TAKSPD_
+        jp   OUTALL_
+        jp   NEWPOS_
+        jp   NEWPSS_
+        jp   RETURN_
+        jp   RRT_
+        jp   RLT_
+        jp   D3D2_
 
 OUTALL_
-        CALL CLER
-        CALL LAND
-        CALL SKY
-        CALL MOVING
-        JP NIGHT
+        call CLER
+        call LAND
+        call SKY
+        call MOVING
+        jp   NIGHT
 
-
-;VOXEL
+; Voxel
 Vox_
-;DE'-ADR OF OBJ
-;HL'-REAL SIZE SPRITE L-X,H-Y
-;B-SIZE Y,C-SIZE X
-;HL-X,DE-Y
-        LD A,B
-        OR A
-        RET Z
-        LD A,C
-        OR A
-        RET Z
-        XOR A
-        LD I,A
-        LD (Vx+1),HL
-        LD (Vy+1),DE
-        LD IYL,C ;SZX
-        LD IYH,B ;SZY
-        LD E,B
-        EXX
-        LD BC,0
-        EXX
-        LD B,0
-Vx      LD HL,0
-        LD A,H
-        AND A
-        JP P,Vx1
-;ЕСЛИ ЧАСТЬ СПРАЙТА ЗА ЭКРАНОМ СЛЕВА
-        ADC HL,BC
-        RET M ;ВЕСЬ СПРАЙТ ЗА ЭКРАНОМ
-        RET Z ;TOЖE
-;КЛИПИРУЕМ
-        LD A,L
-        LD HL,0 ;X=0
-        LD B,C
-        LD C,A ;NEW LEN OF X
-        SUB B
-        LD B,L
-        NEG
-;В "А" БУДЕТ СМЕЩЕНИЕ ПО ШИРИНЕ ДЛЯ
-;ИЗМЕНЕНИЯ АДРЕСА СПРАЙТА
-        EXX
-        LD I,A
-        SET 0,C ;МЕТКА КЛИПИНГА СЛЕВА
-        EXX
-        JP Vx2
+        ; De'-adr of obj
+        ; Hl'-real size sprite l-X,h-Y
+        ; B-size Y,c-size X
+        ; Hl-X,de-Y
+        ld   a,b
+        or   a
+        ret  z
+        ld   a,c
+        or   a
+        ret  z
+        xor  a
+        ld   i,a
+        ld   (Vx+1),hl
+        ld   (Vy+1),de
+        ld   iyl,c              ; SZX
+        ld   iyh,b              ; SZY
+        ld   e,b
+        exx
+        ld   bc,0
+        exx
+        ld   b,0
+Vx      ld   hl,0
+        ld   a,h
+        and  a
+        jp   p,Vx1
+        ; Если часть спрайта за экраном слева
+        adc  hl,bc
+        ret  m                  ; Весь спрайт за экраном
+        ret  z                  ; Тоже
+        ; Клипируем
+        ld   a,l
+        ld   hl,0               ; X=0
+        ld   b,c
+        ld   c,a                ; New LEN of X
+        sub  b
+        ld   b,l
+        neg
+        ; В "а" будет смещение по ширине для
+        ; Изменения адреса спрайта
+        exx
+        ld   i,a
+        set  0,c                ; Метка клипинга слева
+        exx
+        jp   Vx2
 Vx1
-        RET NZ ;ЗА ЭКРНОМ СПРАВА
-        LD A,L
-        CP XEND
-        RET NC ;ТОЖЕ
+        ret  nz                 ; За экрном справа
+        ld   a,l
+        cp   XEND
+        ret  nc                 ; Тоже
 Vx2
-        ADD HL,BC
-        LD A,H
-        OR A
-        LD A,L
-        JR NZ,$+6
-        CP XEND+1
-        JR C,Vy ;ВЕСЬ СПР НА ЭКРАНЕ ПО X
-;ПРАВАЯ ЧАСТЬ СПРАЙТА ЗА ЭКРАНОМ СПРАВА
-;КЛИПИРУЕМ
-        SUB XEND
-        SUB C
-        NEG
-;НОВАЯ ДЛИННА СПРАЙТА
-        LD C,A
-;ПРОВЕРКИ ПО У
-Vy      LD HL,0
-        LD D,0
-        LD A,H
-        AND A
-        JP P,Vx3
-;ЕСЛИ СПРАЙТ ВЫХОДИТ СВЕРХУ ЗА ЭКРАН
-        ADC HL,DE
-        RET M ;ВЫЛЕТ ПО У ВВЕРХУ ВСЕГО
-;СПРАЙТА
-        RET Z ;ТОЖЕ
-        LD A,L
-        LD HL,0 ;У=0
-        LD D,E
-        LD E,A ;НОВАЯ ВЫСОТА СПРАЙТА
-        SUB D
-        LD D,L
-        NEG
-        EXX
-;В "А" КОЛИЧЕСТВО СТРОК ПОДДВЕРГНУТЫХ
-;КЛИППИНГУ, КОТОРЫЕ НЕ ВИДИМЫ
-        LD B,A
-        SET 1,C ;МАРКЕР КЛИПИНГА ПО У
-        EXX
-        JP Vx4
+        add  hl,bc
+        ld   a,h
+        or   a
+        ld   a,l
+        jr   nz,$+6
+        cp   XEND+1
+        jr   c,Vy               ; Весь спр на экране по X
+        ; Правая часть спрайта за экраном справа
+        ; Клипируем
+        sub  XEND
+        sub  c
+        neg
+        ; Новая длинна спрайта
+        ld   c,a
+; Проверки по у
+Vy      ld   hl,0
+        ld   d,0
+        ld   a,h
+        and  a
+        jp   p,Vx3
+        ; Если спрайт выходит сверху за экран
+        adc  hl,de
+        ret  m                  ; Вылет по у вверху всего
+        ; Спрайта
+        ret  z                  ; Тоже
+        ld   a,l
+        ld   hl,0               ; У=0
+        ld   d,e
+        ld   e,a                ; Новая высота спрайта
+        sub  d
+        ld   d,l
+        neg
+        exx
+        ; В "а" количество строк поддвергнутых
+        ; Клиппингу, которые не видимы
+        ld   b,a
+        set  1,c                ; Маркер клипинга по у
+        exx
+        jp   Vx4
 Vx3
-        RET NZ ;ВЕСЬ СПРАЙТ НИЖЕ СКРИНА
-        LD A,L
-        CP YEND
-        RET NC ;ТОЖЕ
+        ret  nz                 ; Весь спрайт ниже скрина
+        ld   a,l
+        cp   YEND
+        ret  nc                 ; Тоже
 Vx4
-        ADD HL,DE
-        LD A,H
-        OR A
-        LD A,L
-        JR NZ,$+6
-        CP YEND+1
-        JR C,Vx5
-;СПРАЙТ ВЫШЕ ВЫСОТЫ СКРАНА ИЛИ ВЫЛЕЗ
-;СНИЗУ
-        SUB YEND
-        SUB E
-        NEG
-        LD E,A ;НОВАЯ ВЫСОТА
+        add  hl,de
+        ld   a,h
+        or   a
+        ld   a,l
+        jr   nz,$+6
+        cp   YEND+1
+        jr   c,Vx5
+        ; Спрайт выше высоты скрана или вылез
+        ; Снизу
+        sub  YEND
+        sub  e
+        neg
+        ld   e,a                ; Новая высота
 Vx5
-;ДЕЛАЕМ НУЖНЫЕ КООРДИНАТЫ ЕСЛИ БЫЛИ
-;КЛИППИНГИ
-        EXX
-        LD A,(Vx+1)
-        BIT 0,C
-        JR Z,$+3
-        XOR A
-        BIT 1,C
-        EXX
-        LD B,A ;КООРДИНАТА Х СПРАЙТА ВЫВД
-        LD A,(Vy+1)
-        JR Z,$+3
-        XOR A
-;"А"-КООРД. У СПРАЙТА ДЛЯ ВЫВОДА
-;РАСЧ. АДР. НА ХАЙД СЛРИНЕ
-        SRL A
-        LD L,D
-        RR L
-        LD H,A ;HL=КООРД. ВЫВОДА У/2
-        LD IXH,E ;КОЛИЧЕСТВО СТРОК
-;КООРД. ВЫВОДА X ПОСЛЕ КЛИППИНГА
-        LD E,B
+        ; Делаем нужные координаты если были
+        ; Клиппинги
+        exx
+        ld   a,(Vx+1)
+        bit  0,c
+        jr   z,$+3
+        xor  a
+        bit  1,c
+        exx
+        ld   b,a                ; Координата х спрайта вывд
+        ld   a,(Vy+1)
+        jr   z,$+3
+        xor  a
+        ; "А"-коорд. у спрайта для вывода
+        ; Расч. адр. на хайд слрине
+        srl  a
+        ld   l,d
+        rr   l
+        ld   h,a                ; Hl=коорд. вывода у/2
+        ld   ixh,e              ; Количество строк
+        ; Коорд. вывода X после клиппинга
+        ld   e,b
 
-;ЗАПОМНИМ КООРД. ВЫВОДА Х
-        LD A,E
-        LD (XX+1),A
+        ; Запомним коорд. вывода х
+        ld   a,e
+        ld   (XX+1),a
 
-        SRL E
+        srl  e
 
-;ПОДГОТОВКА К ВЫВОДУ ВОКСЕЛЯ
-;ВО ВТОРОМ ПОЛУБАЙТЕ
-        LD A,#30 ;JR NC,
-        JR NC,$+6
-        INC C
-        INC C
-        LD A,#38 ;JR C,
-        LD (AW3),A
+        ; Подготовка к выводу вокселя
+        ; Во втором полубайте
+        ld   a,#30              ; Jr nc,
+        jr   nc,$+6
+        inc  c
+        inc  c
+        ld   a,#38              ; Jr c,
+        ld   (AW3),a
 
-        ADD HL,DE
-        SET 7,H
-        EX DE,HL
-;DE-АДР. В СКРИНЕ
-        PUSH DE
-        PUSH BC
-        EXX
-        LD A,L ;РЕАЛЬНАЯ ШИРИНА СПРАЙТА
-        EXX
-        LD B,A ;ЗАПОМНИЛИ
+        add  hl,de
+        set  7,h
+        ex   de,hl
+        ; De-адр. в скрине
+        push de
+        push bc
+        exx
+        ld   a,l                ; Реальная ширина спрайта
+        exx
+        ld   b,a                ; Запомнили
 
-;ИЗНАЧАЛЬНО ЗАДАННАЯ ВЫВОДИМАЯ ШИРИНА
-        LD E,IYL
-;РАСЧИТЫВАЕМ КОЭФ. МАСШТАБИРОВАНИЯ ПО Х
-        CALL DIVV
-;КОЭФ.ПО X=256*РЕАЛ.ШИРИНА/ЗАДАННАЯ
-        EX DE,HL
-;В "HL"-КОЭФ. МАСШТАБИРОВАНИЯ ПО X
-        EXX
-        LD A,H ;РЕАЛЬНАЯ ВЫСОТА
-        EXX
-        LD E,IYH ;ЗАДАННАЯ
-        PUSH HL
-;КОЕФ. МАСШТАБИРОВАНИЯ ПО У
-        CALL DIVV
-        POP HL
-        LD A,E
-        LD IXL,D ;СТАР.БАЙТ КОЕФ.МАСШ.ПО У
-        EXX
-        LD C,A
-;В "C'" МЛАДШ. БАЙТ КОЕФ. МАСШТ. ПО У
-        LD A,B
-        AND A
-        JR Z,Vx6
-;ИЗМЕНЯЕМ АДРЕС СПРАЙТА ЕСЛИ БЫЛ
-;КЛИППИНГ ПО ВЫСОТЕ СПРАЙТА
-;С ВЕРХУ, РЕЗАЛСЯ С ВЕРХУ
-        SLA B
-        LD HL,0
-        LD B,IXL
-        ADD HL,BC
-        DEC A
-        JP NZ,$-2
-        LD A,H
-        AND A
-        JR Z,Vx6
-        LD B,A
-        EXX
-        LD A,B
-        EXX
-        LD L,A
-        LD H,0
-        EX DE,HL
-        ADD HL,DE
-        DJNZ $-1
-        EX DE,HL
+        ; Изначально заданная выводимая ширина
+        ld   e,iyl
+        ; Расчитываем коэф. масштабирования по х
+        call DIVV
+        ; Коэф.по X=256*реал.ширина/заданная
+        ex   de,hl
+        ; В "hl"-коэф. масштабирования по X
+        exx
+        ld   a,h                ; Реальная высота
+        exx
+        ld   e,iyh              ; Заданная
+        push hl
+        ; Коеф. масштабирования по у
+        call DIVV
+        pop  hl
+        ld   a,e
+        ld   ixl,d              ; Стар.байт коеф.масш.по у
+        exx
+        ld   c,a
+        ; В "c'" младш. байт коеф. масшт. по у
+        ld   a,b
+        and  a
+        jr   z,Vx6
+        ; Изменяем адрес спрайта если был
+        ; Клиппинг по высоте спрайта
+        ; С верху, резался с верху
+        sla  b
+        ld   hl,0
+        ld   b,ixl
+        add  hl,bc
+        dec  a
+        jp   nz,$-2
+        ld   a,h
+        and  a
+        jr   z,Vx6
+        ld   b,a
+        exx
+        ld   a,b
+        exx
+        ld   l,a
+        ld   h,0
+        ex   de,hl
+        add  hl,de
+        djnz $-1
+        ex   de,hl
 Vx6
-        EXX
-        LD A,I ;КОЛ.КЛИПНУТЫХ ДАБЛ
-;ВОКСЕЛЕЙ ПО ШИРИНЕ
-;СЛЕВА
-        AND A
-        JR Z,P1
-;ИЗМЕНЯЕМ АДРЕС СПРАЙТА ЕСЛИ БЫЛ КЛИПИНГ
-;СЛЕВА ПО ШИРИНЕ
-        EX DE,HL
-;ПРОСУММИРУЕМ КОЕФ. МАСШТ. ПО ШИРИНЕ
-;СТОЛЬКО РАЗ СКОЛЬКО НУЖНО КЛИПНУТЬ
-;ДАБЛ ВОКСЕЛЕЙ
+        exx
+        ld   a,i                ; Кол.клипнутых дабл
+        ; Вокселей по ширине
+        ; Слева
+        and  a
+        jr   z,P1
+        ; Изменяем адрес спрайта если был клипинг
+        ; Слева по ширине
+        ex   de,hl
+; Просуммируем коеф. масшт. по ширине
+; Столько раз сколько нужно клипнуть
+; Дабл вокселей
 
-        LD HL,0
-        EX AF,AF'
-        XOR A
-        EX AF,AF'
-        EX AF,AF'
-        ADD HL,DE
-        ADC A,0
-        EX AF,AF'
-        DEC A
-        JP NZ,$-6
+        ld   hl,0
+        ex   af,af'
+        xor  a
+        ex   af,af'
+        ex   af,af'
+        add  hl,de
+        adc  a,0
+        ex   af,af'
+        dec  a
+        jp   nz,$-6
 
-        LD A,H
-        EXX
-        LD L,A
-        EX AF,AF'
-        LD H,A
-        ADD HL,DE
-        EX DE,HL
-        EXX
-        EX DE,HL
+        ld   a,h
+        exx
+        ld   l,a
+        ex   af,af'
+        ld   h,a
+        add  hl,de
+        ex   de,hl
+        exx
+        ex   de,hl
 P1
-        LD A,B
-        POP BC
-        POP DE
+        ld   a,b
+        pop  bc
+        pop  de
 
-;ВЫВОД ВОКСЕЛЯ С МАСШТАБИРОВАНИЕМ
-;C-КОЛИЧЕСТВО ВОКСЕЛЕЙ В СТРОКЕ
-;DE-АДРЕС НА СКРИНЕ
-;HX-КОЛ. СТРОК
-;HL-КОЕФ. СМЕЩЕНИЯ ПО Х
-;C'-МЛАДШИЙ БАЙТ ПРОРЕЖИВАНИЯ ПО У
-;LX-СТАРШИЙ БАЙТ ПРОРЕЖИВАНИЯ ПО У
-;DE'-АДРЕС СПРАЙТА, #XX00
-;A-РЕАЛЬНОЕ КОЛ. ВОКСЕЛЕЙ В СТРОКЕ
-;СПРАЙТА
+; Вывод вокселя с масштабированием
+; C-количество вокселей в строке
+; De-адрес на скрине
+; Hx-кол. строк
+; Hl-коеф. смещения по х
+; C'-младший байт прореживания по у
+; Lx-старший байт прореживания по у
+; De'-адрес спрайта, #xx00
+; A-реальное кол. вокселей в строке
+; Спрайта
 Voxout
-        LD (Stkv+1),SP
+        ld   (Stkv+1),sp
 
-        LD (Vxll+1),A ;РЕАЛЬНАЯ ШИРИНА
+        ld   (Vxll+1),a         ; Реальная ширина
 
-        LD SP,HL ;КОЕФ. МАСШ. ПО Х
-;УМНОЖАЕМ СТАРШИЙ БАЙТ КОЕФ.
-;ПРОРЕЖИВАНИЯ НА РЕАЛЬНУЮ ДЛИННУ СТРОКИ
-;ЧТО БЫ ПОЛУЧИТЬ КОЕФ. ПРОРЕЖ. ПО У
-;КРАТНЫЙ ДЛИННЕ СТРОКИ
-        LD B,A
-        LD A,IXL
-        OR A
-        JR Z,P2
-        LD HL,0
-        EX AF,AF'
-        LD A,C
-        EX AF,AF'
-        LD C,B
-        LD B,0
-        ADD HL,BC
-        DEC A
-        JP NZ,$-2
-        EX AF,AF'
-        LD C,A
+        ld   sp,hl              ; Коеф. масш. по х
+        ; Умножаем старший байт коеф.
+        ; Прореживания на реальную длинну строки
+        ; Что бы получить коеф. прореж. по у
+        ; Кратный длинне строки
+        ld   b,a
+        ld   a,ixl
+        or   a
+        jr   z,P2
+        ld   hl,0
+        ex   af,af'
+        ld   a,c
+        ex   af,af'
+        ld   c,b
+        ld   b,0
+        add  hl,bc
+        dec  a
+        jp   nz,$-2
+        ex   af,af'
+        ld   c,a
 
-        LD A,L
-        LD IXL,A
-        LD A,H
-;"А"-СМЕЩЕНИЕ ДЛЯ СТ.БАЙТА АДРЕСА СПРАЙТ
+        ld   a,l
+        ld   ixl,a
+        ld   a,h
+; "А"-смещение для ст.байта адреса спрайт
 P2
-        LD (WE1+1),A
+        ld   (WE1+1),a
 
-;РАСЧИТЫВАЕМ АДРЕС НАЧАЛА ВЫВОДА ВОКСЕЛЯ
-;В РАЗВЕРНУТОМ ЦИКЛЕ ПРОЦЕДУРЫ
+; Расчитываем адрес начала вывода вокселя
+; В развернутом цикле процедуры
 
-;ПОДГОТОВКА К ВЫВОДУ ОДНОГО ВОКСЕЛЯ
-;В ПЕРВОМ ПОЛУБЙТЕ
-;НАХОДИМ СЛЕД. КООРД. Х ПОСЛЕ СПРАЙТА
-;ЕСЛИ 0 БИТ ЕЕ =0 ТО ВЕСЬ ЗНАКОМЕСТ
-;В ВОКСЕЛЯХ
-;ИНАЧЕ ТОЛЬКО ОДИН ПЕРВЫЙ ПОЛУЗНАКОМЕСТ
-;ЗАПОЛНЯЕТСЯ
-XX      LD A,0
-        ADD A,C
-        RRA
-        LD A,#0F
-        JR NC,Q2
-        LD A,(AW3)
-        CP #38
-        JR Z,$+3
-        INC C
-        XOR A
+; Подготовка к выводу одного вокселя
+; В первом полубйте
+; Находим след. коорд. х после спрайта
+; Если 0 бит ее =0 то весь знакомест
+; В вокселях
+; Иначе только один первый полузнакомест
+; Заполняется
+XX      ld   a,0
+        add  a,c
+        rra
+        ld   a,#0F
+        jr   nc,Q2
+        ld   a,(AW3)
+        cp   #38
+        jr   z,$+3
+        inc  c
+        xor  a
 Q2
-        LD (AW1+1),A
-        LD (AW2+1),A
+        ld   (AW1+1),a
+        ld   (AW2+1),a
 
-        SRL C
-        LD A,#20
-        SUB C
-        JP NC,$+4
-        XOR A
-        LD L,A
-        LD H,0
-        LD C,L
-        LD B,H
-;84b
+        srl  c
+        ld   a,#20
+        sub  c
+        jp   nc,$+4
+        xor  a
+        ld   l,a
+        ld   h,0
+        ld   c,l
+        ld   b,h
+; 84b
 
-        DUP 2
-            ADD HL,HL
-        EDUP
-        ADD HL,BC
-        DUP 2
-            ADD HL,HL
-        EDUP
-        ADD HL,BC
-        DUP 2
-            ADD HL,HL
-        EDUP
-        LD BC,VXL4
-        ADD HL,BC
-        LD (VXL3+1),HL
-AW3     JR NC,Q1
-        INC HL
-        INC HL
-        INC HL
-        INC HL
-        LD (HL),0
-        DEC HL
+        dup  2
+        add  hl,hl
+        edup
+        add  hl,bc
+        dup  2
+        add  hl,hl
+        edup
+        add  hl,bc
+        dup  2
+        add  hl,hl
+        edup
+        ld   bc,VXL4
+        add  hl,bc
+        ld   (VXL3+1),hl
+AW3     jr   nc,Q1
+        inc  hl
+        inc  hl
+        inc  hl
+        inc  hl
+        ld   (hl),0
+        dec  hl
 Q1
-        LD (VXL2+1),HL
-        LD IYL,E ;ДУБЛИРУЕМ МЛ.БАЙТ АДРЕСА
-        LD C,E
-        LD B,D
-        RRA
-        LD H,high(VXTAB)+3
-        LD A,#A9 ;RES 5,C
-        JR C,$+8
-        SET 5,C
-        LD H,high(VXTAB)
-        LD A,#E9 ;SET 5,C
-        LD (AW4+1),A
-        LD A,H
-        LD (AW5+1),A
+        ld   (VXL2+1),hl
+        ld   iyl,e              ; Дублируем мл.байт адреса
+        ld   c,e
+        ld   b,d
+        rra
+        ld   h,high(VXTAB)+3
+        ld   a,#A9              ; Res 5,c
+        jr   c,$+8
+        set  5,c
+        ld   h,high(VXTAB)
+        ld   a,#E9              ; Set 5,c
+        ld   (AW4+1),a
+        ld   a,h
+        ld   (AW5+1),a
 
-        LD D,#0F
-        EXX
-        XOR A
-        LD B,E
+        ld   d,#0F
+        exx
+        xor  a
+        ld   b,e
 Vxl3
-;A'-СЧЕТЧИК СМЕЩЕНИЯ ПО СТРОКАМ
-;LX-СТАРШИЙ БАЙТ ПРОРЕЖ. ПО У,КРАТЕН КОЛ
-;ВОКСЕЛЕЙ В СТРОКЕ
-        EX AF,AF'
-        LD H,B
-        LD L,0
+        ; A'-счетчик смещения по строкам
+        ; Lx-старший байт прореж. по у,кратен кол
+        ; Вокселей в строке
+        ex   af,af'
+        ld   h,b
+        ld   l,0
 
-
-;SP-ПРОРЕЖ. ПО Х
-;H-МЛАДШИЙ БАЙТ АДРЕСА СПРАЙТА
-;L-ЕГО СЧЕТЧИК К УВЕЛИЧЕНИЮ
-;D-СТАРШИЙ БАЙТ АДРЕСА СПРАЙТА
-VXL2    JP 0
+; Sp-прореж. по х
+; H-младший байт адреса спрайта
+; L-его счетчик к увеличению
+; D-старший байт адреса спрайта
+VXL2    jp   0
 
 VXL4
-        INCLUDE "VOXP.asm"
+        include "VOXP.asm"
 
+; 157 Takts one cycle
 
-;157 TAKTS ONE CYCLE
-
-        LD A,IYL
-        ADD A,#80
-        LD C,A
-        LD IYL,A
-        JR NC,$+3
-        INC B
-AW4     SET 5,C
-AW5     LD H,0
-        EXX
-        EX AF,AF
-        ADD A,C
-        LD L,A
-        LD A,B
-        JR NC,$+6
-Vxll    ADD A,0 ;LEN OF STRING
-        JR C,V3
+        ld   a,iyl
+        add  a,#80
+        ld   c,a
+        ld   iyl,a
+        jr   nc,$+3
+        inc  b
+AW4     set  5,c
+AW5     ld   h,0
+        exx
+        ex   af,af
+        add  a,c
+        ld   l,a
+        ld   a,b
+        jr   nc,$+6
+Vxll    add  a,0                ; LEN of string
+        jr   c,V3
 V4
-        ADD A,IXL
-        LD B,A
-        LD A,D
-WE1     ADC A,0
-        LD D,A
-        LD A,L
-        DEC IXH
-        JP NZ,Vxl3
-VXL3    LD HL,0
-        DUP 4
-            INC HL
-        EDUP
-        LD (HL),#F0
+        add  a,ixl
+        ld   b,a
+        ld   a,d
+WE1     adc  a,0
+        ld   d,a
+        ld   a,l
+        dec  ixh
+        jp   nz,Vxl3
+VXL3    ld   hl,0
+        dup  4
+        inc  hl
+        edup
+        ld   (hl),#F0
 
-Stkv    LD SP,0
-        RET
-V3      INC D
-        JP V4
-
-
+Stkv    ld   sp,0
+        ret
+V3      inc  d
+        jp   V4
 
 LAND
-        LD (Stkv_+1),SP
-        LD A,#20
-        LD (TYPE_+1),A
+        ld   (Stkv_+1),sp
+        ld   a,#20
+        ld   (TYPE_+1),a
 
+        ld   a,#30              ; Jr nc
+        ld   (COM2),a
+        ld   a,#24              ; Inc h
+        ld   (COM1),a
 
+        ld   b,#0B              ; Кол.вокс.строк земли
+        exx
 
-        LD A,#30 ;JR NC
-        LD (COM2),A
-        LD A,#24 ;INC H
-        LD (COM1),A
+        ld   hl,(PLANT)
+        ld   (ADSPR+1),hl
 
-
-        LD B,#0B ;КОЛ.ВОКС.СТРОК ЗЕМЛИ
-        EXX
-
-        LD HL,(PLANT)
-        LD (ADSPR+1),HL
-
-
-;HL-АДР. В СКРИНЕ
-        LD HL,#8680
+        ; Hl-адр. в скрине
+        ld   hl,#8680
 
 VXL3_
-        LD E,L ;ДУБЛИРУЕМ МЛ.БАЙТ АДРЕСА
-        LD D,#80
-        LD B,high(VXTAB)
-        SET 5,L
-        EXX
+        ld   e,l                ; Дублируем мл.байт адреса
+        ld   d,#80
+        ld   b,high(VXTAB)
+        set  5,l
+        exx
 
-        LD A,0
+        ld   a,0
 Vxl3_
-        LD C,A
-        EX AF,AF'
-;ТАБЛИЦА ПРОРЕЖ. ПО Х И ПО У
-;ДЛЯ КАЖДОЙ ПОЗИЦИИ У
-;ПЕРВЫЙ, ВТОРОЙ БАЙТЫ СМЕЩ. В АДР.СПРЙТА
-;ТРЕТИЙ, ЧЕТВЕРТЫЙ БАЙТЫ ПРОРЕЖ. ПО X
+        ld   c,a
+        ex   af,af'
+; Таблица прореж. по х и по у
+; Для каждой позиции у
+; Первый, второй байты смещ. в адр.спрйта
+; Третий, четвертый байты прореж. по X
 
-        LD A,C
-        RLCA
-TYPE_   OR 0 ;0-ПОЧВА,#40-НЕБО
-        LD L,A
-        LD H,high(TSX)
+        ld   a,c
+        rlca
+TYPE_   or   0                  ; 0-Почва,#40-небо
+        ld   l,a
+        ld   h,high(TSX)
 
-        LD E,(HL)
-        INC L
-        LD D,(HL)
-        EX DE,HL
-        LD SP,HL
-        EX DE,HL
+        ld   e,(hl)
+        inc  l
+        ld   d,(hl)
+        ex   de,hl
+        ld   sp,hl
+        ex   de,hl
 
-        RES 5,L
+        res  5,l
 
-        LD D,(HL)
-        DEC L
-        LD E,(HL)
-ADSPR   LD HL,0
-        ADD HL,DE
-        EX DE,HL
+        ld   d,(hl)
+        dec  l
+        ld   e,(hl)
+ADSPR   ld   hl,0
+        add  hl,de
+        ex   de,hl
 
-        LD H,E
-        LD L,0
+        ld   h,e
+        ld   l,0
 
+; Sp-прореж. по х
+; H-младший байт адреса спрайта
 
-;SP-ПРОРЕЖ. ПО Х
-;H-МЛАДШИЙ БАЙТ АДРЕСА СПРАЙТА
-
-;L-ЕГО СЧЕТЧИК К УВЕЛИЧЕНИЮ
-;D-СТАРШИЙ БАЙТ АДРЕСА СПРАЙТА
-;C-СЧЕТЧИК СТРОК
-
+; L-его счетчик к увеличению
+; D-старший байт адреса спрайта
+; C-счетчик строк
 
 VXL4_
-        INCLUDE "VOXL.asm"
+        include "VOXL.asm"
 
-        LD A,E
-        ADD A,D
-        LD L,A
-        LD E,A
-COM2    JR NC,$+3 ;JR NC/C
-COM1    INC H ;INC/DEC
-        SET 5,L
-        EXX
-        EX AF,AF'
-        INC A
-        DEC B
-        JP NZ,Vxl3_
-Stkv_   LD SP,0
-        RET
-
-
-
-
-
+        ld   a,e
+        add  a,d
+        ld   l,a
+        ld   e,a
+COM2    jr   nc,$+3             ; Jr nc/c
+COM1    inc  h                  ; Inc/dec
+        set  5,l
+        exx
+        ex   af,af'
+        inc  a
+        dec  b
+        jp   nz,Vxl3_
+Stkv_   ld   sp,0
+        ret
 
 SKY
-        LD (Stkv_+1),SP
+        ld   (Stkv_+1),sp
 
-        LD A,#60
-        LD (TYPE_+1),A
+        ld   a,#60
+        ld   (TYPE_+1),a
 
-        LD A,#38 ;JR C
-        LD (COM2),A
-        LD A,#25 ;DEC H
-        LD (COM1),A
+        ld   a,#38              ; Jr c
+        ld   (COM2),a
+        ld   a,#25              ; Dec h
+        ld   (COM1),a
 
-        LD HL,(SKYS)
-        LD (ADSPR+1),HL
+        ld   hl,(SKYS)
+        ld   (ADSPR+1),hl
 
-        LD B,#0A
-        EXX
+        ld   b,#0A
+        exx
 
-;DE-АДР. В СКРИНЕ
-        LD HL,#8480
-        JP VXL3_
-
-
+        ; De-адр. в скрине
+        ld   hl,#8480
+        jp   VXL3_
 
 NIGHT
-;ЗАТУХАНИЕ СПРАЙТОВ ДЛЯ СОЗДАНИЯ
-;ЭФЕКТА  НОЧИ
-        LD HL,1
-        DEC HL
-        LD (NIGHT+1),HL
-        LD A,L
-        OR H
-        RET NZ
-        LD HL,1000
-        LD (NIGHT+1),HL
+        ; Затухание спрайтов для создания
+        ; Эфекта  ночи
+        ld   hl,1
+        dec  hl
+        ld   (NIGHT+1),hl
+        ld   a,l
+        or   h
+        ret  nz
+        ld   hl,1000
+        ld   (NIGHT+1),hl
 
-        LD HL,(SKYS)
-        LD BC,#0C00
+        ld   hl,(SKYS)
+        ld   bc,#0C00
 G1
-        LD A,(HL)
-        OR A
-        JR Z,$+5
-        SUB #11
-        LD (HL),A
-        INC HL
-        DEC BC
-        LD A,B
-        OR C
-        JP NZ,G1
+        ld   a,(hl)
+        or   a
+        jr   z,$+5
+        sub  #11
+        ld   (hl),a
+        inc  hl
+        dec  bc
+        ld   a,b
+        or   c
+        jp   nz,G1
 
-        LD A,%10101010
-        RRCA
-        LD ($-2),A
-        RET NC
-        LD HL,(PLANT)
-        LD BC,#0C00
-G2
-        LD A,(HL)
-        OR A
-        JR Z,$+5
-        SUB #11
-        LD (HL),A
-        INC HL
-        DEC BC
-        LD A,B
-        OR C
-        JP NZ,G2
-        RET
-
-
-
+        ld   a,%10101010
+        rrca
+        ld   ($-2),a
+        ret  nc
+        ld   hl,(PLANT)
+        ld   bc,#0C00
+.G2
+        ld   a,(hl)
+        or   a
+        jr   z,$+5
+        sub  #11
+        ld   (hl),a
+        inc  hl
+        dec  bc
+        ld   a,b
+        or   c
+        jp   nz,.G2
+        ret
 
 RETURN_
-;ВОССТАНОВЛЕНИЕ РУЛЯ
-        LD A,%10101010
-        RRCA
-        LD ($-2),A
-        RET NC
-        LD A,(UNGLE)
-        OR A
-        RET Z
-        JP P,RLT_
-        JP RRT_
-
-
+        ; Восстановление руля
+        ld   a,%10101010
+        rrca
+        ld   ($-2),a
+        ret  nc
+        ld   a,(UNGLE)
+        or   a
+        ret  z
+        jp   p,RLT_
+        jp   RRT_
 
 RLT_
-        LD A,(UNGLE)
-        DEC A
-        JP P,$+7
-        CP 0-STPTURN
-        JR C,$+5
-        LD (UNGLE),A
+        ld   a,(UNGLE)
+        dec  a
+        jp   p,$+7
+        cp   0-STPTURN
+        jr   c,$+5
+        ld   (UNGLE),a
 RP4
-        LD L,A
-        LD BC,TSX
-RP44
-        LD A,(BC)
-        LD E,A
-        ADD A,L
-        AND #3F
-        LD D,A
-        LD A,E
-        AND #C0
-        OR D
-        LD (BC),A
-        SET 6,C
-        LD A,(BC)
-        LD E,A
-        ADD A,L
-        AND #3F
-        LD D,A
-        LD A,E
-        AND #C0
-        OR D
-        LD (BC),A
-        RES 6,C
-        INC C
-        INC C
+        ld   l,a
+        ld   bc,TSX
+.RP44
+        ld   a,(bc)
+        ld   e,a
+        add  a,l
+        and  #3F
+        ld   d,a
+        ld   a,e
+        and  #C0
+        or   d
+        ld   (bc),a
+        set  6,c
+        ld   a,(bc)
+        ld   e,a
+        add  a,l
+        and  #3F
+        ld   d,a
+        ld   a,e
+        and  #C0
+        or   d
+        ld   (bc),a
+        res  6,c
+        inc  c
+        inc  c
 
-        LD A,#18
-        CP C
-        JP NZ,RP44
-        RET
-
-
+        ld   a,#18
+        cp   c
+        jp   nz,.RP44
+        ret
 
 RRT_
-;ПОВОРОТ ВПРАВО ЭКРАНА
-        LD A,(UNGLE)
-        INC A
-        JP M,$+7
-        CP STPTURN+1
-        JR NC,$+5
-        LD (UNGLE),A
-        JP RP4
-
-
-
+        ; Поворот вправо экрана
+        ld   a,(UNGLE)
+        inc  a
+        jp   m,$+7
+        cp   STPTURN+1
+        jr   nc,$+5
+        ld   (UNGLE),a
+        jp   RP4
 
 TAKSPD_
-;ВКЛЮЧИТЬ СКОРОСТЬ
-        OR A
-        LD C,A
-        LD A,%10001000
-        JP M,RP0
-        LD A,%10001000
-        JR Z,RP0
-        DEC C
-        LD A,%10001000
-        JR Z,RP0
-        DEC C
-        LD A,%10101010
-        JR Z,RP0
-        LD A,#FF
-RP0
-        LD (MDN+1),A
-        RET
-
-
+        ; Включить скорость
+        or   a
+        ld   c,a
+        ld   a,%10001000
+        jp   m,.RP0
+        ld   a,%10001000
+        jr   z,.RP0
+        dec  c
+        ld   a,%10001000
+        jr   z,.RP0
+        dec  c
+        ld   a,%10101010
+        jr   z,.RP0
+        ld   a,#FF
+.RP0
+        ld   (MDN+1),a
+        ret
 
 MOVING
-        LD A,(SPEED)
-        OR A
-        JP Z,NEBO2
-        JP P,MDN
-;ПЕРЕМЕЩЕНИЕ ФОНА ОТ СЕБЯ
-        LD A,(MDN+1)
-        RLCA
-        LD (MDN+1),A
-        RET NC
-        LD BC,TSX
-        LD DE,#40
-RP1
-        LD A,(BC)
-        LD L,A
-        INC C
-        LD A,(BC)
-        LD H,A
-        ADD HL,DE
-        LD A,H
-        CP #0B
-        JR NZ,RP5
-        LD H,0
-        LD A,L
-        SUB 19
-        AND #3F
-        LD L,A
-RP5
-        LD A,H
-        LD (BC),A
-        DEC C
-        LD A,L
-        LD (BC),A
-        INC C
-        INC C
-        LD A,#18
-        CP C
-        JP NZ,RP1
-        JP NEBO
-
-
-
-
-
-
+        ld   a,(SPEED)
+        or   a
+        jp   z,NEBO2
+        jp   p,MDN
+        ; Перемещение фона от себя
+        ld   a,(MDN+1)
+        rlca
+        ld   (MDN+1),a
+        ret  nc
+        ld   bc,TSX
+        ld   de,#40
+.RP1
+        ld   a,(bc)
+        ld   l,a
+        inc  c
+        ld   a,(bc)
+        ld   h,a
+        add  hl,de
+        ld   a,h
+        cp   #0B
+        jr   nz,.RP5
+        ld   h,0
+        ld   a,l
+        sub  19
+        and  #3F
+        ld   l,a
+.RP5
+        ld   a,h
+        ld   (bc),a
+        dec  c
+        ld   a,l
+        ld   (bc),a
+        inc  c
+        inc  c
+        ld   a,#18
+        cp   c
+        jp   nz,.RP1
+        jp   NEBO
 
 MDN
-;ПЕРЕМЕЩЕНИЕ ФОНА К СЕБЕ
-        LD A,%10101010
-        RRCA
-        LD ($-2),A
-        JP NC,NEBO
-        LD DE,#FFC0
-        LD BC,TSX
-RP2
-        LD A,(BC)
-        LD L,A
-        INC C
-        LD A,(BC)
-        LD H,A
-        ADD HL,DE
-        JR C,RP3
-        LD H,#0A
-        LD A,L
-        ADD A,19
-        AND #3F
-        OR #C0
-        LD L,A
-RP3
-        LD A,H
-        LD (BC),A
-        DEC C
-        LD A,L
-        LD (BC),A
-        INC C
-        INC C
-        LD A,#18
-        CP C
-        JP NZ,RP2
-        JP NEBO
+        ; Перемещение фона к себе
+        ld   a,%10101010
+        rrca
+        ld   ($-2),a
+        jp   nc,NEBO
+        ld   de,#FFC0
+        ld   bc,TSX
+.RP2
+        ld   a,(bc)
+        ld   l,a
+        inc  c
+        ld   a,(bc)
+        ld   h,a
+        add  hl,de
+        jr   c,.RP3
+        ld   h,#0A
+        ld   a,l
+        add  a,19
+        and  #3F
+        or   #C0
+        ld   l,a
+.RP3
+        ld   a,h
+        ld   (bc),a
+        dec  c
+        ld   a,l
+        ld   (bc),a
+        inc  c
+        inc  c
+        ld   a,#18
+        cp   c
+        jp   nz,.RP2
+        jp   NEBO
 
 NEBO2
-        LD A,%10101010
-        RLCA
-        LD ($-2),A
-        RET NC
+        ld   a,%10101010
+        rlca
+        ld   ($-2),a
+        ret  nc
 NEBO
-        LD A,%00100000
-        RLCA
-        LD ($-2),A
-        RET NC
-        LD DE,#FFC0
-        LD BC,TSXS
-RP22
-        LD A,(BC)
-        LD L,A
-        INC C
-        LD A,(BC)
-        LD H,A
-        ADD HL,DE
-        JR C,RP32
-        LD H,#0A
-        LD A,L
-        ADD A,19
-        AND #3F
-        OR #C0
-        LD L,A
-RP32
-        LD A,H
-        LD (BC),A
-        DEC C
-        LD A,L
-        LD (BC),A
-        INC C
-        INC C
-        LD A,#58
-        CP C
-        JP NZ,RP22
-        RET
-
-
-
-
+        ld   a,%00100000
+        rlca
+        ld   ($-2),a
+        ret  nc
+        ld   de,#FFC0
+        ld   bc,TSXS
+.RP22
+        ld   a,(bc)
+        ld   l,a
+        inc  c
+        ld   a,(bc)
+        ld   h,a
+        add  hl,de
+        jr   c,.RP32
+        ld   h,#0A
+        ld   a,l
+        add  a,19
+        and  #3F
+        or   #C0
+        ld   l,a
+.RP32
+        ld   a,h
+        ld   (bc),a
+        dec  c
+        ld   a,l
+        ld   (bc),a
+        inc  c
+        inc  c
+        ld   a,#58
+        cp   c
+        jp   nz,.RP22
+        ret
 
 CLER
-        LD (STK1+1),SP
-        LD SP,#8680
-        LD HL,#00
-        DUP 192
-            PUSH HL
-        EDUP
-STK1    LD SP,0
-        RET
-
+        ld   (STK1+1),sp
+        ld   sp,#8680
+        ld   hl,#00
+        dup  192
+        push hl
+        edup
+STK1    ld   sp,0
+        ret
 
 FINDY
-        EXX
-        PUSH DE
-        LD A,H
-        EXX
-        POP DE
-        LD L,A
-        LD H,0
-        CALL DIVW
-        EX DE,HL
-        RET
+        exx
+        push de
+        ld   a,h
+        exx
+        pop  de
+        ld   l,a
+        ld   h,0
+        call DIVW
+        ex   de,hl
+        ret
 FINDX
-        EXX
-        LD A,D
-        EXX
-        LD E,A
-        EXX
-        LD A,L
-        EXX
-        CALL DIVV
-        RET
+        exx
+        ld   a,d
+        exx
+        ld   e,a
+        exx
+        ld   a,l
+        exx
+        call DIVV
+        ret
 
 STORED
-        PUSH BC
-        EXX
-        LD A,B
-        EXX
-        LD HL,0
-        OR A
-        JR Z,S1
-        LD BC,#40
-        ADD HL,BC
-        DEC A
-        JP NZ,$-2
-S3
-        LD A,H
-        CP #0A
-        JR C,S1
-        SUB #0A
-        LD H,A
-        JR S3
-S1
-        PUSH HL
-        CALL FINDX
-        EX DE,HL
-        PUSH HL
-        XOR A
-        DUP 8
-            ADD HL,HL
-            ADC A,A
-        EDUP
-        LD D,A
-        LD E,H
-        LD A,#40
-        CALL DIV
-        EX DE,HL
-        LD (IX+#20),E
-        LD (IX+#21),D
-        POP BC
-        POP HL
-        LD A,#20
-        SUB B
-;A-КОЛ. ВОКС. КОТОРЫЕ НУЖНО ПРОПУСТИТЬ
-;НА ЭКРАНЕ
-;НУЖНО КОЛ. ВОКСЕЛЕЙ КОТ. НУЖНО ПРОПУСТ.
-;В СТРОКЕ
-;X=A*D.E
-        PUSH HL
-;HL=A*DE
-        LD C,#00
-        LD H,C
-        LD L,C
-        ADD A,A
-        ADD A,A
-        JR C,$+23
-        ADD A,A
-        JR C,$+26
-        ADD A,A
-        JR C,$+29
-        ADD A,A
-        JR C,$+32
-        ADD A,A
-        JR C,$+35
-        ADD A,A
-        JR C,$+38
-        ADD A,A
-        JR C,$+41
-        JP $+45
-        ADD HL,DE
-        ADC A,C
-        ADD HL,HL
-        ADC A,A
-        JR NC,$+4
-        ADD HL,DE
-        ADC A,C
-        ADD HL,HL
-        ADC A,A
-        JR NC,$+4
-        ADD HL,DE
-        ADC A,C
-        ADD HL,HL
-        ADC A,A
-        JR NC,$+4
-        ADD HL,DE
-        ADC A,C
-        ADD HL,HL
-        ADC A,A
-        JR NC,$+4
-        ADD HL,DE
-        ADC A,C
-        ADD HL,HL
-        ADC A,A
-        JR NC,$+4
-        ADD HL,DE
-        ADC A,C
-        ADD HL,HL
-        ADC A,A
-        JR NC,$+4
-        ADD HL,DE
-        ADC A,C
-        LD L,H
-        LD H,A
-        POP DE
-        LD A,E
-        AND #C0
-        LD H,A
-        LD A,E
-        SUB L
-        AND #3F
-        OR H
-        LD E,A
-        LD (IX+#00),E
-        LD (IX+#01),D
-        POP BC
-        RET
+        push bc
+        exx
+        ld   a,b
+        exx
+        ld   hl,0
+        or   a
+        jr   z,.S1
+        ld   bc,#40
+        add  hl,bc
+        dec  a
+        jp   nz,$-2
+.S3
+        ld   a,h
+        cp   #0A
+        jr   c,.S1
+        sub  #0A
+        ld   h,a
+        jr   .S3
+.S1
+        push hl
+        call FINDX
+        ex   de,hl
+        push hl
+        xor  a
+        dup  8
+        add  hl,hl
+        adc  a,a
+        edup
+        ld   d,a
+        ld   e,h
+        ld   a,#40
+        call DIV
+        ex   de,hl
+        ld   (ix+#20),e
+        ld   (ix+#21),d
+        pop  bc
+        pop  hl
+        ld   a,#20
+        sub  b
+        ; A-кол. вокс. которые нужно пропустить
+        ; На экране
+        ; Нужно кол. вокселей кот. нужно пропуст.
+        ; В строке
+        ; X=a*d.e
+        push hl
+        ; Hl=a*de
+        ld   c,#00
+        ld   h,c
+        ld   l,c
+        add  a,a
+        add  a,a
+        jr   c,$+23
+        add  a,a
+        jr   c,$+26
+        add  a,a
+        jr   c,$+29
+        add  a,a
+        jr   c,$+32
+        add  a,a
+        jr   c,$+35
+        add  a,a
+        jr   c,$+38
+        add  a,a
+        jr   c,$+41
+        jp   $+45
+        add  hl,de
+        adc  a,c
+        add  hl,hl
+        adc  a,a
+        jr   nc,$+4
+        add  hl,de
+        adc  a,c
+        add  hl,hl
+        adc  a,a
+        jr   nc,$+4
+        add  hl,de
+        adc  a,c
+        add  hl,hl
+        adc  a,a
+        jr   nc,$+4
+        add  hl,de
+        adc  a,c
+        add  hl,hl
+        adc  a,a
+        jr   nc,$+4
+        add  hl,de
+        adc  a,c
+        add  hl,hl
+        adc  a,a
+        jr   nc,$+4
+        add  hl,de
+        adc  a,c
+        add  hl,hl
+        adc  a,a
+        jr   nc,$+4
+        add  hl,de
+        adc  a,c
+        ld   l,h
+        ld   h,a
+        pop  de
+        ld   a,e
+        and  #C0
+        ld   h,a
+        ld   a,e
+        sub  l
+        and  #3F
+        or   h
+        ld   e,a
+        ld   (ix+#00),e
+        ld   (ix+#01),d
+        pop  bc
+        ret
 NEWPSS_
-        LD IX,TSXS
-        JR $+6
+        ld   ix,TSXS
+        jr   $+6
 NEWPOS_
-;РАСЧЕТ ТАБЛИЦ ПРОРЕЖИВАНИЯ
-        LD IX,TSX
-        LD A,13
-        EX AF,AF'
-        LD BC,0
-        EXX
-        CALL FINDY
-        LD A,E
-        LD (MINY+1),A
+        ; Расчет таблиц прореживания
+        ld   ix,TSX
+        ld   a,13
+        ex   af,af'
+        ld   bc,0
+        exx
+        call FINDY
+        ld   a,e
+        ld   (MINY+1),a
 
-;ПОИСК СЛЕД. ПОЗИЦИИ ВОКСЕЛЬ СТРОКИ ПО У
+; Поиск след. позиции воксель строки по у
 NP2
-        CALL FINDY
-MINY    LD A,#00
-        SUB E
-        JR NC,NP1
-        LD A,E
-        LD (MINY+1),A
+        call FINDY
+MINY    ld   a,#00
+        sub  e
+        jr   nc,NP1
+        ld   a,e
+        ld   (MINY+1),a
 S2
-        EX AF,AF'
-        DEC A
-        RET Z
-        EX AF,AF'
-        CALL STORED
-        INC IX
-        INC IX
+        ex   af,af'
+        dec  a
+        ret  z
+        ex   af,af'
+        call STORED
+        inc  ix
+        inc  ix
 NP1
-        EXX
-        LD A,C
-        ADD A,STP
-        LD C,A
-        LD A,B
-        ADC A,0
-        LD B,A
+        exx
+        ld   a,c
+        add  a,STP
+        ld   c,a
+        ld   a,b
+        adc  a,0
+        ld   b,a
 
-        LD A,E
-        SUB STP
-        LD E,A
-        LD A,D
-        SBC A,0
-        LD D,A
-        EXX
-        JP NZ,NP2
-        RET
-
-
+        ld   a,e
+        sub  STP
+        ld   e,a
+        ld   a,d
+        sbc  a,0
+        ld   d,a
+        exx
+        jp   nz,NP2
+        ret
 
 DIVV
-;DE=A/E
-        LD L,A
-        XOR A
-        SLL L
-        SLL L
-        JR C,M1
-        SLL L
-        JR C,M1+7
-        SLL L
-        JR C,M1+(7*2)
-        SLL L
-        JR C,M1+(7*3)
-        SLL L
-        JR C,M1+(7*4)
-        SLL L
-        JR C,M1+(7*5)
-        SLL L
-        JP M1+(7*6)
+        ; De=a/e
+        ld   l,a
+        xor  a
+        sll  l
+        sll  l
+        jr   c,M1
+        sll  l
+        jr   c,M1+7
+        sll  l
+        jr   c,M1+(7*2)
+        sll  l
+        jr   c,M1+(7*3)
+        sll  l
+        jr   c,M1+(7*4)
+        sll  l
+        jr   c,M1+(7*5)
+        sll  l
+        jp   M1+(7*6)
 M1
-        RLA
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        RLA
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        RLA
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        RLA
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        RLA
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        RLA
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        RLA
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        LD C,L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        LD A,L
-        CPL
-        LD E,A
-        LD A,C
-        CPL
-        LD D,A
-        RET
-
-
+        rla
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        rla
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        rla
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        rla
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        rla
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        rla
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        rla
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        ld   c,l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        ld   a,l
+        cpl
+        ld   e,a
+        ld   a,c
+        cpl
+        ld   d,a
+        ret
 
 DIVW
-;HL=HL/DE
-        LD A,L
-        LD L,0
-        JR DIV+3
+        ; Hl=hl/de
+        ld   a,l
+        ld   l,0
+        jr   DIV+3
 DIV
-;HL=A/D.E
-        LD HL,0
-        AND A
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        AND A
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        LD B,A
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        CPL
-        LD L,A
-        LD A,B
-        CPL
-        LD H,A
-        RET
-
-
+        ; Hl=a/d.e
+        ld   hl,0
+        and  a
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        and  a
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        ld   b,a
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        cpl
+        ld   l,a
+        ld   a,b
+        cpl
+        ld   h,a
+        ret
 
 D3D2__
-;РАСЧЕТ ИЗ 3D В 2D
-;HL-X,DE-Z,BC-Y
-;L'-ПОЛУ ВЫСОТА СПРАЙТА
-;H'-ПОЛУ ШИРИНА СПРАЙТА
-;DE-Z
-;BC-Y
+; Расчет из 3d в 2d
+; Hl-X,de-z,bc-Y
+; L'-полу высота спрайта
+; H'-полу ширина спрайта
+; De-z
+; Bc-Y
 
-        PUSH HL
+        push hl
 
-        BIT 7,D
-        JP NZ,ED_
+        bit  7,d
+        jp   nz,ED_
 
+        exx
+        ld   a,h
+        exx
+        ld   l,a
+        rlca
+        and  1
+        neg
+        ld   h,a
+Jmp1    jr   $
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
 
-        EXX
-        LD A,H
-        EXX
-        LD L,A
-        RLCA
-        AND 1
-        NEG
-        LD H,A
-Jmp1    JR $
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
+        add  hl,hl
 
-        ADD HL,HL
-
-        AND A
-        ADC HL,BC
-        JP P,$+10
-        LD A,L
-        CPL
-        LD L,A
-        LD A,H
-        CPL
-        LD H,A
-        INC HL
-        EX AF,AF'
-;DIV
-        LD A,D
-        OR A
-        JP Z,PP0
-        XOR A
-        SLL L
-        RL H
-        JR C,PP1
-        SLL L
-        RL H
-        JR C,PP1+6
-        SLL L
-        RL H
-        JR C,PP1+(6*2)
-        SLL L
-        RL H
-        JR C,PP1+(6*3)
-        SLL L
-        RL H
-        JR C,PP1+(6*4)
-        SLL L
-        RL H
-        JR C,PP1+(6*5)
-        SLL L
-        RL H
-        JR C,PP1+(6*6)
-        SLL L
-        RL H
-        JR C,PP1+(6*7)
-        SLL L
-        RL H
-        JR C,PP1+(6*8)
-        SLL L
-        RL H
-        LD B,L
-        JR C,+(PP1+(6*9))+1
-        SLL L
-        RL H
-        JR C,+(PP1+(6*10))+1
-        SLL L
-        RL H
-        JR C,+(PP1+(6*11))+1
-        SLL L
-        RL H
-        JR C,+(PP1+(6*12))+1
-        SLL L
-        RL H
-        JR C,+(PP1+(6*13))+1
-        SLL L
-        RL H
-        JR C,+(PP1+(6*14))+1
-        SLL L
-        RL H
-        JP C,+(PP1+(6*15))+1
-;ZERO
-        LD B,A
-        JP PP9
+        and  a
+        adc  hl,bc
+        jp   p,$+10
+        ld   a,l
+        cpl
+        ld   l,a
+        ld   a,h
+        cpl
+        ld   h,a
+        inc  hl
+        ex   af,af'
+        ; DIV
+        ld   a,d
+        or   a
+        jp   z,PP0
+        xor  a
+        sll  l
+        rl   h
+        jr   c,PP1
+        sll  l
+        rl   h
+        jr   c,PP1+6
+        sll  l
+        rl   h
+        jr   c,PP1+(6*2)
+        sll  l
+        rl   h
+        jr   c,PP1+(6*3)
+        sll  l
+        rl   h
+        jr   c,PP1+(6*4)
+        sll  l
+        rl   h
+        jr   c,PP1+(6*5)
+        sll  l
+        rl   h
+        jr   c,PP1+(6*6)
+        sll  l
+        rl   h
+        jr   c,PP1+(6*7)
+        sll  l
+        rl   h
+        jr   c,PP1+(6*8)
+        sll  l
+        rl   h
+        ld   b,l
+        jr   c,+(PP1+(6*9))+1
+        sll  l
+        rl   h
+        jr   c,+(PP1+(6*10))+1
+        sll  l
+        rl   h
+        jr   c,+(PP1+(6*11))+1
+        sll  l
+        rl   h
+        jr   c,+(PP1+(6*12))+1
+        sll  l
+        rl   h
+        jr   c,+(PP1+(6*13))+1
+        sll  l
+        rl   h
+        jr   c,+(PP1+(6*14))+1
+        sll  l
+        rl   h
+        jp   c,+(PP1+(6*15))+1
+        ; Zero
+        ld   b,a
+        jp   PP9
 
 PP1
-        RLA
-        CP D
-        JR NC,PP2
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,PP2+7
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,PP2+(7*2)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,PP2+(7*3)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,PP2+(7*4)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,PP2+(7*5)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,PP2+(7*6)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,PP2+(7*7)
-        ADC HL,HL
-        RLA
-        LD B,L
-        CP D
-        JR NC,PP2+(7*8)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,PP2+(7*9)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,PP2+(7*10)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,PP2+(7*11)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,PP2+(7*12)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,PP2+(7*13)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,PP2+(7*14)
-        ADC HL,HL
-        RLA
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP +(PP4+63)+(7*6)
-
-
+        rla
+        cp   d
+        jr   nc,PP2
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,PP2+7
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,PP2+(7*2)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,PP2+(7*3)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,PP2+(7*4)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,PP2+(7*5)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,PP2+(7*6)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,PP2+(7*7)
+        adc  hl,hl
+        rla
+        ld   b,l
+        cp   d
+        jr   nc,PP2+(7*8)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,PP2+(7*9)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,PP2+(7*10)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,PP2+(7*11)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,PP2+(7*12)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,PP2+(7*13)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,PP2+(7*14)
+        adc  hl,hl
+        rla
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   +(PP4+63)+(7*6)
 
 PP2
 
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP PP3
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP PP4
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP PP4+8
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP PP4+(8*2)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP PP4+(8*3)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP PP4+(8*4)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP PP4+(8*5)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP PP4+(8*6)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP PP4+(8*7)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP +(PP4+(8*8))-1
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   PP3
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   PP4
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   PP4+8
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   PP4+(8*2)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   PP4+(8*3)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   PP4+(8*4)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   PP4+(8*5)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   PP4+(8*6)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   PP4+(8*7)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   +(PP4+(8*8))-1
 
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP +(PP4+63)+7
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP +(PP4+63)+(7*2)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP +(PP4+63)+(7*3)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP +(PP4+63)+(7*4)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP +(PP4+63)+(7*5)
-
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   +(PP4+63)+7
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   +(PP4+63)+(7*2)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   +(PP4+63)+(7*3)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   +(PP4+63)+(7*4)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   +(PP4+63)+(7*5)
 
 PP0
-        LD A,L
-        LD L,H
-        LD H,0
-        SBC HL,DE
-        JP NC,ED_
-        ADD HL,DE
-        RLA
-        ADC HL,HL
+        ld   a,l
+        ld   l,h
+        ld   h,0
+        sbc  hl,de
+        jp   nc,ED_
+        add  hl,de
+        rla
+        adc  hl,hl
 PP3
-        SBC HL,DE
-        JP NC,ED_
-        ADD HL,DE
-        RLA
-        ADC HL,HL
+        sbc  hl,de
+        jp   nc,ED_
+        add  hl,de
+        rla
+        adc  hl,hl
 PP4
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        LD B,A
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        ld   b,a
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
 PP9
-        LD C,A
-        EX AF,AF'
-        LD HL,#30 ;MIDLE Y
-        JP M,$+8
-        SBC HL,BC
-        JP $+4
-        ADD HL,BC
+        ld   c,a
+        ex   af,af'
+        ld   hl,#30             ; Midle Y
+        jp   m,$+8
+        sbc  hl,bc
+        jp   $+4
+        add  hl,bc
 
-        POP BC
+        pop  bc
 
-        PUSH HL
-        EXX
-        LD A,L
-        EXX
-        LD L,A
-        RLCA
-        AND 1
-        NEG
-        LD H,A
-Jmp2    JR $
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
+        push hl
+        exx
+        ld   a,l
+        exx
+        ld   l,a
+        rlca
+        and  1
+        neg
+        ld   h,a
+Jmp2    jr   $
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
 
-        ADD HL,HL
+        add  hl,hl
 
-        AND A
-        ADC HL,BC
-        JP P,$+10
-        LD A,L
-        CPL
-        LD L,A
-        LD A,H
-        CPL
-        LD H,A
-        INC HL
-        EX AF,AF'
-;DIV
-        LD A,D
-        OR A
-        JP Z,O0
-        XOR A
-        SLL L
-        RL H
-        JR C,O1
-        SLL L
-        RL H
-        JR C,O1+6
-        SLL L
-        RL H
-        JR C,O1+(6*2)
-        SLL L
-        RL H
-        JR C,O1+(6*3)
-        SLL L
-        RL H
-        JR C,O1+(6*4)
-        SLL L
-        RL H
-        JR C,O1+(6*5)
-        SLL L
-        RL H
-        JR C,O1+(6*6)
-        SLL L
-        RL H
-        JR C,O1+(6*7)
-        SLL L
-        RL H
-        JR C,O1+(6*8)
-        SLL L
-        RL H
-        LD B,L
-        JR C,+(O1+(6*9))+1
-        SLL L
-        RL H
-        JR C,+(O1+(6*10))+1
-        SLL L
-        RL H
-        JR C,+(O1+(6*11))+1
-        SLL L
-        RL H
-        JR C,+(O1+(6*12))+1
-        SLL L
-        RL H
-        JR C,+(O1+(6*13))+1
-        SLL L
-        RL H
-        JR C,+(O1+(6*14))+1
-        SLL L
-        RL H
-        JP C,+(O1+(6*15))+1
-;ZERO
-        LD B,A
-        JP O9
+        and  a
+        adc  hl,bc
+        jp   p,$+10
+        ld   a,l
+        cpl
+        ld   l,a
+        ld   a,h
+        cpl
+        ld   h,a
+        inc  hl
+        ex   af,af'
+        ; DIV
+        ld   a,d
+        or   a
+        jp   z,O0
+        xor  a
+        sll  l
+        rl   h
+        jr   c,O1
+        sll  l
+        rl   h
+        jr   c,O1+6
+        sll  l
+        rl   h
+        jr   c,O1+(6*2)
+        sll  l
+        rl   h
+        jr   c,O1+(6*3)
+        sll  l
+        rl   h
+        jr   c,O1+(6*4)
+        sll  l
+        rl   h
+        jr   c,O1+(6*5)
+        sll  l
+        rl   h
+        jr   c,O1+(6*6)
+        sll  l
+        rl   h
+        jr   c,O1+(6*7)
+        sll  l
+        rl   h
+        jr   c,O1+(6*8)
+        sll  l
+        rl   h
+        ld   b,l
+        jr   c,+(O1+(6*9))+1
+        sll  l
+        rl   h
+        jr   c,+(O1+(6*10))+1
+        sll  l
+        rl   h
+        jr   c,+(O1+(6*11))+1
+        sll  l
+        rl   h
+        jr   c,+(O1+(6*12))+1
+        sll  l
+        rl   h
+        jr   c,+(O1+(6*13))+1
+        sll  l
+        rl   h
+        jr   c,+(O1+(6*14))+1
+        sll  l
+        rl   h
+        jp   c,+(O1+(6*15))+1
+        ; Zero
+        ld   b,a
+        jp   O9
 
 O1
-        RLA
-        CP D
-        JR NC,O2
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,O2+7
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,O2+(7*2)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,O2+(7*3)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,O2+(7*4)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,O2+(7*5)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,O2+(7*6)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,O2+(7*7)
-        ADC HL,HL
-        RLA
-        LD B,L
-        CP D
-        JR NC,O2+(7*8)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,O2+(7*9)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,O2+(7*10)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,O2+(7*11)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,O2+(7*12)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,O2+(7*13)
-        ADC HL,HL
-        RLA
-        CP D
-        JR NC,O2+(7*14)
-        ADC HL,HL
-        RLA
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP +(O4+63)+(7*6)
-
-
+        rla
+        cp   d
+        jr   nc,O2
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,O2+7
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,O2+(7*2)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,O2+(7*3)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,O2+(7*4)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,O2+(7*5)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,O2+(7*6)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,O2+(7*7)
+        adc  hl,hl
+        rla
+        ld   b,l
+        cp   d
+        jr   nc,O2+(7*8)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,O2+(7*9)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,O2+(7*10)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,O2+(7*11)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,O2+(7*12)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,O2+(7*13)
+        adc  hl,hl
+        rla
+        cp   d
+        jr   nc,O2+(7*14)
+        adc  hl,hl
+        rla
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   +(O4+63)+(7*6)
 
 O2
 
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP O3
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP O4
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP O4+8
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP O4+(8*2)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP O4+(8*3)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP O4+(8*4)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP O4+(8*5)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP O4+(8*6)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP O4+(8*7)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP +(O4+(8*8))-1
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   O3
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   O4
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   O4+8
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   O4+(8*2)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   O4+(8*3)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   O4+(8*4)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   O4+(8*5)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   O4+(8*6)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   O4+(8*7)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   +(O4+(8*8))-1
 
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP +(O4+63)+7
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP +(O4+63)+(7*2)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP +(O4+63)+(7*3)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP +(O4+63)+(7*4)
-        LD C,A
-        LD A,L
-        LD L,H
-        LD H,C
-        JP +(O4+63)+(7*5)
-
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   +(O4+63)+7
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   +(O4+63)+(7*2)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   +(O4+63)+(7*3)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   +(O4+63)+(7*4)
+        ld   c,a
+        ld   a,l
+        ld   l,h
+        ld   h,c
+        jp   +(O4+63)+(7*5)
 
 O0
-        LD A,L
-        LD L,H
-        LD H,0
-        SBC HL,DE
-        JP NC,ED_
-        ADD HL,DE
-        RLA
-        ADC HL,HL
+        ld   a,l
+        ld   l,h
+        ld   h,0
+        sbc  hl,de
+        jp   nc,ED_
+        add  hl,de
+        rla
+        adc  hl,hl
 O3
-        SBC HL,DE
-        JP NC,ED_
-        ADD HL,DE
-        RLA
-        ADC HL,HL
+        sbc  hl,de
+        jp   nc,ED_
+        add  hl,de
+        rla
+        adc  hl,hl
 O4
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADC HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        LD B,A
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
-        ADD HL,HL
-        SBC HL,DE
-        JR NC,$+3
-        ADD HL,DE
-        RLA
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        adc  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        ld   b,a
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
+        add  hl,hl
+        sbc  hl,de
+        jr   nc,$+3
+        add  hl,de
+        rla
 O9
-        LD C,A
-        EX AF,AF'
-        LD HL,#0080 ;MIDLE X
-        JP M,$+8
-        SBC HL,BC
-        JP $+4
-        ADD HL,BC
-        POP DE
-        RET
+        ld   c,a
+        ex   af,af'
+        ld   hl,#0080           ; Midle X
+        jp   m,$+8
+        sbc  hl,bc
+        jp   $+4
+        add  hl,bc
+        pop  de
+        ret
 ED_
-;ЭКСТРЕННЫЙ ВЫХОД
-        POP HL
-        LD A,3
-        OR A
-        RET
-
+        ; Экстренный выход
+        pop  hl
+        ld   a,3
+        or   a
+        ret
 
 D3D2_
-;ПОИСК КООРД. ВЫВОДА СПРАЙТА И РАЗМЕРА
-;И ВЫВОД СПРАЙТА
-;BC-Z,DE-Y,HL-X
-;HL'-РЕАЛЬН. РАЗМЕРЫ
-;DE'-АДРЕС СПРАЙТА
-;A-МАСШТАБ
-        SUB 6
-        NEG
-        LD (Jmp1+1),A
-        LD (Jmp2+1),A
+        ; Поиск коорд. вывода спрайта и размера
+        ; И вывод спрайта
+        ; Bc-z,de-Y,hl-X
+        ; Hl'-реальн. размеры
+        ; De'-адрес спрайта
+        ; A-масштаб
+        sub  6
+        neg
+        ld   (Jmp1+1),a
+        ld   (Jmp2+1),a
 
-        LD A,C
-        LD C,E
-        LD E,A
-        LD A,B
-        LD B,D
-        LD D,A
-        LD (X_+1),HL
-        LD (Y_+1),BC
-        LD (Z_+1),DE
-        EXX
-        LD A,L
-        NEG
-        LD L,A
-        LD A,H
-        NEG
-        LD H,A
-        EXX
-        CALL D3D2__
-        RET PE
-        PUSH DE
-        PUSH HL
-X_      LD HL,0
-Z_      LD DE,0
-Y_      LD BC,0
-        EXX
-        LD A,L
-        NEG
-        LD L,A
-        LD A,H
-        NEG
-        LD H,A
-        EXX
-        CALL D3D2__
-        RET PE
-        POP BC
-        OR A
-        SBC HL,BC
-        RET Z
-        SRL H
-        RR L
-        SRL H
-        RET NZ
-        RR L
-        LD H,B
-        LD A,C
-        LD C,L
-        LD L,A
-        LD A,C
-        EX AF,AF'
-        EX DE,HL
-        POP BC
-        OR A
-        SBC HL,BC
-        RET Z
-        SRL H
-        RR L
-        SRL H
-        RET NZ
-        RR L
-        LD A,H
-        OR A
-        RET NZ
-        EX AF,AF'
-        LD H,B
-        LD B,L
-        LD L,C
-        LD C,A
-        EX DE,HL
-        DUP 2
-            SRA H
-            RR L
-        EDUP
-        DUP 2
-            SRA D
-            RR E
-        EDUP
-        CALL Vox
-        RET
+        ld   a,c
+        ld   c,e
+        ld   e,a
+        ld   a,b
+        ld   b,d
+        ld   d,a
+        ld   (X_+1),hl
+        ld   (Y_+1),bc
+        ld   (Z_+1),de
+        exx
+        ld   a,l
+        neg
+        ld   l,a
+        ld   a,h
+        neg
+        ld   h,a
+        exx
+        call D3D2__
+        ret  pe
+        push de
+        push hl
+X_      ld   hl,0
+Z_      ld   de,0
+Y_      ld   bc,0
+        exx
+        ld   a,l
+        neg
+        ld   l,a
+        ld   a,h
+        neg
+        ld   h,a
+        exx
+        call D3D2__
+        ret  pe
+        pop  bc
+        or   a
+        sbc  hl,bc
+        ret  z
+        srl  h
+        rr   l
+        srl  h
+        ret  nz
+        rr   l
+        ld   h,b
+        ld   a,c
+        ld   c,l
+        ld   l,a
+        ld   a,c
+        ex   af,af'
+        ex   de,hl
+        pop  bc
+        or   a
+        sbc  hl,bc
+        ret  z
+        srl  h
+        rr   l
+        srl  h
+        ret  nz
+        rr   l
+        ld   a,h
+        or   a
+        ret  nz
+        ex   af,af'
+        ld   h,b
+        ld   b,l
+        ld   l,c
+        ld   c,a
+        ex   de,hl
+        dup  2
+        sra  h
+        rr   l
+        edup
+        dup  2
+        sra  d
+        rr   e
+        edup
+        call Vox
+        ret
 
-        ORG (($+255)&#FF00)
+        org  (($+255)&#FF00)
 VXTAB
-        INCBIN "assets/VOX2.bin"
-
-
+        incbin "assets/VOX2.bin"
 
 TSX
-;СМЕЩЕНИЯ В АДРЕСЕ СПРАЙТА ДЛЯ КАЖДОЙ
-;ПОЗИЦИИ ВЫВОДА У ДЛЯ ПОЧВЫ
-        DW #0140+#24
-        DW #0200+#0E
-        DW #0240+#23
-        DW #02C0+#30
-        DW #0340+#39
-        DW #03C0+#3F
-        DW #0480+#04
-        DW #04C0+#07
-        DW #0500+#0A
-        DW #0500+#0C
-        DW #0500+#0D
-        DW #0540+#0F
-        DW 0, 0, 0, 0
+        ; Смещения в адресе спрайта для каждой
+        ; Позиции вывода у для почвы
+        dw   #0140+#24
+        dw   #0200+#0E
+        dw   #0240+#23
+        dw   #02C0+#30
+        dw   #0340+#39
+        dw   #03C0+#3F
+        dw   #0480+#04
+        dw   #04C0+#07
+        dw   #0500+#0A
+        dw   #0500+#0C
+        dw   #0500+#0D
+        dw   #0540+#0F
+        dw   0, 0, 0, 0
 
-        DW #0400
-        DW #02AA
-        DW #01F8
-        DW #018C
-        DW #0142
-        DW #0110
-        DW #00E6
-        DW #00CE
-        DW #00B5
-        DW #00A6
-        DW #009A
-        DW #008C
-        DW 0, 0, 0, 0
+        dw   #0400
+        dw   #02AA
+        dw   #01F8
+        dw   #018C
+        dw   #0142
+        dw   #0110
+        dw   #00E6
+        dw   #00CE
+        dw   #00B5
+        dw   #00A6
+        dw   #009A
+        dw   #008C
+        dw   0, 0, 0, 0
 
 TSXS
-;СМЕЩЕНИЯ В АДРЕСЕ СПРАЙТА ДЛЯ КАЖДОЙ
-;ПОЗИЦИИ ВЫВОДА У ДЛЯ НЕБА
-        DW #0140+#24
-        DW #0200+#0E
-        DW #0240+#23
-        DW #02C0+#30
-        DW #0340+#39
-        DW #03C0+#3F
-        DW #0480+#04
-        DW #04C0+#07
-        DW #0500+#0A
-        DW #0500+#0C
-        DW #0500+#0D
-        DW #0540+#0F
-        DW 0, 0, 0, 0
+        ; Смещения в адресе спрайта для каждой
+        ; Позиции вывода у для неба
+        dw   #0140+#24
+        dw   #0200+#0E
+        dw   #0240+#23
+        dw   #02C0+#30
+        dw   #0340+#39
+        dw   #03C0+#3F
+        dw   #0480+#04
+        dw   #04C0+#07
+        dw   #0500+#0A
+        dw   #0500+#0C
+        dw   #0500+#0D
+        dw   #0540+#0F
+        dw   0, 0, 0, 0
 
-        DW #0400
-        DW #02AA
-        DW #01F8
-        DW #018C
-        DW #0142
-        DW #0110
-        DW #00E6
-        DW #00CE
-        DW #00B5
-        DW #00A6
-        DW #009A
-        DW #008C
+        dw   #0400
+        dw   #02AA
+        dw   #01F8
+        dw   #018C
+        dw   #0142
+        dw   #0110
+        dw   #00E6
+        dw   #00CE
+        dw   #00B5
+        dw   #00A6
+        dw   #009A
+        dw   #008C
 
 END_

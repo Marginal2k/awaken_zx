@@ -1,8 +1,10 @@
+        include "HW.asm"
+
         org  #8000
         di
         call MAKEDRP
 
-        ld   a,(#5D16)
+        ld   a,(TRDOS_DRIVE)
         or   1
         ld   (DSK+1),a
         ld   c,#FF
@@ -78,7 +80,7 @@ DSK     ld   a,0
         ld   c,#FF
         call TOREG
         ld   a,e
-        ld   c,#5F
+        ld   c,FDC_SECTOR
         call TOREG
         ld   bc,RETS
         push bc
@@ -102,7 +104,7 @@ MEAN
         ret  nz
         exx
         ld   a,#58              ; Step on
-        ld   c,#1F
+        ld   c,FDC_COMMAND
         call TOREG
 
         ld   ix,#3EF5           ; Wait

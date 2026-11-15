@@ -1,30 +1,32 @@
+        include "HW.asm"
+
         org  #8000
-        ld   bc,#7FFD
+        ld   bc,PORT_PAGE
         ld   a,#17
         out  (c),a
         ld   hl,#C000
         ld   de,#C001
-        ld   bc,#1800
+        ld   bc,SCREEN_PIX_LEN
         ld   (hl),l
         ldir
         ld   (hl),%00000111
-        ld   bc,#02FF
+        ld   bc,SCREEN_ATTR_LEN-1
         ldir
-        ld   hl,#4000
-        ld   de,#4001
-        ld   bc,#1800
+        ld   hl,SCREEN
+        ld   de,SCREEN+1
+        ld   bc,SCREEN_PIX_LEN
         ld   (hl),l
         ldir
         ld   (hl),%00000111
-        ld   bc,#02FF
+        ld   bc,SCREEN_ATTR_LEN-1
         ldir
 
-        ld   a,(#5D16)
+        ld   a,(TRDOS_DRIVE)
         ld   (DSK+1),a
         ld   ix,#2F65
         call TOTD
         ld   a,#58              ; Step on
-        ld   c,#1F
+        ld   c,FDC_COMMAND
         call TOREG
         ld   ix,#2F59           ; Wait
         call TOTD
@@ -33,7 +35,7 @@
         ld   bc,#000A
 M1
         push bc
-        ld   bc,#7FFD
+        ld   bc,PORT_PAGE
 PG      ld   a,%00010111
         out  (c),a
         xor  %00001010
@@ -122,7 +124,7 @@ DSK     ld   a,0
         ld   c,#FF
         call TOREG
         ld   a,e
-        ld   c,#5F
+        ld   c,FDC_SECTOR
         call TOREG
         ld   bc,RETS
         push bc
@@ -145,7 +147,7 @@ RETS
         ret  nz
         exx
         ld   a,#58              ; Step on
-        ld   c,#1F
+        ld   c,FDC_COMMAND
         call TOREG
         ld   ix,#2F59           ; Wait
         call TOTD

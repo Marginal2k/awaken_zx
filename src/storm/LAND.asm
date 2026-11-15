@@ -4,12 +4,12 @@
 
         org  #7C00
 START
-        ld   hl,#4000
-        ld   de,#4001
-        ld   bc,#1800
+        ld   hl,SCREEN
+        ld   de,SCREEN+1
+        ld   bc,SCREEN_PIX_LEN
         ld   (hl),l
         ldir
-        ld   bc,#02FF
+        ld   bc,SCREEN_ATTR_LEN-1
         ld   (hl),%00000111
         ldir
 
@@ -18,10 +18,10 @@ START
         di
 
 MAKEDRP
-        ld   a,PGSPR
+        ld   a,PAGE_VOXEL
         call PG
         ld   hl,MODUL
-        ld   de,ADHIDE
+        ld   de,DROP_CODE_ADDR
         ld   bc,DS1-DROPSCR
         ldir
         ex   de,hl
@@ -87,7 +87,7 @@ MDS1
         ld   (DS0+1),hl
         ld   hl,#4010
         ld   (DS01+1),hl
-        ld   a,PGNORM
+        ld   a,PAGE_NORMAL
         call PG
 
         ld   hl,0
@@ -110,7 +110,7 @@ MDS1
 
 MODUL
         org  $
-        disp ADHIDE
+        disp DROP_CODE_ADDR
 DROPSCR
         ld   ((STK92+1)+(191*DLEN)),sp
 DS0
@@ -143,11 +143,11 @@ STK92   ld   sp,0
         ret
 
         ent
-        org  HSCR
+        org  HIDDEN_SCREEN
 ; Defw
 DEFW_
-        ds   Olen*(A3D-1)
-        ds   Olen
+        ds   OBJ_LEN*(OBJ_COUNT-1)
+        ds   OBJ_LEN
         dw   PLANET_
         dw   SKYS_
         db   #C3
@@ -161,15 +161,15 @@ DEFW_
         dw   #2B7B
         db   #C3
         dw   VOXOBJ_
-DDLEN           equ $-HSCR
+DDLEN           equ $-HIDDEN_SCREEN
 
         org  #8C00
 
 DALEE
-        ld   a,PG3D
+        ld   a,PAGE_3D
         call PG
-        call INIT
-        ld   a,PGNORM
+        call ENG3D_INIT
+        ld   a,PAGE_NORMAL
         call PG
 
         ld   hl,DEFW_
@@ -193,8 +193,8 @@ DALEE
 
 E1
 
-        ld   b,A3D-2
-        ld   de,Olen-1
+        ld   b,OBJ_COUNT-2
+        ld   de,OBJ_LEN-1
         ld   hl,Carsb
 .D1
         ld   (hl),0
@@ -220,15 +220,15 @@ M2
         ; Генерить скимеры
         call GENS
 
-        ld   a,PGSPR
+        ld   a,PAGE_VOXEL
         call PG
-        call OUTALL
+        call VOX_OUT_ALL
 
-        ld   a,PG3D
+        ld   a,PAGE_3D
         call PG
-        call OUTALL2
+        call ENG3D_OUT_ALL
 
-        ld   a,PGNORM
+        ld   a,PAGE_NORMAL
         call PG
 
         ; Интелект
@@ -241,7 +241,7 @@ M2
         call Repanel
 
         ld   a,#7F
-        in   a,(#FE)
+        in   a,(PORT_ULA)
         rrca
         push af
         call nc,UP
@@ -263,10 +263,10 @@ M2
 
         call SERVICE
 
-        ld   a,PGSPR
+        ld   a,PAGE_VOXEL
         call PG
-        call ADHIDE
-        ld   a,PGNORM
+        call DROP_CODE_ADDR
+        ld   a,PAGE_NORMAL
         call PG
 
         jp   M2
@@ -275,7 +275,7 @@ M2
         im   1
         ld   a,#3F
         ld   i,a
-        ld   iy,#5C3A
+        ld   iy,SYSVAR_IY
 
         ld   a,#14
         call PG
@@ -287,7 +287,7 @@ M2
         ld   hl,#C000
         ld   c,#0E
         di
-        call #3D13
+        call TRDOS_COMMAND
         ld   a,#13
         call PG
         ld   hl,FILN3
@@ -298,9 +298,9 @@ M2
         ld   hl,#C000
         ld   c,#0E
         di
-        call #3D13
+        call TRDOS_COMMAND
 
-        ld   a,PGNORM
+        ld   a,PAGE_NORMAL
         call PG
         ei
         ret
@@ -343,11 +343,11 @@ VOXOBJ_
         ld   a,(hl)
         pop  hl
         ex   af,af'
-        ld   a,PGSPR
+        ld   a,PAGE_VOXEL
         call PG
         ex   af,af'
-        call D3D2
-        ld   a,PG3D
+        call VOX_DRAW_3D2
+        ld   a,PAGE_3D
         call PG
 
         exx
@@ -356,7 +356,7 @@ VOXOBJ_
         pop  hl
         pop  ix
         exx
-        jp   NXTO
+        jp   ENG3D_NEXT_OBJECT
 
 LEFT
         ld   de,(ZET+1)
@@ -379,16 +379,16 @@ RIGHT
         jp   NEWPOS_
 
 NEWPOS_
-        ld   a,PGSPR
+        ld   a,PAGE_VOXEL
         call PG
-        call NEWPOS
-        ld   a,PGNORM
+        call VOX_NEW_POS
+        ld   a,PAGE_NORMAL
         jp   PG
 NEWPSS_
-        ld   a,PGSPR
+        ld   a,PAGE_VOXEL
         call PG
-        call NEWPSS
-        ld   a,PGNORM
+        call VOX_NEW_POS2
+        ld   a,PAGE_NORMAL
         jp   PG
 
 UP
@@ -442,17 +442,17 @@ DOWN
 
 ROLLT
         ; Перемещение фона влево всего что есть
-        ld   a,PGSPR
+        ld   a,PAGE_VOXEL
         call PG
-        call RLT
-        ld   a,PGNORM
+        call VOX_TURN_LEFT
+        ld   a,PAGE_NORMAL
         jp   PG
 ROLRT
         ; Перемещение фона вправо
-        ld   a,PGSPR
+        ld   a,PAGE_VOXEL
         call PG
-        call RRT
-        ld   a,PGNORM
+        call VOX_TURN_RIGHT
+        ld   a,PAGE_NORMAL
         jp   PG
 
 ROLUP
@@ -484,16 +484,16 @@ ROLDN
 
 TAKSPD
         ex   af,af'
-        ld   a,PGSPR
+        ld   a,PAGE_VOXEL
         call PG
         ex   af,af'
-        call TAKESPD
-        ld   a,PGNORM
+        call VOX_TAKE_SPEED
+        ld   a,PAGE_NORMAL
         jp   PG
 
 PG
         push bc
-        ld   bc,#7FFD
+        ld   bc,PORT_PAGE
         out  (c),a
         pop  bc
         ret
@@ -503,12 +503,12 @@ PG
 TAKEW
         ; Hl-адрес слова
         ; Ret de-слово
-        ld   a,PG3D
+        ld   a,PAGE_3D
         call PG
         ld   e,(hl)
         inc  hl
         ld   d,(hl)
-        ld   a,PGNORM
+        ld   a,PAGE_NORMAL
         call PG
         ret
 
@@ -1154,7 +1154,7 @@ Sfxa
         ld   a,h
         or   a
         jr   z,Sfxb
-        ld   bc,#FFFD
+        ld   bc,PORT_AY_REG
         xor  a
         out  (c),a
         ld   b,#BF
@@ -1195,7 +1195,7 @@ Sfxb
         ld   a,h
         or   a
         jr   z,Sfxn
-        ld   bc,#FFFD
+        ld   bc,PORT_AY_REG
         ld   a,2
         out  (c),a
         ld   b,#BF
@@ -1589,14 +1589,14 @@ DOMA1
 
 INTEL
         ; Интелект поведения кораблей
-        ld   ix,Carsb-Olen
+        ld   ix,Carsb-OBJ_LEN
         jr   I2
 I1
         ld   a,(ix+0)
         cp   #80
         ret  z
 I2
-        ld   de,Olen
+        ld   de,OBJ_LEN
         add  ix,de
         ld   a,(ix+1)
         cp   #80
@@ -1615,21 +1615,21 @@ I2
         push de
         jp   (hl)
 RET_
-        ld   a,PG3D
+        ld   a,PAGE_3D
         call PG
         ld   a,(ix+Rspd)
         or   a
         jr   z,.I4
         ld   d,0
         ld   e,a
-        call MOVEON
+        call ENG3D_MOVE_ON
 .I3
-        call PRECORD
-        ld   a,PGNORM
+        call ENG3D_PRECORD
+        ld   a,PAGE_NORMAL
         call PG
         jp   I2
 .I4
-        call NULMOVE
+        call ENG3D_NULL_MOVE
         jr   .I3
 
 MODES
@@ -1723,7 +1723,7 @@ GENS
 ; Генерить деревья
 GEND
         call RND
-        ld   ix,Carsb-Olen
+        ld   ix,Carsb-OBJ_LEN
         ld   a,l
         or   h
         or   #07
@@ -1733,7 +1733,7 @@ GEND
 G1
         exx
 
-        ld   bc,Olen
+        ld   bc,OBJ_LEN
 .G3
         add  ix,bc
         ld   a,(ix+1)
@@ -1798,7 +1798,7 @@ G1
         ld   (ix+Rspd),0
         ld   (ix+Mode),0
 
-        ld   bc,Olen
+        ld   bc,OBJ_LEN
         add  ix,bc
 
         exx
@@ -1808,8 +1808,8 @@ G1
 FINDOBJ
         ; Поиск первого по типу b d
         ; Fz-on if not found
-        ld   iy,Carsb-Olen
-        ld   bc,Olen
+        ld   iy,Carsb-OBJ_LEN
+        ld   bc,OBJ_LEN
 Find2
         call Findob
         ret  z
@@ -1824,8 +1824,8 @@ FOBJ
         ; Ret hl-obj ad+1
         ; Fz-on no in buf objs
         ; Fz-off found
-        ld   hl,+(Carsb-Olen)+1
-        ld   bc,Olen
+        ld   hl,+(Carsb-OBJ_LEN)+1
+        ld   bc,OBJ_LEN
         jr   $+8
         dec  l
         ld   a,(hl)
@@ -1841,8 +1841,8 @@ FOBJ
 FNDFREE
         ; Find free space
         ; Ret fz-on if not found
-        ld   hl,+(Carsb-Olen)+1
-        ld   de,Olen
+        ld   hl,+(Carsb-OBJ_LEN)+1
+        ld   de,OBJ_LEN
 Hhh3
         add  hl,de
         ld   a,(hl)
@@ -2011,12 +2011,12 @@ SERVICE
         ld   a,(DIRECTZ+5)
         or   c
         jr   z,.SV1
-        ld   a,PG3D
+        ld   a,PAGE_3D
         call PG
-        call FLINE
+        call ENG3D_LINE
         ; Ret fc-on если был выстрел
         ex   af,af'
-        ld   a,PGNORM
+        ld   a,PAGE_NORMAL
         call PG
         ex   af,af'
 .SV1
@@ -2037,11 +2037,11 @@ SERVICE
         ld   a,(DIRECTZ+3)
         or   c
         ex   af,af'
-        ld   a,PGSPR
+        ld   a,PAGE_VOXEL
         call PG
         ex   af,af'
-        call z,RETURN
-        ld   a,PGNORM
+        call z,VOX_RETURN
+        ld   a,PAGE_NORMAL
         call PG
         ret
 
@@ -2135,7 +2135,7 @@ Servkj
         ld   a,0                ; Flag
         and  a
         ret  nz
-        in   a,(#1F)
+        in   a,(PORT_KEMPSTON)
         jp   Gomove
 
 Servqa

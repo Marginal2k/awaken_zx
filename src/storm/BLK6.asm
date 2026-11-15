@@ -129,8 +129,8 @@ Exes
         ld   (Statgen+1),a
         ld   (Nostat+1),a
         ld   (Nostat2+1),a
-        ld   iy,Carsb-Olen
-        ld   bc,Olen
+        ld   iy,Carsb-OBJ_LEN
+        ld   bc,OBJ_LEN
 .Exe2
         call Findob
         ret  z
@@ -163,12 +163,12 @@ Fndpece
         call Rndl3
         ld   a,l
 Pwnpi   cp   #A0
-        ld   a,Splayer
+        ld   a,PLAYER_INDEX
         inc  a
         dec  a
         ret  nc
-        ld   iy,Carsb-Olen
-        ld   bc,Olen
+        ld   iy,Carsb-OBJ_LEN
+        ld   bc,OBJ_LEN
 .Fp2l
         call Findob
         ret  z
@@ -185,8 +185,8 @@ Pwnpi   cp   #A0
         ret
 Findall
         ; Найти all without  ufos
-        ld   iy,Carsb-Olen
-        ld   bc,Olen
+        ld   iy,Carsb-OBJ_LEN
+        ld   bc,OBJ_LEN
 .Fp6l
         call Findob
         ret  z
@@ -201,8 +201,8 @@ Findall
         ret
 Findufo
         ; Найти ufo
-        ld   iy,Carsb-Olen
-        ld   bc,Olen
+        ld   iy,Carsb-OBJ_LEN
+        ld   bc,OBJ_LEN
 .Fp3l
         call Findob
         ret  z
@@ -217,8 +217,8 @@ Findufo
         ret
 Fndprat
         ; Найти пирата
-        ld   iy,Carsb-Olen
-        ld   bc,Olen
+        ld   iy,Carsb-OBJ_LEN
+        ld   bc,OBJ_LEN
 .Fp2
         call Findob
         ret  z
@@ -240,7 +240,7 @@ Fndprat
         ld   a,(ix+Subj)
         inc  a
         jr   nz,.Ts1
-        ld   hl,+(Olen*Splayer)+Carsb
+        ld   hl,+(OBJ_LEN*PLAYER_INDEX)+Carsb
         jr   .Ts2
 .Ts1
         dec  a
@@ -263,7 +263,7 @@ Fndprat
         ret
 Opone   ld   iy,0
         ld   a,(ix+Subj)
-        cp   Splayer
+        cp   PLAYER_INDEX
         jr   nz,.Fg2
         ld   bc,0
         ld   (Tx+1),bc

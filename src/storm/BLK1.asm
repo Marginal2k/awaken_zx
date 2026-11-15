@@ -386,8 +386,8 @@ Unroket
         call Mesags
         ld   hl,Eff19
         ld   (Sfxa+1),hl
-        ld   hl,+(Carsb-Olen)+1
-        ld   de,Olen
+        ld   hl,+(Carsb-OBJ_LEN)+1
+        ld   de,OBJ_LEN
         jp   .Stu1
 .Stu3
         dec  l
@@ -414,7 +414,7 @@ Unroket
         cp   #11
         jr   nz,.Stu1
         ld   a,b
-        cp   Splayer
+        cp   PLAYER_INDEX
         jr   nz,.Stu1
         push ix
         dec  l
@@ -495,8 +495,8 @@ Jumpdrv
         ld   (Jflag+1),a
         ; Проверяем бли3ость других объектов
         ; Если хоть один бли3ко то отмена
-        ld   hl,+(Carsb-Olen)+1
-        ld   de,Olen
+        ld   hl,+(Carsb-OBJ_LEN)+1
+        ld   de,OBJ_LEN
         jr   $+9
         dec  l
         ld   a,(hl)

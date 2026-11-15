@@ -1,3 +1,21 @@
+;==============================================================================
+; EQUS - константы всего движка STORM
+;
+; Включается всеми модулями набора. Содержит: количество/тип товаров и оружия, смещения
+; полей записи 3D-объекта (размер OBJ_LEN = #20; Indi, Alfa, Beta, Gama, Mode, Type,
+; Energy, ... Px/Py/Pz), номера страниц PAGE_3D/PAGE_VOXEL/PAGE_NORMAL, карту переменных
+; (VARS = #6700), адреса таблиц переходов страницы воксельного рендера (#C000, VOX_*) и
+; страницы 3D-движка (#FF00, ENG3D_*).
+;
+; Исправление относительно дискового файла: DROP_CODE_ADDR (бывш. ADHIDE) = #10000-#1388
+; (в оригинале 0-#1388, нужно 16-битное заворачивание).
+;
+; Часть набора STORM (прототип Awaken 1997/98), не входит в основную игру. Подробности: docs/STORM.md,
+; таблица переименований меток: docs/STORM_LABELS.md. Собирается sjasmplus (см. make_*.asm).
+;==============================================================================
+
+        include "HW.asm"
+
 ; Кол. товаров
 TKOL            equ 28
 ; Кол. вооруж. корабля
@@ -79,23 +97,23 @@ Pz              equ #1E
 ; Mspd-на кого направлена ракета
 ; Lzs -=0-ракета персонажа, <>0-игрока
 
-PS              equ 6                   ; Шаг поворота
+TURN_STEP       equ 6                   ; orig: PS. Шаг поворота
 MSPEED          equ #FF
 MSPEED2         equ 4
-Olen            equ #20
-A3D             equ 40                  ; Кол. 3d объектов в списке
+OBJ_LEN         equ #20                 ; orig: Olen
+OBJ_COUNT       equ 40                  ; orig: A3D. Кол. 3d объектов в списке
 
-ADHIDE          equ #10000-#1388
+DROP_CODE_ADDR  equ #10000-#1388        ; orig: ADHIDE
 
-PG3D            equ #11
-PGSPR           equ #13
-PGNORM          equ #10
+PAGE_3D         equ #11                 ; orig: PG3D
+PAGE_VOXEL      equ #13                 ; orig: PGSPR
+PAGE_NORMAL     equ #10                 ; orig: PGNORM
 
-HSCR            equ #8000
+HIDDEN_SCREEN   equ #8000               ; orig: HSCR
 
 VARS            equ #6700
 Carsb           equ VARS
-PLAYER          equ Carsb+(Olen*(A3D-1))
+PLAYER          equ Carsb+(OBJ_LEN*(OBJ_COUNT-1))
 XXP             equ PLAYER
 YYP             equ XXP+3
 ZZP             equ YYP+3
@@ -103,7 +121,7 @@ ACTION          equ PLAYER+12
 SPEED           equ ACTION+3
 SHILD           equ SPEED+5
 UNGLE           equ SHILD+1
-PLANT           equ Carsb+(Olen*A3D)
+PLANT           equ Carsb+(OBJ_LEN*OBJ_COUNT)
 SKYS            equ PLANT+2
 Mesags          equ SKYS+2
 NEWEFA          equ Mesags+3
@@ -112,32 +130,32 @@ Mnums           equ NEWEFB+3
 Pcord           equ Mnums+3
 VOXOBJ          equ Pcord+2
 
-L97             equ VARS+((((A3D+2)*Olen)+255)&#FF00)
+L97             equ VARS+((((OBJ_COUNT+2)*OBJ_LEN)+255)&#FF00)
 
-Splayer         equ A3D-1
+PLAYER_INDEX    equ OBJ_COUNT-1         ; orig: Splayer
 
 ; Данные процедур вывода спрайта в своей
 ; Странице
-Vox             equ #C000
-TAKESPD         equ Vox+3
-OUTALL          equ TAKESPD+3
-NEWPOS          equ OUTALL+3
-NEWPSS          equ NEWPOS+3
-RETURN          equ NEWPSS+3
-RRT             equ RETURN+3
-RLT             equ RRT+3
-D3D2            equ RLT+3
+VOX_DRAW        equ #C000               ; orig: Vox
+VOX_TAKE_SPEED  equ VOX_DRAW+3          ; orig: TAKESPD
+VOX_OUT_ALL     equ VOX_TAKE_SPEED+3    ; orig: OUTALL
+VOX_NEW_POS     equ VOX_OUT_ALL+3       ; orig: NEWPOS
+VOX_NEW_POS2    equ VOX_NEW_POS+3       ; orig: NEWPSS
+VOX_RETURN      equ VOX_NEW_POS2+3      ; orig: RETURN
+VOX_TURN_RIGHT  equ VOX_RETURN+3        ; orig: RRT
+VOX_TURN_LEFT   equ VOX_TURN_RIGHT+3    ; orig: RLT
+VOX_DRAW_3D2    equ VOX_TURN_LEFT+3     ; orig: D3D2
 
 ; Данные процедур вывода 3d в своей
 ; Странице
-INIT            equ #FF00               ; 3
-OUTALL2         equ INIT+3
-NXTO            equ OUTALL2+3
-ADI3D           equ NXTO+3              ; 2
-MOVEON          equ ADI3D+2             ; 3
-PRECORD         equ MOVEON+3
-NULMOVE         equ PRECORD+3
-FLINE           equ NULMOVE+3
+ENG3D_INIT      equ #FF00               ; orig: INIT. 3
+ENG3D_OUT_ALL   equ ENG3D_INIT+3        ; orig: OUTALL2
+ENG3D_NEXT_OBJECT equ ENG3D_OUT_ALL+3   ; orig: NXTO
+ENG3D_OBJECT_INDEX equ ENG3D_NEXT_OBJECT+3  ; orig: ADI3D. 2
+ENG3D_MOVE_ON   equ ENG3D_OBJECT_INDEX+2  ; orig: MOVEON. 3
+ENG3D_PRECORD   equ ENG3D_MOVE_ON+3     ; orig: PRECORD
+ENG3D_NULL_MOVE equ ENG3D_PRECORD+3     ; orig: NULMOVE
+ENG3D_LINE      equ ENG3D_NULL_MOVE+3   ; orig: FLINE
 
 EYEA            equ #C203
 
@@ -147,7 +165,7 @@ Detaliz         equ #1F
 Xvisibi         equ #60
 
 STP             equ #80
-STPTURN         equ 3
+MAX_TURN        equ 3                   ; orig: STPTURN
 
 XEND            equ 64
 YEND            equ 24

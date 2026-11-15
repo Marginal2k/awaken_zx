@@ -167,7 +167,7 @@ Ren3d
 
         ld   hl,#01
         ld   (Indt1),hl
-        ld   bc,Olen            ; Vector LEN for cars
+        ld   bc,OBJ_LEN         ; Vector LEN for cars
         ld   hl,Carsb           ; Vector cars
         ld   (La294),sp
         jr   L9f04

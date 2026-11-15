@@ -1,27 +1,29 @@
+        include "HW.asm"
+
 STEPX           equ 3
 STEPY           equ 2
 SZX             equ 5
 SZY             equ 3
 
-HSCR            equ #8000
+HIDDEN_SCREEN   equ #8000               ; orig: HSCR
 XEND            equ 64
 YEND            equ 24
 
-        org  HSCR+((YEND/2)*#0100)
+        org  HIDDEN_SCREEN+((YEND/2)*#0100)
 START
         di
         ; Пробный вывод воксель спрайта с масшта
         ; Бированием
-        ld   hl,#4000
-        ld   de,#4001
-        ld   bc,#1800
+        ld   hl,SCREEN
+        ld   de,SCREEN+1
+        ld   bc,SCREEN_PIX_LEN
         ld   (hl),l
         ldir
-        ld   bc,#02FF
+        ld   bc,SCREEN_ATTR_LEN-1
         ld   (hl),%00000111
         ldir
         ld   a,1
-        out  (#FE),a
+        out  (PORT_ULA),a
 
 M2
 
@@ -36,10 +38,10 @@ Y1      ld   de,#00
         call Vox
         ei
         ld   a,0
-        out  (#FE),a
+        out  (PORT_ULA),a
         halt
         ld   a,2
-        out  (#FE),a
+        out  (PORT_ULA),a
         di
         call DROPH
 
@@ -52,7 +54,7 @@ Y1      ld   de,#00
 ; INCL "CMOVE"  ; file CMOVE exists on no disk (not needed to assemble)
 
         xor  a
-        in   a,(#FE)
+        in   a,(PORT_ULA)
         and  #1F
         cp   #1F
         jp   z,M2
@@ -573,7 +575,7 @@ Divv
         ret
 
 DROPH
-        ld   hl,HSCR
+        ld   hl,HIDDEN_SCREEN
         ld   de,#4000
         ld   bc,+(YEND/2)*#0100
 M1
@@ -599,7 +601,7 @@ M1
 
 CLER
         ld   (STK1+1),sp
-        ld   sp,HSCR+((YEND/2)*#0100)
+        ld   sp,HIDDEN_SCREEN+((YEND/2)*#0100)
         ld   hl,#00
         ld   b,YEND/2
 .M22

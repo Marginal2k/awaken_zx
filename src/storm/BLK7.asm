@@ -176,8 +176,8 @@ Eyeg_   ld   a,0
 Findobj
         ; Поиск первого по типу b d
         ; Fz-on if not found
-        ld   iy,Carsb-Olen
-        ld   bc,Olen
+        ld   iy,Carsb-OBJ_LEN
+        ld   bc,OBJ_LEN
 Find2
         call Findob
         ret  z
@@ -191,8 +191,8 @@ Fobj
         ; Ret hl-obj ad+1
         ; Fz-on no in buf objs
         ; Fz-off found
-        ld   hl,+(Carsb-Olen)+1
-        ld   bc,Olen
+        ld   hl,+(Carsb-OBJ_LEN)+1
+        ld   bc,OBJ_LEN
         jr   $+8
         dec  l
         ld   a,(hl)
@@ -207,8 +207,8 @@ Fobj
 Fndfree
         ; Find free space
         ; Ret fz-on if not found
-        ld   hl,+(Carsb-Olen)+1
-        ld   de,Olen
+        ld   hl,+(Carsb-OBJ_LEN)+1
+        ld   de,OBJ_LEN
 Hhh3
         add  hl,de
         ld   a,(hl)
@@ -267,11 +267,11 @@ Hhh3
         ld   a,(ix+Type)
         cp   #10
         jp   nc,.Jj11
-        ld   hl,+(Carsb-Olen)+1
+        ld   hl,+(Carsb-OBJ_LEN)+1
         ld   a,3
 .Jj12
         ex   af,af
-        ld   de,Olen
+        ld   de,OBJ_LEN
         add  hl,de
         ld   a,(hl)
         cp   #80
@@ -445,7 +445,7 @@ Sfxa
         ld   a,h
         or   a
         jr   z,Sfxb
-        ld   bc,#FFFD
+        ld   bc,PORT_AY_REG
         xor  a
         out  (c),a
         ld   b,#BF
@@ -486,7 +486,7 @@ Sfxb
         ld   a,h
         or   a
         jr   z,Sfxn
-        ld   bc,#FFFD
+        ld   bc,PORT_AY_REG
         ld   a,2
         out  (c),a
         ld   b,#BF

@@ -107,7 +107,7 @@ Servkj
         ld   a,0                ; Flag
         and  a
         ret  nz
-        in   a,(#1F)
+        in   a,(PORT_KEMPSTON)
         jp   Gomove
 
 Servqa

@@ -1,8 +1,10 @@
+        include "HW.asm"
+
         org  #7000
 
         ld   c,1
         ld   a,1
-        call #3D13
+        call TRDOS_COMMAND
 
         ld   de,#0100
         ld   (#5CF4),de
@@ -15,7 +17,7 @@ M1
         ld   bc,#8005
         ld   hl,#8000
         push hl
-        call #3D13
+        call TRDOS_COMMAND
         pop  hl
         ld   a,(hl)
         cpl
@@ -27,7 +29,7 @@ M1
         ld   hl,#8000
         pop  de
         ld   bc,#8006
-        call #3D13
+        call TRDOS_COMMAND
         pop  bc
         djnz M1
         ret

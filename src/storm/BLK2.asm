@@ -31,7 +31,7 @@ Newrokt
         ld   a,Minren
         jr   z,$+4
         ld   a,Maxren
-        ld   b,Splayer
+        ld   b,PLAYER_INDEX
 Rkn11
         ; INIT roket
         ; Hl'-X,de'-Y,bc'-z
@@ -40,8 +40,8 @@ Rkn11
         ; Dy
         ; B-кто пустил ракету
         ld   (Enrok+1),a
-        ld   hl,+(Carsb-Olen)+1
-        ld   de,Olen
+        ld   hl,+(Carsb-OBJ_LEN)+1
+        ld   de,OBJ_LEN
         add  hl,de
         ld   a,(hl)
         cp   #80
@@ -118,7 +118,7 @@ Enrok   ld   (hl),0             ; Энергия
 Repanel
         ; Вывод индикаторов панели , a так же вр
         ; Емени
-        ld   bc,#7FFD
+        ld   bc,PORT_PAGE
         push bc
         ld   a,Pgnorm
         out  (c),a
@@ -143,11 +143,11 @@ Korni
         ; De-счего брать корень
         ; A-3начение
         push bc
-        ld   bc,#7FFD
+        ld   bc,PORT_PAGE
         ld   a,Pgcontr
         out  (c),a
         call Korni2
-        ld   bc,#7FFD
+        ld   bc,PORT_PAGE
         ex   af,af
         ld   a,Pgnorm
         out  (c),a
@@ -507,7 +507,7 @@ Shut
         ld   c,(hl)
         ; B c номер того c которым имел дело пер
         ; Сонаж до этого
-        ld   (hl),Splayer
+        ld   (hl),PLAYER_INDEX
         ld   a,l
         add  a,Type-Subj
         ld   l,a
@@ -518,7 +518,7 @@ Shut
         ld   hl,Eff21
         ld   (Sfxa+1),hl
         ld   a,c
-        cp   Splayer
+        cp   PLAYER_INDEX
         ret  z                  ; Если пред. был игрок
 Chstat_
         ld   a,b
@@ -718,7 +718,7 @@ Pwnpp   cp   6
         ld   a,h
         cp   3
         ret  nc
-        ld   (ix+Subj),Splayer
+        ld   (ix+Subj),PLAYER_INDEX
         ret
 Pirat
         ld   a,r
@@ -732,13 +732,13 @@ Topeace
         ld   (ix+Subj),a
         ret
 Datal_
-        ld   bc,#7FFD
+        ld   bc,PORT_PAGE
         ex   af,af
         ld   a,Pgcontr
         out  (c),a
         ex   af,af
         call Datal
-        ld   bc,#7FFD
+        ld   bc,PORT_PAGE
         ld   a,Pgnorm
         out  (c),a
         ret

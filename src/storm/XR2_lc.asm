@@ -23,7 +23,7 @@ MERZ
         ret
 
 ; Общая инициализация
-INIT
+ENG3D_INIT                      ; orig: INIT
         xor  a
         ld   l,a
         ld   h,a
@@ -124,7 +124,7 @@ Lc66b
 Lc867   ld   sp,#0000
         pop  hl
         ld   a,0
-        out  (#FE),a
+        out  (PORT_ULA),a
         ret
 
 Lc66e   jp   Lc6c0
@@ -422,7 +422,7 @@ LLC     pop  hl
 
 Polygon
         ld   a,2
-        out  (#FE),a
+        out  (PORT_ULA),a
         push hl
         ld   a,(L91+#0A)
         ld   b,a

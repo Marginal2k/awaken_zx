@@ -607,7 +607,7 @@ RLT_
         ld   a,(UNGLE)
         dec  a
         jp   p,$+7
-        cp   0-STPTURN
+        cp   0-MAX_TURN
         jr   c,$+5
         ld   (UNGLE),a
 RP4
@@ -647,7 +647,7 @@ RRT_
         ld   a,(UNGLE)
         inc  a
         jp   m,$+7
-        cp   STPTURN+1
+        cp   MAX_TURN+1
         jr   nc,$+5
         ld   (UNGLE),a
         jp   RP4
@@ -1965,7 +1965,7 @@ Y_      ld   bc,0
         sra  d
         rr   e
         edup
-        call Vox
+        call VOX_DRAW
         ret
 
         org  (($+255)&#FF00)

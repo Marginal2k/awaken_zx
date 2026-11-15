@@ -56,8 +56,18 @@ def parse_lines(lines, enc='cp866'):
             except ValueError:
                 res.append(('other', l.rstrip())); continue
             res.append(('bytes', bs, com.strip())); continue
-        m = re.match(r'^ds\s+(\d+)\s*,\s*(\S+)$', s)
+        m = re.match(r'^(dw|DW)\s+(.*)$', s)
         if m:
-            res.append(('bytes', [num(m.group(2))] * int(m.group(1)), com.strip())); continue
+            bs = []
+            try:
+                for a in split_args(m.group(2)):
+                    v = num(a)
+                    bs += [v & 255, (v >> 8) & 255]
+            except ValueError:
+                res.append(('other', l.rstrip())); continue
+            res.append(('bytes', bs, com.strip())); continue
+        m = re.match(r'^ds\s+(\d+)\s*(?:,\s*(\S+))?$', s)
+        if m:
+            res.append(('bytes', [num(m.group(2)) if m.group(2) else 0] * int(m.group(1)), com.strip())); continue
         res.append(('other', l.rstrip()))
     return res

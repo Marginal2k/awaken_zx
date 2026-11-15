@@ -1,0 +1,38 @@
+# Goods (30 kinds), id 0..29.  The goods NAMES and UNITS are in assets/text/trade_names.txt (TTWR2): line number = id + 1.
+# cheap_where : economy type of the star system (TYPE in station_ui.txt: 0 agricultural, 1 cultural, 2 technological, 3 general) in which
+#               the good is cheaper / lighter
+# weight_class: 0 = tons (weighs its amount), 1 = persons (1/16 ton each), 2 = negligible weight (kg / g)
+# price       : average ("base") price in credits per unit
+# ban_level   : how often the good is illegal: 0 never, 1 rarely, 2 often, 3 always banned in democracies
+# orig_comment is the developers comment in the old source (an older name of the good); it is ignored by the build.
+id,cheap_where,weight_class,price,ban_level,orig_comment
+0,3,0,19,1,ТЕКСТИЛЬ
+1,0,0,20,1,С/Х Продукты
+2,0,0,90,1,С/Х Техника
+3,2,0,21,1,Стройматериялы
+4,2,0,95,1,Стройтехника
+5,0,0,17,1,вода
+6,1,0,27,2,Спиртное
+7,1,0,28,2,Пиво
+8,0,0,18,2,Табак
+9,2,0,30,0,Медикаменты
+10,2,0,60,1,Оборудование
+11,2,0,65,1,Электроника
+12,2,0,70,1,Компьютеры
+13,2,0,80,1,Энергоностители
+14,3,0,55,1,Минералы
+15,2,0,72,2,РАДИАКТИВНЫЕ РУДЫ
+16,3,0,67,1,Черн.металлы
+17,3,0,80,1,Цвет.металлы
+18,1,2,100,1,Драг.металлы
+19,1,2,120,1,Драг.камни
+20,1,2,110,2,ПРЕДМЕТЫ РОСКОШИ
+21,3,0,80,1,легкое Вооружение
+22,2,0,125,2,тяжолое Вооружение
+23,1,2,140,3,Наркотики
+24,1,1,130,3,Рабы
+25,1,1,120,3,Проститутки
+26,2,2,170,3,Трансплонтанты
+27,1,1,230,3,Уникумы
+28,0,2,240,0,Технологии
+29,0,0,250,0,Артефакты

@@ -1,0 +1,19 @@
+# Offer per planet level: id = planet level 1..16.  Number of ships / skimmers that are SKIPPED at the end of the list at a station of that level
+# (0 = the station sells all; a high level station sells all, a low level one only the cheapest ones).
+id,skip_ships,skip_skimmers,orig_comment
+1,5,3,
+2,5,3,
+3,5,3,
+4,4,3,
+5,4,2,
+6,4,2,
+7,3,2,
+8,3,2,
+9,3,1,
+10,2,1,
+11,2,1,
+12,2,1,
+13,1,0,
+14,1,0,
+15,0,0,
+16,0,0,

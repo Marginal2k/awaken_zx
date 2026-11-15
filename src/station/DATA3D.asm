@@ -1,6 +1,3 @@
-; Text encoding: Windows-1251 source, converted to the game's CP866 font codes by sjasmplus (ENCODING "DOS")
-            ENCODING "DOS"
-
 L90k:
             incbin "D9000.d"
 
@@ -325,4 +322,3 @@ L97:        equ  high($)
 
 
 
-            ENCODING "WIN"

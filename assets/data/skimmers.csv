@@ -1,0 +1,8 @@
+# The 4 skimmers (id 1..4).  Names / descriptions: text/ships.txt.
+# unused : always 0 (a skimmer has no tonnage of its own)   price : credits   speed : shown in the viewer text   weight : weight in tons added to the ship load
+# NB: skim.tok / NAMSK in assets/text/ships.txt repeat price/speed/weight as plain text; keep them in sync by hand.
+id,unused,price,speed,weight,orig_comment
+1,0,30000,170,5,
+2,0,27000,150,4,
+3,0,24000,130,3,
+4,0,18000,100,2,

@@ -21,10 +21,11 @@ def asm(src, cwd, extra=()):
 
 def generate_assets():
     """assets/ (human-editable) -> build/gen/ (game form: db/inc/bin files that the sources include).  tools/assets/*.py"""
-    import gen_text
+    import gen_text, gen_tables
     shutil.rmtree(B + '/gen', ignore_errors=True)
     os.makedirs(B + '/gen', exist_ok=True)
     gen_text.generate(ROOT, B + '/gen')
+    gen_tables.generate(ROOT, B + '/gen')
 
 
 TEST = '--test-return' in sys.argv

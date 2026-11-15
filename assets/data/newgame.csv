@@ -1,0 +1,28 @@
+# Initial state of a new game: the 512-byte state record of the station (labels TIME ... ABONS, DATA_M.asm), which also becomes the content of the
+# save slots SAVE0..SAVE5 written by the build.  Each row is one labelled field.  bytes = hex bytes separated by blanks, "XX*N" = N times XX.
+# size is checked against the number of bytes (the record layout is fixed: do not change the sizes).  NB: the flight has its own copy (NDATA, flight/SETHJRET.asm) used
+# only on a separate path; see docs/GAME_DESIGN.md 7.2.  Values are binary: words are little endian.
+label,size,bytes,meaning
+TIME,4,22 01 10 10,"game time: day (word, little endian) then hour, minute (hex-coded decimal: 0x10 = 10)"
+PLACE,4,38 4B F3 4A,"current system: map coordinate word, coordinate-in-map word"
+PLANET,1,00,current planet number (counted from the bottom)
+WHERE,4,38 4B F3 4A,"target system of the hyperjump: map coordinate word, coordinate in the map word"
+WPLANET,1,00,target planet number
+SHIP,1,06,"ship model number (0-based, 6 = Karen the starting ship)"
+SKIMMER,1,FF,"skimmer model number, 0xFF = none"
+STATUS,1,43,"legal status (class = status/32: 0 clean, 1 suspect, 2 wanted, 3 convicted)"
+SUMM,2,A8 61,"credits (word, little endian: 0x61A8 = 25000)"
+TONN,2,00 32,"two bytes (0, 50): tonnage related, see docs/GAME_DESIGN.md 3.2"
+TWRI,60,00*60,"goods in the hold: 30 pairs (count, price paid), all 0"
+WKRBI,0,,(label only: same address as FUEL)
+FUEL,34,00 00 05 00 00 FF FF FF FE FF*22 00 FF 80,"ship equipment counts, 33 items + terminator 0x80 (WKRBI = FUEL = item 1): 0..100 = count, 0xFF = not installed, 0xFE = installed"
+WSKMI,15,00 00 00 FF*11 80,"skimmer equipment counts, 14 items + terminator 0x80"
+NEWS,7,01 00*6,"news state: message number, hours to keep it, system words, planet"
+ORDER,64,FF 00*15 FF 00*15 FF 00*15 FF 00*15,"4 contract orders of 16 bytes each, first byte 0xFF = empty"
+SPEED,2,00 00,"speed of the bought ship, skimmer"
+DALNO,2,00 00,distance of the last chosen star (word)
+MSTARS,51,FF*50 80,remembered stars: 50 bytes 0xFF + terminator 0x80
+WAY,51,FF*50 80,route stars: 50 bytes 0xFF + terminator 0x80
+WAYMASK,11,22 00*10,route line mask + 10 bytes
+PSTARS,200,39 4B 06 00*197,systems where the subscribers live (PKOL * 4 bytes)
+ABONS,51,02 02 01*48 00,"subscriber states: 1 = not available, 2 = available; terminated by 0"

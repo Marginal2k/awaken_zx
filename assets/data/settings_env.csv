@@ -1,0 +1,20 @@
+# Defaults of the environment settings window (tables SETSD = value + mask and SETSI = key letters; the labels MOUSE.. are used by the code).
+# label  : the code label of the setting (do not rename)
+# value  : for a switch 0x81 = "Y" (on), 0x80 = "N" (off); for a key: the keyboard half-row port (high byte, see keyboard.csv); for INK/PAPER/BRIGHT: the number
+# mask   : key bit mask (keys) or 0
+# key    : the letter shown in the settings window for this row (a letter/digit, SS, SPACE or a number)
+# The row captions are in assets/text/station_ui.txt (TSETS1), same order.  13 rows, do not add or remove.
+label,value,mask,key,orig_comment
+MOUSE,0x81,0x00,Y,
+JOYSTIK,0x80,0x00,N,
+MUSIC,0x81,0x00,Y,
+INVERSE,0x80,0x00,N,
+KUP,0xFB,0x01,Q,
+KDOWN,0xFD,0x01,A,
+KLEFT,0xDF,0x02,O,
+KRIGHT,0xDF,0x01,P,
+KFIRE,0x7F,0x01,SPACE,
+KCANCEL,0x7F,0x04,M,
+INK,0x00,0x00,0,
+PAPER,0x05,0x00,4,
+BRIGHT,0x00,0x00,0,

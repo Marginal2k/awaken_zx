@@ -1,189 +1,187 @@
-; LOAD -- restored from awk5/LOAD.C (767 bytes, STORM tokenized)
-; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
-        ORG #8000
-        DI
-        CALL MAKEDRP
+        org  #8000
+        di
+        call MAKEDRP
 
-        LD A,(#5D16)
-        OR 1
-        LD (DSK+1),A
-        LD C,#FF
-        CALL TOREG
-        LD IX,#2F65
-        CALL TOTD
-        LD IX,#2F59 ;WAIT
-        CALL TOTD
+        ld   a,(#5D16)
+        or   1
+        ld   (DSK+1),a
+        ld   c,#FF
+        call TOREG
+        ld   ix,#2F65
+        call TOTD
+        ld   ix,#2F59           ; Wait
+        call TOTD
 
-        LD DE,#0101
-        LD BC,#0040
+        ld   de,#0101
+        ld   bc,#0040
 M1
-        PUSH BC
-        EXX
-        LD HL,#9000
-        EXX
-        CALL LOAD
-        CALL PAUS
-        EXX
-        LD HL,#9100
-        EXX
-        CALL LOAD
-        CALL PAUS
-        EXX
-        LD HL,#9200
-        EXX
-        CALL LOAD
-        CALL PAUS
-        EXX
-        LD HL,#9300
-        EXX
-        CALL LOAD
-        CALL PAUS
-        EXX
-        LD HL,#9400
-        EXX
-        CALL LOAD
-        CALL PAUS
-        EXX
-        LD HL,#9500
-        EXX
-        CALL LOAD
-        CALL PAUS
+        push bc
+        exx
+        ld   hl,#9000
+        exx
+        call LOAD
+        call PAUS
+        exx
+        ld   hl,#9100
+        exx
+        call LOAD
+        call PAUS
+        exx
+        ld   hl,#9200
+        exx
+        call LOAD
+        call PAUS
+        exx
+        ld   hl,#9300
+        exx
+        call LOAD
+        call PAUS
+        exx
+        ld   hl,#9400
+        exx
+        call LOAD
+        call PAUS
+        exx
+        ld   hl,#9500
+        exx
+        call LOAD
+        call PAUS
 
-        PUSH DE
-        CALL DROPSCR
-        POP DE
+        push de
+        call DROPSCR
+        pop  de
 
-        CALL MEAN
+        call MEAN
 
-        POP BC
-        DEC BC
-        LD A,C
-        OR B
-        JP NZ,M1
-        RET
+        pop  bc
+        dec  bc
+        ld   a,c
+        or   b
+        jp   nz,M1
+        ret
 PAUS
-        LD BC,160
-        DEC BC
-        LD A,C
-        OR B
-        JP NZ,$-3
-        RET
+        ld   bc,160
+        dec  bc
+        ld   a,c
+        or   b
+        jp   nz,$-3
+        ret
 LOAD
-DSK     LD A,0
-        AND %00101111
-        LD C,A
-        XOR A
-        BIT 0,D
-        JR NZ,$+4
-        LD A,#10
-        OR C
-        LD C,#FF
-        CALL TOREG
-        LD A,E
-        LD C,#5F
-        CALL TOREG
-        LD BC,RETS
-        PUSH BC
-        LD BC,ODIN
-        PUSH BC
-        EXX
-        LD BC,#007F
-        LD IX,#2090
-        JR TOTD
+DSK     ld   a,0
+        and  %00101111
+        ld   c,a
+        xor  a
+        bit  0,d
+        jr   nz,$+4
+        ld   a,#10
+        or   c
+        ld   c,#FF
+        call TOREG
+        ld   a,e
+        ld   c,#5F
+        call TOREG
+        ld   bc,RETS
+        push bc
+        ld   bc,ODIN
+        push bc
+        exx
+        ld   bc,#007F
+        ld   ix,#2090
+        jr   TOTD
 RETS
-        DI
-        EXX
+        di
+        exx
 MEAN
-        INC E
-        LD A,E
-        CP #11
-        RET C
-        INC D
-        LD E,1
-        BIT 0,D
-        RET NZ
-        EXX
-        LD A,#58 ;STEP ON
-        LD C,#1F
-        CALL TOREG
+        inc  e
+        ld   a,e
+        cp   #11
+        ret  c
+        inc  d
+        ld   e,1
+        bit  0,d
+        ret  nz
+        exx
+        ld   a,#58              ; Step on
+        ld   c,#1F
+        call TOREG
 
-        LD IX,#3EF5 ;WAIT
-        CALL TOTD
-        DI
+        ld   ix,#3EF5           ; Wait
+        call TOTD
+        di
 
-        EXX
-        RET
-ODIN    DB 1
+        exx
+        ret
+ODIN    db   1
 TOREG
-        LD IX,#2A53
+        ld   ix,#2A53
 TOTD
-        PUSH IX
-        JP #3D2F
+        push ix
+        jp   #3D2F
 MAKEDRP
-        LD BC,#10
-        EXX
-        LD DE,DS1
-        LD A,95
+        ld   bc,#10
+        exx
+        ld   de,DS1
+        ld   a,95
 MDS1
-        EX AF,AF'
-        LD HL,DS0
-        LD BC,DLEN
-        EXX
-        LD HL,(DS0+1)
-        ADD HL,BC
-        LD (DS0+1),HL
-        LD HL,(DS01+1)
-        INC H
-        LD A,H
-        AND 7
-        JP NZ,$+14
-        LD A,L
-        ADD A,32
-        LD L,A
-        JP C,$+7
-        LD A,H
-        SUB 8
-        LD H,A
-        LD (DS01+1),HL
-        EXX
-        LDIR
-        EX AF,AF'
-        DEC A
-        JP NZ,MDS1
-        LD HL,#9000
-        LD (DS0+1),HL
-        LD HL,#40D8
-        LD (DS01+1),HL
-        RET
+        ex   af,af'
+        ld   hl,DS0
+        ld   bc,DLEN
+        exx
+        ld   hl,(DS0+1)
+        add  hl,bc
+        ld   (DS0+1),hl
+        ld   hl,(DS01+1)
+        inc  h
+        ld   a,h
+        and  7
+        jp   nz,$+14
+        ld   a,l
+        add  a,32
+        ld   l,a
+        jp   c,$+7
+        ld   a,h
+        sub  8
+        ld   h,a
+        ld   (DS01+1),hl
+        exx
+        ldir
+        ex   af,af'
+        dec  a
+        jp   nz,MDS1
+        ld   hl,#9000
+        ld   (DS0+1),hl
+        ld   hl,#40D8
+        ld   (DS01+1),hl
+        ret
 DROPSCR
-        LD (STK92+1),SP
+        ld   (STK92+1),sp
 DS0
-        LD SP,#9000
-        POP HL
-        POP DE
-        POP BC
-        POP AF
-        EXX
-        EX AF,AF'
-        POP HL
-        POP DE
-        POP BC
-        POP AF
-DS01    LD SP,#40D8
-        PUSH AF
-        PUSH BC
-        PUSH DE
-        PUSH HL
-        EXX
-        EX AF,AF'
-        PUSH AF
-        PUSH BC
-        PUSH DE
-        PUSH HL
+        ld   sp,#9000
+        pop  hl
+        pop  de
+        pop  bc
+        pop  af
+        exx
+        ex   af,af'
+        pop  hl
+        pop  de
+        pop  bc
+        pop  af
+DS01    ld   sp,#40D8
+        push af
+        push bc
+        push de
+        push hl
+        exx
+        ex   af,af'
+        push af
+        push bc
+        push de
+        push hl
 DS1
-DLEN    EQU 26
+DLEN            equ 26
 
-        DS 95*DLEN
+        ds   95*DLEN
 
-STK92   LD SP,0
-        RET
+STK92   ld   sp,0
+        ret

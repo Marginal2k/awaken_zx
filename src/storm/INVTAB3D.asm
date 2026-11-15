@@ -1,31 +1,29 @@
-; INVTAB3D -- restored from awk2/INVTAB3D.C (95 bytes, STORM tokenized)
-; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
-;ИНВЕРТИРОВАНИЕ ТАБЛИЦЫ МАСОК ДЛЯ 3D
-        ORG #8000
-        LD HL,#9000
-        LD B,#80
+        ; Инвертирование таблицы масок для 3d
+        org  #8000
+        ld   hl,#9000
+        ld   b,#80
 M1
-        LD A,(HL)
-        CPL
-        LD C,A
-        INC L
-        LD A,(HL)
-        CPL
-        AND C
-        LD (HL),A
-        DEC L
-        INC H
-        LD A,(HL)
-        CPL
-        LD C,A
-        INC L
-        LD A,(HL)
-        CPL
-        AND C
-        LD (HL),A
-        INC L
-        DEC H
-        DJNZ M1
-        RET
-        ORG #9000
-        INCBIN "assets/D9000_plus.bin"
+        ld   a,(hl)
+        cpl
+        ld   c,a
+        inc  l
+        ld   a,(hl)
+        cpl
+        and  c
+        ld   (hl),a
+        dec  l
+        inc  h
+        ld   a,(hl)
+        cpl
+        ld   c,a
+        inc  l
+        ld   a,(hl)
+        cpl
+        and  c
+        ld   (hl),a
+        inc  l
+        dec  h
+        djnz M1
+        ret
+        org  #9000
+        incbin "assets/D9000_plus.bin"

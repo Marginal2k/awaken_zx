@@ -20,9 +20,10 @@ a segment may be held across it; keep >=10 frames between a key and a segment en
 Raw passthrough: any line starting with '!' is appended verbatim to that segment's xpeccy args
 (e.g.  !--bp 0x6300  or  !-l build/awaken.lab).
 """
-import argparse, os, re, subprocess, struct, sys, zlib
+import argparse, os, re, shutil, subprocess, struct, sys, zlib
 
-XP = r'D:\Emulators\ZX\XpeccyPlus\xpeccy-plus.exe'
+# Xpeccy+ executable: env XPECCY, else xpeccy-plus on PATH, else the author's install path
+XP = os.environ.get('XPECCY') or shutil.which('xpeccy-plus') or r'D:\Emulators\ZX\XpeccyPlus\xpeccy-plus.exe'
 CONF = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'work', 'xpconf'))
 
 def ppm2png(src, dst):
@@ -41,6 +42,10 @@ def main():
     ap.add_argument('--conf', default=CONF, help='Xpeccy+ confdir (work/xpconf = Pentagon 512K, work/xpconf128 = 128K)')
     ap.add_argument('--retries', type=int, default=3, help='re-run a segment that hangs (rare Xpeccy bench hang; runs are deterministic)')
     a = ap.parse_args()
+    if not os.path.exists(XP):
+        print('Xpeccy+ not found: set XPECCY=<path to xpeccy-plus.exe> (https://github.com/dotkoval/xpeccy-plus)', file=sys.stderr); return 4
+    if not os.path.isdir(a.conf):
+        print('Xpeccy+ confdir %s missing: copy your Xpeccy+ config folder there (see docs/TESTING.md)' % a.conf, file=sys.stderr); return 4
     os.makedirs(a.o, exist_ok=True)
     disk, machine, start = a.d, 'pent', None
     segs = []; cur = None

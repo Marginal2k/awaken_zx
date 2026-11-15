@@ -1,9 +1,9 @@
 # Testing / emulator harness (coder)
 
-Emulator: **Xpeccy+** (`D:\Emulators\ZX\XpeccyPlus\xpeccy-plus.exe`), headless `--bench` mode, always with a private config dir:
+Emulator: **Xpeccy+** (https://github.com/dotkoval/xpeccy-plus; `tools/xp/run.py` takes the exe from env `XPECCY`, else `xpeccy-plus` on PATH), headless `--bench` mode, always with a private config dir:
 `work\xpconf` (Pentagon, 512 KB RAM; copy of the user's config incl. ROMs) or `work\xpconf128` (Pentagon with 128 KB); never the user's own config.
 Only processes started by the harness are ever stopped (no kill by image name: the user plays in their own emulator windows).
-The earlier ZX-M8XXX/CDP route (`tools/cdp/`) and `work/run128.py` (kills by image name; replaced by `run.py --conf work/xpconf128`) are obsolete.
+The earlier ZX-M8XXX/CDP harness (tools/cdp, tools/emu) was removed; `run.py --conf work/xpconf128` covers 128K.
 
 ## Regression (one command)
 

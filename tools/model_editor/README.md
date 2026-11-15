@@ -13,6 +13,7 @@ python tools/model_editor/serve.py --open   # same + opens the browser
 
 The server serves the editor, serves `assets/models/` at `/models/` and lets **Save write straight into `assets/models/`** (PUT/DELETE
 restricted to `flight|station/NAME.txt` and `index.txt`, 127.0.0.1 only). The editor then loads all 113 models by itself.
+A model and a view can be opened directly: `http://localhost:8780/?model=Klopd&mode=zx` (mode = zx, edit, front, side, top).
 
 Other ways to open models (Chrome / Edge; opening `index.html` from `file://` does not work because of ES modules - always use the server):
 

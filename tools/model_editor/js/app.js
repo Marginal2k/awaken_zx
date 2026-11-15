@@ -353,9 +353,13 @@ app.syncModeButtons = () => { for (const b of document.querySelectorAll('#modes 
 // actions
 async function loadDone(how) {
   app.cur = null; app.sel = { vertex: null, face: null, group: null };
-  const first = app.ws.allEntries()[0];
+  // optional URL parameters: ?model=NAME&mode=zx|edit|front|side|top
+  const q = new URLSearchParams(location.search);
+  const want = q.get('model') && app.ws.allEntries().find((e) => e.name === q.get('model'));
+  const first = want || app.ws.allEntries()[0];
   app.refresh(['list']);
   if (first) openEntry(first);
+  if (q.get('mode')) { const b = document.querySelector(`[data-mode="${q.get('mode')}"]`); if (b) b.click(); }
   app.status(how);
 }
 $('btnOpen').onclick = async () => {

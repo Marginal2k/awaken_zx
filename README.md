@@ -1,43 +1,97 @@
-# Awaken - source restoration
+# Awaken — ZX Spectrum 128 (Mythos, 1999) — source code
 
-ZX Spectrum 128K game "Awaken" (Mythos / Rage Technologies, 1999).  Inputs: `archive/awk1..6.trd` (developer disks), `reference/` (released demos).
-Goal: readable sjasmplus sources that build a complete, working game on a plain TR-DOS disk (no protection, all disk I/O in `src/common/disk.asm`, editable assets).
+Buildable source code of *Awaken*, an unreleased Elite-like space trading and combat game
+for the ZX Spectrum 128K / TR-DOS by Mythos (1999). The authors' tokenized ZASM 3.10 and
+STORM sources from the open-sourced developer disks were decoded and converted to
+[sjasmplus](https://github.com/z00m128/sjasmplus). Protection is gone, all disk access goes
+through one small layer, every text, table, picture, 3D model, sound and the music is an
+editable file in `assets/`, and a web editor for the 3D models is included.
+`python build.py` produces a bootable `.trd`. Documentation below is in Russian.
 
-## Build and run
+![Станция](docs/screenshots/station_ship.png)
 
-    python build.py                  # sjasmplus must be on PATH (or C:\sjasmplus) -> build/awaken.trd (+ awaken_nointro.trd, symbol files build/*.sym/.lst)
-    python build.py --test-return    # test disk: the flight returns to the station at once  -> build/awaken_test_return.trd
-    python build.py --test-ending    # test disk: "Вылет" starts the ending                  -> build/awaken_test_ending.trd
+---
 
-Load `build/awaken.trd` in a Pentagon/128K emulator with a Beta disk interface (TR-DOS) and `RUN` (autostart): intro animation (SPACE skips it) -> station -> "Вылет" -> flight -> fly into the station -> station.
-128 KB is enough.  Emulator harness and scenarios: `docs/TESTING.md`, `tools/xp/`, `tools/scen/` (e.g. `python tools/xp/run.py tools/scen/ours_flight.txt -o work/xp_ours`).
+*Awaken* — космическая торговля и бои в духе Elite для ZX Spectrum 128K, группа Mythos, 1999.
+Игра так и не вышла: были только демо-версии. Этот репозиторий — авторские исходники с дисков
+разработчика (токенизированный ZASM 3.10 и STORM), приведённые к виду, который собирается
+sjasmplus и удобен для правок, модов, локализации и, может быть, завершения игры:
 
-## Controls
+* защита снята, вся работа с диском — в одном слое (`src/common/disk.asm`);
+* станция и полёт связаны: вылет, стыковка, возврат с сохранением состояния, сохранения в 5 слотов;
+* все тексты, таблицы, графика, 3D-модели, звуки и музыка лежат в `assets/` в редактируемом виде
+  (UTF-8, CSV, PNG, текст, PT3), перед сборкой их переводят в игровой формат скрипты;
+* код с шапками у каждого файла и понятными именами меток (старые имена — в комментариях
+  и таблицах `docs/*_LABELS.md`);
+* веб-редактор 3D-моделей с видом «как в игре».
 
-* Station: `Q` up, `A` down, `O` left, `P` right (or Kempston joystick/mouse), `Space` = click, `M` = cancel / system menu on empty background (save "Сохраниться", load "Восстановиться", settings).
-* Flight (Elite-like): `A` laser, `S` / `X` pitch, `N` / `M` roll, `Space` throttle.  Docking: fly into the station's docking block (distance box, no docking computer).
-* Intro: `Space` skips the effects.
+## Скриншоты
 
-## Save slots
+| | |
+|---|---|
+| ![Заставка](docs/screenshots/intro_logo.png) | ![Заставка](docs/screenshots/intro_title.png) |
+| ![Станция](docs/screenshots/station.png) | ![Товары](docs/screenshots/station_goods.png) |
+| ![Карта](docs/screenshots/station_map.png) | ![Оснащение](docs/screenshots/station_equipment.png) |
+| ![Полёт](docs/screenshots/flight.png) | ![Лазер](docs/screenshots/flight_laser.png) |
+| ![Концовка](docs/screenshots/ending.png) | ![Корабль](docs/screenshots/station_ship.png) |
 
-Menu `M` -> "Сохраниться" -> "В позицию 1..5" writes the 512-byte state record into the file `SAVEn` (in place); "Восстановиться" -> "С позиции n" reloads the station with that record.
+Редактор моделей (`tools/model_editor`):
 
-## Disk layout (`build/awaken.trd`, details and memory map in `docs/ANALYSIS.md` section 14)
+![Редактор моделей](docs/screenshots/model_editor_edit.png)
+![Вид «как в игре»](docs/screenshots/model_editor_zx.png)
 
-`boot` (BASIC) -> `INTRO` (#6400) -> `STATIONF` (#6000, entry #6300) + banks `LANG D3D KARTA HELP MUZ1 stscr`; `ACTION` (#6000) + `VOXAL0 VOXAL CONTROL0 CONTROL OBJECT3D PANEL` (flight);
-`SAVE0..SAVE5`; `FINALF` (ending, test build only).  Station and flight swap by reloading each other; the 512-byte state record (`TIME`) is handed over in screen RAM (`src/common/state.inc`, `launcher.asm`).
+## Сборка
 
-## Source tree
+Нужны Python 3 (с Pillow) и sjasmplus 1.23 (в PATH или `C:\sjasmplus`).
 
-* `src/boot` - `boot.asm` (BASIC loader), `intro.asm` (disassembled intro of demo v0.2).
-* `src/station`, `src/flight` - the game parts (ZASM 3.10 sources converted to sjasmplus; Cyrillic data files are Windows-1251 text with `ENCODING "DOS"`).
-* `src/common` - `disk.asm` (the only TR-DOS access), `launcher.asm`, `state.inc` (the glue between the parts, marked `[glue]`).
-* `src/storm` - finished isolated STORM 3D prototype (not part of the game); `src/legacy` - unused old sources, not built.
-* `assets/` (+ `MANIFEST.md`) - binary blobs `incbin`ed by the sources.
-* `work/phase1_src` - phase-1 conversion used by `tools/verify_original.py` (`python tools/verify_original.py all` checks that the developer-disk binaries rebuild byte-exact; `-DDISK_ORIGINAL` reproduces the 1999 loaders).
-* Phase 1 tools: `python tools/rebuild_all.py` (extract disks, decode ZASM/STORM sources, convert, compare); `docs/ZASM_FORMAT.md`, `VERSIONS.md`, `BINARIES.md`, `CATALOGUE.md`.
+    python build.py                  # build/awaken.trd (+ awaken_nointro.trd, символы build/*.sym/.lst)
+    python build.py --test-return    # тест: полёт сразу возвращается на станцию
+    python build.py --test-ending    # тест: «Вылет» запускает концовку
+    python build.py --storm          # собрать блок STORM (src/storm, в игру не входит)
 
-## Status
+`build/awaken.trd` запускается в эмуляторе Pentagon/128K с TR-DOS (`RUN`): заставка (пробел
+пропускает) → станция → «Вылет» → полёт → стыковка → станция. Хватает 128 КБ.
 
-Boots, plays the intro, runs the station (map, trade windows, save/load), launches the flight, docks and returns with the state carried, launches again; the ending program is on the disk but has no trigger
-(open question, `docs/ANALYSIS.md` 13.4).  Verified in Xpeccy+ (Pentagon 512 and 128).  Not verified on real hardware.
+Проверка, что исходники собираются в те же байты, что бинарники 1999 года на дисках разработчика:
+
+    python tools/rebuild_all.py      # распаковка archive/*.trd, декодирование ZASM/STORM, конвертация, сверка
+    python tools/verify_original.py all
+
+## Управление
+
+* Станция: `Q` вверх, `A` вниз, `O` влево, `P` вправо (или Kempston), `Пробел` — нажать, `M` — отмена /
+  системное меню на пустом фоне (сохранение «Сохраниться», загрузка «Восстановиться», настройки).
+* Полёт: `A` лазер, `S` / `X` тангаж, `N` / `M` крен, `Пробел` — тяга. Стыковка — влететь в станцию
+  (стыковочного компьютера нет).
+
+## Что где лежит
+
+* `src/station`, `src/flight` — игра (станция и полёт); `src/boot` — загрузчик и заставка;
+  `src/common` — диск, переход станция ↔ полёт, запись состояния.
+* `src/storm` — прототипы 1997–98 года на STORM (посадка на планету LAND, воксели, 3D), отдельный блок.
+* `src/legacy`, `original_src` — старые и исходные версии модулей, как на дисках.
+* `assets/` — тексты (`text/`), таблицы (`data/`), графика (`gfx/`), модели (`models/`), звук и музыка;
+  описание форматов и локализации — `assets/README.md`.
+* `tools/assets` — конвертеры ассетов; `tools/model_editor` — редактор моделей
+  (`python tools/model_editor/serve.py --open`); `tools/xp` — прогон сценариев в эмуляторе Xpeccy+.
+* `archive/` — диски разработчика (`awk1..6.trd`), источник всех исходников.
+* `docs/` — `GAME_DESIGN.md` (устройство игры: тексты, корабли, экономика, карта, ИИ, сюжет,
+  неиспользованное, что не доделано), `ANALYSIS.md` (восстановление, карта памяти),
+  `TESTING.md`, `STORM.md`, `ZASM_FORMAT.md`, таблицы меток.
+
+## Состояние
+
+Игра собирается и работает: заставка, станция (торговля, оснащение, карта, корабли, сохранения),
+полёт, стыковка и возврат. Проверено в Xpeccy+ (Pentagon 512 и 128), на реальном железе не проверялось.
+Чего нет, потому что не было и у авторов: контрактов и миссий (только заготовки интерфейса),
+сюжета, условия победы и гибели игрока; концовка есть, но ничем не вызывается.
+Подробно — `docs/GAME_DESIGN.md`, раздел 9.
+
+## Права
+
+*Awaken* — © Mythos, 1999 (Сергей Апетёнок и команда). Исходники опубликованы проектом
+Open Source ZX (opensourcezx.untergrund.net). Музыка станции — Mast/FtL. Исходные тексты,
+графика, тексты и данные игры выложены для сохранения, изучения и некоммерческих модификаций;
+права на них принадлежат авторам. Демо-версии игры есть на [zxart.ee](https://zxart.ee).
+
+Инструменты проекта (`build.py`, `tools/`, документация) — под лицензией MIT, см. `LICENSE`.

@@ -1,16 +1,26 @@
-DREVO1
+;==============================================================================
+; OBJX - данные 3D-объектов (вершины и грани)
+;
+; ObjTree1/ObjTree2 (деревья), ObjHouse1 (дом), ObjSturm, ObjTrad, ObjTuri, ObjIstr
+; (машины). Таблица адресов: ObjectIndexTab в S3D.
+;
+; Часть набора STORM (прототип Awaken 1997/98), не входит в основную игру. Подробности: docs/STORM.md,
+; таблица переименований меток: docs/STORM_LABELS.md. Собирается sjasmplus (см. make_*.asm).
+;==============================================================================
+
+ObjTree1                        ; orig: DREVO1
         ; Теоритич.размер и масштаб
         db   #20, #03
         ; Размер в вокселях
         dw   #200E
-DREVO2
+ObjTree2                        ; orig: DREVO2
         db   #20, #03
         dw   #2010
-DOM1
+ObjHouse1                       ; orig: DOM1
         db   #20, #04
         dw   #2010
 
-Sturm
+ObjSturm                        ; orig: Sturm
         db   #6D, #02
         db   #FF, #2E, #0F, #43
         db   #33, #5D, #00, #16
@@ -39,7 +49,7 @@ P00stur
         db   #24, #4B, #3C, #41, #46
         db   #00
 
-Trad
+ObjTrad                         ; orig: Trad
         db   #6D, #03
         db   #FF, #25, #0A, #6D
         db   #FF, #32, #11, #57
@@ -84,7 +94,7 @@ P00trd
         db   #14, #37, #32, #0A, #0F
         db   #00
 
-Turi
+ObjTuri                         ; orig: Turi
         db   #6D, #02
         db   #3F, #2E, #17, #63
         db   #FF, #12, #06, #6D
@@ -112,7 +122,7 @@ P00turi
         db   #26, #14, #19, #50, #00, #05, #55
         db   #00
 
-Istr
+ObjIstr                         ; orig: Istr
         db   #6D, #02
         db   #FF, #26, #10, #45
         db   #F0, #09, #07, #45

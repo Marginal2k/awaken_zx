@@ -1,3 +1,17 @@
+;==============================================================================
+; XR2 - растеризатор полигонов и 3D-преобразование (часть S3D)
+;
+; Инициализация (Init3d), проекция точек (ProjectPoints), закраска полигонов,
+; линии (DrawLine*), видимость (VisibilityMask, PolygonVisible). Требует выравнивания
+; по странице. Предок awk6 XR2 и awk1 3D-II.
+;
+; Патч относительно дискового XR2: четыре перехода JP NC,ED_ возвращены в JP NC,Ld73d/Ld73c
+; (состояние, скомпилированное в S3D.C).
+;
+; Часть набора STORM (прототип Awaken 1997/98), не входит в основную игру. Подробности: docs/STORM.md,
+; таблица переименований меток: docs/STORM_LABELS.md. Собирается sjasmplus (см. make_*.asm).
+;==============================================================================
+
 ; Начало процедур вывода плоскости
 ; Must ве only from #xx00
 Lc5
@@ -23,13 +37,13 @@ MERZ
         ret
 
 ; Общая инициализация
-INIT_
+Init3d                          ; orig: INIT_
         xor  a
         ld   l,a
         ld   h,a
         ld   (Eye_a),hl
         ld   (Eye_g),a
-        ld   hl,ADI3D_
+        ld   hl,ObjectIndexTab
         ld   de,L97
         ld   bc,#0100
         ldir
@@ -471,7 +485,7 @@ Lc7bb   ld   l,#01
 LLC     pop  hl
         ret
 
-Polygon
+DrawPolygonSpan                 ; orig: Polygon
         push hl
         ld   a,(L91+#0A)
         ld   b,a
@@ -600,7 +614,7 @@ Stkc    ld   sp,0
         ret
 
 ; Render obj 2
-Renobj2
+RenderObject2                   ; orig: Renobj2
         ld   a,(Eye_b)
         ld   b,a
         ld   a,(Eyeb)
@@ -778,49 +792,49 @@ Xb0     ld   de,0
         ld   a,ixh
         bit  0,b
         ld   hl,$+6
-        jp   nz,Calcd           ; Take 1st set dot
+        jp   nz,ProjectPoints   ; Take 1st set dot
 Xb1     ld   de,0
         ld   a,iyh
         bit  1,b
         ld   hl,$+6
-        jp   nz,Calcd           ; Rend of z
+        jp   nz,ProjectPoints   ; Rend of z
 Xb2     ld   de,0
         ld   a,iyl
         bit  3,b
         ld   hl,$+6
-        jp   nz,Calcd           ; Rend of X
+        jp   nz,ProjectPoints   ; Rend of X
         bit  2,b
 Xb3     ld   de,0
         ld   a,ixl
         ld   hl,$+6
-        jp   nz,Calcd           ; Rend of z back
+        jp   nz,ProjectPoints   ; Rend of z back
 Xb4     ld   de,0
 Zb6     ld   a,0
         bit  6,b
         ld   hl,$+6
-        jp   nz,Calcd           ; Rend of Y
+        jp   nz,ProjectPoints   ; Rend of Y
 Xb5     ld   de,0
 Zb7     ld   a,0
         bit  7,b
         ld   hl,$+6
-        jp   nz,Calcd           ; Rend of z
+        jp   nz,ProjectPoints   ; Rend of z
 Xb6     ld   de,0
 Zb5     ld   a,0
         bit  5,b
         ld   hl,$+6
-        jp   nz,Calcd           ; Rend of X back
+        jp   nz,ProjectPoints   ; Rend of X back
 Xb7     ld   de,0
 Zb4     ld   a,0
         bit  4,b
         ld   hl,$+6
-        jp   nz,Calcd           ; Not rend of zback
+        jp   nz,ProjectPoints   ; Not rend of zback
 
 STORHL  ld   hl,0
         jp   Ld534
 
 ; Calculation dots from setting bits mask
 ; И перевод 3d cords in 2d cords
-Calcd
+ProjectPoints                   ; orig: Calcd
         exx
 Tz      ld   de,0
         ld   l,a
@@ -1537,14 +1551,14 @@ Ld73c
         jp   (hl)
 
 ; Draw poly
-Drwpol
+DrawPolygon                     ; orig: Drwpol
         ld   a,(hl)
         and  a
         ret  z
         jp   m,Ld8b2
         and  #0F
         ld   b,a
-        call Vspoly
+        call PolygonVisible
         jp   p,Ld8a5
         xor  a                  ; May be visible poly
         ld   (L91+#5A),a
@@ -1583,18 +1597,18 @@ Drwpol
         ex   af,af
         dec  a
         jp   nz,$-13
-        call Polygon
-        jp   Drwpol
-Ld89a   call Clip
-        call nc,Polygon
-        jp   Drwpol
+        call DrawPolygonSpan
+        jp   DrawPolygon
+Ld89a   call ClipPolygon
+        call nc,DrawPolygonSpan
+        jp   DrawPolygon
 Ld8a5   ld   a,#01              ; Unvisible poly
         ld   (L91+#5A),a
 Ld8aa   inc  b
         ld   c,b
         ld   b,#00
         add  hl,bc
-        jp   Drwpol
+        jp   DrawPolygon
 
 ; Line drawing
 Ld8b2   and  #0F
@@ -1679,11 +1693,11 @@ Ld907   ld   a,(hl)
         ld   (L91+#2C),a
         ld   a,(L91+#4A)
         ld   (L91+#2D),a
-Ld964   call Drwlin             ; Ldabe
+Ld964   call DrawLine           ; Ldabe
 Ld967   pop  hl
         pop  bc
         djnz Ld907
-        jp   Drwpol
+        jp   DrawPolygon
 Ld96e   ld   hl,(L91+#3A)
         ld   (L91+#0B),hl
         ld   hl,(L91+#3C)
@@ -1697,7 +1711,7 @@ Ld96e   ld   hl,(L91+#3A)
         ld   a,(L91+#4D)
         ld   (L91+#1F),a
         push ix
-        call CLIPLIN
+        call ClipLine
         pop  ix
         jr   nz,Ld967
         ld   hl,L9e*256
@@ -1714,14 +1728,14 @@ Ld96e   ld   hl,(L91+#3A)
         ld   (L91+#2D),a
         jp   Ld964
 
-Drwpol2
+DrawPolygonAlt                  ; orig: Drwpol2
         ld   a,(hl)
         and  a
         ret  z
         jp   m,Ld9ea
         and  #0F
         ld   b,a
-        call Vspoly
+        call PolygonVisible
         jp   p,Ld9dd
         xor  a
         ld   (L91+#5A),a
@@ -1752,15 +1766,15 @@ Drwpol2
         ex   af,af
         dec  a
         jp   nz,$-13
-        call Polygon
-        jp   Drwpol2
+        call DrawPolygonSpan
+        jp   DrawPolygonAlt
 Ld9dd   ld   a,#01
         ld   (L91+#5A),a
 Ld9e2   inc  b
         ld   c,b
         ld   b,#00
         add  hl,bc
-        jp   Drwpol2
+        jp   DrawPolygonAlt
 Ld9ea   and  #0F
         ld   b,a
         bit  6,(hl)
@@ -1807,11 +1821,11 @@ Lda2c   ld   d,L9c
         inc  e
         ld   a,(de)
         ld   (L91+#2D),a
-        call Drwlin             ; Ldabe
+        call DrawLine           ; Ldabe
         pop  hl
         pop  bc
         djnz Lda2c
-        jp   Drwpol2
+        jp   DrawPolygonAlt
 Lda9f   ld   ixl,b
         push hl
         ex   de,hl
@@ -1837,7 +1851,7 @@ Ldab9   scf
         ret
 
 ; Draw line from some cords
-Drwlin
+DrawLine                        ; orig: Drwlin
         ld   hl,(L91+#2A)
         ld   de,(L91+#2C)
         and  a
@@ -1846,7 +1860,7 @@ Drwlin
         add  hl,de
 ; Draw line cords in hl,de
 ; H,d-Y : l,e-X
-Drawl1
+DrawLineHLDE                    ; orig: Drawl1
         ld   (Ldbbb),sp
         ld   sp,#0020
         ld   a,d
@@ -1999,7 +2013,7 @@ Ldbbb           equ $-#0002
         ret
 
 ; Calc visible mask for polygon
-Vsmask
+VisibilityMask                  ; orig: Vsmask
         push hl
         xor  a
         ex   af,af
@@ -2059,7 +2073,7 @@ Ld85d   pop  hl
 
 ; Visibility polygon
 ; Ret fs-m poly visible
-Vspoly
+PolygonVisible                  ; orig: Vspoly
         push bc
         push hl
         inc  hl
@@ -2110,11 +2124,11 @@ Lda7a           equ $-#0002
         ex   (sp),hl
         exx
         pop  hl
-        call Mull
+        call MulHLDE
         push hl
         push de
         exx
-        call Mull
+        call MulHLDE
         ex   de,hl
         pop  bc
         sbc  hl,bc

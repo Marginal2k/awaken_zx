@@ -7,7 +7,7 @@ except Python (for the tiny local server) and Chrome / Edge.
 ## Start
 
 ```
-python tools/model_editor/serve.py          # http://localhost:8765/  (first free port from 8765 up; never 8000/8090/8095/8851)
+python tools/model_editor/serve.py          # http://localhost:8780/  (first free port from 8780 up; never 8000/8090/8095/8851)
 python tools/model_editor/serve.py --open   # same + opens the browser
 ```
 

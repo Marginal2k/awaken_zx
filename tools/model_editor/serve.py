@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """serve.py - localhost server for the Awaken model editor.
 
-    python tools/model_editor/serve.py [--port 8765] [--open]
+    python tools/model_editor/serve.py [--port 8780] [--open]
 
 * serves tools/model_editor/ (the editor, static files) at /
 * serves assets/models/ at /models/ (the editor loads the models from here automatically)
 * PUT / DELETE /models/{flight,station}/NAME.txt|index.txt: lets the editor's Save write into assets/models
   (bound to 127.0.0.1 only; requires the header X-Model-Editor, accepts only those file names)
 * GET /api/refs?name=NAME: where NAME occurs in src/**/*.asm (used by the delete warning)
-Picks the first free port from --port upwards (default 8765).  The ports 8000, 8090, 8095, 8851 are never used (taken by other tools).
+Picks the first free port from --port upwards (default 8780).  The ports 8000, 8090, 8095, 8851 are never used and 8765 is avoided (taken by other tools, e.g. Unreal-NG).
 """
 import argparse, http.server, json, os, re, socket, sys, urllib.parse, webbrowser
 
@@ -109,7 +109,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--port', type=int, default=8765)
+    ap.add_argument('--port', type=int, default=8780)
     ap.add_argument('--open', action='store_true', help='open the editor in the default browser')
     a = ap.parse_args()
     port = free_port(a.port)

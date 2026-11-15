@@ -1,14 +1,14 @@
 ;EXD
 
 
-; МАКРОСЫ
+; Макросы
 
-; ВЫРАВНИВАНИЕ АДРЕСА
+; Выравнивание адреса
             MACRO ADRXX00
             ds   (low((high(($-1))))*256)-$+256
             ENDM
 
-; СЛЕДУЮЩАЯ ЛИНИЯ В СКРИНЕ
+; Следующая линия в скрине
             MACRO NEXTLINE
             inc  h
             ld   a,h
@@ -23,7 +23,7 @@
             ld   h,a
             ENDM
 
-; ПРЕДЫДУЩАЯ ЛИНИЯ В СКРИНЕ
+; Предыдущая линия в скрине
             MACRO PREVLINE
             ld   a,h
             dec  h
@@ -38,7 +38,7 @@
             ld   h,a
             ENDM
 
-; ВЫЗОВ ПЕРЕКЛЮЧЕНИЯ СТРАНИЦЫ
+; Вызов переключения страницы
             MACRO PAGE_ par1
             ld   a,par1
             call Page_
@@ -48,18 +48,18 @@
             call Page_
             ENDM
 
-; НЕ ОБРАБАТЫВАЕМАЯ КОМНДА addix,ix
+; Не обрабатываемая комнда addix,ix
             MACRO ADDIXIX
             db   #DD,#29
             ENDM
 
-; НЕ ОБРАБАТЫВАЕМАЯ КОМНДА addiy,iy
+; Не обрабатываемая комнда addiy,iy
             MACRO ADDIYIY
             db   #FD,#29
             ENDM
 
-; ОПЕРАЦИЯ СЛОЖЕНИЯ hl,deС ПРОВЕРКОЙ
-; ФЛАГА ПЕРЕПОЛНЕНИЯ И КОРРЕКЦИЕЙ
+; Операция сложения hl,dес проверкой
+; флага переполнения и коррекцией
             MACRO ADPHLDE par1
             adc  hl,de
             jp   po,$+14
@@ -71,7 +71,7 @@
             ld   (par1+1),hl
             ENDM
 
-; ИНВЕРСИЯ hl
+; Инверсия hl
             MACRO NEGHL
             ld   a,l
             cpl
@@ -81,7 +81,7 @@
             ld   h,a
             inc  hl
             ENDM
-; ИНВЕРСИЯ de
+; Инверсия de
             MACRO NEGDE
             ld   a,e
             cpl
@@ -91,7 +91,7 @@
             ld   d,a
             inc  de
             ENDM
-; ИНВЕРСИЯ bc
+; Инверсия bc
             MACRO NEGBC
             ld   a,c
             cpl
@@ -102,28 +102,28 @@
             inc  bc
             ENDM
 
-; АБСОЛЮТНОЕ ЗНАЧЕНИЕ hl
+; Абсолютное значение hl
             MACRO ABSHL
             bit  7,h
             jr   z,$+9
             NEGHL
             ENDM
 
-; АБСОЛЮТНОЕ ЗНАЧЕНИЕ de
+; Абсолютное значение de
             MACRO ABSDE
             bit  7,d
             jr   z,$+9
             NEGDE
             ENDM
 
-; АБСОЛЮТНОЕ ЗНАЧЕНИЕ bc
+; Абсолютное значение bc
             MACRO ABSBC
             bit  7,b
             jr   z,$+9
             NEGBC
             ENDM
 
-; ЦИКЛ РИСОВАНИЯ СТРОКИ ВОКССПРАЙТА
+; Цикл рисования строки воксспрайта
             MACRO CYCL1
             ld   e,h
             add  hl,sp
@@ -161,7 +161,7 @@
             exx
             ENDM
 
-; УМНОЖЕНИЕ ЗНАКОВОЕ a=a*b
+; Умножение знаковое a=a*b
             MACRO MULAB
             sra  a
             ld   l,b
@@ -175,7 +175,7 @@
             sub  e
             ENDM
 
-; УМНОЖЕНИЕ ЗНАКОВОЕ a=a*c
+; Умножение знаковое a=a*c
             MACRO MULAC
             sra  a
             ld   l,c
@@ -189,7 +189,7 @@
             sub  e
             ENDM
 
-; УМНОЖЕНИЕ ЗНАКОВОЕ a=a*d
+; Умножение знаковое a=a*d
             MACRO MULAD
             sra  a
             ld   l,d
@@ -203,7 +203,7 @@
             sub  e
             ENDM
 
-; СЛОЖЕНИЕ a=a+xhС УЧЕТОМ ПЕРЕПОНЕНИЯ
+; Сложение a=a+хhс учетом перепонения
             MACRO ADPAXH
             add  a,ixh
             jp   po,$+9
@@ -212,7 +212,7 @@
             dec  a
             ENDM
 
-; ВЫЧИТАНИЕ a=a-xhС УЧЕТОМ ПЕРЕПОНЕНИЯ
+; Вычитание a=a-хhс учетом перепонения
             MACRO SBPAXH
             sub  ixh
             jp   po,$+9
@@ -221,7 +221,7 @@
             dec  a
             ENDM
 
-; ДЕЛЕНИЕ AE=e/d
+; Деление AE=e/d
             MACRO DIVED
             rept 8
             rl   e
@@ -232,12 +232,12 @@
             endr
             ENDM
 
-; ДЛЯ
-; ДЕЛЕНИЕ БЫСТРОЕ ТОЧНОЕ ОПТИМИЗИРОВАННОЕ
-; ДЕЛИМ hl=hl/de
-; ЕДИНСТВЕННЫЙ ПАРАМЕТР ДОЛЖЕН БЫТЬ АДРЕС
-; ПРОЦЕДУРЫ ОБРАБОТКИ ПЕРЕПОЛНЕНИЯ
-; ПРИ ДЕЛЕНИИ НА 0 И Т.Д.
+; Для
+; деление быстрое точное оптимизированное
+; делим hl=hl/de
+; единственный параметр должен быть адрес
+; процедуры обработки переполнения
+; при делении на 0 и т.д.
             MACRO SM1
             ld   c,a
             ld   a,l
@@ -254,7 +254,7 @@
             rl   h
             ENDM
 
-; ПЕЧАТЬ СООБЩЕНИЙ В ОЧЕРЕДИ КОМПУТЕРА
+; Печать сообщений в очереди компутера
             MACRO MESAG par1
             push de
             ld   de,par1

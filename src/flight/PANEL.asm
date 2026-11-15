@@ -6,7 +6,7 @@
 
 DrawCompass:                    ; orig: COMPOS - компас (чистка и вывод)
             ld   (STK08+1),sp
-; ЧИСТИМ ПОЛЕ КОМПАСА
+; Чистим поле компаса
             ld   hl,0
             ld   sp,#48B8
             push hl
@@ -76,9 +76,9 @@ STK08:      ld   sp,0
             ld   a,(NOSUN)
             dec  a
             jr   z,.ECOMP
-; ЕСЛИ ЗВЕЗДА ЕСТЬ В ПОЛЕ ВИДИМОСТИ
+; Если звезда есть в поле видимости
             ld   a,(STX)
-;X-ЗВЕЗДЫ ПРЕОБРАЗОВАННАЯ К X НА КОМПАСЕ
+;X-звезды преобразованная к X на компасе
             add  a,CMPX
             jp   po,$+5
             ld   a,CMPX-8
@@ -89,7 +89,7 @@ STK08:      ld   sp,0
             jr   c,$+4
             ld   a,CMPX+5
             ld   c,a
-; ТОЖЕ С Y
+; Тоже с Y
             ld   a,(STY)
             add  a,CMPY
             cp   CMPY-8
@@ -99,7 +99,7 @@ STK08:      ld   sp,0
             jr   c,$+4
             ld   a,CMPY+5
             ld   b,a
-; ПО zОПРЕДЕЛИН СПРАЙТ ВЫВОДА
+; По zопределин спрайт вывода
             ld   a,(STZ)
             and  a
             ld   de,VISUN
@@ -107,7 +107,7 @@ STK08:      ld   sp,0
             ld   de,UVISUN
             call DrawMiniSprite
 .ECOMP
-; ТОЖЕ С ПЛАНЕТОЙ
+; Тоже с планетой
             ld   a,(ETX)
             ld   c,a
             ld   a,(ETY)
@@ -175,9 +175,9 @@ STK08:      ld   sp,0
 
 
 DrawMiniSprite:                 ; orig: MINISPRITE - вывод спрайта 3x3 (6 байт)
-; ВЫВОД СПРАЙТА 3X3 6 BYTES
-; В deАДРЕС НАБОРА СПРАЙТОВ (СДВИНУТЫХ)
-; В bcКООРДИНАТЫ НА ЭКРАНЕ
+; Вывод спрайта 3X3 6 BYTES
+; в dеадрес набора спрайтов (сдвинутых)
+; в bскоординаты на экране
             ld   a,b
             and  a
             rra
@@ -391,9 +391,9 @@ RDR1:
             cp   #80
             jr   z,RDR2
             ld   a,(ix+TYPE)
-            cp   #14                ;TPAШ
+            cp   #14                ;Траш
             jr   z,.RDR11
-            cp   #15                ;CHAPЯД
+            cp   #15                ;Снаряд
             jr   z,.RDR11
             ld   a,(ix+PX+1)
             cp   #80
@@ -591,8 +591,8 @@ RDR1:
             exx
             ld   c,a
             ld   b,0
-; ЕСЛИ ЕСТЬ ПРИБОР ИДЕНТИФИКАЦИИ ЦЕЛЕЙ ТО
-; ВЗЯТЬ ТИП ИЗ ix+TYPE
+; Если есть прибор идентификации целей то
+; взять тип из ix+TYPE
             ld   a,(IDENTC)
             inc  a
             ld   a,(ix+TYPE)
@@ -714,13 +714,13 @@ MMASK:
             include "gen/RADAR_BLIPS.inc"   ; GENERATED from assets/gfx/radar_sprites.png
 
 
-; ВЫВОД ЛИНИИ СТАТУСА ТИПА ЭНЕРГИЯ И Т.Д.
+; Вывод линии статуса типа энергия и т.д.
 DATAL:
-; В hl-АДРЕС НА ЭКРАНЕ
-; В a-ЗНАЧЕНИЕ
+; В hl-адрес на экране
+; в a-значение
             ld   c,a
             and  a
-; ЕСЛИ РОВНО НУЛЮ ЗНАЧЕНИЕ
+; Если ровно нулю значение
             jr   z,.ZR1
             cpl
             and  7
@@ -902,7 +902,7 @@ LIGHTER:
             jp   nz,.ZR4
 
 
-; ВЫВОД МАРКЕРОВ КОРАБЛЕЙ
+; Вывод маркеров кораблей
             ld   de,OLEN
             ld   ix,CARSB-OLEN
             jp   $+9
@@ -916,26 +916,26 @@ LIGHTER:
             add  ix,de
             ld   a,(ix+1)
             cp   #80
-            jr   z,.ZR8              ;ПУСТОЕ ПОЛЕ
+            jr   z,.ZR8              ;Пустое поле
             ld   a,(ix+TYPE)
             cp   #14                ;TRASH
             jr   z,.ZR8
             ld   a,(ix+PX+1)
             cp   #80
-; ЕСЛИ НЕТ РАСЧЕТНЫХ КООРДИНАТ
+; Если нет расчетных координат
             jr   z,.ZR7
             ld   b,a
             ld   c,(ix+PX)
             ld   d,(ix+PZ+1)
             bit  7,d
-; ЕСЛИ ЗА ЭКРАНОМ СЗАДИ
+; Если за экраном сзади
             jr   nz,.ZR6
-;ДОП. ПРОВЕРКА ПО X
+;Доп. проверка по X
 ;           and  a
 ;           jp   p,$+5
 ;           neg
 ;           cp   XVISIBILITY-#20
-;           jrnc $R6;ДАЛЕКО ПО X
+;           jrnc $R6;далеко по X
             ld   a,d
             cp   6
             jr   c,.ZR6
@@ -946,27 +946,27 @@ LIGHTER:
 ;           jp   p,$+5
 ;           neg
 ;           cp   XVISIBILITY-#20
-;           jrnc $R6;ДАЛЕКО ПО Y
+;           jrnc $R6;далеко по Y
             ld   l,(ix+PY)
             call Project3Dto2D
-            jr   nz,.ZR6             ;ПЕРЕПОЛНЕНИЕ
+            jr   nz,.ZR6             ;Переполнение
             ld   a,h
             and  a
-            jr   nz,.ZR6             ;ДАЛЕКО ПО X
+            jr   nz,.ZR6             ;Далеко по X
             ld   a,d
             and  a
             jr   nz,.ZR6             ;ПО Y
             ld   a,l
-;X НАЧАЛА ПОДСВЕТКИ
+;X начала подсветки
             sub  #50
             jr   c,.ZR6
-            cp   #5E                ;ДЛИННА ЕЕ
+            cp   #5E                ;Длинна ее
             jr   nc,.ZR6
             ld   a,e
-;Y НАЧАЛА ПОДСВЕТКИ
+;Y начала подсветки
             sub  #0E
             jr   c,.ZR6
-            cp   #4C                ;ВЫСОТА
+            cp   #4C                ;Высота
             jr   nc,.ZR6
             ld   b,e
             ld   a,l

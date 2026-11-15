@@ -2,8 +2,8 @@
 
 
 ApplyPlayerMotion:              ; orig: PRECORD - смещение координат всех объектов по движению игрока
-; ИЗМЕНЯЕМ КООРДИНАТЫ В ЗАВИСИМОСТИ ОТ
-; ДВИЖЕНИЯ
+; Изменяем координаты в зависимости от
+; движения
             ld   (STK1+1),sp
 
             ld   a,(ix+TYPE)
@@ -100,7 +100,7 @@ STK1:       ld   sp,0
             ld   d,#12
             call FindObjectByType
             jp   z,REXE
-; НАХОДИМ САМУЮ БОЛЬШУЮ КООРДИНАТУ СТАНЦИИ
+; Находим самую большую координату станции
             ld   a,(iy+5)
             ACPL_A
             ld   b,a
@@ -116,7 +116,7 @@ STK1:       ld   sp,0
             jr   nc,$+3
             ld   a,b
             cp   LAUNGH
-; ЕСЛИ ЕЩЕ ДАЛЕКО
+; Если еще далеко
             jr   c,MESST
             ld   a,#80
             ld   (MESST+1),a
@@ -124,19 +124,19 @@ STK1:       ld   sp,0
 MESST:      ld   a,0
             and  a
             jp   p,REXE
-; РЕЖИМ СТЫКОВКИ СО СТАНЦИЕЙ
+; Режим стыковки со станцией
             ld   a,24
             ld   (MESST+1),a
             MESAG _DOCKING
             jr   REXE
 EXES:
-; ЕСЛИ КОРАБЛЬ ЗА ГРАНИЦЕЙ
+; Если корабль за границей
             ld   sp,(STK1+1)
             call DEATHX
             ld   a,(ix+TYPE)
             cp   T_STATION
             jr   nz,REXE
-; ЕСЛИ СТАНЦИЯ ЗА ГРАНИЦЕЙ
+; Если станция за границей
             xor  a
             ld   (STATGEN),a
             ld   (NOSTAT),a
@@ -165,8 +165,8 @@ RSTPZ:      ld   hl,0
 
 
 ObjAddrFromIndexIY:             ; orig: GETADRY - адрес вектора объекта по индексу, в iy
-; ПОЛУЧЕНИЕ АДРЕСА ВЕКТОРА ИЗ ИНДЕКСА ЕГО
-; В РЕГ. iy
+; Получение адреса вектора из индекса его
+; в рег. iy
             push hl
             call ObjAddrFromIndex
             push hl
@@ -176,9 +176,9 @@ ObjAddrFromIndexIY:             ; orig: GETADRY - адрес вектора об
 
 
 ObjAddrFromIndex:               ; orig: GETADR - адрес вектора объекта по индексу, в hl
-; ПОЛУЧЕНИЕ АДРЕСА ВЕКТОРА ИЗ ИНДЕКСА ЕГО
-;a-ИНДЕКС
-;rethl-АДРЕС
+; Получение адреса вектора из индекса его
+;a-индекс
+;rethl-адрес
             ld   l,0
             srl  a
             rr   l
@@ -190,9 +190,9 @@ ObjAddrFromIndex:               ; orig: GETADR - адрес вектора об�
 
 
 ObjIndexFromIX:                 ; orig: GETINDX - индекс объекта по адресу в ix
-; ПОЛУЧЕНИЕ ИНДЕКСА ИЗ АДРЕСА В iy
-;ix-АДРЕС
-;reta-ИНДЕКС
+; Получение индекса из адреса в iy
+;ix-адрес
+;reta-индекс
             push hl
             push ix
             pop  hl
@@ -202,9 +202,9 @@ ObjIndexFromIX:                 ; orig: GETINDX - индекс объекта п
 
 
 ObjIndexFromIY:                 ; orig: GETINDY - индекс объекта по адресу в iy
-; ПОЛУЧЕНИЕ ИНДЕКСА ИЗ АДРЕСА В iy
-;iy-АДРЕС
-;reta-ИНДЕКС
+; Получение индекса из адреса в iy
+;iy-адрес
+;reta-индекс
             push hl
             push iy
             pop  hl
@@ -214,9 +214,9 @@ ObjIndexFromIY:                 ; orig: GETINDY - индекс объекта п
 
 
 ObjIndexFromHL:                 ; orig: GETIND - индекс объекта по адресу в hl
-; ПОЛУЧЕНИЕ ИНДЕКСА ИЗ АДРЕСА В hl
-;hl-АДРЕС
-;reta-ИНДЕКС
+; Получение индекса из адреса в hl
+;hl-адрес
+;reta-индекс
             ld   a,h
             sub  high(CARSB)
             sla  l
@@ -227,14 +227,14 @@ ObjIndexFromHL:                 ; orig: GETIND - индекс объекта п�
 
 
 ;----------------------
-; ПОИСКОВИКИ ЧЕГО ЛИБО
+; Поисковики чего либо
 ;----------------------
 
 FindAnyObject:                  ; orig: FINDOB - найти какой-нибудь объект
-; НАЙТИ КАКОЙ НИБУДЬ ОБЪЕКТ
+; Найти какой нибудь объект
 ;iy-VECTOR-OLEN
 ;bc-OLEN
-;FZ-ON ТО НЕ НАЙДЕНО
+;FZ-ON то не найдено
             add  iy,bc
             ld   a,(iy+1)
             cp   #80
@@ -246,7 +246,7 @@ FindAnyObject:                  ; orig: FINDOB - найти какой-нибу�
 
 
 FindPeaceful:                   ; orig: FINDPEACE - найти мирного
-; НАЙТИ МИРНОГО
+; Найти мирного
             call RNDL3
             ld   a,l
 PWNPI:      cp   #A0
@@ -268,12 +268,12 @@ PWNPI:      cp   #A0
             cp   T_CHIP
             jr   nc,.FP2L
             call ObjIndexFromIY
-            inc  e                  ;cБPOC FZ
+            inc  e                  ;сБРОС FZ
             ret
 
 
 FindAnyNotUfo:                  ; orig: FINDALL - найти любого, кроме УФО
-; НАЙТИ ЛЮБОГО НО НЕ УФО
+; Найти любого но не уфо
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
 .FP6L
@@ -286,12 +286,12 @@ FindAnyNotUfo:                  ; orig: FINDALL - найти любого, кр�
             cp   T_UFO2
             jr   z,.FP6L
             call ObjIndexFromIY
-            inc  e                  ;cБPOC FZ
+            inc  e                  ;сБРОС FZ
             ret
 
 
 FindUfo:                        ; orig: FINDUFO - найти УФО
-; НАЙТИ УФО
+; Найти уфо
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
 .FP3L
@@ -309,7 +309,7 @@ FindUfo:                        ; orig: FINDUFO - найти УФО
 
 
 FindPirate:                     ; orig: FINDPIRAT - найти пирата
-; НАЙТИ ПИРАТА
+; Найти пирата
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
 .FP2
@@ -328,8 +328,8 @@ FindPirate:                     ; orig: FINDPIRAT - найти пирата
 
 
 CheckSubjectGone:               ; orig: TESTSUBJ - проверка, исчез ли субъект персонажа
-; ТЕСТИРОВАНИЕ ПЕРСОНАЖА НА ПРЕДМЕТ ЕГО
-; УЖЕ ИСЧЕЗНОВЕНИЯ
+; Тестирование персонажа на предмет его
+; уже исчезновения
             ld   a,(ix+SUBJ)
             inc  a
             jr   nz,.TS1
@@ -398,8 +398,8 @@ OPONE:      ld   iy,0
 
 
 ShipFire:                       ; orig: FIREING - выстрел персонажа
-; ОРГАНИЗАЦИЯ ВЫСТРЕЛА ПЕРСОНАЖА В КОГО
-; ЛИБО, ВЫВДО ЛУЧА, ИНИЦИАЛИЗАЦИЯ ДАННЫХ
+; Организация выстрела персонажа в кого
+; либо, вывдо луча, инициализация данных
 ;SUBJ & ACTN
             ld   a,(ix+PX+1)
             cp   #80
@@ -457,26 +457,26 @@ FG1:
 
 
 FleetStart:                     ; orig: FLOTSTART - проверка условий и старт флота
-; ПРОВЕРКИ НА СТАРТ ФЛОТА И ЕГО СТРАРТ
+; Проверки на старт флота и его страрт
             ld   a,(ix+TYPE)
             cp   T_HERMIT
-            ret  nz                 ;НЕ ОН
+            ret  nz                 ;Не он
             ld   a,C_FIGHT
 
-; СТАРТ ФЛОТА АСТЕРОИДА С РЕЖИМОМ
-; В РЕГ. a
+; Старт флота астероида с режимом
+; в рег. a
 FLOTSTART2:
             bit  2,(ix+SETUP)
-; ЕСЛИ ВЫПУСК ФЛОТА УЖЕ БЫЛ
+; Если выпуск флота уже был
             ret  nz
             ld   (A_MODE+3),a
             call RNDL5
             ld   a,l
             cp   10
-; ПО ВЕРОЯТНОСТИ ВЫПУСКАТЬ НЕ НАДО
+; По вероятности выпускать не надо
             ret  nc
             set  2,(ix+SETUP)
-; ВЫПУСК ФЛОТА
+; Выпуск флота
             ld   a,r
             and  1
             inc  a
@@ -484,14 +484,14 @@ FLOTSTART2:
 FLT1:
             exx
             call FindFreeSlot
-; НЕТ СВОБОДНОГО МЕСТА В БУФЕРЕ
+; Нет свободного места в буфере
             ret  z
             push ix
             pop  hl
             call ObjIndexFromHL
             ld   (iy+BSUBJ),a
-; ТИП ОБЪЕКТА НА КОТОРЫЙ НУЖНО ВЕРНУТЬСЯ
-; ОТШЕЛЬНИК
+; Тип объекта на который нужно вернуться
+; отшельник
             ld   (iy+TSUBJ),T_HERMIT
             ld   a,r
             and  1
@@ -532,7 +532,7 @@ FLT1:
             ld   (iy+GAMA),a
             ld   (iy+LZS),40
 A_MODE:     ld   (iy+MODE),C_FIGHT
-; РЕЖИМ ВОЗВРАТА НА АСТЕРОИД
+; Режим возврата на астероид
             ld   (iy+OMODE),C_BACKTOASTER
             ld   (iy+ACTN),0
             ld   (iy+TYPE),T_MIKR
@@ -550,11 +550,11 @@ A_MODE:     ld   (iy+MODE),C_FIGHT
 
 
 CHECKALL:
-; ПРОВЕРКИ НА ВЕРОЯТНОСТЬ ПОДБИРАНИЯ ГРУЗА
-; ФОРСАЖА, ОБЛЕТА
-; ЕСЛИ FC-ON ТО СВОБОДНЫЙ ПОЛЕТ, ЗНАЧИТ
-; ЧТО ТО ВЫБРАЛОСЬ ИНАЧЕ НАДО ВОЕВАТЬ
-; ДАЛЕЕ
+; Проверки на вероятность подбирания груза
+; форсажа, облета
+; если FC-ON то свободный полет, значит
+; что то выбралось иначе надо воевать
+; далее
             ld   a,r
             cp   VTKCG
             jr   c,CHECKA2
@@ -571,18 +571,18 @@ CHECKA2:
             cp   #FA
             jr   c,.FS3
             ld   a,l
-; ВЕРОЯТНОСТЬ ФОРСАЖА
+; Вероятность форсажа
             cp   VFRS
             jr   c,.FS3
             ld   a,(ix+MODE)
             ld   (ix+OMODE),a
-; ФОРСАЖ
+; Форсаж
             ld   (ix+MODE),C_FORSAGE
 .FS3
             ld   a,(ix+PX+1)
             ACPL_A
-; МИНИМАЛЬНОЕ РАССТОЯНИЕ ПО X,Y В ПУТИ
-; ПРОЛЕТА ДЛЯ ОБЛЕТА
+; Минимальное расстояние по X,Y в пути
+; пролета для облета
             cp   DLRAZI
             ret  nc
             ld   a,(ix+PY+1)
@@ -591,19 +591,19 @@ CHECKA2:
             ret  nc
             ld   a,(ix+PZ+1)
             ACPL_A
-; ДАЛЬНОСТЬ ОТ ИГРОКА ДЛЯ ОБЛЕТА
+; Дальность от игрока для облета
             cp   DLRAZ
             ret  nc
             ld   a,(ix+MODE)
             ld   (ix+OMODE),a
-; ОБЛЕТ
+; Облет
             ld   (ix+MODE),C_FLYAROUND
-; ВРЕМЯ ОБЛЕТА
+; Время облета
             ld   (ix+POWOR),TIMEOBL
             ret
 
 
-; ПОСИК АСТЕРОИДА
+; Посик астероида
 FindAsteroid:                   ; orig: FINDASTER - найти астероид
             ld   d,T_HERMIT
             call FindObjectByType
@@ -614,9 +614,9 @@ FindAsteroid:                   ; orig: FINDASTER - найти астероид
 
 
 FindObjectByType:               ; orig: FINDOBJ - поиск первого объекта по типу в d
-; ПОИСК ПЕРВОГО ПО ТИПУ В "D"
-;FZ-ON ЕСЛИ НЕ НАЙДЕН
-;retiyАДРЕС ВЕКТОРА ОБЪЕКТА
+; Поиск первого по типу в "D"
+;FZ-ON если не найден
+;rеtiуадрес вектора объекта
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
 .FIND2
@@ -630,9 +630,9 @@ FindObjectByType:               ; orig: FINDOBJ - поиск первого об
 
 
 FindFreeSlot:                   ; orig: FINDFREE - найти свободный вектор объекта
-; НАЙТИ СВОБОДНЫЙ ВЕКТОР
-;retFZ-ON ЕСЛИ НЕ НАДЕН
-;retiyАДРЕС СВОБОДНОГО ВЕКТОРА
+; Найти свободный вектор
+;retFZ-ON если не наден
+;rеtiуадрес свободного вектора
             ld   iy,CARSB-OLEN
             ld   de,OLEN
 .HHH3
@@ -651,7 +651,7 @@ FindFreeSlot:                   ; orig: FINDFREE - найти свободный
 
 
 FindNearestCargo:               ; orig: NEARCARGO - найти ближайший груз
-; НАЙТИ САМЫЙ БЛИЖАЙШИЙ ГРУЗ
+; Найти самый ближайший груз
             ld   a,#FF
             ld   (NEARC+1),a
             ld   hl,CARGS-1
@@ -692,8 +692,8 @@ NRC1:
 
 
 CanTakeCargo:                   ; orig: CHECKOBJ - флаг z: объект умеет брать грузы
-; С ФЛАГОМ z-ON ПОКАЗАТЬ ТЕХ, КТО МОЖЕТ
-; БРАТЬ ГРУЗЫ
+; С флагом z-ON показать тех, кто может
+; брать грузы
             ld   a,(ix+TYPE)
             cp   T_PIRAT
             ret  z
@@ -710,10 +710,10 @@ CanTakeCargo:                   ; orig: CHECKOBJ - флаг z: объект ум
 
 
 HasCargoToTake:                 ; orig: YESCARGO - проверка наличия грузов для объекта
-; ПРОВЕРКА ЕСТЬ ЛИ ГРУЗЫ
-; ТАК ЖЕ ОТСЕИТЬ ТЕХ КТО НЕБЕРЕТ ГРУЗЫ
-;retFZ-ON НЕТ
-;FZ-OFF ЕСТЬ
+; Проверка есть ли грузы
+; так же отсеить тех кто неберет грузы
+;retFZ-ON нет
+;FZ-OFF есть
             call CanTakeCargo
             jr   z,$+4
             xor  a
@@ -729,11 +729,11 @@ HasCargoToTake:                 ; orig: YESCARGO - проверка наличи
 
 
 MakeExplosion:                  ; orig: MAKEEXPLO - данные о взрыве и осколках объекта
-; ЗАДАТЬ ДАННЫЕ О ВЗРЫВЕ И ОСКОЛКАХ
-; ОБЪЕКТА
+; Задать данные о взрыве и осколках
+; объекта
 
-; УСТАНОВКА СКОРОСТИ ПОЛЕТА ОСКОЛКОВ
-; СПЕЦИАЛЬНО ДЛЯ АСТЕРОИДА ОТДЕЛЬНО
+; Установка скорости полета осколков
+; специально для астероида отдельно
             ld   a,(ix+TYPE)
             cp   T_HERMIT
             ld   a,#A0
@@ -840,15 +840,15 @@ OSKOLSPEED: or   #A0
             dec  a
             jp   nz,JJ12
 JJ11:
-; ЗВУК ВЗРЫВА
+; Звук взрыва
             ld   hl,EFF0
             ld   (SFXB+1),hl
             jp   DEATHX
 
 
 DistanceHigh:                   ; orig: RASTOY - расстояние (кратное #100) между ix и iy
-; ВЗЯТЬ РАССТОЯНИЕ КРАТНОЕ #100 ОТ ОДНОГО
-; ОБЪЕКТА В ixДО ДРУГОГО  iy
+; Взять расстояние кратное #100 от одного
+; объекта в iхдо другого  iy
 ;reta
             ld   e,(ix+0)
             ld   d,(ix+1)
@@ -886,7 +886,7 @@ DistanceHigh:                   ; orig: RASTOY - расстояние (крат�
 
 
 ;------------------------
-; ВЫВОД ЛИНИИ В 3D ПРОСТРАНСТВЕ
+; Вывод линии в 3D пространстве
 ;------------------------
 DrawLine3D:                     ; orig: OUTLINE - вывод линии по 3D-координатам
 ;de-Z1,hl-Y1,bc-X1
@@ -1071,7 +1071,7 @@ RNDO:
 
 
 CheckLineVisible:               ; orig: VSLINE - проверка видимости линии
-; ПРОВЕРКА ВИДИМОСТИ ЛИНИИ
+; Проверка видимости линии
             ld   hl,(low(L9C)*256)+1
             xor  a
             ex   af,af'
@@ -1126,7 +1126,7 @@ LD85:       inc  l
             jp   LD83
 
 
-; ПЛЕЙЕР СЕМПЛОВ
+; Плейер семплов
 SFXA:
             ld   hl,0
             ld   a,h

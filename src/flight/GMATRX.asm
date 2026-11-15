@@ -4,9 +4,9 @@
 
 
 GMATRX:
-;bЫЧИcЛEHИeTPEX MATPИЦ ПOBOPOTOB ДЛЯ BCEX OБЪEKTOB
+;bычислениетрех матриц поворотов для BCEX объектов
 
-;BOKPУГ "У"
+;Вокруг "у"
             ld   a,(EYEG)
             and  a
             jp   nz,.TLZ
@@ -144,7 +144,7 @@ GMATRX:
 
 
 .TLX
-;BOKPУГ "X"
+;Вокруг "X"
             ld   a,(EYEA)
             and  a
             jp   nz,.TLX2
@@ -281,7 +281,7 @@ LB32:       ld   hl,0
             ADPHLDE LC33
 
 TLY:
-;BOKPУГ "Y"
+;Вокруг "Y"
             ld   a,(EYEB)
             and  a
             jp   nz,.TLY2
@@ -421,7 +421,7 @@ LC33:       ld   hl,0
 
 
 MULS6:
-;hl=hl*bc(ТОЛЬКО СТАРШИЕ 14 БИТ)
+;hl=hl*bc(только старшие 14 бит)
             ld   a,b
             xor  h
             ex   af,af'
@@ -479,6 +479,6 @@ ANBY2:      ld   a,0
             ret
 
             ADRXX00
-; П 14-ТИ БИТНАЯ ТАБЛИЦА КОСИНУСОВ
+; П 14-ти битная таблица косинусов
 COSTB2:
             incbin "CSTB.d"

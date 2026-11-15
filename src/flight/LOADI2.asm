@@ -1,4 +1,4 @@
-;  ПpoГPAMA ПEPEБPOCKИ ПpoГPAMMЫ ПOДГpУ3KИ
+;  Програма переброски программы подгру3ки
             xor  a
             out  (#FE),a
             ld   bc,#7FFD

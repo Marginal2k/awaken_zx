@@ -69,17 +69,17 @@ LM1:
 
 ControlsHandler:                ; orig: SETCONTROL - управление полётом: опрос клавиш
 
-; УПРАВЛЕНИЕ ПОЛЕТОМ
-; ВЫЗОВ ПРОЦЕДУР ОБРАБОТКИ КЛАВИШ УПРАВЛЕН
-; ПЕРЕД ВХОДОМ ФЛАГ z(ON) ГОВОРИТ ЧТО
-; СЧЕТЧИК ОЖИДАНИЯ ПЕРЕД НАЖАТИЕМ ДР.
-; КЛАВИШИ ПУСТ, ЗНАЧИТ МОЖНО ОБРАБОТАТЬ
-; ЕСЛИ НАДО И ЭТУ КНОПКУ
+; Управление полетом
+; вызов процедур обработки клавиш управлен
+; перед входом флаг z(ON) говорит что
+; счетчик ожидания перед нажатием др.
+; Клавиши пуст, значит можно обработать
+; если надо и эту кнопку
 
 
-; ПОРТЫ, МАСКИ КЛАВИШ УПРАВЛЕНИЯ
+; Порты, маски клавиш управления
             ld   ix,SETGD+2
-; АДРЕСА ПРОЦЕДУР ОБРАБОТКИ КЛАВИШ
+; Адреса процедур обработки клавиш
             ld   de,ADCON-2
             ld   l,KKEYS+1
             ld   c,#FE
@@ -114,7 +114,7 @@ ControlsHandler:                ; orig: SETCONTROL - управление пол
             pop  hl
             jr   .SCL1
 
-; УБЕРЕМ ТРЕШИ ЕСЛИ НАДО
+; Уберем треши если надо
 JFLAG:      ld   a,0
             or   a
 JFLAG2:     ld   c,0
@@ -134,7 +134,7 @@ JFLAG2:     ld   c,0
             ld   (JFLAG+1),a
 
 
-; ГАШЕНИЕ ПОВОРОТОВ
+; Гашение поворотов
 NOPWR2:
             ld   a,0
             or   a
@@ -251,22 +251,22 @@ ADCON:
 
 
 ;---------------------------------------
-; БЛОК ОБРАБОТКИ КЛАВИШ КОНТРОЛЯ
+; Блок обработки клавиш контроля
 
 
 DROPDROID:
             ret
 
 ;-------------------------
-; БЛОК ОБРАБОТКИ РАКЕТ
+; Блок обработки ракет
 
 LaunchMissile1:                 ; orig: LAUNG1 - пуск ракеты 1
-; ПУСК РАКЕТЫ 1
-; ЕСЛИ ПАУСА ЕЩЕ НЕ ПРОЩЛА
+; Пуск ракеты 1
+; если пауса еще не прощла
             ret  nz
             ld   a,(ROKETN1)
             call RTN1
-; ЕСЛИ НЕТ ЦЕЛИ ИЛИ НЕТ РАКЕТ
+; Если нет цели или нет ракет
             ret  z
             ld   a,(ROKETN1)
             ld   c,a
@@ -276,7 +276,7 @@ RTN2:
             ld   hl,EFF13
             ld   (SFXA+1),hl
             call NewMissile
-; ЕСЛИ НЕТ ЦЕЛИ ИЛИ
+; Если нет цели или
             ret  nc
             ld   hl,0-SUBJ+TYPE
             add  hl,de
@@ -286,7 +286,7 @@ RTN2:
             jp   RAIN
 
 LaunchMissile2:                 ; orig: LAUNG2 - пуск ракеты 2
-; ПУСК РАКЕТЫ 1
+; Пуск ракеты 1
             ret  nz
             ld   a,(ROKETN2)
             call RTN1
@@ -298,7 +298,7 @@ LaunchMissile2:                 ; orig: LAUNG2 - пуск ракеты 2
             jr   RTN2
 
 LaunchMissile3:                 ; orig: LAUNG3 - пуск ракеты 3
-; ПУСК РАКЕТЫ 1
+; Пуск ракеты 1
             ret  nz
             ld   a,(ROKETN3)
             call RTN1
@@ -310,11 +310,11 @@ LaunchMissile3:                 ; orig: LAUNG3 - пуск ракеты 3
             jr   RTN2
 
 ShowNoTarget:                   ; orig: NOCELS - сообщение "нет цели"
-; ВЫВОД СООБЩЕНИЯ "НЕТ ЦЕЛИ"
+; Вывод сообщения "нет цели"
             MESAG _NOTARGET
             ret
 RTN1:
-; ПРОВЕРКА НА НЕТРОКЕТ И НА НЕТ ЦЕЛИ
+; Проверка на нетрокет и на нет цели
             inc  a
             jr   z,ShowNoTarget
             ld   a,5
@@ -330,22 +330,22 @@ RTN1:
             xor  a
             ret
 RAIN:
-; ПУСК РАКЕТЫ И ВЫВОД СООБЩЕНИЙ
+; Пуск ракеты и вывод сообщений
             dec  (hl)
             ld   a,(TONN)
             dec  a
             ld   (TONN),a
-; РАКЕТА УШЛА
+; Ракета ушла
             MESAG _ROKETGO
-; ОСТАЛОСЬ
+; Осталось
             MESAG _HAVE
             call AROKS
             call PrintNumbersInOrder
-; РАКЕТ
+; Ракет
             MESAG _ROKET
             ret
 AROKS:
-; КОЛИЧЕСТВО РАКЕТ
+; Количество ракет
             ld   hl,ROKS+1
             ld   a,(hl)
             and  a
@@ -354,13 +354,13 @@ AROKS:
             ld   a,(hl)
             ret
 
-; КОНЕЦ БЛОКА ОБР. РАКЕТ
+; Конец блока обр. ракет
 ;----------------------------
 
 
 HyperJump:                      ; orig: HIPER - вызов гиперпрыжка
-; ВЫЗОВ ГИПЕР ПРЫЖКА
-; ПРОВЕРКА ПРЫЖКА НА СИСТЕМУ НАХОЖДЕНИЯ
+; Вызов гипер прыжка
+; проверка прыжка на систему нахождения
             ld   hl,(FUEL)
             ld   e,0
             ld   a,h
@@ -370,30 +370,30 @@ HyperJump:                      ; orig: HIPER - вызов гиперпрыжк�
             ld   a,l
             rra
             and  a
-            ret  z                  ;НЕТ ТОПЛИВА
+            ret  z                  ;Нет топлива
             ld   c,a
             ld   hl,(DALNO)
             ld   a,h
             and  a
-            ret  nz                 ;ДaЛEKO
+            ret  nz                 ;Далеко
             ld   a,c
             cp   l
-            ret  c                  ;МАЛО ТОПЛИВА
+            ret  c                  ;Мало топлива
             ld   a,l
             and  a
             jr   nz,.HR1
             ld   a,(GDIABLO)
             inc  a
-; ЕСЛИ ПРЫЖОК НА ТУЖУ ЗВЕЗДУ
+; Если прыжок на тужу звезду
             ret  z
-; ЕСЛИ ЕСТЬ ДЬЯВОЛ
+; Если есть дьявол
             ld   a,(PLANET)
             ld   b,a
             ld   a,(WPLANET)
             cp   b
-; ЕСЛИ НА ТУЖУ ПЛАНЕТУ ПРИ ДЬЯВОЛЕ
+; Если на тужу планету при дьяволе
             ret  z
-; ОДНУ ТОНУ НАДО ИСТРАТИТЬ НА ТУЖУ ПЛАНЕТУ
+; Одну тону надо истратить на тужу планету
             inc  l
 .HR1
             ld   b,l
@@ -429,7 +429,7 @@ HyperJump:                      ; orig: HIPER - вызов гиперпрыжк�
 
 
 AntiMissile:                    ; orig: UNROKET - противоракетная система
-; ПРОТИВОРАКЕТНАЯ СИСТЕМА
+; Противоракетная система
             ld   a,(COUNTER+1)
             and  a
             ret  nz
@@ -473,11 +473,11 @@ STU1:
             push hl
             pop  ix
 
-; ВЫСТРЕЛ ЛАЗЕРА
+; Выстрел лазера
             set  0,(ix+ACTN)
-; ПРОТ.РАКЕТНАЯ СИСТЕМА
+; Прот.ракетная система
             set  3,(ix+ACTN)
-; РИСОВАНИЕ ЛИНИИ ИГРОКА К РАКЕТЕ
+; Рисование линии игрока к ракете
             ld   a,(ix+PX+1)
             cp   #80
             scf
@@ -505,7 +505,7 @@ STU1:
 
 
 CancelTargets:                  ; orig: CLRMARK - отмена захвата целей
-; ОТМЕНИТЬ ЗАХВАТ ЦЕЛЕЙ
+; Отменить захват целей
             ld   a,(COUNTER+1)
             and  a
             ret  nz
@@ -522,7 +522,7 @@ CancelTargets:                  ; orig: CLRMARK - отмена захвата ц
 
 
 MissileGuidanceMode:            ; orig: NAVOD - режим наведения ракеты
-; РЕЖИМ НАВЕДЕНИЯ РАКЕТЫ
+; Режим наведения ракеты
             ld   a,(COUNTER+1)
             and  a
             ret  nz
@@ -545,11 +545,11 @@ NAVOD_:
 
 
 FireButton:                     ; orig: FLINE2 - кнопка FIRE в разных режимах
-; КНОПКА FIRE В РАЗНЫХ РЕЖИМАХ
+; Кнопка FIRE в разных режимах
             ld   a,0
             and  a
             jp   z,DrawPlayerLaser
-; ЗАХВАТ
+; Захват
             ld   a,(ROKETN1)
             or   a
             ret  m
@@ -631,20 +631,20 @@ STKL:       ld   sp,0
             ret  nz
             ld   a,#FF
             ld   (ROKETN1),a
-; СМОТРИМ ТОНАЖ, ВМЕСТИМ ЛИ
-; ГЕНЕРИТЬ КАКОЙ ГРУЗ БЫЛ ПОЙМАН
+; Смотрим тонаж, вместим ли
+; генерить какой груз был пойман
             push hl
             ld   a,l
             add  a,TYPE
             ld   l,a
             ld   a,(hl)
             cp   T_CARGO
-            jr   z,.OKGRU            ;КОНТЕЙНЕР
+            jr   z,.OKGRU            ;Контейнер
             cp   T_CHIP
-; ЧЕРНЫЙ МЕТАЛ ЕСЛИ ОСКОЛОК
+; Черный метал если осколок
             ld   e,15
             jr   z,$+4
-            ld   e,27               ;АРТЕФАКТ
+            ld   e,27               ;Артефакт
             ld   a,r
             and  7
             inc  a
@@ -736,7 +736,7 @@ TNN:
 
 
 TargetLockToggle:               ; orig: ZAHWAT - вкл/выкл режим захвата цели
-; ВКЛ/ВЫКЛ РЕЖИМ ЗАХВАТА ОБЪЕКТА
+; Вкл/выкл режим захвата объекта
             ld   a,(COUNTER+1)
             and  a
             ret  nz
@@ -766,7 +766,7 @@ TargetLockToggle:               ; orig: ZAHWAT - вкл/выкл режим за
 
 
 ToggleLight:                    ; orig: TURNLIGHTER - переключение подсветки
-; ПЕРЕКЛЮЧЕНИЕ ПОДСВЕТКИ
+; Переключение подсветки
             ld   a,(COUNTER+1)
             and  a
             ret  nz
@@ -787,14 +787,14 @@ ToggleLight:                    ; orig: TURNLIGHTER - переключение �
 
 
 PlayerAfterburner:              ; orig: JUMPDRIVE - форсаж двигателя игрока
-; ФОРСАЖ ДВИГАТЕЛЯ
+; Форсаж двигателя
             ld   a,(CALCSTEP)
             cp   #C9
             ret  z
             ld   a,1
             ld   (JFLAG+1),a
-; ПРОВЕРЯЕМ БЛИЗОСТЬ ДРУГИХ ОБЪЕКТОВ
-; ЕСЛИ ХОТЬ ОДИН БЛИЗКО ТО ОТМЕН
+; Проверяем близость других объектов
+; если хоть один близко то отмен
             ld   hl,CARSB-OLEN+1
             ld   de,OLEN
             jr   $+9
@@ -838,7 +838,7 @@ PlayerAfterburner:              ; orig: JUMPDRIVE - форсаж двигате�
             sub  4
             ld   l,a
             ld   a,c
-; МИН. РАССТОЯНИЕ ДЛЯ ДЖАМПА
+; Мин. расстояние для джампа
             cp   JMIN
             jp   nc,.JJD1
             jp   KillTrash
@@ -890,7 +890,7 @@ FUEL_:
 
 
 FreeFlightControl:              ; orig: FREECONTROL - свободный полёт
-; СВОБОДНЫЙ ПЛЕТ
+; Свободный плет
             ld   a,(COUNTER+1)
             and  a
             ret  nz
@@ -902,7 +902,7 @@ FreeFlightControl:              ; orig: FREECONTROL - свободный пол�
             ld   hl,(SetMaxSpeed+1)
             ld   bc,MXSPD
             SUB_BC
-; ЕСЛИ В РЕЖИМЕ ДЖАМП
+; Если в режиме джамп
             ret  nz
             ld   hl,EFF13
             ld   (SFXA+1),hl
@@ -923,7 +923,7 @@ FreeFlightControl:              ; orig: FREECONTROL - свободный пол�
 
 
 DropCargoKey:                   ; orig: DROPCR - сброс груза
-; СБРОС ГРУЗА
+; Сброс груза
             ld   a,(COUNTER+1)
             and  a
             ret  nz
@@ -952,7 +952,7 @@ DropCargoKey:                   ; orig: DROPCR - сброс груза
 
 
 DropMineKey:                    ; orig: DROPMINE - сброс мины
-; СБРОС МИНЫ
+; Сброс мины
             ld   a,(COUNTER+1)
             and  a
             ret  nz
@@ -977,7 +977,7 @@ DropMineKey:                    ; orig: DROPMINE - сброс мины
 
 
 ReturnSystem:                   ; orig: RETURNSYS - система возврата
-; СИСТЕМА ВОЗВРАТА
+; Система возврата
             ld   a,(COUNTER+1)
             and  a
             ret  nz
@@ -998,7 +998,7 @@ ReturnSystem:                   ; orig: RETURNSYS - система возвра�
 
 
 FrontBackView:                  ; orig: FRONTBACK - задний/передний виды
-; ЗАДНИЙ ПЕРЕДНИЙ ВИДЫ
+; Задний передний виды
             ld   a,(COUNTER+1)
             and  a
             ret  nz

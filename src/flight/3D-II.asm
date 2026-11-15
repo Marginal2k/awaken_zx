@@ -3,7 +3,7 @@
 
             ADRXX00
 LC5:
-; ТЕКСТУРЫ, МАСКИ
+; Текстуры, маски
             dw   #00FF
             dw   #AA77
             dw   #FF55
@@ -486,7 +486,7 @@ LLC:        pop  hl
             ret
 
 
-; ВЫВОД ПОЛИГОНА
+; Вывод полигона
 POLYGON:
             push hl
             ld   a,(LOW_CORDS_BUF)
@@ -610,7 +610,7 @@ RENOBJ:
             ld   a,4
             ld   (ADT+1),a
 
-; ДЕЛАЕНИЕ JUMP
+; Делаение JUMP
             ld   a,#06
             sub  (hl)
             ld   (JMP4+1),a
@@ -746,7 +746,7 @@ XB0:        ld   de,0
             ld   a,ixh
             ld   hl,ENDC
             jp   CALCD
-; ПРОЦЕСС ПОСТРОЕНИЯ
+; Процесс построения
 .LD633
             ld   a,ixh
             bit  0,b
@@ -795,7 +795,7 @@ ENDC:
 STKC:       ld   sp,0
             ret
 
-; ПЕРЕВОТ КООРДИНАТ В 2D
+; Перевот координат в 2D
 CALCD:
             exx
 TZ:         ld   de,0
@@ -1167,7 +1167,7 @@ ZZZ:        ld   de,0
             jp   (hl)
 
 
-; ЕСЛИ ПЕРЕПОЛНЕНИЕ
+; Если переполнение
 LD73D:
             push de
             ld   d,#80
@@ -1247,7 +1247,7 @@ LD8AA:      inc  b
             add  hl,bc
             jp   DRWPOL
 
-; РИСОВАНИЕ ЛИНИИ
+; Рисование линии
 LIN_E:      and  #0F
             ld   b,a
             bit  6,(hl)
@@ -1490,14 +1490,14 @@ LDA9F:      ld   ixl,b
             ret
 
 
-; РИСОВАНИЕ ЛИНИИ
+; Рисование линии
 DRWLIN:
             ld   hl,(L91+#2A)
             ld   de,(L91+#2C)
             SUB_DE
             ret  z
             add  hl,de
-; РИСОВАНИЕ ЛИНИИ ИЗ hl,de
+; Рисование линии из hl,de
 ;h,d-Y : l,e-X
 DRAWL1:
             ld   (LDBBB),sp
@@ -1657,7 +1657,7 @@ LD85D:
             xor  a
             ret
 
-; ПРОСЧЕТ МАТРИЦЫ ВИДЕНИЯ ОБЪЕКТА
+; Просчет матрицы видения объекта
 VSMASK:
             push hl
             xor  a
@@ -1811,7 +1811,7 @@ LD83F:      set  3,c
             ex   af,af'
             ret
 
-; ПРОСЧЕТ ВОДИМОСТИ ПОЛИГОНА
+; Просчет водимости полигона
 ;retFS-mPOLY VISIBLE
 VSPOLY:
             push bc
@@ -1879,7 +1879,7 @@ LDA7A:      equ  $-#0002
             pop  bc
             ret
 
-; ВСЯКИЕ МАСКИ
+; Всякие маски
             ds   ($-1)/16*16-$+16
 MASKS:
             dw   #4080

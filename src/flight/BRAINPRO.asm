@@ -29,8 +29,8 @@ AiModeNone:                     ; orig: NTH - пустой режим (ret)
 
 
 FlyAroundPlayer:                ; orig: OBLET - C_FLYAROUND: облёт игрока, поворот на 20 градусов по BETA
-; ОБЛЕТ ИГРОКА, ПОВОРОТ НА 20 ГРАДУСОВ ПО
-; УГЛУ BETA
+; Облет игрока, поворот на 20 градусов по
+; углу BETA
             ld   a,(ix+ALFA)
             add  a,2
             ld   (ix+ALFA),a
@@ -38,14 +38,14 @@ FlyAroundPlayer:                ; orig: OBLET - C_FLYAROUND: облёт игро
             dec  a
             ld   (ix+POWOR),a
             jp   nz,MoveStraight
-; ВОЗВРАТ
+; Возврат
             ld   (ix+MODE),C_RETURN
             ld   (ix+POWOR),TIMEOBL
             jp   MoveStraight
 
 
 ReturnAfterFlyAround:           ; orig: WOZWRAT - C_RETURN: возврат после облёта, поворот назад
-; ВОЗВРАТ ПОСЛЕ ОБЛЕТА, ПОВОРОТ НАЗАД 20гд
+; Возврат после облета, поворот назад 20гд
             ld   a,(ix+ALFA)
             sub  2
             ld   (ix+ALFA),a
@@ -59,7 +59,7 @@ ReturnAfterFlyAround:           ; orig: WOZWRAT - C_RETURN: возврат по�
 
 
 Afterburner:                    ; orig: FORSAGE - C_FORSAGE: форсаж объекта
-; ФОРСАЖ ОБЪЕКТА
+; Форсаж объекта
             ld   a,(ix+TYPE)
             cp   T_HERMIT
             jr   nc,.FS4
@@ -102,16 +102,16 @@ NOCARGO:
 
 
 PickUpCargo:                    ; orig: GETCARGO - C_GETCARGO: подобрать груз
-; ПОДОБРАТЬ ГРУЗ
+; Подобрать груз
             ld   a,(ix+SUBJ)
             call ObjAddrFromIndex
-; АДРЕС ГРУЗА hl
+; Адрес груза hl
             inc  l
             ld   a,(hl)
             cp   #80
-; ЕСЛИ ГРУЗА УЖЕ НЕТ
+; Если груза уже нет
             jr   z,NOCARGO
-; ПРОВЕРИТЬ ГРУЗ ЛИ ЭТО ?
+; Проверить груз ли это ?
             ld   a,l
             add  a,TYPE-1
             ld   l,a
@@ -120,21 +120,21 @@ PickUpCargo:                    ; orig: GETCARGO - C_GETCARGO: подобрат�
             ld   l,a
             ld   a,c
             cp   T_CARGO
-; ЕСЛИ ЭТО НЕ ГРУЗ
+; Если это не груз
             jr   nz,NOCARGO
-; ГРУЗ!
+; Груз!
             push hl
             pop  iy
-; МЕРИМ РАССТОЯНИЕ
+; Мерим расстояние
             call DistanceHigh
             cp   1
-; ЕСЛИ ЕЩЕ ДАЛЕКО
+; Если еще далеко
             jp   nc,TOTHEALL
-; ВЗЯЛИ
+; Взяли
             bit  4,(iy+SETUP)
             call DEATHY
             jp   z,NOCARGO
-; ВЗРЫВ, ПОДОБРАНА МИНА
+; Взрыв, подобрана мина
             call MakeExplosion
             jp   MoveStraight
 DEATHY:
@@ -145,7 +145,7 @@ DEATHY:
 
 
 ReturnToAsteroid:               ; orig: BACKAS - C_BACKTOASTER: возврат на астероид
-; ВОЗВРАТ НА АСТЕРОИД
+; Возврат на астероид
             ld   a,(ix+BSUBJ)
             call ObjAddrFromIndexIY
             ld   a,(iy+1)
@@ -164,7 +164,7 @@ ReturnToAsteroid:               ; orig: BACKAS - C_BACKTOASTER: возврат �
 
 
 MissileAttackStation:           ; orig: SROKA - ракетная атака на станцию
-; РАКЕТНАЯ АТАКА НА СТАНЦИЮ
+; Ракетная атака на станцию
             ld   (ix+MODE),C_DEFENCESTAT
             jp   SINT3
 
@@ -175,8 +175,8 @@ GoAwayNoCargo:                  ; orig: GOAWAY - C_GOAWAY: просто улет
 
 
 GoToStar:                       ; orig: GOSUN - C_GOSTAR: движение по заданному углу (к звезде)
-; ДВИЖЕНИЕ ПО ЗАДАННОМУ УГЛУ НАПРАВЛЕНИЯ
-; ПО ИДЕЕ НА СОЛНЦЕ
+; Движение по заданному углу направления
+; по идее на солнце
             call CHECKALL
             jp   c,MoveStraight
 GSUN1:
@@ -189,7 +189,7 @@ GSUN1:
             add  a,40
             ld   (Jjj1+1),a
             call RND
-; ПРОВЕРКА НА ГИПЕР ПЕРЕХОД
+; Проверка на гипер переход
             ld   a,h
             srl  a
 Jjj1:       cp   40
@@ -204,7 +204,7 @@ GOS1:
             ld   a,l
             cp   4
             jr   nc,MoveStraight
-; ЕСЛИ ЗВЕЗД БЛИЗКО
+; Если звезд близко
             ld   a,(ix+BETA)
             inc  a
             ld   (ix+BETA),a
@@ -238,7 +238,7 @@ GoToPlanet:                     ; orig: GOEAR - C_GOPLANET: лететь на п
             ld   a,l
             cp   VWZST
             jr   c,MoveStraight
-; ВОЗВРАТ НА СТАНЦИЮ
+; Возврат на станцию
             ld   (ix+MODE),C_BACKPOLICE
 MoveStraight:                   ; orig: GOSIMPLY - общий шаг движения по текущим углам
             ld   a,(ix+1)
@@ -261,7 +261,7 @@ MoveStraight:                   ; orig: GOSIMPLY - общий шаг движе�
             ld   a,(ix+TYPE)
             cp   T_CHIP
             jr   nc,.NNI1
-; УБИРТЬ ФОРСАЖ ТОЛЬКО КОРАБЛЯМ
+; Убирть форсаж только кораблям
             ld   a,(ix+MODE)
             cp   C_FORSAGE          ;FORSAGE
             jr   z,$+6
@@ -272,7 +272,7 @@ MoveStraight:                   ; orig: GOSIMPLY - общий шаг движе�
 
 
 Fight:                          ; orig: FIGHT - C_FIGHT: нападение на объект
-; РЕЖИМ НАПАДЕНИЯ НА ОБЪЕКТ
+; Режим нападения на объект
             ld   a,(ix+SUBJ)
             inc  a
             jr   nz,.FGH7
@@ -337,7 +337,7 @@ Fight:                          ; orig: FIGHT - C_FIGHT: нападение на
             jr   nz,.FGT9
 .DFN102
             call DropCargo
-; РЕЖИМ СВОБОДНОГО ПОЛЕТА
+; Режим свободного полета
             ld   a,(ix+TYPE)
             cp   T_HERMIT
             jp   z,MoveStraight
@@ -368,15 +368,15 @@ DDZ:        ld   bc,0
             exx
 
 
-; ОРГАНИЗАЦИЯ ОГНЯ ЛАЗЕРОМ ИЛИ РАКЕТАМИ
-; ПЕРСОНАЖА ПО ПЕРСОНАЖУ
+; Организация огня лазером или ракетами
+; персонажа по персонажу
 AimNose:                        ; orig: NAVODFIRE - наведение носа на цель
 
-; НАВЕДЕНИЕ НОСА
+; Наведение носа
             call AimAtObject
 
-; НАЙТИ МАКСИМАЛЬНЫЙ УГОЛ, ВЗЯВ ЕГО ПО
-; МОДУЛЮ И ПО ЧЕТВЕРТИ
+; Найти максимальный угол, взяв его по
+; модулю и по четверти
 
             ld   a,h
             cp   l
@@ -397,7 +397,7 @@ FGHT1:
 
 
 MissileAttack:                  ; orig: FIROK - ракетная атака
-; РАКЕТНЯ АТАКА
+; Ракетня атака
             cp   #F0
             jp   nz,MoveStraight
             ld   a,h
@@ -433,7 +433,7 @@ FIROK22:
             ex   af,af'
             xor  a
             ex   af,af'
-; НОМЕР ОБЪЕКТ КТО ПУСТИЛ РАКЕТУ
+; Номер объект кто пустил ракету
             call ObjIndexFromIX
             ld   b,a
             bit  3,(ix+SETUP)
@@ -444,21 +444,21 @@ FIROK22:
 
 
 JTYPE:
-; СЧЕТЧИК ПОВТОРНОГО ПУСКА РАКЕТ ДЛЯ
-; КАЖДОГО ПЕРСОНАЖА
-            db   20                 ;ПИРАТ
-            db   0                  ;МИРНЫЙ
-            db   18                 ;ВОЕННЫЙ
-            db   30                 ;ПОЛИЦИЯ
-            db   0                  ;ЛЕГИОНЕР
-            db   30                 ;ПИРАТ2
-            db   35                 ;УФО
-            db   10                 ;УФО2
-            db   40                 ;ОТШЕЛЬНИК
+; Счетчик повторного пуска ракет для
+; каждого персонажа
+            db   20                 ;Пират
+            db   0                  ;Мирный
+            db   18                 ;Военный
+            db   30                 ;Полиция
+            db   0                  ;Легионер
+            db   30                 ;Пират2
+            db   35                 ;Уфо
+            db   10                 ;Уфо2
+            db   40                 ;Отшельник
 
 
 Defence:                        ; orig: DEFENCE - C_DEFENCE: защита от нападения
-; РЕЖИМ ЗАЩИТЫ ОТ НАПАДЕНИЯ
+; Режим защиты от нападения
             ld   a,(ix+SUBJ)
             inc  a
             jr   nz,.DFN7
@@ -556,8 +556,8 @@ Defence:                        ; orig: DEFENCE - C_DEFENCE: защита от �
 
 
 PoliceReturn:                   ; orig: BACKUP - C_BACKPOLICE: возврат на станцию, стадия 2
-; ВОЗВРАЩЕНИЕ НА СТАНЦИЮ, СТАДИЯ 2
-; ДВИЖЕНИЕ В СТОРОНУ СТАНЦИИ
+; Возвращение на станцию, стадия 2
+; движение в сторону станции
             ld   d,T_STATION
             call FindObjectByType
             jp   z,MoveStraight
@@ -592,7 +592,7 @@ DEATHX:
             ret
 
 TurnAway:                       ; orig: TURNOUT - C_TURNOUT: повернуть в сторону
-; ПОВОРОТ КУДАТО
+; Поворот кудато
             ld   a,(ix+POWOR)
             dec  a
             ld   (ix+POWOR),a
@@ -611,10 +611,10 @@ TurnAway:                       ; orig: TURNOUT - C_TURNOUT: повернуть 
 
 
 FlyAway:                        ; orig: OTLET - C_FLYAWAY: отлёт в заданном направлении
-; ОТЛЕТ В ЗАДАННОМ НАПРАВЛЕНИИ СЕКУНДУ
-; ДРУГУЮ
-; В POWOR-ВРЕМЯ В КАДРАХ
-; В PMODE-ПРЕДЫДУЩИЙ РЕЖИМ
+; Отлет в заданном направлении секунду
+; другую
+; в POWOR-время в кадрах
+; в PMODE-предыдущий режим
             ld   a,(ix+POWOR)
             dec  a
             ld   (ix+POWOR),a
@@ -634,13 +634,13 @@ FlyAway:                        ; orig: OTLET - C_FLYAWAY: отлёт в зад�
 
 
 PoliceLaunch:                   ; orig: STARTPOLICE - C_STARTPOLICE: пуск полиции из станции
-; РЕЖИМ ПУСКА ПОЛИЦИИ ИЗ СТАНЦИИ
+; Режим пуска полиции из станции
             ld   a,10
             inc  a
             and  #0F
             ld   ($-4),a
             jp   nz,STAYSTATION
-; ПОИСК СВОБОДНОГО МЕСТА
+; Поиск свободного места
             call FindFreeSlot
             jp   z,STAYSTATION
 
@@ -672,8 +672,8 @@ PoliceLaunch:                   ; orig: STARTPOLICE - C_STARTPOLICE: пуск п
             ld   (iy+4),l
             ld   (iy+5),h
 
-; ЗАДАНИЕ ВИДА ПОЛИЦИИ В ЗАВИСИМОСТИ ОТ
-; ГОСУДАРСТВА
+; Задание вида полиции в зависимости от
+; государства
             ld   hl,(PLACE)
             call GovernmentAt
 
@@ -688,7 +688,7 @@ PoliceLaunch:                   ; orig: STARTPOLICE - C_STARTPOLICE: пуск п
             ld   (iy+GAMA),0
             ld   (iy+LZS),70
             ld   (iy+MODE),C_FIGHT
-; РЕЖИМ ВОЗВРАТА BACKUP
+; Режим возврата BACKUP
             ld   (iy+OMODE),C_BACKPOLICE
             ld   (iy+ACTN),0
             ld   (iy+TYPE),T_POLICE
@@ -704,15 +704,15 @@ PoliceLaunch:                   ; orig: STARTPOLICE - C_STARTPOLICE: пуск п
             dec  a
             ld   (ix+OMODE),a
             jr   nz,$+6
-; РЕЖИМ STAYSTATION
+; Режим STAYSTATION
             ld   (ix+MODE),C_STAYSTAT
             jp   STAYSTATION
 
 
 StationDefence:                 ; orig: STATDEF - C_DEFENCESTAT: станция сбивает ракеты
-; СТАНЦИЯ ЗАЩИЩАЕТСЯ
-; УНИЧТОЖЕНИЕ ТРЕХ РАКЕТ НАПРАВЛЕННЫХ НА
-; НЕЕ
+; Станция защищается
+; уничтожение трех ракет направленных на
+; нее
             ld   a,%10010010
             rrca
             ld   ($-2),a
@@ -785,7 +785,7 @@ STD1:
             exx
             jr   nz,STD1
 STD2:
-; РЕЖИМ ВЫПУСК ПОЛИЦИИ НА НАПАДАЮЩЕГО
+; Режим выпуск полиции на нападающего
             call CheckPolicePair
             jr   nc,STAYSTATION
 ;MODE START POLICE
@@ -800,13 +800,13 @@ STD2:
             call z,ChangeStatus
             jp   STAYSTATION
 
-; ПЕРЕХОД В РЕЖИМ STAYSTATION, ЧТО БЫ
-; ЧАСТИ СТАНЦИИ СТОЯЛИ НА МЕСТЕ
+; Переход в режим STAYSTATION, что бы
+; части станции стояли на месте
 
 
 StationStay:                    ; orig: STYSTAT - C_STAYSTAT: станция проверяет статус игрока
-; ПРОВЕРИТЬ СТАТУС ИГРОКА, ЕСЛИ СТАТУС
-; ПЛОХ, ТО ВЫЛЕТ ПОЛИЦИИ
+; Проверить статус игрока, если статус
+; плох, то вылет полиции
             ld   a,r
             cp   VWLPL
             jr   c,.STTT9
@@ -815,7 +815,7 @@ StationStay:                    ; orig: STYSTAT - C_STAYSTAT: станция п�
             cp   40
             jr   nc,.STTT9
             ld   a,(STATUS)
-            cp   80                 ;ВЫЩЕ ПРЕДЕЛА
+            cp   80                 ;Выще предела
             ld   a,SPLAYER
             jr   nc,.STTT1
 .STTT9
@@ -836,13 +836,13 @@ StationStay:                    ; orig: STYSTAT - C_STAYSTAT: станция п�
             jr   z,STAYSTATION
             call ObjIndexFromIY
 .STTT1
-; ИНИТ РЕЖИМА ПУСКА КОРАБЛЕЙ
+; Инит режима пуска кораблей
             ex   af,af'
-; ЕСЛИ ЕСТЬ ПОЛИЦИЯ В КОСМОСЕ
+; Если есть полиция в космосе
             ld   d,3
             call FindObjectByType
             jr   nz,STAYSTATION
-; ПОИСК ЧАСТИ СТАНЦИИ
+; Поиск части станции
             ld   d,#12
             call FindObjectByType
             jr   z,STAYSTATION
@@ -859,13 +859,13 @@ STAYSTATION:
 
 
 MissileHoming:                  ; orig: NAVODROKET - C_NAVODROKET: ракета идёт по следу цели
-; ДВИЖЕНИЕ РАКЕТЫ ПО СЛЕДУ ЦЕЛИ
+; Движение ракеты по следу цели
             ld   a,(ix+MSPD)        ;SUBJ
             call ObjAddrFromIndexIY
-; НАВЕДЕНА РАКЕТА
+; Наведена ракета
             set  1,(iy+ACTN)
             ld   a,(ix+RAND)
-; КТО ПУСТИЛ РАКЕТУ
+; Кто пустил ракету
             ld   (iy+OSUBJ),a
             call ObjIndexFromIX
             ld   (iy+SUBJ),a
@@ -925,7 +925,7 @@ MissileHoming:                  ; orig: NAVODROKET - C_NAVODROKET: ракета 
             ret
 
 .EXPLO1
-; ПРОВЕРИМ ЕСЛИ ЭТО ИГРОК ПО МРКЕРУ
+; Проверим если это игрок по мркеру
             ld   a,(ix+MSPD)
             call ObjAddrFromIndex
             ld   a,l
@@ -936,12 +936,12 @@ MissileHoming:                  ; orig: NAVODROKET - C_NAVODROKET: ракета 
             jr   z,.EXL4
             call DEATHX
 .EXL4
-; РАКЕТА ПОПАЛА В ЦЕЛЬ
+; Ракета попала в цель
             set  2,(iy+ACTN)
             ld   a,(ix+LZS)
             and  a
             jr   z,.EXPLO2
-; ЦЕЛЬ УНИЧТОЖЕНА
+; Цель уничтожена
             MESAG _DESTROY
 .EXPLO2
             push ix
@@ -953,9 +953,9 @@ MissileHoming:                  ; orig: NAVODROKET - C_NAVODROKET: ракета 
 
 
 HyperJumpStart:                 ; orig: JUMPING - C_JUMPING: начало гиперперехода
-; ПРЫЖОК В ГИПЕР ПРОСТРАНСТВО, ТЯНЕМ ВРЕМЯ
-; НА ПРОПАДАНИЕ СПРАЙТА, А ПОТОМ ИСЧЕЗНЕТ
-; КОРАБЛЬ
+; Прыжок в гипер пространство, тянем время
+; на пропадание спрайта, а потом исчезнет
+; корабль
             dec  (ix+LZS)
             jp   z,DEATHX
             ld   a,(ix+RSPD)
@@ -989,7 +989,7 @@ Stay:                           ; orig: STAY - C_STAY: стоять
 
 
 FlyFree:                        ; orig: FREEFLY - C_FLYFREE: полёт без управления с вращением
-; СВОБОДНЫЙ ПОЛЕТ С ВРАЩЕНИЕМ
+; Свободный полет с вращением
             inc  (ix+BETA)
             inc  (ix+BETA)
             inc  (ix+GAMA)
@@ -999,7 +999,7 @@ FlyFree:                        ; orig: FREEFLY - C_FLYFREE: полёт без �
 
 
 AsteroidDrift:                  ; orig: GOASTER - C_GOASTER: движение астероида
-; ДВИЖЕНИЕ ДЛЯ АСТЕРОИДА
+; Движение для астероида
             call HasCargoToTake
             jr   z,GA1
             call FindNearestCargo
@@ -1021,7 +1021,7 @@ GA1:
 
 
 HyperJumpEnd:                   ; orig: JUMPOUT - C_JUMPOUT: конец гиперперехода
-; ГИПЕР ПРЫЖОК КУДАТО ОТ СЮДА
+; Гипер прыжок кудато от сюда
             ld   a,(ix+INDI)
             call ObjectSize
             ld   a,h
@@ -1044,43 +1044,43 @@ HyperJumpEnd:                   ; orig: JUMPOUT - C_JUMPOUT: конец гипе
             ld   a,26
             ld   (CEX+1),a
             ld   (ix+MODE),C_JUMPING
-; ИНИЦИИРУЕМ ВРЕМЯ ЖИЗНИ ПЕРЕД
-; ИСЧЕЗНОВЕНИЕМ
+; Инициируем время жизни перед
+; исчезновением
             ld   (ix+LZS),18
             ret
 
 
 ;---------------------------------------
-; ЦЕНТР ОБРАБОТКИ ИНТЕЛЕКТА
+; Центр обработки интелекта
 ;---------------------------------------
 
 ShipAI:                         ; orig: SHIPINTELEGENT - главный цикл ИИ: обход всех объектов, вызов обработчика режима
-; СПИСОК ОБЪЕКТОВ
+; Список объектов
             ld   ix,CARSB-OLEN
             jr   $+8
             ld   a,(ix+0)
             cp   #80
-            ret  z                  ;КОНЕЦ СПИСКА
+            ret  z                  ;Конец списка
 SINT1:
             ld   de,OLEN
             add  ix,de
             ld   a,(ix+1)
             cp   #80
-            jp   z,$-16             ;ПУСТО-КОНЕЦ
+            jp   z,$-16             ;Пусто-конец
 
 
-; ВОССТАНОВЛЕНИЕ ЭНЕРГИИ ОБЪЕКТА, ЕСЛИ
-; ЕЕ НЕ ДОСТАТОЧНО
+; Восстановление энергии объекта, если
+; ее не достаточно
             ld   a,(ix+TYPE)
             cp   T_CHIP
-; ЕСЛИ НЕ КОРАБЛИ
+; Если не корабли
             jp   nc,.SINT2
-; ЕСЛИ ЭНЕРГИИ МЕНЬШЕ, ТО ДОБАВИТЬ
-; МАКСИМАЛЬНЫЙ УРОВЕНЬ ЭНЕРГИИ КОРАБЛЕЙ
+; Если энергии меньше, то добавить
+; максимальный уровень энергии кораблей
             ld   a,(ix+MENE)
             dec  a
             ld   h,a
-; ЕСЛИ ЭНЕРГИИ МЕНЬШЕ, ТО ДОБАВИТЬ
+; Если энергии меньше, то добавить
             ld   a,(ix+ENERGY)
             cp   h
             jr   nc,.SINT2
@@ -1088,49 +1088,49 @@ SINT1:
             ld   (ix+ENERGY),a
 
 .SINT2
-; ЕСЛИ БЫЛО ДЕЙСТВИЕ СО СТОРОНЫ
+; Если было действие со стороны
             ld   a,(ix+ACTN)
             and  a
-            jp   z,SINT3            ;НЕБЫЛО
+            jp   z,SINT3            ;Небыло
             bit  1,a
 
-; ЕСЛИ РАКЕТНАЯ АТАКА
+; Если ракетная атака
             jp   nz,ROKATAC
 
-; ЛАЗЕРНАЯ АТКА
+; Лазерная атка
             ld   a,(ix+TYPE)
             cp   T_STATION
 
-; ЕСЛИ ОБЪЕКТ НЕ СТАНЦИЯ
+; Если объект не станция
             jr   nz,.SINT4
 
-; ЭТО СТАНЦИЯ, ЕЕ ЛАЗЕРОМ НЕ ВОЗЬМЕШЬ
-; СТАРТ ПОЛИЦИИ НА НАПАДАЮЩЕГО
+; Это станция, ее лазером не возьмешь
+; старт полиции на нападающего
             ld   a,(ix+SUBJ)
-; КТО НАПАЛ
+; Кто напал
             ld   (ix+RAND),a
-; ЕСТЬ ЛИ ПОЛИЦИЯ УЖЕ В КОСМОСЕ?
+; Есть ли полиция уже в космосе?
             call CheckPolicePair
             jp   nc,SINT3
 
-; РЕЖИМ ВЫПУСКА
+; Режим выпуска
             ld   (ix+MODE),C_STARTPOLICE
             ld   a,r
             and  1
             add  a,2
 
-; КОЛИЧЕСТВО ПОЛИЦИИ
+; Количество полиции
             ld   (ix+OMODE),a
             ld   a,(ix+RAND)
             cp   SPLAYER
 
-; ИЗМЕНЕНИЕ СТАТУСА ЕСЛИ НАПАЛ ИГРОК
+; Изменение статуса если напал игрок
             ld   c,8
             call z,ChangeStatus
             jp   SINT3
 
-; ЕСЛИ НАПАЛ ИГРОК, ТО ОДНО ПРИРАЩЕНИЕ
-; ЭНЕРГИИ ИНАЧЕ ДРУГОЕ
+; Если напал игрок, то одно приращение
+; энергии иначе другое
 .SINT4
             ld   a,(ix+SUBJ)
             cp   SPLAYER
@@ -1138,7 +1138,7 @@ PMLPL:      ld   c,#0A
             jr   nz,SINT44
 PMLI:       ld   c,#0A
 
-; ЕСЛИ ЭТО БЫЛ ПРОТИВОРАКЕТНЫЙ ЛАЗЕР
+; Если это был противоракетный лазер
             bit  3,(ix+ACTN)
             jr   z,SINT44
             ld   a,(PROTR1)
@@ -1151,29 +1151,29 @@ PMLI:       ld   c,#0A
             jr   nz,SINT44
             ld   c,20               ;PROTRAK2
 SINT44:
-; ИЗМЕНЯЕМ ЭНЕРГИЮ
+; Изменяем энергию
             ld   a,(ix+ENERGY)
             sub  c
-; ЕСЛИ ЭНЕРГИЯ НЕ КОНЧИЛАСЬ
+; Если энергия не кончилась
             jp   nc,SINT5
-; ВЗРЫВ ОБЪЕКТА
+; Взрыв объекта
             call MakeExplosion
             ld   (ix+ACTN),0
             jp   SINT1
 
-; РАКЕТНАЯ АТАКА НА ОБЪЕКТ
+; Ракетная атака на объект
 ROKATAC:
 
-; ТИП ОБЪЕКТА
+; Тип объекта
             ld   a,(ix+TYPE)
             cp   T_STATION
-; ЕСЛИ АТАКА НА СТАНЦИЮ
+; Если атака на станцию
             jp   z,MissileAttackStation
             cp   T_CHIP
-; ЕСЛИ НЕ КОРАБЛЬ
+; Если не корабль
             jr   nc,SINT3
 
-; РЕЖИМ ЗАЩИТЫ
+; Режим защиты
             ld   a,(ix+MODE)
             cp   C_JUMPING
             jp   z,SINT3
@@ -1182,31 +1182,31 @@ ROKATAC:
             ld   (ix+MODE),C_DEFENCE
             jp   SINT3
 
-; АТАКА ЛАЗЕРОМ НО ЭНЕРГИЯ НЕ КОНЧИЛАСЬ
+; Атака лазером но энергия не кончилась
 SINT5:
             ld   (ix+ENERGY),a
             ld   a,(ix+TYPE)
             cp   T_CHIP
-; ЕСЛИ НЕ КОРАБЛЬ
+; Если не корабль
             jp   nc,SINT3
-; СМОТРИМ ТЕКУЩИЙ РЕЖИМ ЕГО ДЕЙСТВИЙ
+; Смотрим текущий режим его действий
             ld   a,(ix+MODE)
             cp   C_FIGHT
 
             jp   nz,.SINT8
 
-; ЕСЛИ РЕЖИМ СРАЖЕНИЯ
-; ПРОВЕРКА СУБЪЕКТА НА КОГО НАПАДАЛИ ДО
-; ТОГО КАК В НАС СТРЕЛЬНУЛИ
+; Если режим сражения
+; проверка субъекта на кого нападали до
+; того как в нас стрельнули
             ld   c,(ix+SUBJ)
             inc  c
-; ЕСЛИ НЕТ СУБЪЕКТА ТО ОПРЕДЕЛЕНИЕ
-; БУДУЩЕГО РЕЖИМА УЧИТЫВАЯ ОБЪЕКТ
+; Если нет субъекта то определение
+; будущего режима учитывая объект
             jr   z,.SINT6
 ;----------
-; ЕСТЬ СУБЪЕКТ НАПАДЕНИЯ
-; СЛУЧАЙНО МОЖНО ПЕРЕЙТИ В НАПАДЕНИЕ НА
-; НОВОГО ПРОТИВНИКА
+; Есть субъект нападения
+; случайно можно перейти в нападение на
+; нового противника
             ld   a,r
             cp   10
             jr   c,.SINT6
@@ -1217,9 +1217,9 @@ SINT5:
             cp   10
             jp   c,SINT3
 .SINT6
-; ОПРЕДЕЛИМ ВЕРОЯТНОСТЬ ПЕРЕХОДА В
-; НАПАДЕНИЕ ИЛИ ОБРАТНУЮ ВЕРОЯТНОСТЬ
-; ПЕРЕХОДА В ЗАЩИТУ ДЛЯ ОПР. ОБЪЕКТ
+; Определим вероятность перехода в
+; нападение или обратную вероятность
+; перехода в защиту для опр. объект
             ld   a,(ix+TYPE)
             and  #0F
             cp   T_POLICE
@@ -1245,10 +1245,10 @@ SINT5:
             ld   (ix+MODE),a
 
 SINT3:
-; ВЫЗОВ ПРОЦЕДУРЫ ОБРБОТКИ СОСТОЯНИЯ
-; СТИРАЕМ АКТИВНОСТЬ НА ОБЪЕКТ
+; Вызов процедуры обрботки состояния
+; стираем активность на объект
             ld   (ix+ACTN),0
-; БЕРЕМ РЕЖИМ СОСТОЯНИЯ
+; Берем режим состояния
             ld   a,(ix+MODE)
             sla  a
             ld   l,a

@@ -1,31 +1,29 @@
-; LOADER -- restored from awk2/LOADER.C (162 bytes, STORM tokenized)
-; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
-        JR LD1
+        jr   LD1
 FILE1
-        DB "VSPRIT.CC"
+        db   "VSPRIT.CC"
 FILE2
-        DB "S3D.C   C"
+        db   "S3D.C   C"
 LD1
-;ЗАГР. СТРАНИЦЫ
-        LD A,PGSPR
-        CALL PG
-        LD HL,FILE1
-        LD DE,23773
-        LD BC,9
-        LDIR
-        LD HL,#C000
-        LD C,#0E
-        LD A,3
-        CALL #3D13
-        LD A,PG3D
-        CALL PG
-        LD HL,FILE2
-        LD DE,23773
-        LD BC,9
-        LDIR
-        LD HL,#C000
-        LD C,#0E
-        LD A,3
-        CALL #3D13
-        LD A,PGNORM
-        CALL PG
+        ; Загр. страницы
+        ld   a,PGSPR
+        call PG
+        ld   hl,FILE1
+        ld   de,23773
+        ld   bc,9
+        ldir
+        ld   hl,#C000
+        ld   c,#0E
+        ld   a,3
+        call #3D13
+        ld   a,PG3D
+        call PG
+        ld   hl,FILE2
+        ld   de,23773
+        ld   bc,9
+        ldir
+        ld   hl,#C000
+        ld   c,#0E
+        ld   a,3
+        call #3D13
+        ld   a,PGNORM
+        call PG

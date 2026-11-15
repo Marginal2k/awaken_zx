@@ -67,7 +67,49 @@ About 12 KB of strings plus 5.9 KB of tok files.  Texts outside the station: fli
 
 ## 4. Contracts, missions, news, subscriber
 
-(pending)
+**Short answer: the contract/mission/news/subscriber *interfaces* exist, but there are no missions, no story contracts and no dialogues in the code or data.  All of it is stubs; the only working "rules" are the trade/police rules in the script.**  Line numbers: `work/tech/u8/src_station_*.asm` (= `src/station/*`) unless marked.
+
+### 4.1 Contracts ("Контракт", `WMISS1/WMISS2`)
+* Two windows exist ("список подписанных контрактов" / "список предлагаемых контрактов", per `help.tok` chapter 8): `WMISS1`, `WMISS2` (OBR.asm:1265-1349), opened by button `BMISS` (OBR2.asm:~780).  Both draw only the placeholder text `Txt` = "Это есть прототип интерфейса" (OBR.asm:1285-1288, 1324-1330).  The click handlers (`F_S4`, `F_S5`, `WMISS1C`) are a bare `ret`.  The header text `TMISS1` ("Доставка грузов ко времени / Звезда / Планета / Вес / Время / Цена", DATAT.asm:745) is referenced by no code.  VERIFIED (grep `TMISS1`).
+* Data layout is planned, in the state record: `JLIST` (DATA_M.asm:679) = 160 bytes = 10 offers x 16 bytes: destination system 2 words (4 B), deadline 2 words (4 B), time of generation 2 words (4 B), reward word, weight byte (bit 7 = "taken, cannot be refused"), planet byte.  `ORDER` (DATA_M.asm:901) = 4 signed contracts x 16 bytes in the same layout, first byte `#FF` = no order.  **No code reads or writes `JLIST`/`ORDER`** (grep), so contracts are neither generated nor accepted nor delivered; flight has only the buffers (3DTABS.asm:355 `ORDER`) and nothing checks delivery.  Operations 12/13 ("контракт" buy/sell) are listed in the `OPERATION` comment (DATA_M.asm:742-750) but the script has no block for them.  VERIFIED.
+* Design intent (INFERRED from the layout and the TMISS1 header): procedurally generated *cargo delivery* contracts "deliver N tonnes to star/planet by time T for money M", 10 offered + 4 accepted, like Elite's "cargo delivery" with a deadline.  Time unit = the game clock `TIME` (day word, hour, minute; starts day #0122 = 290, 10:10).
+
+### 4.2 News ("Новости", `WNEWS_`)
+* `WNEWS_` (OBR.asm:1048) prints item `NEWS` of the list `TNEWS` (DATAT.asm:396): index 0 empty, 1 "Новостей нет.", 2 "Внимание! На Галактическую Федерацию напала враждебная расса инопланетян! Призываем всех патриотов на защиту своего государства!".  `NEWS` (DATA_M.asm:897) = `db 1,0 / dw 0,0 / db 0` = message number (starts 1), "hour until which it is held", system coordinates and planet where the event happens (the comment says news is tied to a system + planet).  **Nothing ever writes `NEWS`** (station and flight grep), so only "Новостей нет." can ever be seen; the alien-invasion text is unreachable.  VERIFIED.
+* Design intent (INFERRED): news items driven by the script/events (`t_HAPP` = 7 event flags, `_HAPPAND`) with a system+planet attached.
+
+### 4.3 Subscribers ("Абонент", `WABON_`, `WFOTO_`)
+* 16 named subscribers (`NABONS`, DATAT.asm:377: "Петр Грек - Миир", "Алексей Ворсин - Пика", "Николай Громов - Сули", "Борис Симонов - Лолэ", "Сергей Еремеев - Редиво", "Евгений Покровский - Каалис", "Григорий Опорский - Амиго", "Дмитрий Смирнов - Руокр", "Максим Руслов - Ювегацз", "Вадим Хлопотин - Пикасо", "Виталий Бордов - Тера", "Владимир Земерский - Аргона", "Денис Типовский - Цоки", "Павел Ворожин - Резера", "Кирил Риманов - Рубина", "Иван Ефремов - Ипраби"; person + home star; names look like real people, probably the author's friends/team).  `ABONS` (DATA_M.asm:952) = availability byte per person (1 = hidden, 2 = visible, 0 = end) for up to `PKOL` = 50 people; initially persons 1 and 2 are visible.  `PSTARS` (DATA_M.asm:943) = coordinates of the star where each person lives (map word + in-map word): only person 1 is filled (`#4B39,#0006`), the other 49 are zero.  The map button "Абонент" centres the map on the next visible person's star (OBR2.asm:650-680, `BNABO`); the Абонент window lists visible persons (`WABON_`, OBR.asm:1108-1141) and clicking one opens a photo window `WFOTO_` (OBR.asm:1185-1226) that blits 128 bytes per portrait from `FOTOS` = #E700 of bank #17.  **That address is inside the help text (`THELP` = #E3E2..#F220, build/station.sym), so there are no portraits: the window shows garbage/help text bytes.**  VERIFIED (sym addresses).
+* There is no "call" action: the button help says "Вызов абонента с последующей интерактивной связью", `help.tok` chapter 6 says "Окна: список абонентов, досье на абонента, фото абонента. Кнопка: прервать связь" (dossier window + photo window + hang-up button), but the handlers `F_S1`, `F_S15`, `WABONC` are bare `ret` and no dossier text exists.  VERIFIED.
+
+### 4.4 The script "Paradox" and the scenario-text design (`LANGUAGE.C` on awk6)
+* The disk awk6 also holds `LANGUAGE.C` (7934 B) = the **language manual** and `TREE.t` (494 B) = the layout of the dialogue tree (neither is built into the game; extracted to `work/extract/awk6/`, decoded copy `work/tech/language_doc.txt`).  Contents: operands/commands as in `LANG.asm` and the text-file format for scenario texts: identifiers ` _p1s1t1@` (**p**ersonage 1, **s**cene 1, **t**ext 1), text left-aligned, `@` = paragraph end, `#` = end of text; one text may belong to several persons/scenes (` _p1s1t2 _p2s2t3@`); the converter joins lines until `@` and produces `TXTES` (empty in the build).  Switch commands `+p1 / -v1` (person, question `v`, text `t`, mission `m`, event `e` on/off), `#` = **end of game**, `=g1+10` change, `?cond:then@else`, `{ }` blocks, `T` recount tonnage, `^` leave.  The sample texts in the manual are jokes ("И пошел Иоан туда куда его послали!", "Я не русский разведчик не трогайте меня").  `TREE.t`: "all persons start with #FF, all scenes with #FE" = byte tree: per person a marker, per scene a marker followed by the count of texts.  So the intended mission system: persons (50) with scenes (dialogue states) and texts, questions (20), missions (15) and events (7) as on/off flags driven by the script, with `#` as a possible game-ending command.  INFERRED from the manual; flag arrays `t_PERS` (50), `t_QUES` (20), `t_MISS` (15), `t_HAPP` (7) sit at TIME+#2AB, +#2DD, +#2F1, +#300 (DATA_M.asm:1034-1041, offsets from `build/station.sym`).
+* **These flags are outside the 512-byte state record** (`TIME` = #983B, record ends at #9A3B; `ABONS` = #9A41, `PERSONAJ` #9AE4, `t_PERS` #9AE6, `t_TREE` #9B42; `SETSD/SETGD` key settings #9A74/#9A8E).  Consequence: person availability, mission/event flags and the key settings are neither saved in `SAVEn` nor handed to the flight, so a mission system needs the record enlarged (the record is exactly 2 sectors; `PSTARS` already runs past the end: its last 6 bytes are outside).  VERIFIED (addresses); the consequence is INFERRED.
+
+### 4.5 What *does* run: the trade/police rules (`C_SCENAR.t`, executed by `PARADOX`)
+Run from `Dalee` (BODY.asm:30-50: operation 15 at every arrival/start, operation 16 for the parking fee) and from the trade windows (OBR.asm:1397/1675/2002, OBR2.asm:71).  `X` = the operation number (OPERATION, DATA_M.asm:742): 1/2 buy/sell ship, 3/4 skimmer, 5/6 ship equipment, 7/8 skimmer equipment, 9/10 goods, 11 sell all of a good, 15 start check, 16 parking fee.  Details (prices, tonnage, fines) are in section 3.
+**No flight code ever reads a mission**: delivery would need a check at docking (`RETSTAT`, section 6), which does not exist.  Completion checking in flight: none.  VERIFIED (grep of flight sources for `ORDER`/`JLIST`: only the data buffer).
+
+### 4.6 Flags and counters in the state record (offsets from TIME = #983B, `build/station.sym`)
+| offset | label | size | meaning |
+|--|--|--|--|
+| +000 | TIME | 4 | day word (start #0122), hour, minute (BCD? shown as 0122:10:10) |
+| +004/+008 | PLACE/PLANET | 4+4+1 | map tile word, in-map word, planet number where you are |
+| +009/+00D | WHERE/WPLANET | same | selected destination |
+| +00E/+00F | SHIP/SKIMMER | 1/1 | ship model 0..6 (start 6 = Карэн), skimmer #FF = none |
+| +010 | STATUS | 1 | police status (start 67 = wanted!) |
+| +011 | SUMM | 2 | credits (start 25000) |
+| +013 | TONN | 2 | carried tonnage / ship capacity (start 0,50) |
+| +015 | TWRI | 60 | 30 goods x (amount, buy price) |
+| +051 | WKRBI/FUEL | 34 | ship equipment counts (first two = fuel types), `#80` terminator |
+| +073 | WSKMI | 15 | skimmer equipment counts |
+| +082 | NEWS | 6 | news slot |
+| +089 | ORDER | 64 | 4 signed contracts |
+| +0C9 | SPEED/DALNO | 2+2 | speed of ship/skimmer; distance to selected star |
+| +0CD | MSTARS | 51 | 10 remembered stars x 5 bytes (map word, in-map word, planet) |
+| +100 | WAY | 51 | route stars |
+| +133 | WAYMASK | 11 | route line descriptor |
+| +13E | PSTARS | 200 | person star coordinates (cut at +200) |
 
 ## 5. Map
 

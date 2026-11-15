@@ -1,9 +1,19 @@
+;==============================================================================
+; SERV - драйвер мыши/клавиатуры (MOUSE DRIVER FROM ZX-FORMAT)
+;
+; KeyState: 7 флагов (огонь, вверх, вниз, вправо, влево, отмена, средняя). Ожидает
+; константы KUP/KDOWN... главной программы, которой нет на дисках. Фрагмент.
+;
+; Часть набора STORM (прототип Awaken 1997/98), не входит в основную игру. Подробности: docs/STORM.md,
+; таблица переименований меток: docs/STORM_LABELS.md. Собирается sjasmplus (см. make_*.asm).
+;==============================================================================
+
 ; MOUSE driver from zx-format
 Directz db   0                  ; Fire
-        db   0                  ; UP
-        db   0                  ; DOWN
-        db   0                  ; RIGHT
-        db   0                  ; LEFT
+        db   0                  ; Up
+        db   0                  ; Down
+        db   0                  ; Right
+        db   0                  ; Left
         db   0                  ; Cancel
         db   0                  ; Medium
 ; Устанавливаются b 1 если нажато
@@ -119,25 +129,25 @@ Servqa
         in   a,(c)
         and  h
         jr   nz,$+4
-        set  3,e                ; UP
+        set  3,e                ; Up
         ld   hl,(KDOWN)
         ld   b,l
         in   a,(c)
         and  h
         jr   nz,$+4
-        set  2,e                ; DOWN
+        set  2,e                ; Down
         ld   hl,(KLEFT)
         ld   b,l
         in   a,(c)
         and  h
         jr   nz,$+4
-        set  1,e                ; LEFT
+        set  1,e                ; Left
         ld   hl,(KRIGHT)
         ld   b,l
         in   a,(c)
         and  h
         jr   nz,$+4
-        set  0,e                ; RIGHT
+        set  0,e                ; Right
         ld   hl,(KFIRE)
         ld   b,l
         in   a,(c)
@@ -209,9 +219,9 @@ Cler
         ld   (hl),a
         ret
 Directj
-        db   0                  ; RIGHT
-        db   0                  ; LEFT
-        db   0                  ; DOWN
-        db   0                  ; UP
+        db   0                  ; Right
+        db   0                  ; Left
+        db   0                  ; Down
+        db   0                  ; Up
         db   0                  ; Fire
         db   0                  ; Cancel

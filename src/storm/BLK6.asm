@@ -1,566 +1,559 @@
-; BLK6 -- restored from awk2/BLK6.C (3393 bytes, STORM tokenized)
-; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
-;И3MEHЯEM KOOPДИHATЫ,3ABИ. ДBИЖEHИЯ
+; И3меняем координаты,3ави. движения
 Precord
-        LD (Stk1+1),SP
-        LD L,(IX+Indi)
-        LD H,L97
-        LD SP,HL
-        POP HL
-        INC HL
-        LD B,(HL)
-        RES 7,B
-        LD A,#06
-        SUB B
-        LD HL,200
-        LD ($+4),A
-        JR $
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        LD A,Spacebd
-        SUB H
-        LD B,A
-        LD A,IXL
-        LD L,A
-        LD A,IXH
-        LD H,A
-        LD SP,HL
-Stpx_   LD HL,0
-Stpx    LD DE,0
-        AND A
-        SBC HL,DE
-        POP DE
-        LD A,D
-        CP #80
-        JR Z,Stk1
-        AND A
-        ADC HL,DE
-        JP PE,Exes
-        LD A,H
-        JP P,$+4
-        CPL
-        CP B
-        JP NC,Exes
-        PUSH HL
-Stpy_   LD HL,0
-Stpy    LD DE,0
-        AND A
-        SBC HL,DE
-        INC SP
-        INC SP
-        POP DE
-        AND A
-        ADC HL,DE
-        JP PE,Exes
-        LD A,H
-        JP P,$+4
-        CPL
-        CP B
-        JR NC,Exes
-        PUSH HL
-Stpz_   LD HL,0
-Stpz    LD DE,0
-        AND A
-        SBC HL,DE
-        INC SP
-        INC SP
-        POP DE
-        AND A
-        ADC HL,DE
-        JP PE,Exes
-        LD A,H
-        JP P,$+4
-        CPL
-        CP B
-        JR NC,Exes
-        PUSH HL
-Stk1    LD SP,0
-        LD A,(Nostat+1)
-        AND A
-        RET Z
-        LD D,#12
-        CALL Findobj
-        RET Z
-;HAXOДИM CAMУЮ БOЛЬШУЮ KOOPДИHATУ CTAHЦ
-;ИИ
-        LD A,(IY+5)
-        AND A
-        JP P,$+4
-        CPL
-        LD B,A
-        LD A,(IY+3)
-        AND A
-        JP P,$+4
-        CPL
-        LD C,A
-        LD A,(IY+1)
-        AND A
-        JP P,$+4
-        CPL
-        CP C
-        JR NC,$+3
-        LD A,C
-        CP B
-        JR NC,$+3
-        LD A,B
-        CP Laungh
-        JR C,Messt ;ДAЛEKO EЩE
-        LD A,#80
-        LD (Messt+1),A
-        RET
-Messt   LD A,0
-        AND A
-        RET P
-        LD A,24 ;PEЖИM CTЫKOBKИ CO
-;CTAHЦИEЙ
-        LD (Messt+1),A
-        JP Mesags
+        ld   (Stk1+1),sp
+        ld   l,(ix+Indi)
+        ld   h,L97
+        ld   sp,hl
+        pop  hl
+        inc  hl
+        ld   b,(hl)
+        res  7,b
+        ld   a,#06
+        sub  b
+        ld   hl,200
+        ld   ($+4),a
+        jr   $
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        ld   a,Spacebd
+        sub  h
+        ld   b,a
+        ld   a,ixl
+        ld   l,a
+        ld   a,ixh
+        ld   h,a
+        ld   sp,hl
+Stpx_   ld   hl,0
+Stpx    ld   de,0
+        and  a
+        sbc  hl,de
+        pop  de
+        ld   a,d
+        cp   #80
+        jr   z,Stk1
+        and  a
+        adc  hl,de
+        jp   pe,Exes
+        ld   a,h
+        jp   p,$+4
+        cpl
+        cp   b
+        jp   nc,Exes
+        push hl
+Stpy_   ld   hl,0
+Stpy    ld   de,0
+        and  a
+        sbc  hl,de
+        inc  sp
+        inc  sp
+        pop  de
+        and  a
+        adc  hl,de
+        jp   pe,Exes
+        ld   a,h
+        jp   p,$+4
+        cpl
+        cp   b
+        jr   nc,Exes
+        push hl
+Stpz_   ld   hl,0
+Stpz    ld   de,0
+        and  a
+        sbc  hl,de
+        inc  sp
+        inc  sp
+        pop  de
+        and  a
+        adc  hl,de
+        jp   pe,Exes
+        ld   a,h
+        jp   p,$+4
+        cpl
+        cp   b
+        jr   nc,Exes
+        push hl
+Stk1    ld   sp,0
+        ld   a,(Nostat+1)
+        and  a
+        ret  z
+        ld   d,#12
+        call Findobj
+        ret  z
+        ; Находим самую большую координату станц
+        ; Ии
+        ld   a,(iy+5)
+        and  a
+        jp   p,$+4
+        cpl
+        ld   b,a
+        ld   a,(iy+3)
+        and  a
+        jp   p,$+4
+        cpl
+        ld   c,a
+        ld   a,(iy+1)
+        and  a
+        jp   p,$+4
+        cpl
+        cp   c
+        jr   nc,$+3
+        ld   a,c
+        cp   b
+        jr   nc,$+3
+        ld   a,b
+        cp   Laungh
+        jr   c,Messt            ; Далеко еще
+        ld   a,#80
+        ld   (Messt+1),a
+        ret
+Messt   ld   a,0
+        and  a
+        ret  p
+        ld   a,24               ; Режим стыковки со
+        ; Станцией
+        ld   (Messt+1),a
+        jp   Mesags
 Exes
-;ECЛИ KOPAБЛЬ 3A ГPAHИЦEЙ
-        LD (IX+0),0
-        LD (IX+1),#80
-        LD SP,(Stk1+1)
-        LD A,(IX+Type)
-        CP #12
-        RET NZ
-;ECЛИ CTAHЦИЯ 3A ГPAHИЦEЙ
-        XOR A
-        LD (Statgen+1),A
-        LD (Nostat+1),A
-        LD (Nostat2+1),A
-        LD IY,Carsb-Olen
-        LD BC,Olen
-Exe2
-        CALL Findob
-        RET Z
-        LD A,(IY+Type)
-        CP #12
-        JR NZ,Exe2
-        LD (IY+1),#80
-        LD (IY),0
-        JP Exe2
+        ; Если корабль 3a границей
+        ld   (ix+0),0
+        ld   (ix+1),#80
+        ld   sp,(Stk1+1)
+        ld   a,(ix+Type)
+        cp   #12
+        ret  nz
+        ; Если станция 3a границей
+        xor  a
+        ld   (Statgen+1),a
+        ld   (Nostat+1),a
+        ld   (Nostat2+1),a
+        ld   iy,Carsb-Olen
+        ld   bc,Olen
+.Exe2
+        call Findob
+        ret  z
+        ld   a,(iy+Type)
+        cp   #12
+        jr   nz,.Exe2
+        ld   (iy+1),#80
+        ld   (iy),0
+        jp   .Exe2
 
-
-
-;----------------------
-;ПOИCKOBИKИ ЧEГO TO
-;----------------------
+; ----------------------
+; Поисковики чего то
+; ----------------------
 
 Findob
-;HAЙTИ KAKOЙ HИБУДЬ OБЪEKT
-;IY-VECTOR-OLEN
-;BC-OLEN
-;FZ-ON NOT FOUND
-        ADD IY,BC
-        LD A,(IY+1)
-        CP #80
-        RET NZ
-        LD A,(IY+0)
-        CP #80
-        JP NZ,Findob
-        RET
+        ; Найти какой нибудь объект
+        ; Iy-vector-olen
+        ; Bc-olen
+        ; Fz-on not found
+        add  iy,bc
+        ld   a,(iy+1)
+        cp   #80
+        ret  nz
+        ld   a,(iy+0)
+        cp   #80
+        jp   nz,Findob
+        ret
 Fndpece
-;HAЙTИ MИPHOГO
-        CALL Rndl3
-        LD A,L
-Pwnpi   CP #A0
-        LD A,Splayer
-        INC A
-        DEC A
-        RET NC
-        LD IY,Carsb-Olen
-        LD BC,Olen
-Fp2l
-        CALL Findob
-        RET Z
-        LD E,(IY+Type)
-        LD A,E
-        AND A
-        JR Z,Fp2l
-        CP #12
-        JR Z,$+6
-        CP #10
-        JR NC,Fp2l
-        CALL Getindy
-        INC E ;CБPOC FZ
-        RET
+        ; Найти мирного
+        call Rndl3
+        ld   a,l
+Pwnpi   cp   #A0
+        ld   a,Splayer
+        inc  a
+        dec  a
+        ret  nc
+        ld   iy,Carsb-Olen
+        ld   bc,Olen
+.Fp2l
+        call Findob
+        ret  z
+        ld   e,(iy+Type)
+        ld   a,e
+        and  a
+        jr   z,.Fp2l
+        cp   #12
+        jr   z,$+6
+        cp   #10
+        jr   nc,.Fp2l
+        call Getindy
+        inc  e                  ; Сброс fz
+        ret
 Findall
-;HAЙTИ ALL WITHOUT  UFOS
-        LD IY,Carsb-Olen
-        LD BC,Olen
-Fp6l
-        CALL Findob
-        RET Z
-        LD E,(IY+Type)
-        LD A,E
-        CP 6
-        JR Z,Fp6l
-        CP 7
-        JR Z,Fp6l
-        CALL Getindy
-        INC E ;CБPOC FZ
-        RET
+        ; Найти all without  ufos
+        ld   iy,Carsb-Olen
+        ld   bc,Olen
+.Fp6l
+        call Findob
+        ret  z
+        ld   e,(iy+Type)
+        ld   a,e
+        cp   6
+        jr   z,.Fp6l
+        cp   7
+        jr   z,.Fp6l
+        call Getindy
+        inc  e                  ; Сброс fz
+        ret
 Findufo
-;HAЙTИ UFO
-        LD IY,Carsb-Olen
-        LD BC,Olen
-Fp3l
-        CALL Findob
-        RET Z
-        LD E,(IY+Type)
-        LD A,E
-        CP 6
-        JR Z,$+6
-        CP 7
-        JR NZ,Fp3l
-        CALL Getindy
-        INC E
-        RET
+        ; Найти ufo
+        ld   iy,Carsb-Olen
+        ld   bc,Olen
+.Fp3l
+        call Findob
+        ret  z
+        ld   e,(iy+Type)
+        ld   a,e
+        cp   6
+        jr   z,$+6
+        cp   7
+        jr   nz,.Fp3l
+        call Getindy
+        inc  e
+        ret
 Fndprat
-;HAЙTИ ПИPATA
-        LD IY,Carsb-Olen
-        LD BC,Olen
-Fp2
-        CALL Findob
-        RET Z
-        LD E,(IY+Type)
-        LD A,E
-        CP 5
-        JR Z,$+5
-        AND A
-        JR NZ,Fp2
-        CALL Getindy
-        INC E
-        RET
-;---------------------------------
+        ; Найти пирата
+        ld   iy,Carsb-Olen
+        ld   bc,Olen
+.Fp2
+        call Findob
+        ret  z
+        ld   e,(iy+Type)
+        ld   a,e
+        cp   5
+        jr   z,$+5
+        and  a
+        jr   nz,.Fp2
+        call Getindy
+        inc  e
+        ret
+; ---------------------------------
 
-
-;testsubj
-;;TECTИPOBAHИE ПEPCOHAЖA HA ПPEДMET EГO
-;УЖE ИCЧE3HOBEHИЯ
-;ИЛИ ECЛИ ЭTO ИГPOK
-        LD A,(IX+Subj)
-        INC A
-        JR NZ,Ts1
-        LD HL,+(Olen*Splayer)+Carsb
-        JR Ts2
-Ts1
-        DEC A
-        CALL Getadr
-Ts2
-        LD (Opone+2),HL
-        INC L
-        LD A,(HL)
-        CP #80
-        RET Z
-        LD L,(IX+0)
-        LD H,(IX+1)
-        LD (Ddx+1),HL
-        LD L,(IX+2)
-        LD H,(IX+3)
-        LD (Ddy+1),HL
-        LD L,(IX+4)
-        LD H,(IX+5)
-        LD (Ddz+1),HL
-        RET
-Opone   LD IY,0
-        LD A,(IX+Subj)
-        CP Splayer
-        JR NZ,Fg2
-        LD BC,0
-        LD (Tx+1),BC
-        LD (Dx+1),BC
-        LD (Dy+1),BC
-        LD (Dz_+1),BC
-        LD HL,#FFB0
-        LD (Ty+1),HL
-        LD DE,0-1
-        LD (Tz+1),DE
-        LD IY,Player
-        AND A
-        RET
-Fg2
-        LD A,(IY+(Px+1))
-        CP #80
-        SCF
-        RET Z
-        AND A
-        LD L,(IY+0)
-        LD H,(IY+1)
-        LD (Dx+1),HL
-        LD L,(IY+2)
-        LD H,(IY+3)
-        LD (Dy+1),HL
-        LD L,(IY+4)
-        LD H,(IY+5)
-        LD (Dz_+1),HL
-        LD C,(IY+Px)
-        LD B,A
-        LD (Tx+1),BC
-        LD L,(IY+Py)
-        LD H,(IY+(Py+1))
-        LD (Ty+1),HL
-        LD E,(IY+Pz)
-        LD D,(IY+(Pz+1))
-        LD (Tz+1),DE
-        RET
+        ; testsubj
+        ; ;Тестирование персонажа на предмет его
+        ; Уже исче3новения
+        ; Или если это игрок
+        ld   a,(ix+Subj)
+        inc  a
+        jr   nz,.Ts1
+        ld   hl,+(Olen*Splayer)+Carsb
+        jr   .Ts2
+.Ts1
+        dec  a
+        call Getadr
+.Ts2
+        ld   (Opone+2),hl
+        inc  l
+        ld   a,(hl)
+        cp   #80
+        ret  z
+        ld   l,(ix+0)
+        ld   h,(ix+1)
+        ld   (Ddx+1),hl
+        ld   l,(ix+2)
+        ld   h,(ix+3)
+        ld   (Ddy+1),hl
+        ld   l,(ix+4)
+        ld   h,(ix+5)
+        ld   (Ddz+1),hl
+        ret
+Opone   ld   iy,0
+        ld   a,(ix+Subj)
+        cp   Splayer
+        jr   nz,.Fg2
+        ld   bc,0
+        ld   (Tx+1),bc
+        ld   (Dx+1),bc
+        ld   (Dy+1),bc
+        ld   (Dz_+1),bc
+        ld   hl,#FFB0
+        ld   (Ty+1),hl
+        ld   de,0-1
+        ld   (Tz+1),de
+        ld   iy,Player
+        and  a
+        ret
+.Fg2
+        ld   a,(iy+(Px+1))
+        cp   #80
+        scf
+        ret  z
+        and  a
+        ld   l,(iy+0)
+        ld   h,(iy+1)
+        ld   (Dx+1),hl
+        ld   l,(iy+2)
+        ld   h,(iy+3)
+        ld   (Dy+1),hl
+        ld   l,(iy+4)
+        ld   h,(iy+5)
+        ld   (Dz_+1),hl
+        ld   c,(iy+Px)
+        ld   b,a
+        ld   (Tx+1),bc
+        ld   l,(iy+Py)
+        ld   h,(iy+(Py+1))
+        ld   (Ty+1),hl
+        ld   e,(iy+Pz)
+        ld   d,(iy+(Pz+1))
+        ld   (Tz+1),de
+        ret
 Fireing
-;OPГAHИ3AЦИЯ BЫCTPEЛA ПEPCOHAЖA B KOГO
-;ЛИБO
-;BЫBOД ЛУЧA, ИHИЦИAЛИ3. ДAHHЫX SUBJ & A
-;CTN
-        LD A,(IX+(Px+1))
-        CP #80
-        SCF
-        RET Z
-        LD B,A
-        LD C,(IX+Px)
-        LD L,(IX+Py)
-        LD H,(IX+(Py+1))
-        LD E,(IX+Pz)
-        LD D,(IX+(Pz+1))
-        EXX
-        CALL Opone
-        RET C
-        LD A,R
-Pwppi   CP #4A
-        JR C,Fg1
-        SET 0,(IY+Actn) ;FIRE
-        PUSH HL
-        PUSH IX
-        POP HL
-        CALL Getind
-        POP HL
-        LD (IY+Subj),A
+        ; Органи3ация выстрела персонажа b кого
+        ; Либо
+        ; Вывод луча, инициали3. данных subj & a
+        ; Ctn
+        ld   a,(ix+(Px+1))
+        cp   #80
+        scf
+        ret  z
+        ld   b,a
+        ld   c,(ix+Px)
+        ld   l,(ix+Py)
+        ld   h,(ix+(Py+1))
+        ld   e,(ix+Pz)
+        ld   d,(ix+(Pz+1))
+        exx
+        call Opone
+        ret  c
+        ld   a,r
+Pwppi   cp   #4A
+        jr   c,Fg1
+        set  0,(iy+Actn)        ; Fire
+        push hl
+        push ix
+        pop  hl
+        call Getind
+        pop  hl
+        ld   (iy+Subj),a
 Fg1
-        LD A,D
-        EXX
-        AND D
-        RET M
-        PUSH HL
-        LD HL,(Tx+1)
-        AND A
-        SBC HL,BC
-        POP HL
-        SCF
-        RET PE
-        PUSH HL
-        LD HL,(Tz+1)
-        AND A
-        SBC HL,DE
-        POP HL
-        SCF
-        RET PE
-        PUSH HL
-        PUSH DE
-        LD DE,(Ty+1)
-        AND A
-        SBC HL,DE
-        POP DE
-        POP HL
-        SCF
-        RET PE
-        PUSH IX
-        CALL Outline
-        POP IX
-        AND A
-        RET
-
+        ld   a,d
+        exx
+        and  d
+        ret  m
+        push hl
+        ld   hl,(Tx+1)
+        and  a
+        sbc  hl,bc
+        pop  hl
+        scf
+        ret  pe
+        push hl
+        ld   hl,(Tz+1)
+        and  a
+        sbc  hl,de
+        pop  hl
+        scf
+        ret  pe
+        push hl
+        push de
+        ld   de,(Ty+1)
+        and  a
+        sbc  hl,de
+        pop  de
+        pop  hl
+        scf
+        ret  pe
+        push ix
+        call Outline
+        pop  ix
+        and  a
+        ret
 
 Checkal
-;ПPOBEPKИ HA BEPOЯTHOCTЬ ПOДБИPAHИЯ ГPУ
-;3A, ФOPCAЖA, OБЛETA
-;FC-ON LET GO GOSIMPLY
-        CALL Rndk3
-        LD A,L
-        CP Vfrs ;BEPOЯTHOCTЬ ФOPCAЖA
-        JR C,Fs3
-        LD A,(IX+Mode)
-        LD (IX+Omode),A
-        LD (IX+Mode),19 ;FORSAGE
-Fs3
-        LD A,(IX+(Px+1))
-        AND A
-        JP P,$+4
-        CPL
-;MИHИM. PACT. ПO X,Y B ПУTИ ПPOЛETA, ДЛ
-;Я OБЛETA
-        CP Dlrazi
-        RET NC
-        LD A,(IX+(Py+1))
-        AND A
-        JP P,$+4
-        CPL
-        CP Dlrazi
-        RET NC
-        LD A,(IX+(Pz+1))
-        AND A
-        JP P,$+4
-        CPL
-        CP Dlraz ;ДAЛЬHOCTЬ OT ИГPO
-;KA ДЛЯ OБЛETA
-        RET NC
-        LD A,(IX+Mode)
-        LD (IX+Omode),A
-        LD (IX+Mode),20 ;OБЛET
-        LD (IX+Powor),Timeobl
-        RET
-
+        ; Проверки на вероятность подбирания гру
+        ; 3A, форсажа, облета
+        ; Fc-on let go gosimply
+        call Rndk3
+        ld   a,l
+        cp   Vfrs               ; Вероятность форсажа
+        jr   c,.Fs3
+        ld   a,(ix+Mode)
+        ld   (ix+Omode),a
+        ld   (ix+Mode),19       ; Forsage
+.Fs3
+        ld   a,(ix+(Px+1))
+        and  a
+        jp   p,$+4
+        cpl
+        ; Миним. раст. по X,Y b пути пролета, дл
+        ; Я облета
+        cp   Dlrazi
+        ret  nc
+        ld   a,(ix+(Py+1))
+        and  a
+        jp   p,$+4
+        cpl
+        cp   Dlrazi
+        ret  nc
+        ld   a,(ix+(Pz+1))
+        and  a
+        jp   p,$+4
+        cpl
+        cp   Dlraz              ; Дальность от игро
+        ; Ка для облета
+        ret  nc
+        ld   a,(ix+Mode)
+        ld   (ix+Omode),a
+        ld   (ix+Mode),20       ; Облет
+        ld   (ix+Powor),Timeobl
+        ret
 
 Rnd
-        EXX
-        LD HL,Sdo
-        JP Rndo
+        exx
+        ld   hl,Sdo
+        jp   Rndo
 Rndw
-        EXX
-        LD HL,Sdw
-        JP Rndo
+        exx
+        ld   hl,Sdw
+        jp   Rndo
 Rndk1
-        EXX
-        LD HL,Sdk1
-        JP Rndo
+        exx
+        ld   hl,Sdk1
+        jp   Rndo
 Rndk2
-        EXX
-        LD HL,Sdk2
-        JP Rndo
+        exx
+        ld   hl,Sdk2
+        jp   Rndo
 Rndk3
-        EXX
-        LD HL,Sdk3
-        JP Rndo
+        exx
+        ld   hl,Sdk3
+        jp   Rndo
 Rndt2
-        EXX
-        LD HL,Sdt2
-        JP Rndo
+        exx
+        ld   hl,Sdt2
+        jp   Rndo
 Rndt1
-        EXX
-        LD HL,Sdt1
-        JP Rndo
+        exx
+        ld   hl,Sdt1
+        jp   Rndo
 Rndl1
-        EXX
-        LD HL,Sdl1
-        JP Rndo
+        exx
+        ld   hl,Sdl1
+        jp   Rndo
 Rndl2
-        EXX
-        LD HL,Sdl2
-        JP Rndo
+        exx
+        ld   hl,Sdl2
+        jp   Rndo
 Rndl3
-        EXX
-        LD HL,Sdl3
-        JP Rndo
+        exx
+        ld   hl,Sdl3
+        jp   Rndo
 Rndl4
-        EXX
-        LD HL,Sdl4
-        JP Rndo
+        exx
+        ld   hl,Sdl4
+        jp   Rndo
 Rndl5
-        EXX
-        LD HL,Sdl5
-        JP Rndo
+        exx
+        ld   hl,Sdl5
+        jp   Rndo
 Rndl7
-        EXX
-        LD HL,Sdl7
-        JP Rndo
+        exx
+        ld   hl,Sdl7
+        jp   Rndo
 Rndl8
-        EXX
-        LD HL,Sdl8
-        JP Rndo
+        exx
+        ld   hl,Sdl8
+        jp   Rndo
 Rndl9
-        EXX
-        LD HL,Sdl9
-        JP Rndo
+        exx
+        ld   hl,Sdl9
+        jp   Rndo
 Sdw
-;ГEHEPATOP KAKOГO ЛAHДШAФTA
-        DB 7, 8, 0
+        ; Генератор какого ландшафта
+        db   7, 8, 0
 Sdo
-        DB 101, 0, 0
+        db   101, 0, 0
 Sdl1
-        DB 9, 0, 0
+        db   9, 0, 0
 Sdl2
-        DB 231, 0, 0
+        db   231, 0, 0
 Sdl3
-        DB 71, 1, 0
+        db   71, 1, 0
 Sdl4
-        DB 10, 0, 0
+        db   10, 0, 0
 Sdl5
-        DB 77, 1, 0
+        db   77, 1, 0
 Sdl7
-        DB 200, 0, 0
+        db   200, 0, 0
 Sdl8
-        DB 13, 0, 0
+        db   13, 0, 0
 Sdl9
-        DB 13, 3, 1
+        db   13, 3, 1
 Sdt2
-        DB 44, 0, 0
+        db   44, 0, 0
 Sdt1
-        DB 21, 0, 0
+        db   21, 0, 0
 Sdk1
-        DB 247, 0, 0
+        db   247, 0, 0
 Sdk2
-        DB 93, 0, 0
+        db   93, 0, 0
 Sdk3
-        DB 29, 0, 0
+        db   29, 0, 0
 Rndo
-;IN HL ADR OF SEED
-        LD C,(HL)
-        INC HL
-        LD B,(HL)
-        INC HL
-        LD A,(HL)
-        PUSH HL
-        LD E,A
-        LD H,B
-        LD L,C
-        DEC HL
-        ADD HL,HL
-        ADC A,0
-        ADD HL,HL
-        ADC A,0
-        ADD HL,HL
-        ADC A,0
-        ADD HL,HL
-        ADC A,0
-        ADD HL,HL
-        ADC A,0
-        ADD HL,HL
-        ADC A,0
-        EX DE,HL
-        LD H,B
-        LD L,C
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,DE
-        ADC A,0
-        ADD HL,BC
-        ADC A,0
-        ADD HL,BC
-        ADC A,0
-        ADD HL,BC
-        ADC A,0
-        LD D,H
-        LD E,L
-        LD L,H
-        LD H,A ;0
-        LD B,0
-        LD C,E
-        AND A
-        SBC HL,BC
-        SBC A,0
-        EX DE,HL
-        AND A
-        SBC HL,DE
-        SBC A,0
-        DEC HL
-        EX DE,HL
-        POP HL
-        LD (HL),A
-        DEC HL
-        LD (HL),D
-        DEC HL
-        LD (HL),E
-        PUSH DE
-        EXX
-        POP HL
-        RET
+        ; In hl adr of seed
+        ld   c,(hl)
+        inc  hl
+        ld   b,(hl)
+        inc  hl
+        ld   a,(hl)
+        push hl
+        ld   e,a
+        ld   h,b
+        ld   l,c
+        dec  hl
+        add  hl,hl
+        adc  a,0
+        add  hl,hl
+        adc  a,0
+        add  hl,hl
+        adc  a,0
+        add  hl,hl
+        adc  a,0
+        add  hl,hl
+        adc  a,0
+        add  hl,hl
+        adc  a,0
+        ex   de,hl
+        ld   h,b
+        ld   l,c
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,de
+        adc  a,0
+        add  hl,bc
+        adc  a,0
+        add  hl,bc
+        adc  a,0
+        add  hl,bc
+        adc  a,0
+        ld   d,h
+        ld   e,l
+        ld   l,h
+        ld   h,a                ; 0
+        ld   b,0
+        ld   c,e
+        and  a
+        sbc  hl,bc
+        sbc  a,0
+        ex   de,hl
+        and  a
+        sbc  hl,de
+        sbc  a,0
+        dec  hl
+        ex   de,hl
+        pop  hl
+        ld   (hl),a
+        dec  hl
+        ld   (hl),d
+        dec  hl
+        ld   (hl),e
+        push de
+        exx
+        pop  hl
+        ret

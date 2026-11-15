@@ -253,7 +253,7 @@ Run from `Dalee` (BODY.asm:30-50: operation 15 at every arrival/start, operation
 ### 4.6 Flags and counters in the state record (offsets from TIME = #983B, `build/station.sym`)
 | offset | label | size | meaning |
 |--|--|--|--|
-| +000 | TIME | 4 | day word (start #0122), hour, minute (BCD? shown as 0122:10:10) |
+| +000 | TIME | 4 | day word (start #0122), hour, minute - **BCD** (the legacy generator adds times with `daa`; shown as 0122:10:10) |
 | +004/+008 | PLACE/PLANET | 4+4+1 | map tile word, in-map word, planet number where you are |
 | +009/+00D | WHERE/WPLANET | same | selected destination |
 | +00E/+00F | SHIP/SKIMMER | 1/1 | ship model 0..6 (start 6 = Карэн), skimmer #FF = none |
@@ -456,7 +456,59 @@ Method: a script (`work/tech/unused.py`) lists labels that occur exactly once in
 
 ## 9. Gap list for a full game
 
-(pending)
+Status key: **exists** (works in the build), **stub** (UI/data present, logic missing), **missing** (nothing).  Size: S = hours, M = days, L = weeks of work for one person who knows the sources.  Ordered by importance for "a complete game".
+
+### 9.1 Gap list
+| # | feature | status | size | files affected | notes / what exists to build on |
+|--|--|--|--|--|--|
+| 1 | **Game goal and ending trigger** | missing | S-M | station `OBR2.asm` (BEXIT/map), new check in `BODY.asm`/`Dalee`, `FINALF` launch (`LaunchEnding`, `station.asm`) | decide the win condition (reach a star? finish missions? `#` command of the script?); the old demo compared `PLACE` with a destination word; ending program exists and works |
+| 2 | **Contracts / delivery missions** | stub (UI+data, no logic) | L | station `OBR.asm` (`WMISS1/2`), `OBR2.asm` (`BMISS`), `DATA_M.asm` (`JLIST`,`ORDER`), flight docking `RETSTAT`/station `Dalee` for the delivery check, state record | **reuse `src/legacy/station_unused/BLOCK2.asm`** (`INIMIS/NEWJ/OMLIN`: generator + list line printer already in the `JLIST` format); add accept/cancel handlers (script operations 12/13), a deadline check vs `TIME` (BCD), payment on arrival (`c += money`), a delivery rule: cargo of weight W must be in the hold; `TMISS1` header exists |
+| 3 | **Dialogues / subscribers / story missions** | stub (interpreter + flags + 16 names) | L | `LANG.asm` (`TXTES` empty), `OBR.asm` (`WABON_`, `WFOTO_`), `DATAT.asm` (`NABONS`), state record, new text file + converter (`PEREKOD`) | write the scenario texts (`_p1s1t1@ ... #`), a dialogue window handler (select answer -> run script -> `+m1`/`+e1`), portraits (`FOTOS`), persons' stars (`PSTARS`: only 1 of 50 filled); save the flag arrays (outside the 512-byte record now); needs a **story** (section 7: none exists) |
+| 4 | **News and events** | stub | M | `NEWS` record, `TNEWS`, script `_HAPPAND`/`t_HAPP` | write events (e.g. alien invasion of the Federation) triggered by time/missions; the text and the slot format (message, hour, system, planet) exist |
+| 5 | **Player death / game over** | missing (disabled) | S-M | `BODY.asm` (5 commented `jpc GAMEOVER`), `SLOWPRO.asm` `GAMEOVER`, `SETHJRET.asm` `RETSTT`/`NDATA` | un-comment and decide the consequence: return to the station (lose cargo/ship, fine), or new game with `NDATA`; make the shield a signed value (underflow now) |
+| 6 | **Docking rules** | stub | S | `3D-I.asm` `CRASH`, `SETCONTR`/`COMPUTE` | add speed/angle check, message `_DOCKING` exists; docking fee already in the script |
+| 7 | **Hyperjump consistency** | stub / inconsistent | S-M | station `OBR2.asm` `BPERE` (free teleport), flight `HIPER`, `FUEL`, `TIME` | choose one rule: station button only sets the destination, flight jump costs fuel and **game time** (days by distance); persist fuel; the map circle already shows the range |
+| 8 | **Start state** | two versions | S | `DATA_M.asm` defaults, `SETHJRET.asm` `NDATA`, `build.py` SAVE0..5 | pick (clean + 40000 cr + no ship) or (wanted + Карэн + 25000 cr); fix the ship-sale rule for illegal ships |
+| 9 | Ship **speed/tonnage effect in flight**, ship models | stub | M | `3DTABS.asm` (`SPEED`), `SETCONTR.asm`, `OBJGENER.asm` | `SPEED` byte exists in the record, flight's own acceleration constants probably do not read it (INFERRED, not traced); player ship model not shown (cockpit view) |
+| 10 | **Equipment effects** | partial | M | `SETCONTR.asm`, `BRAINPRO/BRAINDOP.asm` | check each of 33 + 14 items has an effect: lasers, shields, rockets, afterburner, anti-missile, free-flight, return, tractor, hyper-track exist; **droid (`DROPDROID` ret)**, **cyber fleet**, cryo module, landing module, identifiers, marshrutizer (route, partly on map), skimmer items have none |
+| 11 | **Skimmers and planet landing** | missing | L | new overlay from `src/storm/LAND.asm` (S3D + VSPRITE engines), station/flight launchers, `DATAM` tables | the landing prototype exists but needs RAM pages #11/#13 (used by CONTR/VOXAL in flight), see `docs/STORM.md` §5; skimmer purchase/equipment/viewer already exist |
+| 12 | Missing **spawn content**: cruisers, cyber killers, droid, UFO8, special stations (pirate base, prison, science, UFO bases, hyper gate) | stub (models only) | M | `OBJGENER.asm` (`KREYSERS`, `STATTB`), `BRAINPRO.asm` | wire the tables, add behaviours (`C_*` modes), stations as mission targets |
+| 13 | **System damage** | missing | M | flight COMPUTE messages exist | planned (`_SYSTEMOFF/_SYSTEMSOFF`) but unused |
+| 14 | **Persistence**: settings, flags, person availability, remembered stars | partial | S-M | `DATA_M.asm` (record is exactly 512 B), `disk.asm` (`SAVEn` are 2 sectors) | grow the record to 3-4 sectors, update `STATE_LEN`, flight `3DTABS`, `launcher.asm`, build.py; `SAVE0` = autosave slot? |
+| 15 | **Time**: advance on travel, day/night, deadlines | stub | S-M | `BODY.asm` clock, flight `TIMER` | BCD clock exists in both parts |
+| 16 | Real **Parking-fee expulsion** | stub | S | `BODY.asm` `WYDWOR` branch | currently credits go to 0 only |
+| 17 | **Music in flight, sound** | missing (flight beeper effects only) | M | `MUZ1`, flight pages | PT3 player + module only in station bank 3 |
+| 18 | **Portraits, backgrounds, panel art** | partial | M | assets | 16 backgrounds exist (`stscr`), portraits missing (G10), panel variants in `assets/unused` |
+| 19 | **Balance and testing** of the economy | partial | M | `DATA_M.asm`, `C_SCENAR.t` | prices, ship stats mismatch (section 2.1), ban probabilities, profit loops; playtest after all missions exist |
+| 20 | **Localisation** (EN) | missing | M | texts (section 10.1) | after the asset conversion the texts are files; 255-px windows limit lengths |
+| 21 | Tools: Hrust packer, model/sprite editors, converters (next phase) | missing | M | `tools/` | see section 10 |
+
+### 9.2 Constraints
+**Memory (free bytes, computed from `build/*.sym` and the file sizes; INFERRED where the runtime use of a page is not traced)**
+| part | region | used | free |
+|--|--|--|--|
+| station main image | #6000-#FEB1 (STATIONF.C 40625 B) | all | **~207 B** (ANALYSIS 14: fills #6000-#FF30) - the main image is full: any new code goes to a bank |
+| LANG (bank 6, #C000) | 4204 B used (`END_L` = #D06C) | | **~12.6 KB** free (`TXTES` is the planned place of scenario texts; the interpreter is here) |
+| KARTA (bank 1) | #C000-#FA00 incl. buffers | | ~1.5 KB |
+| D3D (bank 4, 3D viewer, `TISHIP/TISKIM`) | #C000-#FE6A | | **~150 B** (full) |
+| HELP (bank 7) | #DB00-#F221 | | ~3.5 KB (the `FOTOS` portrait area #E700 overlaps the help text: either move the help or put portraits elsewhere; 16 x 128 B = 2 KB) |
+| MUZ1 (bank 3) | #DB00-~#F2A6 | | ~3.4 KB (INFERRED; page 3 also holds `stscr` at #C000 while loading) |
+| flight main (#6000-#BFFF + bank 0 #C000-#F843) | ACTION.C 38979 B | | bank 0 ~1.9 KB; the main image is full |
+| flight CONTR bank 1 (CONTROL0 + CONTROL = 14.7 KB) | | | ~1.6 KB |
+| flight VOXAL bank 3 (VOXAL0 + VOXAL = 15 KB) | | | ~1.3 KB |
+| flight OBJ3D bank 4 (OBJECT3D 10580 B) | | | **~5.8 KB** (new ship/station models) |
+| state record | 512 B = 2 sectors (`STATE_LEN`) | all of `TIME`.. `PSTARS`' beginning | **0** (flags `ABONS`/`t_*`/settings are *outside*) |
+| total RAM | 128 KB is enough today (verified on Pentagon-128) | | |
+**Disk**: `build/awaken.trd` uses 1023 of 2544 sectors (docs/ANALYSIS 14.1) = **1521 sectors (~380 KB) free** on a TR-DOS disk; the 17 `assets/unused` files (~200 KB) would fit but are not loaded by any code.  A larger game needs more overlay files (each overlay is read to a bank by name: `disk.asm` macros; the TR-DOS catalogue holds at most 128 entries).
+**Code organisation**: every new feature should be an *overlay in a free bank* (LANG 12 KB, OBJ3D 5.8 KB, HELP 3.5 KB) because the main images are full; the contract generator (BLOCK2), dialogue handlers and scenario texts fit into the LANG bank.
+**Process**: all start/flight transitions go through the 512-byte hand-over buffer in screen RAM (`STATE_BUF` #4000): enlarging the record needs the screen-RAM budget (6912 B screen area) rechecked (a 1.5 KB record still fits).
+
+### 9.3 Suggested order for finishing
+1. Decide goal, start state, death rule (items 1, 5, 8): a day of design, hours of code.
+2. Contracts on top of `BLOCK2` (2) + time/fuel rules (7, 15) + save record growth (14): makes the game loop (trade -> contract -> fly -> dock -> pay) complete.
+3. Missions/dialogues/news (3, 4) once the story is written; portraits.
+4. Flight content (10, 12, 13), docking rules (6), balance (19).
+5. Optional: skimmers/landing from STORM (11), music (17), EN texts (20).
 
 ## 10. Asset inventory
 

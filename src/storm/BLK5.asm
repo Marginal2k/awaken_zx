@@ -1,65 +1,62 @@
-; BLK5 -- restored from awk2/BLK5.C (416 bytes, STORM tokenized)
-; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
 Korni
-;DE-CTAPШAЯ ЧACTЬ ЧИCЛA
-;RET A-MEAN
-        LD A,D
-        AND A
-        JR Z,Kor
-        LD L,A
-        LD H,high(Korn)
-        LD A,(HL)
-        INC H
-        LD C,A
-        CPL
-        EX AF,AF
-        LD B,#FF
-        INC BC
-        SLA C
-        RL B
-        DEC BC
-        LD A,(HL)
-        INC H
-        LD H,(HL)
-        LD L,A
-        EX AF,AF
-        ADD HL,DE
-        DUP 5
-            ADD HL,BC
-            RET NC
-            DEC BC
-            DEC BC
-            INC A
-        EDUP
-        ADD HL,BC
-        RET NC
-        INC A
-        RET
+        ; De-старшая часть числа
+        ; Ret a-MEAN
+        ld   a,d
+        and  a
+        jr   z,Kor
+        ld   l,a
+        ld   h,high(Korn)
+        ld   a,(hl)
+        inc  h
+        ld   c,a
+        cpl
+        ex   af,af
+        ld   b,#FF
+        inc  bc
+        sla  c
+        rl   b
+        dec  bc
+        ld   a,(hl)
+        inc  h
+        ld   h,(hl)
+        ld   l,a
+        ex   af,af
+        add  hl,de
+        dup  5
+        add  hl,bc
+        ret  nc
+        dec  bc
+        dec  bc
+        inc  a
+        edup
+        add  hl,bc
+        ret  nc
+        inc  a
+        ret
 Kor
-;ПOДCЧET KOPHЯ БE3 TAБЛИЦЫ, ДЛЯ MAЛEHЬK
-;ИX ДAHHЫX
-;DE-DATA <2116
-;A-MEAN
-        EX DE,HL
-        LD BC,0-1
-        XOR A
-        DUP 14
-            ADD HL,BC
-            RET NC
-            INC A
-            DEC BC
-            DEC BC
-        EDUP
-        ADD HL,BC
-        RET NC
-        INC A
-        RET
+        ; Подсчет корня бе3 таблицы, для маленьк
+        ; Их данных
+        ; De-data <2116
+        ; A-MEAN
+        ex   de,hl
+        ld   bc,0-1
+        xor  a
+        dup  14
+        add  hl,bc
+        ret  nc
+        inc  a
+        dec  bc
+        dec  bc
+        edup
+        add  hl,bc
+        ret  nc
+        inc  a
+        ret
 
-
-        ORG (($+255)&#FF00)
-;TAБЛИЦA ДЛЯ ПOДCEЧETA KOPHЯ
-;ПEPBЫЙ БAЙT KOPEHЬ И3 "kpУГЛoГo" ЧИCЛA
-;BTOP. CЛOBO ИHBEPTHУTOE ПO 3HAKУ ЧИCЛO
-; KAK OCTATOK
+        org  (($+255)&#FF00)
+; Таблица для подсечета корня
+; Первый байт корень и3 "круглого" числа
+; Втор. слово инвертнутое по 3наку число
+; Как остаток
 Korn
-        INCBIN "assets/korni.bin"
+        incbin "assets/korni.bin"

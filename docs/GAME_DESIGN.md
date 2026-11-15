@@ -113,7 +113,41 @@ Run from `Dalee` (BODY.asm:30-50: operation 15 at every arrival/start, operation
 
 ## 5. Map
 
-(pending)
+**The galaxy is procedural: there is no star table.**  Every star, its name, planets, government, economy and the goods prices are computed from the 4 coordinate bytes of the star by small PRNGs.  Line numbers: `work/tech/u8/src_station_*.asm`.
+
+### 5.1 Coordinates and map generation
+* A star is addressed by two words: `PLACE`/`WHERE` = "map" word (`h` = x tile, `l` = y tile; start `#4B38` = tile 75,56) and "in-map" word (`#4AF3`: y = #4A, x = #F3 position inside the tile) plus a planet number (`PLANET`/`WPLANET`, 0 = lowest planet).  (DATA_M.asm:771-783; `WHERE` default in flight `#4B38,#4AF4`, 3DTABS.asm:204.)  Tile coordinates are bytes, so the grid is at most 256 x 256 tiles; INFERRED: ~128 stars per tile, i.e. millions of systems, only the area around 75,56 is "inhabited" (see 5.3).
+* `GENKART` (KARTA.asm:653) fills four 256-byte buffers `KR1..KR4` (CIRCMATH.asm:1724) - the 2 x 2 tiles around the current view `KCORD` - with the PRNG `RNDI/RNX` (KARTA.asm:683-720) seeded from the tile coordinates; each buffer is a list of (x,y) star positions.  `MBUFM` (KARTA.asm:787) clips them to the window and builds the table of visible stars `DOTB`; `STARCH` (KARTA.asm:521) picks the star nearest to the cursor (`RAST` distance), then `OPRPLAN` finds the planet number from the remembered-stars list `MSTARS` (10 x 5 bytes; unknown stars -> planet 0).  Star markers are 6 small sprites in KARTA.asm:1615-2113 (`SPRP`.. `SPLUS SMINI STREUG SNULL SKREST SQUADR`: plus, mini, triangle, null, cross, square) used for memorised stars / route / persons; `ways.d` (702 B, `PWAYS`) = the dotted route-line patterns.  VERIFIED.
+* Map windows: galaxy map (`WMAP`, OBR.asm:768), enlarged map `WMAP_`, system map with rotating planets (`WPLAN`, OBR.asm:2650), info window `WINFS`.  Buttons: `Память` (remember a star: 10 slots), `Маршрут` (route, up to 10 stars `WAY`), `Стереть маршрут`, `Листать звезды`, `Позиция`, `Центр`, `Абонент` (centre on the next subscriber's star), `Перелет`.  The big circle on the map = jump range from the fuel (`FUEL`: radius = fuel/2 low byte, KARTA.asm:28-35).  VERIFIED.
+
+### 5.2 Names
+* Star name = Greek-letter word (16 of `NAMTAB`: Алфа, Бета, Гамма, Дельта, Эпсилон, Дзета, Эта, Тета, Иота, Каппа, Ламбда, Сигма, Омега, Кси, Пи, Пси; CIRCMATH.asm:1472-1490, bytes are CP866 codes) + "-" + a number 0..255 + "/" + a number 0..255 + "-" + a letter А..П: e.g. "Алфа-123/45-В", computed from the 4 coordinate bytes (`NAME`, CIRCMATH.asm:1378, result in `TNAME`).  Planet name = letter + "-" + number (`PNTPLAN`, KARTA.asm:1406).  VERIFIED.
+* The subscribers' home star names in `NABONS` ("Миир", "Пика", "Рубина", ...) are *hand-written* words that the generator can never produce: either each person's home star was meant to have a fixed name override, or the names are decoration (INFERRED).
+
+### 5.3 System data (`PINFO_`, KARTA.asm:1496; same code in flight, SETHJRET.asm:663)
+From the seed (`RNDD` PRNG, DOPPROC.asm:1500ff) for each star: number of planets = ((x^y^...)&7) - 1 clamped at 0 (so 0..6; 0 = "Планет нет"), for each planet one byte `%SSUUUUTT`: government `SS` (0..2 `STROY` Демократия, Диктатура, Анархия; 3 = Необитаемая), level `UUUU`+1 = 1..16 ("Уровень", also index of the station model and the docking fee), economy type `TT` (0..3 `TYPE`: агро, культурная, технологическая, общая).  The state (`GOSTA`, CIRCMATH.asm:1498) is a function of the tile rectangle:
+| tiles (x, y) | state |
+|--|--|
+| x 74..77, y 54..57 | 0 Галактическая Федерация (the start tile 75,56 is inside) |
+| x 71..73, y 52..55 | Содружество Миров (code comment "СОДР. МИРОВ") |
+| x 71..73, y 56..58 | Конфедерация Первых |
+| everything else | 3 Свободные Земли ("Неизвестный" government: `h` = 4, no data) |
+(The numbers in the code comments of `GOSTA` 1 = Конфедерация / 2 = Содружество contradict the code, which returns 1 for the x71..73,y52..55 block; the `TGOST` list order is Федерация, Конфедерация, Содружество, Свободные Земли; so the labels of states 1 and 2 may be swapped on screen: INFERRED, check in game.)
+So the "civilised" region is only 4 + 3 + 3 tile blocks (about 20 tiles); the rest of the 256 x 256 grid is free lands with unknown government, which the flight treats as "NEИЗВЕСТНАЯ" (`VERTAB` last row) and "НЕЗАСЕЛЕННАЯ" (uninhabited).  VERIFIED (code), the meaning INFERRED.
+* Distance = integer square root (table `KORNI.d`) of (dx^2 + dy^2)/9 over the 16-bit coordinates (`FARER`, CIRCMATH.asm:1553; result 1..254, `#FF` = too far), in "сл" (light years).
+
+### 5.4 Hyperjump rules
+* **In the station** the map button `Перелет` (`BPERE`, OBR2.asm:333; object table OBJECT.asm:236 "ПЕРЕЛЕТ НА ДР. СИСТЕМУ", button text 40) just copies `WHERE/WPLANET` into `PLACE/PLANET` and jumps to `Dalee` (new screen: goods prices regenerated, start check run).  **No fuel check, no distance check, no time advance**: a free teleport (probably a development shortcut; the real jump is in flight).  VERIFIED (OBR2.asm:333-347).
+* **In flight** `HIPER` (SETCONTR.asm:404, key "Гипер прыжок, +CS к звезде"): fuel units = `FUEL` word (if the high byte is 0 the low byte is halved), `DALNO` = distance of the selected star; refused if no fuel, distance > 255 (`h` != 0) or fuel < distance; jump to the same star costs 0 (same planet is refused unless a "Дьявол" system `GDIABLO` is fitted: "Гипер Система" can jump inside a system) and +1 tonne when only the planet changes; then `AFUEL` subtracts the fuel; ship message `_HIPER` ("Разогрев реактора. Подготовка к совершению гипер прыжка."), and `ZM18/ZM19` (SETHJRET.asm:23-190) loads the voxel hyperspace animation, then `SETIT/SETT` regenerates the destination system (planet/sun model, probability tables from government and level, see section 6).  `RETURNSYS` ("Система возврата") re-jumps to `PLACE` once (flag `SWOZWR`).  VERIFIED.
+* Equipment that changes the jump: "Система 'Гиперслед'" (the "hyper-track" computer: "расчитать точку перелета к системе в момент нахождения за ней"), "Система Возврата", "Гипер Система 'Фостэр'" ("перелёт к любой планете или звезде", code name "Дьявол" in the old comments), "Топливо МРП/ЛНП" (two fuel types, fuel table `FUEL`).  Ship fuel is `FUEL` in the state record.
+
+### 5.5 Which station you dock at
+* In the station you are always at *one planet's orbital station*: the model name comes from the planet level (`WELCOME`: "Орбитальная станция, модель <MODELS[level]>, системы <name>-<planet>, ... почасовая оплата <5 x level> кредитов", OBR.asm:2817-2870; `PINFO2` level l -> fee `l*5`).  The tonnage/parking fee `L.u` (level) is used in the script: `=c-(L.u*5)` for the hourly fee (X=16).
+* In flight `OBJGENER` (OBJGENER.asm:25 `STATTB`, :137-139) builds the station 3D object for the level of `PLACE/PLANET` (16 station models `St1..St16`, hand-modelled in OBJECTSS.asm), places the sun and planet models (`MODELSTAR`/`MODELPLANET` at SETHJRET.asm:921/947) and generates traffic.  Arrival at a planet: the ship appears near the planet with the station at some distance; flying into the docking block returns to the station of the planet you jumped to (`RETSTAT`, section 6).
+* Selecting a planet on the map: the planet number of a star is only known when the star is in the memory list (`MSTARS` stores 5 bytes: map word, in-map word, planet), else planet 0 ("снизу вверх" = lowest planet first).  Planet count and per-planet data come from `PINFO` with the planet number as the iteration count.
+
+### 5.6 Distances and time
+The clock `TIME` is advanced by the clock routines only (station BODY.asm:219-234, flight `TIMER` COMPUTE.asm:454); a hyperjump does not add travel time (no code does `TIME += distance`).  The parking fee is charged through the `PLATA` flag (BODY.asm:36-52, script operation 16).  INFERRED.
 
 ## 6. Flight
 

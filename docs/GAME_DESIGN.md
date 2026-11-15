@@ -59,7 +59,55 @@ About 12 KB of strings plus 5.9 KB of tok files.  Texts outside the station: fli
 
 ## 2. Ships and objects
 
-(pending)
+Three separate things share the word "ship": (a) the **purchasable ships/skimmers** (stat tables + descriptions in the station, section 2.1), (b) the **3D models shown in the station viewer** (`OBJX.asm`, section 2.2), (c) the **flight objects** (`OBJECTS*.asm`, section 2.3).  They are **not linked by data**: the viewer models, the flight models and the shop ships were drawn independently.  Line numbers: `work/tech/u8/src_*`.
+
+### 2.1 Shop ships and skimmers (7 + 4)
+Stat record `CNKR` (DATA_M.asm:691): per ship 5 bytes = tonnage (capacity, t), price (word), speed, legal flag (1 = legal, 0 = illegal and not sold); `CNSK` (DATA_M.asm:716) per skimmer: tonnage 0, price (word), speed, weight (t).  Descriptions in `ship.tok`/`skim.tok`, price list in the buy windows `NAMSH`/`NAMSK` (DATA3D.asm:287-305).  VERIFIED.
+| # | ship | CNKR capacity / price / speed | text says (ship.tok) | price in list |
+|--|--|--|--|--|
+| 0 | Доминион | 100 / 64000 / 130 | speed 130, tonnage 100, weight 28 | 64000 |
+| 1 | Софист | 90 / 44000 / 120 | 110 / 120 / 29 | 44000 |
+| 2 | Мемфис | 60 / 40000 / 140 | 140 / 60 / 20 | 40000 |
+| 3 | Фирс | 70 / 35000 / 110 | 110 / 75 / 25 | 35000 |
+| 4 | Орсан | 72 / 34000 / 90 | 90 / 90 / 32 | 34000 |
+| 5 | Барос | 80 / 27000 / 100 | 100 / 110 / 30 | 27000 |
+| 6 | Карэн | 50 / 12000 / 70, **illegal** | 60 / 50 / 33 | **13000** |
+| s0 | Фервест | - / 30000 / 170, weight 5 | 170 / 5 | 30000 |
+| s1 | Кридон ("Кридан" in the list) | 27000 / 150 / 4 | 150 / 4 | 27000 |
+| s2 | Протос | 24000 / 130 / 3 | 130 / 3 | 24000 |
+| s3 | Алгол | 18000 / 100 / 2 | 100 / 2 | 18000 |
+**Inconsistencies to decide when finishing** (data is duplicated in three places): capacities and speeds in `CNKR` differ from the description texts for ships 1, 3, 4, 5 (tonnage 90/70/72/80 vs 120/75/90/110) and 6 (speed 70 vs 60); "Карэн" costs 12000 in `CNKR` but 13000 in the list; "Кридон" vs "Кридан".  The game logic uses `CNKR`/`CNSK`.  VERIFIED.
+Class hints from the texts: Доминион = top aristocracy, Софист = aristocracy, Мемфис = fast mid-class, Фирс = representative mid-class, Орсан = old low-class ship, Барос = best trading ship (110 t), Карэн = relic of the "past era", fits little equipment.  Skimmer = surface vehicle with "прыжковый движок" (jumping engine), "ходовой модуль" (wheels), "стыковочный узел" (docking unit); skimmers do **not** exist in flight (only a control list for them in the settings, `TSETG1`).
+
+### 2.2 Station 3D viewer (window "Корабль"/"Скиммер", "3D обзор", `BODY3D.asm`, `DATA3D.asm`, `OBJX.asm`)
+* The viewer (rotating wire/solid model with a clipper `CLPXR1`, projection `XR2`) takes the model address from the table at `L97` (DATA3D.asm:326-345): 11 entries (each `dw model,model`): 0 Pushkad, 1 Klopd, 2 Kryld, 3 Treugd, 4 Kobrad, 5 Wognd, 6 Pushkad (again: the relic Карэн uses the first model), 7 Istr, 8 Sturm, 9 Turi, 10 Trad.  Ships 0..6 use entries 0..6, skimmers 0..3 use entries 7..10 (index +28/4 in `ISHIP`, BODY3D.asm:200ff).  The names are only the **labels** (Russian transliteration: Пушка, Клоп, Крыло, Треугольник, Кобра, Вогнутый, Ист(ребитель?), Штурм, Тур(...), Тряд) - no name strings in the data.  Texts shown next to the model come from `TISHIP`/`TISKIM` (item = ship number).  VERIFIED.
+* `OBJX.asm` (10856 bytes, 333 lines of `db`) contains the 10 distinct models.
+
+### 2.3 Flight objects (OBJECTS.asm 5763 B of model bytes, OBJECTS2.asm 1063 B "old models", OBJECTSS.asm 3754 B stations)
+**Model record** (from `REMOVEOBJ`, flight BODY.asm:380-410, and `RENOBJ`, 3D-II.asm:635; the record is copied to `OBJBUF`): 2-byte header (`#6D,#02` = size/radius, scale shift), then **vertices** as 4-byte entries `colour/amount, x, y, z` (signed bytes) ending with a `#00` byte, a `#00` separator, then **faces**: each begins with a byte whose low nibble `n` = number of vertex indices following (copied `n+1` bytes) and whose high nibble = colour/type (`#43` = triangle, `#44`/`#24` = quad, `#16` = 6-gon); vertex indices are multiples of 5 (offsets into the vertex array); a `#00` ends the model.  Sub-blocks `P00xxx`, `P01xxx` (labels in the files) are extra part lists (e.g. stations' turret/door parts, animated parts).  The in-game form uses far (`KNnn`, low-detail) and near (`Kdnn`, detailed) versions of every ship; `3DTABS.asm:470-700` is the **object index table** `L97` (`dw far, near` per index; index byte = `low($)`).  INFERRED from the code that reads it (no format document in the sources).
+All objects (flight index names, 3DTABS.asm:470-700):
+| group (AI type) | indices | models | notes |
+|--|--|--|--|
+| police in space (`T_POLICE`) | IPOL1..4 | KN01pol1/Kd1, KN06pol2/Kd6, KN29pol6/Kd29, KN27pol7/Kd27 | names "pol1,2,6,7" mean the original numbering had 7 police models |
+| police launched from stations | IPLS1..3 | KN21plS3/Kd21, KN25plS4/Kd25, KN28plS5/Kd28 | |
+| military (`T_MILITARY`) | IMLT1..4 | mlt1 Kd2, mlt2 Kd9, mlt3 Kd17, mlt4 Kd26 | |
+| cargo ships | IGRZ1..5 | grz1 Kd3, grz2 Kd8, grz3 Kd11, grz4 Kd30, grz5 Kd31 | traders and pirates also use them |
+| "trade, sold at the station" (pirates/traders/hunters) | ITRG1..6 | trg1 Kd4, trg2 Kd5, trg3 Kd10, trg4 Kd16, KOBRA/KOBRAD, KRYL/KRYLD (OBJECTS2 "СТАРЫЕ МОДЕЛИ КОРАБЛЕЙ") | six = the six sellable ship classes |
+| UFO (`T_UFO`) | IUFO1..8 | ufo2 Kd13, ufo3 Kd14, ufo4 Kd18, ufo5 Kd20, ufo6 Kd23, ufo7 Kd24, UFO1/UFO1D, Kd12 | aliens |
+| cruisers | IKRS1..4 | KN07krs1/Kd7, Kd15, Kd19, Kd22 | |
+| micro ships (launched from others) | IMIK1..2 | micKN, micKd1, micKd2 | `T_MIKR` |
+| rocket | IROK, IROKUFO | ROKET (15 B), UfoRD | 2 rocket types (`SETUP` bit 3 = РКН1/РКН2) |
+| cargo containers | ICRG, ICRGUFO | CRG1, KontUFO | |
+| cyber killers | IKIB, IKIBUFO | Kib_K, ufo_K | the "Кибер Флот" |
+| repair droid | IREMDR | REM_DR | the "Ремонтный Дроид" equipment |
+| asteroids | IASTER1..3 | ASTER1 (120 B), ASTER2, ASTER3 | |
+| debris / target / trash | IOSKOL, ITARGET, ITRASH | OSKOL, TARGET (invisible target), TRASH (afterburner dust) | |
+| stations | IST1..IST16 + IST_PIRAT, IPRISON, IST_U1, IST_U2, IST_SCINCE, IGIP_PL | St1..St16 (one per planet level), St_pirat (pirate base), Prison, St_u1/St_u2 (UFO bases?), St_scince (science station), Gip_pl (hyper gate / "гипер планета"?) | stations are made of parts (`T_STATION`, docking block flag `SETUP` bit 4); 16 + 6 = 22 models |
+**Only the 16 level stations are generated today**: `STATTB` (OBJGENER.asm:25) lists `ST1k..ST16k`; `IST_PIRAT, IPRISON, IST_U1, IST_U2, IST_SCINCE, IGIP_PL` are in the index table but referenced by no code (grep: no hit outside 3DTABS.asm).  Other index names **never referenced by name** outside the table: `IKIB`/`IKIBUFO` (cyber killers), `IREMDR` (repair droid), `IASTER3`, `ITARGET`, `IUFO8`, `IROKUFO`, `ICRGUFO` (the player's "Ремонтный Дроид" release `DROPDROID` is `ret`, SETCONTR.asm:290; the key list has "Выпуск флота" with no handler: INFERRED).  So the *models and equipment for droid, cyber fleet and some UFO variants exist but the behaviour is missing*.  VERIFIED by grep.
+The player's own ship is **not a 3D object** (cockpit view); the viewer models of section 2.2 appear nowhere in flight.
+
+### 2.4 Per-object runtime record (flight, `OLEN` = #40 = 64 bytes each at `CARSB` = #A200, 25 objects; fields EQUS.asm:300-430)
+`INDI` model index, x/y/z (3 words), angles `ALFA/BETA/GAMA`, `MODE` current AI mode (`C_*`, section 6), `SUBJ` current target (`SPLAYER` = 26 = the player), `ACTN` flags (attacks you / rocket attacks / rocket killed you), `RAND` id, `MSPD` max speed, `RSPD` speed, `LZS` laser/weapon bit mask, `TYPE` (`T_PIRAT`..`T_TARGET`), `ENERGY`, `RCO` rocket counter, `OSUBJ`, `OMODE` fallback mode, `POWOR`, `SETUP` bits (cargo count, own fleet released, rocket type, container "NIMA"/ station docking), `PMODE` previous mode, `PX/PY/PZ` target coordinates, `BSUBJ/TSUBJ` return subject/type, `MENE` max energy, `TOWR` cargo type, `FORSAG` afterburner byte, `SPT` turn angle, `PLAN` planet number.  Only **25 objects** can exist at once (the buffer CARSB), including stations' parts and projectiles.  VERIFIED (EQUS.asm).
 
 ## 3. Goods, equipment, economy
 

@@ -1,4 +1,13 @@
-Vsline
+;==============================================================================
+; BLK7 - видимость линии (VisibleLine) и звук AY, старая версия
+;
+; Фрагмент.
+;
+; Часть набора STORM (прототип Awaken 1997/98), не входит в основную игру. Подробности: docs/STORM.md,
+; таблица переименований меток: docs/STORM_LABELS.md. Собирается sjasmplus (см. make_*.asm).
+;==============================================================================
+
+VisibleLine                     ; orig: Vsline
         ; Check wisibility of line
         ; Cords of line in cordline bufer
         ld   hl,+(L9c*256)+1
@@ -54,7 +63,7 @@ Ld85    inc  l
         ld   (hl),c
         jp   Ld83
 
-Shmtrx
+ShipMatrix                      ; orig: Shmtrx
 ; Calc SHIP matrix vector
 Eyea_   ld   a,0
         ld   h,Sintb
@@ -408,7 +417,7 @@ Rastoy
 ; ------------------------
 ; Вывод линии b 3d пространстве
 ; ------------------------
-Outline
+DrawLine3d                      ; orig: Outline
         ; De-z1,hl-Y1,bc-X1
         ; De'-z2,hl'-y2,bc'-x2
         call Clc2d3d
@@ -421,7 +430,7 @@ Outline
         ld   ((L9c*256)+5),hl
         ld   ((L9c*256)+7),de
         exx
-        call Vsline
+        call VisibleLine
         ret  z
         ld   b,a
         cpl
@@ -429,10 +438,10 @@ Outline
         ret  nz
         ld   a,b
         and  #0F
-        ld   hl,Masklin
-        jp   nz,Drwpol
-        jp   Drwpol2            ; Draw poly.
-Masklin
+        ld   hl,LineMask
+        jp   nz,DrawPolygon
+        jp   DrawPolygonAlt     ; Draw poly.
+LineMask                        ; orig: Masklin
         db   %10110010, 0, 5, 0
 
 ; Плейер семплев
@@ -485,7 +494,7 @@ Sfxb
         ld   hl,0
         ld   a,h
         or   a
-        jr   z,Sfxn
+        jr   z,.Sfxn
         ld   bc,PORT_AY_REG
         ld   a,2
         out  (c),a
@@ -516,7 +525,7 @@ Sfxb
         ld   (Sfxb+1),hl
         ld   a,(hl)
         or   a
-        jr   nz,Sfxn
+        jr   nz,.Sfxn
         ld   (Sfxb+2),a
         ld   b,#FF
         ld   a,7
@@ -525,7 +534,7 @@ Sfxb
         or   %00010010
         ld   b,#BF
         out  (c),a
-Sfxn
+.Sfxn
         ld   c,#FD
         ld   b,#FF
         ld   a,5

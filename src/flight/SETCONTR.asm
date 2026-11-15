@@ -1,5 +1,14 @@
-;FRONTBACK
-
+;==============================================================================
+; SETCONTR - управление кораблём: клавиатура/джойстик, пуск ракет, сброс груза, гиперпрыжок
+;
+;
+; Где живёт: блок disp #6000 внутри ACTION.C (после SLOWPRO).
+; ControlsHandler (SETCONTROL) опрашивает клавиши (таблица KKEYS = 27 кодов, GAME_DESIGN 6.1),
+; вызывает LaunchMissile1..3, HyperJump, CancelTargets, FireButton, TargetLockToggle, ToggleLight,
+; PlayerAfterburner, DropCargoKey, DropMineKey, ReturnSystem, FrontBackView и движение
+; (Throttle, Brake, Roll/Turn/Pitch). Вход: нажатые клавиши (порт PORT_ULA, Kempston). Выход: правка записи
+; игрока (углы ALFA/BETA/GAMA, скорость SPEED) и флагов ACTN.
+;==============================================================================
 
 MOVEU:
             call TOUCH
@@ -413,7 +422,7 @@ HyperJump:                      ; orig: HIPER - вызов гиперпрыжк�
             pop  bc
             djnz $-5
 
-            ld   bc,#FFFD
+            ld   bc,PORT_AY_REG
             ld   a,7
             out  (c),a
             ld   b,#BF

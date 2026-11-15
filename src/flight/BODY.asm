@@ -1,3 +1,15 @@
+;==============================================================================
+; BODY - главный цикл полёта и математика пространства
+;
+;
+; Где живёт: после DATAS.C, образ ACTION.C, страница MAIN.
+; START/CYCL: за кадр вызывает GENSHIPS, звёзды, TIMER, REN3D (3D-вывод), ShipAI (ИИ всех объектов),
+; MVSTT/MoveSun, взрывы, ControlsHandler, итог кадра (смерть/стыковка/прыжок). Здесь же
+; DEHRUST (распаковщик), Page_ (выбор страницы), ObjectSize, REMOVEOBJ, ToShipCoords (обратная матрица),
+; InvertMatrix, AimAngles, Project3Dto2D, ArcTanDiv, FastDivide, ShipMatrix, возврат на станцию
+; через LaunchStation (src/common/launcher.asm). GAME_DESIGN 6.1, 6.5. docs/ANALYSIS.md 12-14.
+;==============================================================================
+
 START:
             di
 
@@ -329,7 +341,7 @@ EXIT:
 ;              ld     a,(DRIVE+1)
 ;              jp     RETSTT
 
-            ld   bc,#FFFD
+            ld   bc,PORT_AY_REG
             ld   a,7
             out  (c),a
             ld   b,#BF
@@ -401,7 +413,7 @@ Page_:
 ; Переключение страниц
 ; а-код
             push bc
-            ld   bc,#7FFD
+            ld   bc,PORT_PAGE
             out  (c),a
             pop  bc
             ret

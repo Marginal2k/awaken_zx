@@ -1,5 +1,15 @@
-;SHIPINTELEGENT
-
+;==============================================================================
+; BRAINPRO - ИИ объектов: 22 режима поведения и диспетчер ShipAI
+;
+;
+; Где живёт: образ ACTION.C, последний модуль перед END_, страница MAIN.
+; ShipAI: для каждого объекта по режиму (ix+MODE) вызывает обработчик через AiModeTable
+; (индекс = C_STAY..C_RETURN из EQUS.asm, GAME_DESIGN 6.2). Обработчики: Stay, GoToPlanet, Fight,
+; GoToStar, FlyFree, Defence, HyperJumpEnd/Start, MissileHoming, StationStay/Defence, PoliceLaunch/Return,
+; ReturnToAsteroid, PickUpCargo, GoAwayNoCargo, FlyAway, TurnAway, AsteroidDrift, Afterburner,
+; FlyAroundPlayer, ReturnAfterFlyAround. Общие: MoveStraight (шаг по углам), AimNose, MissileAttack.
+; Читает/пишет запись объекта (ix+ALFA, POWOR, MODE, OMODE, SUBJ, ACTN ...).
+;==============================================================================
 
 AiModeTable:                    ; orig: ITAB - таблица обработчиков режимов ИИ (индекс = C_*)
             dw   Stay

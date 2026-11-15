@@ -1,3 +1,15 @@
+;==============================================================================
+; flight - главный файл сборки полётной части (ACTION.C, VOXAL*.C, CONTROL*.C, OBJECT3D.C, DATAS.C)
+;
+;
+; Сборка: python build.py; sjasmplus, DEVICE ZXSPECTRUM128.
+; Порядок: LOADI2, INITV (загрузчик) -> блок #6000: SLOWPRO, SETCONTR, OBJGENER -> #8C00: 3DTABS, BODY,
+; launcher станции -> #C000: CLIPMATR, 3D-II, 3D-I, BRAINDOP, BRAINPRO (ACTION.C) ->
+; VOXAL.C (GMATRX, VOXEL) -> CONTROL0.C (STARHSUN) -> CONTROL.C (SETHJRET, PANEL, COMPUTE) ->
+; OBJECT3D.C (модели gen/OBJECTS*.inc). Страницы: MAIN #10, CONTR #11, VOXAL #13, OBJ3D #14, FREE #16.
+; Таблица меток: docs/FLIGHT_LABELS.md; общие модули: src/common.
+;==============================================================================
+
             DEVICE ZXSPECTRUM128
             include "MACRO.asm"
             include "EQUS.asm"

@@ -1,5 +1,13 @@
-;VSLINE
-
+;==============================================================================
+; BRAINDOP - вспомогательные процедуры ИИ и мира
+;
+;
+; Где живёт: образ ACTION.C, сегмент после 3D-I, страница MAIN.
+; ApplyPlayerMotion (сдвиг объектов по движению игрока), ObjAddrFromIndex*/ObjIndexFrom* (адрес<->индекс),
+; Find* (поиск объектов по типу/признаку), ShipFire (выстрел), FleetStart (старт флота), CanTakeCargo,
+; MakeExplosion (взрыв и осколки), DistanceHigh, DrawLine3D, генератор случайных чисел RND/RNDW/RND* (RND - frozen),
+; SFXA/SFXB (звуки через AY). GAME_DESIGN 6.2-6.4.
+;==============================================================================
 
 ApplyPlayerMotion:              ; orig: PRECORD - смещение координат всех объектов по движению игрока
 ; Изменяем координаты в зависимости от
@@ -1132,7 +1140,7 @@ SFXA:
             ld   a,h
             or   a
             jr   z,SFXB
-            ld   bc,#FFFD
+            ld   bc,PORT_AY_REG
             xor  a
             out  (c),a
             ld   b,#BF
@@ -1173,7 +1181,7 @@ SFXB:
             ld   a,h
             or   a
             jr   z,.SFXN
-            ld   bc,#FFFD
+            ld   bc,PORT_AY_REG
             ld   a,2
             out  (c),a
             ld   b,#BF

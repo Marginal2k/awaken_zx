@@ -1,3 +1,16 @@
+;==============================================================================
+; SLOWPRO - "медленные" процедуры полёта: ракеты, попадания, грузы, солнце, планета, звёзды
+;
+;
+; Где живёт: блок disp #6000 (метка ZM15) внутри ACTION.C; не должен лежать в переключаемой странице.
+; Содержит: вывод чисел (PrintNumScroll/PrintNumNoScroll), GameOver, NewMissile/InitMissile (пуск ракеты),
+; RedrawPanel, мусор форсажа (InitTrash/KillTrash), AimAtObject (наведение носа), PlayerHit (попадание
+; лазера игрока), ChangeStatus, DropCargo/SpawnCargo, NewOrder (задание по типу объекта),
+; DrawDataLines, NewSun/MakeBlackHole/MoveSun, DrawSun/DrawPlanet, MoveShipsForward, GovernmentAt.
+; Вызывается из BODY.asm (главный цикл START/CYCL) и из ИИ (BRAINPRO/BRAINDOP).
+; GAME_DESIGN: 6.1, 6.3, 6.4.
+;==============================================================================
+
 PrintNumbersInOrder:            ; orig: MNUMS_ - вывод номеров по порядку
             ex   af,af'
             PAGE_ CONTR
@@ -81,7 +94,7 @@ GameOver:                       ; orig: GAMEOVER - конец игры (гибе
             jp   nz,.EBEG2
             ld   b,1
             xor  a
-            in   a,(#FE)
+            in   a,(PORT_ULA)
             and  #1F
             cp   #1F
             jr   z,.EBEG
@@ -89,7 +102,7 @@ GameOver:                       ; orig: GAMEOVER - конец игры (гибе
 .EBEG2
             ld   a,1
             xor  a
-            in   a,(#FE)
+            in   a,(PORT_ULA)
             and  #1F
             cp   #1F
             jr   .EBEG

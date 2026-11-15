@@ -1,16 +1,12 @@
-;$M18
-;NDATA
-;RETSTT
-;RETSTAT
-;RNDD
-;CLRBUFS
-;SETIT
-;SETT
-;VERTAB
-;STROYTAB
-;LEVLTAB
-;PINFO
-
+;==============================================================================
+; SETHJRET - установка среды системы, гиперпрыжок, возврат на станцию
+;
+;
+; Где живёт: страница CONTR (#11), образ CONTROL.C (MAKE_3).
+; SETT/SETIT: таблицы вероятностей и мощностей по типу планеты (GAME_DESIGN 6.3); PlanetInfo - данные системы;
+; LOAD_/TOREG_: загрузка следующей системы; RETSTAT/RSTT: возврат на станцию с записью состояния TIME..
+; (src/common/state.inc) и вызовом LaunchStation. Вход: HyperJump из SETCONTR. GAME_DESIGN 5.4, 6.5.
+;==============================================================================
 
 ZM18:
             disp ADHDP
@@ -18,7 +14,7 @@ ZM19:
             push ix
             ld   (STK77+1),sp
             ld   a,FREE
-            ld   bc,#7FFD
+            ld   bc,PORT_PAGE
             out  (c),a
             exx
             ld   hl,#8C00
@@ -51,7 +47,7 @@ ZM19:
             ld   sp,#6000
             call #6500
             di
-            ld   bc,#7FFD
+            ld   bc,PORT_PAGE
             ld   a,FREE
             out  (c),a
             exx
@@ -88,7 +84,7 @@ STK77:      ld   sp,0
             ld   a,CONTR
             out  (c),a
             call ClearBuffers
-            ld   bc,#FFFD
+            ld   bc,PORT_AY_REG
             ld   a,7
             out  (c),a
             ld   b,#BF
@@ -236,13 +232,13 @@ ReturnToStation:                ; orig: RETSTAT - возврат на станц
 RSTT:
             disp #4200
 RSTT2:
-            ld   bc,#FFFD
+            ld   bc,PORT_AY_REG
             ld   a,7
             out  (c),a
             ld   b,#BF
             ld   a,#FF
             out  (c),a
-            ld   bc,#7FFD
+            ld   bc,PORT_PAGE
             ld   a,#17
             out  (c),a
             ld   hl,#C000
@@ -259,7 +255,7 @@ RSTT2:
 ; [glue] original: raw FDC track reads of the station image from the track in MTRK (protected loader),
 ; then a RET into it.  Replaced by an ordinary TR-DOS file load of STATIONF; the state record stays in
 ; STATE_BUF (screen RAM) and the station copies it into its own data at start (STATE_FLAG=1).
-            ld   bc,#7FFD
+            ld   bc,PORT_PAGE
             ld   a,#10
             out  (c),a
             im   1

@@ -1,25 +1,3 @@
-;INIMS            ■MNUMS
-;MESAGS           ■PRINT
-;PRINTNUM         ■SCROLL
-;RST10            ■PRICEL
-;TIMER            ■ZEROTIME
-;ZEROUT           ■_SYSTEMREADY
-;_SYSTEMOK        ■_MODEON
-;_MODEOFF         ■_FREEFLY
-;_GETTARGET       ■_FRONT
-;_BACK            ■_LOSTTARGET
-;_ALLTARGET       ■_HAVE
-;_ROKET           ■_NOROKET
-;_DESTROY         ■_GAMEOVER
-;_NOTARGET        ■_POWERRAY
-;_ROKETGO         ■_SYSTEMOFF
-;_SYSTEMSOFF      ■_ANTIROKET
-;_TARGETOFF       ■_TAKING
-;_HIPER           ■_DOCKING
-;_DROPCARGO       ■_DROPMINE
-;_NOMINE          ■_NOCARGO
-
-
 INIMS:
             ld   hl,0
             ld   (ADTT+1),hl
@@ -58,7 +36,7 @@ ZJ70:
             ex   af,af'
             dec  a
             jr   nz,ZJ67
-            ret  
+            ret
 MNUMS:
 ;NUMBERS inORDER PRINT
 ;a-NUMBER
@@ -84,7 +62,7 @@ ZJ69:
             pop  af
             pop  bc
             pop  hl
-            ret  
+            ret
 ZJ65:
             ld   hl,TBUF
             djnz ZJ66
@@ -130,7 +108,7 @@ ZJ68:
             ld   a,(CORD+1)
             inc  a
             ld   (CORD+1),a
-            ret  
+            ret
 ZJ60:
             or   a
             ret  nz
@@ -150,7 +128,7 @@ ZJ59:
 ZJ63:
             ld   hl,0
             ld   (ADTT+1),hl
-            ret  
+            ret
 ZJ58:
             xor  a
             ld   (CORD+1),a
@@ -204,13 +182,13 @@ SCROLL:
             pop  de
             pop  bc
             pop  af
-            exx  
+            exx
             pop  bc
             pop  de
             ld   sp,#5120
             push de
             push bc
-            exx  
+            exx
             push af
             push bc
             push de
@@ -262,7 +240,7 @@ SCROLL:
             push hl
             push hl
 STK5:       ld   sp,0
-            ret  
+            ret
 
 ; ПЕЧАТЬ СИМВОЛА
 RST10:
@@ -303,7 +281,7 @@ ZJ56:
             jr   nz,$+4
             ld   b,#0F
             ex   af,af'
-            rra  
+            rra
             jr   nc,$+6
             ld   a,c
             xor  1
@@ -313,14 +291,14 @@ ZJ56:
             jr   nz,ZJ57
             rept 5
             ld   a,c
-            cpl  
+            cpl
             and  (hl)
             ld   b,a
             ld   a,(de)
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             and  c
             or   b
             ld   (hl),a
@@ -328,24 +306,24 @@ ZJ56:
             inc  de
             endr
             ld   a,c
-            cpl  
+            cpl
             and  (hl)
             ld   b,a
             ld   a,(de)
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             and  c
             or   b
             ld   (hl),a
-            ret  
+            ret
 ZJ57:
 ; ПЕЧАТЬ БЕЗ СДВИГА
 
             rept 5
             ld   a,c
-            cpl  
+            cpl
             and  (hl)
             ld   b,a
             ld   a,(de)
@@ -357,15 +335,14 @@ ZJ57:
             endr
 
             ld   a,c
-            cpl  
+            cpl
             and  (hl)
             ld   b,a
             ld   a,(de)
             and  c
             or   b
             ld   (hl),a
-            ret  
-
+            ret
 
 
 PRICEL:
@@ -375,18 +352,18 @@ PRICEL:
             ld   h,b
             ld   a,c
             srl  h
-            rra  
+            rra
             srl  h
-            rra  
-            scf  
+            rra
+            scf
             rr   h
-            rra  
+            rra
             ld   l,a
             EXD
             ld   a,c
             and  7
-            rla  
-            rla  
+            rla
+            rla
             ld   l,a
             ld   h,0
             ld   bc,MPRICEL
@@ -427,7 +404,7 @@ PRICEL:
             xor  (hl)
             ld   (hl),a
             endr
-            ret  
+            ret
 
 MPRICEL:
 ; СПРАЙТ ПРИЦЕЛА
@@ -449,13 +426,11 @@ MPRICEL:
             db   %00000000,%00111100,%01111000
 
 
-
-
 TIMER:
 ; ВЫВОД И ИЗМЕНЕНИЕ ВРЕМЕНИ НА ПРИБОРНУЮ
 ; ПАНЕЛЬ
             ld   a,%10000000
-            rrca 
+            rrca
             ld   ($-2),a
             ret  nc
 
@@ -464,26 +439,26 @@ TIMER:
             ld   hl,(TIME+2)        ;#3418
             ld   a,l
             add  a,1
-            daa  
+            daa
             ld   l,a
             ld   a,h
             jr   nc,$+4
             set  0,b
             adc  a,c
-            daa  
+            daa
             ld   h,a
             ld   de,(TIME)          ;#0122
             ld   a,e
             jr   nc,$+4
             set  1,b
             adc  a,c
-            daa  
+            daa
             ld   e,a
             ld   a,d
             jr   nc,$+4
             set  2,b
             adc  a,c
-            daa  
+            daa
             ld   d,a
 ZEROTIME:
             ld   (TIME+2),hl
@@ -494,10 +469,10 @@ ZEROUT:
             ld   c,#2F
             call PRNUM
             ld   a,l
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             ld   c,#2E
             call PRNUM
             bit  0,b
@@ -506,10 +481,10 @@ ZEROUT:
             ld   c,#2C
             call PRNUM
             ld   a,h
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             ld   c,#2B
             call PRNUM
             bit  1,b
@@ -518,10 +493,10 @@ ZEROUT:
             ld   c,#29
             call PRNUM
             ld   a,e
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             ld   c,#28
             call PRNUM
             bit  2,b
@@ -530,15 +505,15 @@ ZEROUT:
             ld   c,#27
             call PRNUM
             ld   a,d
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             ld   c,#26
 PRNUM:
 ; ПЕЧАТЬ ЧИСЛА В BCD ИЗ РЕГ. a
 ; П c-КООРДИНАТА X
-            exx  
+            exx
             and  #0F
             add  a,"0"-" "
             ld   l,a
@@ -553,20 +528,19 @@ PRNUM:
             EXD
             ex   af,af'
             ld   h,#51
-            exx  
+            exx
             ld   a,c
-            exx  
+            exx
             ld   c,a
             srl  a
             ld   l,a
             inc  c
             call ZJ56
-            exx  
-            ret  
+            exx
+            ret
 
 
 ; СООБЩЕНИЯ БОРТОВОГО КОМПА
-
 
 
 ; Flight computer messages: GENERATED from assets/text/flight_messages.txt (tools/assets/gen_text.py), one include per message.
@@ -599,5 +573,3 @@ _DROPCARGO:   include "gen/_DROPCARGO.inc"
 _DROPMINE:    include "gen/_DROPMINE.inc"
 _NOMINE:      include "gen/_NOMINE.inc"
 _NOCARGO:     include "gen/_NOCARGO.inc"
-
-

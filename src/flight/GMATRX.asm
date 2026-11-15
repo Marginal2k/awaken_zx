@@ -3,23 +3,6 @@
 ;COSTB2
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 GMATRX:
 ;bЫЧИcЛEHИeTPEX MATPИЦ ПOBOPOTOB ДЛЯ BCEX OБЪEKTOB
 
@@ -52,21 +35,21 @@ TLZ:
             dec  h
             ld   c,(hl)
             ld   a,c
-            cpl  
+            cpl
             ld   l,a
             ld   a,b
-            cpl  
+            cpl
             ld   h,a
             inc  hl
             push de
-            exx  
+            exx
             pop  bc
             ld   hl,(LA11)
             call MULS6
             push hl
-            exx  
+            exx
             push bc
-            exx  
+            exx
             pop  bc
             ld   hl,(LA12)
             call MULS6
@@ -74,16 +57,16 @@ TLZ:
 
             ADPHLDE LC11
 
-            exx  
+            exx
             push hl
-            exx  
+            exx
             pop  bc
             ld   hl,(LA11)
             call MULS6
             push hl
-            exx  
+            exx
             push de
-            exx  
+            exx
             pop  bc
             ld   hl,(LA12)
             call MULS6
@@ -91,16 +74,16 @@ TLZ:
 
             ADPHLDE LB12
 
-            exx  
+            exx
             push de
-            exx  
+            exx
             pop  bc
             ld   hl,(LA21)
             call MULS6
             push hl
-            exx  
+            exx
             push bc
-            exx  
+            exx
             pop  bc
             ld   hl,(LA22)
             call MULS6
@@ -108,16 +91,16 @@ TLZ:
 
             ADPHLDE LC21
 
-            exx  
+            exx
             push hl
-            exx  
+            exx
             pop  bc
             ld   hl,(LA21)
             call MULS6
             push hl
-            exx  
+            exx
             push de
-            exx  
+            exx
             pop  bc
             ld   hl,(LA22)
             call MULS6
@@ -125,16 +108,16 @@ TLZ:
 
             ADPHLDE LB22
 
-            exx  
+            exx
             push de
-            exx  
+            exx
             pop  bc
             ld   hl,(LA31)
             call MULS6
             push hl
-            exx  
+            exx
             push bc
-            exx  
+            exx
             pop  bc
             ld   hl,(LA32)
             call MULS6
@@ -142,16 +125,16 @@ TLZ:
 
             ADPHLDE LC31
 
-            exx  
+            exx
             push hl
-            exx  
+            exx
             pop  bc
             ld   hl,(LA31)
             call MULS6
             push hl
-            exx  
+            exx
             push de
-            exx  
+            exx
             pop  bc
             ld   hl,(LA32)
             call MULS6
@@ -190,21 +173,21 @@ TLX2:
             dec  h
             ld   c,(hl)
             ld   a,c
-            cpl  
+            cpl
             ld   l,a
             ld   a,b
-            cpl  
+            cpl
             ld   h,a
             inc  hl
             push de
-            exx  
+            exx
             pop  bc
 LB12:       ld   hl,0
             call MULS6
             push hl
-            exx  
+            exx
             push bc
-            exx  
+            exx
             pop  bc
             ld   hl,(LB13)
             call MULS6
@@ -212,16 +195,16 @@ LB12:       ld   hl,0
 
             ADPHLDE LA12-1
 
-            exx  
+            exx
             push hl
-            exx  
+            exx
             pop  bc
             ld   hl,(LB12+1)
             call MULS6
             push hl
-            exx  
+            exx
             push de
-            exx  
+            exx
             pop  bc
             ld   hl,(LB13)
             call MULS6
@@ -229,16 +212,16 @@ LB12:       ld   hl,0
 
             ADPHLDE LC13
 
-            exx  
+            exx
             push de
-            exx  
+            exx
             pop  bc
 LB22:       ld   hl,0
             call MULS6
             push hl
-            exx  
+            exx
             push bc
-            exx  
+            exx
             pop  bc
             ld   hl,(LB23)
             call MULS6
@@ -246,16 +229,16 @@ LB22:       ld   hl,0
 
             ADPHLDE LA22-1
 
-            exx  
+            exx
             push hl
-            exx  
+            exx
             pop  bc
             ld   hl,(LB22+1)
             call MULS6
             push hl
-            exx  
+            exx
             push de
-            exx  
+            exx
             pop  bc
             ld   hl,(LB23)
             call MULS6
@@ -263,16 +246,16 @@ LB22:       ld   hl,0
 
             ADPHLDE LC23
 
-            exx  
+            exx
             push de
-            exx  
+            exx
             pop  bc
 LB32:       ld   hl,0
             call MULS6
             push hl
-            exx  
+            exx
             push bc
-            exx  
+            exx
             pop  bc
             ld   hl,(LB33)
             call MULS6
@@ -280,16 +263,16 @@ LB32:       ld   hl,0
 
             ADPHLDE LA32-1
 
-            exx  
+            exx
             push hl
-            exx  
+            exx
             pop  bc
             ld   hl,(LB32+1)
             call MULS6
             push hl
-            exx  
+            exx
             push de
-            exx  
+            exx
             pop  bc
             ld   hl,(LB33)
             call MULS6
@@ -314,7 +297,7 @@ TLY:
             ld   (LB23),hl
             ld   hl,(LC33+1)
             ld   (LB33),hl
-            ret  
+            ret
 TLY2:
             ld   l,a
             ld   h,high(COSTB2)
@@ -327,21 +310,21 @@ TLY2:
             dec  h
             ld   c,(hl)
             ld   a,c
-            cpl  
+            cpl
             ld   l,a
             ld   a,b
-            cpl  
+            cpl
             ld   h,a
             inc  hl
             push de
-            exx  
+            exx
             pop  bc
 LC11:       ld   hl,0
             call MULS6
             push hl
-            exx  
+            exx
             push hl
-            exx  
+            exx
             pop  bc
 LC13:       ld   hl,0
             call MULS6
@@ -349,16 +332,16 @@ LC13:       ld   hl,0
 
             ADPHLDE LA11-1
 
-            exx  
+            exx
             push bc
-            exx  
+            exx
             pop  bc
             ld   hl,(LC11+1)
             call MULS6
             push hl
-            exx  
+            exx
             push de
-            exx  
+            exx
             pop  bc
             ld   hl,(LC13+1)
             call MULS6
@@ -366,16 +349,16 @@ LC13:       ld   hl,0
 
             ADPHLDE LB13-1
 
-            exx  
+            exx
             push de
-            exx  
+            exx
             pop  bc
 LC21:       ld   hl,0
             call MULS6
             push hl
-            exx  
+            exx
             push hl
-            exx  
+            exx
             pop  bc
 LC23:       ld   hl,0
             call MULS6
@@ -383,16 +366,16 @@ LC23:       ld   hl,0
 
             ADPHLDE LA21-1
 
-            exx  
+            exx
             push bc
-            exx  
+            exx
             pop  bc
             ld   hl,(LC21+1)
             call MULS6
             push hl
-            exx  
+            exx
             push de
-            exx  
+            exx
             pop  bc
             ld   hl,(LC23+1)
             call MULS6
@@ -400,16 +383,16 @@ LC23:       ld   hl,0
 
             ADPHLDE LB23-1
 
-            exx  
+            exx
             push de
-            exx  
+            exx
             pop  bc
 LC31:       ld   hl,0
             call MULS6
             push hl
-            exx  
+            exx
             push hl
-            exx  
+            exx
             pop  bc
 LC33:       ld   hl,0
             call MULS6
@@ -417,16 +400,16 @@ LC33:       ld   hl,0
 
             ADPHLDE LA31-1
 
-            exx  
+            exx
             push bc
-            exx  
+            exx
             pop  bc
             ld   hl,(LC31+1)
             call MULS6
             push hl
-            exx  
+            exx
             push de
-            exx  
+            exx
             pop  bc
             ld   hl,(LC33+1)
             call MULS6
@@ -434,7 +417,7 @@ LC33:       ld   hl,0
 
             ADPHLDE LB33-1
 
-            ret  
+            ret
 
 
 MULS6:
@@ -448,9 +431,9 @@ MULS6:
             ABSBC
 
             ld   a,c
-            rla  
+            rla
             rl   b
-            rla  
+            rla
             rl   b
             ld   (ANBY2+1),a
             EXD
@@ -480,7 +463,7 @@ MULS6:
             adc  hl,hl
 ANBY2:      ld   a,0
             rept 6
-            rla  
+            rla
             jr   nc,$+6
             add  iy,de
             adc  hl,bc
@@ -493,10 +476,9 @@ ANBY2:      ld   a,0
             ex   af,af'
             ret  p
             NEGHL
-            ret  
+            ret
 
             ADRXX00
 ; П 14-ТИ БИТНАЯ ТАБЛИЦА КОСИНУСОВ
 COSTB2:
             incbin "CSTB.d"
-

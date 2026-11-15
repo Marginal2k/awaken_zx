@@ -14,12 +14,6 @@
 ;MOD_DEHL
 
 
-
-
-
-
-
-
 ; АДРЕСА ОБЪЕКТОВ СТАНЦИЙ ДЛЯ КАЖДОГО
 ; УРОВНЯ РАЗВИТИЯ
 STATTB:
@@ -112,7 +106,6 @@ ST16k:
             dw   #80FF
 
 
-
 ; ГЕНЕРАЦИЯ СТАНЦИИ
 STATGEN_:
             ld   a,(STATGEN)
@@ -129,7 +122,7 @@ STATGEN_:
             ld   (STATGEN),a
             ld   (NOSTAT),a
 
-            exx  
+            exx
 
             ld   a,#10
             ld   (SSETU+3),a
@@ -162,7 +155,7 @@ STATGEN_:
 GS99:
             call FINDFREE
             ret  z                  ;БУФEP ПOЛOH
-            exx  
+            exx
             push hl
             push de
             push bc
@@ -253,10 +246,10 @@ DOPGEN:
             ld   a,h
             or   a
             jp   p,$+10
-            cpl  
+            cpl
             ld   h,a
             ld   a,l
-            cpl  
+            cpl
             ld   l,a
             inc  hl
             ld   a,h
@@ -267,10 +260,10 @@ DOPGEN:
             ld   a,h
             or   a
             jp   p,$+10
-            cpl  
+            cpl
             ld   h,a
             ld   a,l
-            cpl  
+            cpl
             ld   l,a
             inc  hl
             ld   a,h
@@ -282,10 +275,10 @@ DOPGEN:
             ld   a,h
             or   a
             jp   p,$+10
-            cpl  
+            cpl
             ld   h,a
             ld   a,l
-            cpl  
+            cpl
             ld   l,a
             inc  hl
             ld   a,h
@@ -331,7 +324,7 @@ DOPC1:
             add  a,5
             ld   (DOPCOUNT+1),a
             ld   a,r
-            rra  
+            rra
             ld   a,32
             jr   c,$+4
             ld   a,0
@@ -384,7 +377,7 @@ FORRAID:    add  a,0                ;32
             pop  af
             ex   af,af'
             ld   a,26
-            exx  
+            exx
             ld   hl,NWTEL
             call NEWVSPR
             ld   a,1
@@ -400,7 +393,7 @@ FORRAID:    add  a,0                ;32
             and  3
             bit  7,l
             jr   z,$+4
-            neg  
+            neg
             add  a,h
             ld   (ix+BETA),a
             call RNDL3
@@ -458,8 +451,6 @@ TYPERAID:   ld   (ix+TYPE),T_PIRAT
             jp   TONEWORD
 
 
-
-
 ; ТАБЛИЦЫ ВИДОВ КОРАБЛЕЙ ДЛЯ ОПРЕДЕЛЕННОГО
 ; ТИПА ПЕРСОНАЖА
 INDTABK:
@@ -476,19 +467,15 @@ INDTABK:
             include "gen/INDTAB.inc"   ; GENERATED from assets/data/ship_choice.csv (TPIRAT TTRADER TARMY TPOLICE THUNTER TUFO TOTSHEL KREYSERS)
 
 
-
-
-
-
 ; ГЕНЕРАЦИЯ ОБЪЕКТОВ ОБЩАЯ
 GENSHIPS:
             ld   a,%10000000
-            rrca 
+            rrca
             ld   ($-2),a
             ret  nc
 
 
-PWOPK:      nop  
+PWOPK:      nop
 DOPCOUNT:   ld   a,0
             dec  a
 ;????
@@ -517,16 +504,16 @@ GNUM:       cp   #FD
             ld   e,a
             ld   a,(de)
             ld   d,a
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             and  #07
             ld   c,T_PIRAT
             sub  h
             jr   c,$+3
             xor  a
-            neg  
+            neg
 
 
 ;?????
@@ -534,13 +521,12 @@ GNUM:       cp   #FD
 ;            jr   CHSN
 
 
-
 ; ЗДЕСЬ ХРАНЯТСЯ УСТАНОВОЧНЫЕ ДАННЫЕ
 ; ПО ВЕРОЯТНОСТЯМ СРЕДЫ ГЕНЕРАЦИИ
             cp   #0A
 VARPS:      equ  $-1
             ld   a,h
-            nop  
+            nop
 ; ПИРАТ
             jr   c,CHSN
             cp   #43
@@ -576,7 +562,7 @@ VARPS:      equ  $-1
 ; ОТШЕЛЬНИК
             jr   c,CHSN
             pop  de
-            ret  
+            ret
 CHSN:
             ld   a,c
             cp   T_HERMIT
@@ -585,7 +571,7 @@ CHSN:
             or   a
             jr   z,CHSN2
             pop  de
-            ret  
+            ret
 CHSN2:
             ld   (ix+TYPE),c
             sla  c
@@ -598,7 +584,7 @@ CHSN2:
             ld   l,a
             ld   a,r
             and  7
-            rla  
+            rla
             add  a,l
             ld   l,a
             ld   a,h
@@ -665,7 +651,7 @@ GSS99:
             pop  af
             ex   af,af'
             ld   a,26
-            exx  
+            exx
 ; СОЗДАЕМ СПРАЙТ ТЕЛЕПОРТА
             ld   hl,NWTEL
             call NEWVSPR
@@ -736,9 +722,6 @@ GSS1:
             jp   GSH299
 
 
-
-
-
 ; ЛЕТИМ К ПЛАНЕТЕ
 GSH1:
 
@@ -794,7 +777,7 @@ GSH21:
             or   #07
             bit  7,h
             jr   z,$+3
-            cpl  
+            cpl
             ld   h,a
             pop  de
             add  hl,de
@@ -807,7 +790,7 @@ GSH21:
             or   #07
             bit  7,h
             jr   z,$+3
-            cpl  
+            cpl
             ld   h,a
             pop  de
             add  hl,de
@@ -820,13 +803,12 @@ GSH21:
             or   #01
             bit  7,h
             jr   z,$+3
-            cpl  
+            cpl
             ld   h,a
             pop  de
             add  hl,de
             ld   (ix+4),l
             ld   (ix+5),h
-
 
 
             ld   (ix+MODE),C_GOPLANET
@@ -997,12 +979,12 @@ TOPLAN:
             ld   d,(ix+1)
             ld   c,(ix+2)
             ld   b,(ix+3)
-            exx  
+            exx
             pop  hl
             pop  de
             ld   c,(ix+4)
             ld   b,(ix+5)
-            exx  
+            exx
             jp   ONWAY2
 
 ; ПРОЕБРАЗОВАНИЕ ДВОЙНОГО СЛОВА В СЛОВО
@@ -1058,22 +1040,22 @@ AG3:        ld   de,0
             or   a
             ret  p
             NEGBC
-            ret  
+            ret
 
 MOD_DEHL:
             bit  7,d
             ret  z
             ld   a,d
-            cpl  
+            cpl
             ld   d,a
             ld   a,e
-            cpl  
+            cpl
             ld   e,a
             ld   a,h
-            cpl  
+            cpl
             ld   h,a
             ld   a,l
-            cpl  
+            cpl
             ld   l,a
             ld   bc,1
             add  hl,bc
@@ -1081,5 +1063,4 @@ MOD_DEHL:
             EXD
             adc  hl,bc
             EXD
-            ret  
-
+            ret

@@ -1,23 +1,4 @@
-;MOVEU            ■TOUCH
-;SETCONTROL       ■UPP
-;DOWNN            ■LEFTF
-;RIGHTF           ■LEFTT
-;RIGHTT           ■FLINE2
-;GAZ              ■TORMOZ
-;BORT             ■NAVOD
-;CLRMARK          ■LAUNG1
-;LAUNG2           ■LAUNG3
-;JUMPDRIVE        ■FREECONTROL
-;TURNLIGHTER      ■RETURNSYS
-;ZAHWAT           ■UNROKET
-;DROPCR           ■DROPMINE
-;HIPER            ■DROPDROID
 ;FRONTBACK
-
-
-
-
-
 
 
 MOVEU:
@@ -42,7 +23,7 @@ BFC3:       dw   0
             ld   ix,$+7
             jp   MULADE
             ld   (STPZ+1),hl
-            ret  
+            ret
 
 
 TOUCH:
@@ -61,10 +42,10 @@ CMODE:      ld   a,0
             ex   af,af'
             jr   nc,$+6
             ld   (Speed),hl
-            ret  
+            ret
             xor  a
             ld   (CMODE+1),a
-            ret  
+            ret
 LM1:
             ld   a,1
             ld   (CMODE+1),a
@@ -83,12 +64,7 @@ LM1:
             rr   l
             inc  hl
             ld   (Speed),hl
-            ret  
-
-
-
-
-
+            ret
 
 
 SETCONTROL:
@@ -99,7 +75,6 @@ SETCONTROL:
 ; СЧЕТЧИК ОЖИДАНИЯ ПЕРЕД НАЖАТИЕМ ДР.
 ; КЛАВИШИ ПУСТ, ЗНАЧИТ МОЖНО ОБРАБОТАТЬ
 ; ЕСЛИ НАДО И ЭТУ КНОПКУ
-
 
 
 ; ПОРТЫ, МАСКИ КЛАВИШ УПРАВЛЕНИЯ
@@ -171,7 +146,7 @@ NOPWR2:
             ld   (RIF1+1),a
             ld   (LEF1+1),a
             ld   a,%10010010
-            rrca 
+            rrca
             ld   ($-2),a
             jr   nc,KL3
             ld   a,(EYE_B)
@@ -199,7 +174,7 @@ KL3:
             ld   (UPP1+1),a
             ld   (DWN1+1),a
             ld   a,%10010010
-            rrca 
+            rrca
             ld   ($-2),a
             jr   nc,KL6
             ld   a,(EYE_A)
@@ -226,7 +201,7 @@ KL6:
             ld   (LET1+1),a
             ld   (RIT1+1),a
             ld   a,%10010010
-            rrca 
+            rrca
             ld   ($-2),a
             ret  nc
             ld   a,(EYE_G)
@@ -243,11 +218,7 @@ KL7:
             xor  a
 KL8:
             ld   (EYE_G),a
-            ret  
-
-
-
-
+            ret
 
 
 ADCON:
@@ -279,16 +250,12 @@ ADCON:
             dw   FRONTBACK          ;Передний и задний вид
 
 
-
-
-
-
 ;---------------------------------------
 ; БЛОК ОБРАБОТКИ КЛАВИШ КОНТРОЛЯ
 
 
 DROPDROID:
-            ret  
+            ret
 
 ;-------------------------
 ; БЛОК ОБРАБОТКИ РАКЕТ
@@ -345,7 +312,7 @@ LAUNG3:
 NOCELS:
 ; ВЫВОД СООБЩЕНИЯ "НЕТ ЦЕЛИ"
             MESAG _NOTARGET
-            ret  
+            ret
 RTN1:
 ; ПРОВЕРКА НА НЕТРОКЕТ И НА НЕТ ЦЕЛИ
             inc  a
@@ -361,7 +328,7 @@ RTN1:
             ld   (ROKETN1),a
             MESAG _NOROKET
             xor  a
-            ret  
+            ret
 RAIN:
 ; ПУСК РАКЕТЫ И ВЫВОД СООБЩЕНИЙ
             dec  (hl)
@@ -376,7 +343,7 @@ RAIN:
             call MNUMS_
 ; РАКЕТ
             MESAG _ROKET
-            ret  
+            ret
 AROKS:
 ; КОЛИЧЕСТВО РАКЕТ
             ld   hl,ROKS+1
@@ -385,20 +352,10 @@ AROKS:
             ret  nz
             dec  hl
             ld   a,(hl)
-            ret  
+            ret
 
 ; КОНЕЦ БЛОКА ОБР. РАКЕТ
 ;----------------------------
-
-
-
-
-
-
-
-
-
-
 
 
 HIPER:
@@ -411,7 +368,7 @@ HIPER:
             jr   nz,$+6
             ld   e,1
             ld   a,l
-            rra  
+            rra
             and  a
             ret  z                  ;НЕТ ТОПЛИВА
             ld   c,a
@@ -445,7 +402,7 @@ HR1:
             sub  b
             dec  e
             jr   nz,$+3
-            rlca 
+            rlca
             ld   (hl),a
 
             MESAG _HIPER
@@ -467,15 +424,8 @@ HR1:
             ld   de,ADHDP
             push de
             ld   bc,ZM20
-            ldir 
-            ret  
-
-
-
-
-
-
-
+            ldir
+            ret
 
 
 UNROKET:
@@ -530,7 +480,7 @@ STU1:
 ; РИСОВАНИЕ ЛИНИИ ИГРОКА К РАКЕТЕ
             ld   a,(ix+PX+1)
             cp   #80
-            scf  
+            scf
             jr   z,NOANTI
             ld   b,a
             ld   c,(ix+PX)
@@ -538,7 +488,7 @@ STU1:
             ld   h,(ix+PY+1)
             ld   e,(ix+PZ)
             ld   d,(ix+PZ+1)
-            exx  
+            exx
             ld   bc,3
             ld   (TX+1),bc
             ld   (DX+1),bc
@@ -551,16 +501,7 @@ STU1:
             call FG1
 NOANTI:
             pop  ix
-            ret  
-
-
-
-
-
-
-
-
-
+            ret
 
 
 CLRMARK:
@@ -577,17 +518,7 @@ CLRMARK:
             ld   (ROKETN2),a
             ld   (ROKETN3),a
             MESAG _TARGETOFF
-            ret  
-
-
-
-
-
-
-
-
-
-
+            ret
 
 
 NAVOD:
@@ -610,20 +541,7 @@ ZM3:
             MESAG _MODEON
 ZM2:
             MESAG _GETTARGET
-            ret  
-
-
-
-
-
-
-
-
-
-
-
-
-
+            ret
 
 
 FLINE2:
@@ -648,7 +566,7 @@ FLINE2:
             jr   z,$+8
             ld   a,#FF
             ld   (ROKETN1),a
-            ret  
+            ret
             ld   a,l
             add  a,RSPD-MODE
             ld   l,a
@@ -783,21 +701,7 @@ TNN2:
             ld   hl,EFF14
             ld   (SFXA+1),hl
             MESAG _TAKING
-            ret  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            ret
 
 
 TNN:
@@ -861,20 +765,6 @@ ZM5:
             jp   NAVOD_
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 TURNLIGHTER:
 ; ПЕРЕКЛЮЧЕНИЕ ПОДСВЕТКИ
             ld   a,(COUNTER+1)
@@ -893,21 +783,7 @@ TURNLIGHTER:
             ld   (PODSWET+1),a
             ld   hl,EFF1
             ld   (SFXA+1),hl
-            ret  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            ret
 
 
 JUMPDRIVE:
@@ -973,7 +849,7 @@ AFUEL:
             ret  nz
             inc  hl
             ld   a,(hl)
-            ret  
+            ret
 FUEL_:
             call AFUEL
             ld   c,a
@@ -996,11 +872,11 @@ FUEL_:
             ld   (FFUEL+1),a
 JKL2:
             ld   a,#11
-            rrca 
+            rrca
             ld   ($-2),a
             jr   nc,$+11
             ld   a,#88
-            rrca 
+            rrca
             ld   ($-2),a
             call c,TRASHINI
             ld   hl,#1000
@@ -1010,21 +886,7 @@ JKL2:
             call GAZ_
             pop  bc
             djnz $-5
-            ret  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            ret
 
 
 FREECONTROL:
@@ -1057,22 +919,7 @@ ZM6:
 ZM7:
             ld   (CALCSTEP),a
             MESAG _FREEFLY
-            ret  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            ret
 
 
 DROPCR:
@@ -1092,7 +939,7 @@ DROPCR:
             jr   nz,DC2
             djnz $-5
             MESAG _NOCARGO
-            ret  
+            ret
 DC2:
             ld   (hl),0
             ld   de,0-TWRI
@@ -1101,22 +948,7 @@ DC2:
             ld   ix,PLAYER
             call NEWCARGO
             MESAG _DROPCARGO
-            ret  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            ret
 
 
 DROPMINE:
@@ -1138,28 +970,10 @@ DROPMINE:
             ld   ix,PLAYER
             call NEWCARGO
             MESAG _DROPMINE
-            ret  
+            ret
 DM1:
             MESAG _NOMINE
-            ret  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            ret
 
 
 RETURNSYS:
@@ -1183,21 +997,6 @@ RETURNSYS:
             jp   HIPER
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 FRONTBACK:
 ; ЗАДНИЙ ПЕРЕДНИЙ ВИДЫ
             ld   a,(COUNTER+1)
@@ -1218,7 +1017,7 @@ FRONTBACK:
             ld   (BFC3),hl
             MESAG _MODEON
             MESAG _FRONT
-            ret  
+            ret
 BK1:
             ld   hl,#44ED
             ld   (BFC1),hl
@@ -1226,22 +1025,7 @@ BK1:
             ld   (BFC3),hl
             MESAG _MODEON
             MESAG _BACK
-            ret  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            ret
 
 
 GAZ:
@@ -1262,7 +1046,7 @@ MAXSPEED:   ld   de,MXSPD
             ld   (Speed),hl
             ld   a,1
             ld   (FSPEED+1),a
-            ret  
+            ret
 
 
 TORMOZ:
@@ -1283,7 +1067,7 @@ TORMOZ:
             ld   (Speed),hl
             ld   a,1
             ld   (FSPEED+1),a
-            ret  
+            ret
 
 
 LEFTT:
@@ -1302,7 +1086,7 @@ LET1:       ld   a,0
             cp   #100-MANE1
             ret  c
             ld   (EYE_G),a
-            ret  
+            ret
 
 
 RIGHTT:
@@ -1321,7 +1105,7 @@ RIT1:       ld   a,0
             cp   MANE1+1
             ret  nc
             ld   (EYE_G),a
-            ret  
+            ret
 
 
 LEFTF:
@@ -1340,7 +1124,7 @@ LEF1:       ld   a,0
             cp   #100-MANE2
             ret  c
             ld   (EYE_B),a
-            ret  
+            ret
 
 
 RIGHTF:
@@ -1359,7 +1143,7 @@ RIF1:       ld   a,0
             cp   MANE2+1
             ret  nc
             ld   (EYE_B),a
-            ret  
+            ret
 
 
 UPP:
@@ -1378,7 +1162,7 @@ UPP1:       ld   a,0
             cp   #100-MANE2
             ret  c
             ld   (EYE_A),a
-            ret  
+            ret
 
 
 DOWNN:
@@ -1397,5 +1181,4 @@ DWN1:       ld   a,0
             cp   MANE2+1
             ret  nc
             ld   (EYE_A),a
-            ret  
-
+            ret

@@ -6,20 +6,6 @@
 ;DIVHLDE
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 CLIP:
 ; КЛИППИРОВАИНЕ ПЛОСКОСТИ
 ; b-КОЛИЧЕСТВО УЗЛОВ
@@ -76,7 +62,7 @@ X8B2:       ld   hl,(_X1)
             ld   a,(hl)
             ld   (_F1),a
             ld   a,(_F0)
-            cpl  
+            cpl
             and  #F0
             ld   l,a
             ld   a,(_F1)
@@ -96,7 +82,7 @@ X8B2:       ld   hl,(_X1)
             pop  hl
             ld   a,(LOW_CORDS_BUF)
             cp   #06
-X902:       ret  
+X902:       ret
 X903:       call DXaY
 X906:       call aXDY
 X909:       call aY_aX
@@ -106,7 +92,7 @@ X912:       ld   hl,F_ACTING
             bit  0,(hl)
             jp   nz,SET_XaYa
             set  0,(hl)
-            ret  
+            ret
 X91D:       call DXaY
 X920:       call iXDY
 X923:       call aY_iX
@@ -116,7 +102,7 @@ X92C:       ld   hl,F_ACTING
             bit  1,(hl)
             jp   nz,SET_XiYa
             set  1,(hl)
-            ret  
+            ret
 X937:       call DXiY
 X93A:       call aXDY
 X93D:       call iY_aX
@@ -126,7 +112,7 @@ X946:       ld   hl,F_ACTING
             bit  2,(hl)
             jp   nz,SET_XaYi
             set  2,(hl)
-            ret  
+            ret
 X951:       call DXiY
 X954:       call iXDY
 X957:       call iY_iX
@@ -136,7 +122,7 @@ X960:       ld   hl,F_ACTING
             bit  3,(hl)
             jp   nz,SET_XiYi
             set  3,(hl)
-            ret  
+            ret
 X96B:       call C_XY_aXDY
             jp   STOR_Y1_X1
 X971:       call C_XY_aXDY
@@ -163,7 +149,7 @@ X9A4:       call DXiY
             jp   C_XY_DXiY+3
 X9B3:       call X1_X0
             jp   m,_BREAK
-            ret  
+            ret
 X9BA:       call aXDY
 X9BD:       call DXiY
             call iY_aX
@@ -188,7 +174,7 @@ X9ED:       call DXaY
             jp   X906
 X9FC:       call X1_X0
             jp   p,_BREAK
-            ret  
+            ret
 XA03:       call iXDY
 XA06:       call DXiY
             call iY_iX
@@ -219,7 +205,7 @@ XA48:       call iXDY
             jp   C_XY_iXDY+3
 XA57:       call Y1_Y0
             jp   m,_BREAK
-            ret  
+            ret
 XA5E:       call C_XY_DXaY
             jp   C_XY_DXiY
 XA64:       call DXaY
@@ -250,7 +236,7 @@ XAAA:       call C_XY_DXaY+3
             jp   STOR_Y1_X1
 XAB0:       call X1_X0
             jp   p,_BREAK
-            ret  
+            ret
 XAB7:       call DXaY
             call aXDY
             call aY_aX
@@ -266,7 +252,7 @@ XAD6:       ld   hl,F_ACTING
             bit  0,(hl)
             jp   nz,SET_XaYa
             set  0,(hl)
-            ret  
+            ret
 XAE1:       call XAD6
             jp   X92C
 XAE7:       call DXaY
@@ -306,10 +292,10 @@ XB46:       ld   hl,F_ACTING
             bit  1,(hl)
             jp   nz,SET_XiYa
             set  1,(hl)
-            ret  
+            ret
 XB51:       call Y1_Y0
             jp   p,_BREAK
-            ret  
+            ret
 XB58:       call DXaY
             call iXDY
             call aY_iX
@@ -366,7 +352,7 @@ XBE4:       call iXDY
             jp   X923
 XBF6:       call Y1_Y0
             jp   p,_BREAK
-            ret  
+            ret
 XBFD:       call DXiY
             call aXDY
             call iY_aX
@@ -381,7 +367,7 @@ XC19:       ld   hl,F_ACTING
             bit  2,(hl)
             jp   nz,SET_XaYi
             set  2,(hl)
-            ret  
+            ret
 XC24:       call DXiY
             call aXDY
             call iY_aX
@@ -413,7 +399,7 @@ XC5E:       call DXiY
             jp   X98C
 XC77:       call Y1_Y0
             jp   m,_BREAK
-            ret  
+            ret
 XC7E:       call DXiY
             call iXDY
             call iY_iX
@@ -437,7 +423,7 @@ XCB3:       call C_XY_iXDY+3
             jp   C_XY_aXDY
 XCB9:       call X1_X0
             jp   m,_BREAK
-            ret  
+            ret
 XCC0:       call DXiY
             call iXDY
             call iY_iX
@@ -458,7 +444,7 @@ XCEE:       ld   hl,F_ACTING
             bit  3,(hl)
             jp   nz,SET_XiYi
             set  3,(hl)
-            ret  
+            ret
 XCF9:       call XCEE
             jp   X946
 
@@ -473,7 +459,7 @@ DXiY:       ld   bc,(_X1)
             call MULL
             ld   (_DXiY),de
             ld   (_DXiY+2),hl
-            ret  
+            ret
 ;DX*(MAX-Y0)
 DXaY:       ld   bc,(_X1)
             ld   hl,(_X0)
@@ -485,7 +471,7 @@ DXaY:       ld   bc,(_X1)
             call MULL
             ld   (_DXaY),de
             ld   (_DXaY+2),hl
-            ret  
+            ret
 ;(MIN-X0)*DY
 iXDY:       ld   bc,0
             ld   hl,(_X0)
@@ -497,7 +483,7 @@ iXDY:       ld   bc,0
             call MULL
             ld   (_iXDY),de
             ld   (_iXDY+2),hl
-            ret  
+            ret
 ;(MAX-X0)*DY
 aXDY:       ld   bc,#00FF
             ld   hl,(_X0)
@@ -509,7 +495,7 @@ aXDY:       ld   bc,#00FF
             call MULL
             ld   (_aXDY),de
             ld   (_aXDY+2),hl
-            ret  
+            ret
 
 C_XY_DXiY:  call DXiY
             ld   a,(_DXiY)
@@ -537,7 +523,7 @@ C_XY_DXiY:  call DXiY
             inc  l
             ld   a,l
             ld   (LOW_CORDS_BUF),a
-            ret  
+            ret
             ld   l,#FF
             ld   e,l
             ld   a,(LOW_CORDS_BUF)
@@ -549,7 +535,7 @@ C_XY_DXiY:  call DXiY
             inc  l
             ld   a,l
             ld   (LOW_CORDS_BUF),a
-            ret  
+            ret
 C_XY_DXaY:  call DXaY
             ld   a,(_DXaY)
             ex   af,af'
@@ -575,7 +561,7 @@ C_XY_DXaY:  call DXaY
             inc  l
             ld   a,l
             ld   (LOW_CORDS_BUF),a
-            ret  
+            ret
             ld   l,#FF
             ld   e,l
             ld   a,(LOW_CORDS_BUF)
@@ -587,7 +573,7 @@ C_XY_DXaY:  call DXaY
             inc  l
             ld   a,l
             ld   (LOW_CORDS_BUF),a
-            ret  
+            ret
 C_XY_iXDY:  call iXDY
             ld   a,(_iXDY)
             ex   af,af'
@@ -615,7 +601,7 @@ C_XY_iXDY:  call iXDY
             inc  l
             ld   a,l
             ld   (LOW_CORDS_BUF),a
-            ret  
+            ret
 IO1:
             ld   a,(LOW_CORDS_BUF)
             ld   l,a
@@ -627,7 +613,7 @@ IO1:
             inc  l
             ld   a,l
             ld   (LOW_CORDS_BUF),a
-            ret  
+            ret
 IO2:
             ld   d,l
             ld   a,(LOW_CORDS_BUF)
@@ -639,7 +625,7 @@ IO2:
             inc  l
             ld   a,l
             ld   (LOW_CORDS_BUF),a
-            ret  
+            ret
 C_XY_aXDY:  call aXDY
             ld   a,(_aXDY)
             ex   af,af'
@@ -667,7 +653,7 @@ C_XY_aXDY:  call aXDY
             inc  l
             ld   a,l
             ld   (LOW_CORDS_BUF),a
-            ret  
+            ret
 IO4:
             ld   a,(LOW_CORDS_BUF)
             ld   l,a
@@ -678,7 +664,7 @@ IO4:
             inc  l
             ld   a,l
             ld   (LOW_CORDS_BUF),a
-            ret  
+            ret
 IO3:
             ld   d,l
             ld   a,(LOW_CORDS_BUF)
@@ -690,7 +676,7 @@ IO3:
             inc  l
             ld   a,l
             ld   (LOW_CORDS_BUF),a
-            ret  
+            ret
 SET_XiYi:   ld   a,(F_POL_LIN)
             and  a
             ret  nz
@@ -718,7 +704,7 @@ iY_iX:
             ld   hl,(_DXiY+2)
             ld   bc,(_iXDY+2)
             sbc  hl,bc
-            ret  
+            ret
 iY_aX:
             ld   hl,(_DXiY)
             ld   bc,(_aXDY)
@@ -726,7 +712,7 @@ iY_aX:
             ld   hl,(_DXiY+2)
             ld   bc,(_aXDY+2)
             sbc  hl,bc
-            ret  
+            ret
 aY_iX:
             ld   hl,(_DXaY)
             ld   bc,(_iXDY)
@@ -734,7 +720,7 @@ aY_iX:
             ld   hl,(_DXaY+2)
             ld   bc,(_iXDY+2)
             sbc  hl,bc
-            ret  
+            ret
 aY_aX:
             ld   hl,(_DXaY)
             ld   bc,(_aXDY)
@@ -742,15 +728,15 @@ aY_aX:
             ld   hl,(_DXaY+2)
             ld   bc,(_aXDY+2)
             sbc  hl,bc
-            ret  
+            ret
 X1_X0:      ld   hl,(_X1)
             ld   de,(_X0)
             SUB_DE
-            ret  
+            ret
 Y1_Y0:      ld   hl,(_Y1)
             ld   de,(_Y0)
             SUB_DE
-            ret  
+            ret
 STOR_Y1_X1: ld   a,(_X1)
             ld   e,a
             ld   a,(_Y1)
@@ -764,7 +750,7 @@ STOR_YX_DE: ld   a,(LOW_CORDS_BUF)
             inc  l
             ld   a,l
             ld   (LOW_CORDS_BUF),a
-            ret  
+            ret
 _BREAK:     pop  af
             pop  bc
             pop  hl
@@ -772,9 +758,8 @@ _BREAK:     pop  af
             dec  c
             ld   b,0
             add  hl,bc
-            scf  
-            ret  
-
+            scf
+            ret
 
 
 ; УМНОЖЕНИЕ HLDE=hl*de
@@ -830,7 +815,7 @@ XFBE:       pop  af
             EXD
             ld   hl,0
             sbc  hl,bc
-            ret  
+            ret
 XFDA:       ld   a,h
             and  a
             jr   z,LD030
@@ -887,12 +872,12 @@ LD030:      rr   e
             jp   $+49
             rept 7
             add  a,l
-            rra  
+            rra
             rr   e
             jr   nc,$+3
             endr
             add  a,l
-            rra  
+            rra
             rr   e
             ld   d,a
             ld   l,h
@@ -911,50 +896,49 @@ DIVHLDE:    ld   ixl,0
 LD098:      bit  7,h
             jr   z,LD0AA
             ex   af,af'
-            cpl  
+            cpl
             ex   af,af'
-            cpl  
+            cpl
             ld   b,h
             ld   c,l
             ld   hl,0
-            scf  
+            scf
             sbc  hl,bc
             inc  ixl
 LD0AA:
 
             rept 8
-            rla  
+            rla
             adc  hl,hl
             sbc  hl,de
             jr   nc,$+3
             add  hl,de
             endr
 
-            rla  
+            rla
             ex   af,af'
 
             rept 8
-            rla  
+            rla
             adc  hl,hl
             sbc  hl,de
             jr   nc,$+3
             add  hl,de
             endr
 
-            rla  
+            rla
             dec  ixl
             jr   nz,$+6
             ld   l,a
             ex   af,af'
             ld   h,a
-            ret  
-            cpl  
+            ret
+            cpl
             ld   l,a
             ex   af,af'
-            cpl  
+            cpl
             ld   h,a
-            ret  
-
+            ret
 
 
 CLIPLINE:
@@ -979,7 +963,7 @@ CLIPLINE:
 LD16E:      xor  a
             ld   (LOW_CORDS_BUF),a
             ld   a,(_F0)
-            cpl  
+            cpl
             and  #F0
             ld   l,a
             ld   a,(_F1)
@@ -1000,8 +984,7 @@ LD16E:      xor  a
             pop  de
             pop  de
             cp   #04
-            ret  
-
+            ret
 
 
 ; МАТРИЦА ОТДЕЛЬНОГО ОБЪЕКТА
@@ -1020,7 +1003,7 @@ MATRX:
             ld   l,b
             ld   a,(hl)             ;SIN
             ld   (GM_13+1),a        ;SIN b
-            neg  
+            neg
             ld   (GM_31+1),a        ;-SIN b
             xor  a
             ld   (GM_12+1),a
@@ -1029,7 +1012,7 @@ MATRX:
             ld   (GM_32+1),a
             ld   a,#7F
             ld   (GM_22+1),a
-            ret  
+            ret
 LD1D8:
             ld   a,(EYEA)
             ld   h,SINTB
@@ -1051,7 +1034,7 @@ LD1D8:
             ld   l,a
             ld   a,(hl)
             ld   d,a
-            neg  
+            neg
             ld   (GM_12+1),a
             ld   a,l
             add  a,#40
@@ -1122,9 +1105,7 @@ LD1D8:
             MULAD
             ADPAXH
             ld   (GM_33+1),a
-            ret  
-
-
+            ret
 
 
 PMATRX:
@@ -1320,7 +1301,7 @@ GM_32:      ld   d,0
             ADPAXH
 
             ld   (OM_32+1),a
-            ret  
+            ret
 LD429:
             ld   a,(SM_21+1)
             ld   (OM_12+1),a
@@ -1328,7 +1309,7 @@ LD429:
             ld   (OM_22+1),a
             ld   a,(SM_23+1)
             ld   (OM_32+1),a
-            ret  
+            ret
 LD43C:
             ld   a,(SM_21+1)
             ld   (OM_12+1),a
@@ -1348,15 +1329,15 @@ LD43C:
             ld   a,(SM_33+1)
             ld   (OM_31+1),a
             ld   a,(SM_11+1)
-            neg  
+            neg
             ld   (OM_13+1),a
             ld   a,(SM_12+1)
-            neg  
+            neg
             ld   (OM_23+1),a
             ld   a,(SM_13+1)
-            neg  
+            neg
             ld   (OM_33+1),a
-            ret  
+            ret
 LD485:      ld   a,(SM_11+1)
             ld   (OM_11+1),a
             ld   a,(SM_12+1)
@@ -1369,15 +1350,15 @@ LD485:      ld   a,(SM_11+1)
             ld   (OM_23+1),a
             ld   a,(SM_33+1)
             ld   (OM_33+1),a
-            ret  
+            ret
 LD4AA:      ld   a,(SM_31+1)
-            neg  
+            neg
             ld   (OM_11+1),a
             ld   a,(SM_32+1)
-            neg  
+            neg
             ld   (OM_21+1),a
             ld   a,(SM_33+1)
-            neg  
+            neg
             ld   (OM_31+1),a
             ld   a,(SM_11+1)
             ld   (OM_13+1),a
@@ -1385,27 +1366,26 @@ LD4AA:      ld   a,(SM_31+1)
             ld   (OM_23+1),a
             ld   a,(SM_13+1)
             ld   (OM_33+1),a
-            ret  
+            ret
 LD4D5:      ld   a,(SM_11+1)
-            neg  
+            neg
             ld   (OM_11+1),a
             ld   a,(SM_12+1)
-            neg  
+            neg
             ld   (OM_21+1),a
             ld   a,(SM_13+1)
-            neg  
+            neg
             ld   (OM_31+1),a
             ld   a,(SM_31+1)
-            neg  
+            neg
             ld   (OM_13+1),a
             ld   a,(SM_32+1)
-            neg  
+            neg
             ld   (OM_23+1),a
             ld   a,(SM_33+1)
-            neg  
+            neg
             ld   (OM_33+1),a
-            ret  
-
+            ret
 
 
             ADRXX00
@@ -1636,5 +1616,3 @@ _DXiY:      dw   0,0
             db   high(XCF9)
             db   high(X902)
             db   0,0,0,0,0
-
-

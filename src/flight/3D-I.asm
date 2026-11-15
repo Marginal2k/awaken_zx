@@ -1,4 +1,3 @@
-
 REN3D:
 
 ; НАЧИНАЕМ ВЫБОР ОБЪЕКТОВ КОТОРЫЕ ВИДИМЫ
@@ -10,7 +9,7 @@ RETPRI:     ld   a,0
             ld   hl,(PCORD)
             ld   a,l
             sub  #77
-            neg  
+            neg
             jr   z,$+9
             inc  l
             or   a
@@ -19,7 +18,7 @@ RETPRI:     ld   a,0
             dec  l
             ld   a,h
             sub  #2B
-            neg  
+            neg
             jr   z,$+9
             inc  h
             or   a
@@ -100,7 +99,7 @@ L9EED:
             and  a
             jp   m,END_1
 L9EFC:
-            exx  
+            exx
             add  hl,bc              ;NEXT VECTOR
 L9F04:
             ld   sp,hl
@@ -114,7 +113,7 @@ L9F04:
             ld   a,#80
             ld   (hl),a
             EXD
-            exx  
+            exx
             pop  hl                 ;X
             cp   h
             jr   z,L9EED            ;END
@@ -122,7 +121,7 @@ L9F04:
             ld   a,h
             and  a
             jp   p,$+5
-            neg  
+            neg
             cp   VISIBILITY
             jr   nc,L9EFC
             ld   (DX+1),hl
@@ -131,7 +130,7 @@ L9F04:
             ld   a,h
             and  a
             jp   p,$+5
-            neg  
+            neg
             cp   VISIBILITY
             jr   nc,L9EFC
             ld   (DY+1),hl
@@ -140,7 +139,7 @@ L9F04:
             ld   a,h
             and  a
             jp   p,$+5
-            neg  
+            neg
             cp   VISIBILITY
             jr   nc,L9EFC
             ld   (DZ+1),hl
@@ -167,13 +166,13 @@ L9F04:
             jp   pe,L9EFC
 ; ПЕРЕНОСИМ ПРОСЧИТАННЫЕ КООРДИНАТЫ В
 ; ВЕКТОР ОБЪЕКТА ТЕМ САМЫМ СТИРАЯ МАРК
-            exx  
+            exx
             ld   a,l
-            exx  
+            exx
             ld   l,a
-            exx  
+            exx
             ld   a,h
-            exx  
+            exx
             ld   h,a
             ld   de,PZ+2
             add  hl,de
@@ -190,17 +189,17 @@ L9F04:
             ld   a,h
             and  a
             jp   p,$+5
-            neg  
+            neg
             ld   c,a
             ld   a,d
             and  a
             jp   p,$+5
-            neg  
+            neg
             ld   e,a
             ld   a,b
             and  a
             jp   p,$+5
-            neg  
+            neg
             cp   e
             jr   nc,$+3
             ld   a,e
@@ -210,7 +209,7 @@ L9F04:
             srl  a
             sub  #0F
             jr   nc,NUNU2
-            neg  
+            neg
             jp   NUNU2+1
 NUNU2:
             xor  a
@@ -348,7 +347,6 @@ Jmp3:       jr   $
             jp   m,L9EFC
 
 
-
 ; ЕСЛИ МЫ В РЕЖИМЕ ФОРСАЖА ТО НИКАКИХ
 ; НАВЕДЕНИЙ
             ld   a,(JFLAG2+1)
@@ -362,13 +360,13 @@ Jmp3:       jr   $
             ld   a,(TX+2)
             and  a
             jp   p,$+5
-            neg  
+            neg
             cp   #0A
             jp   nc,LLLK
             ld   a,(TY+2)
             and  a
             jp   p,$+5
-            neg  
+            neg
             cp   #0A
             jp   nc,LLLK
 ; ОБЪЕКТ В ЗОНЕ
@@ -426,7 +424,7 @@ FLL:        ld   a,1
 ; ЛАЗЕРА
             ld   a,(PCORD+1)
             sub  #2B
-            neg  
+            neg
             ld   l,a
             ld   h,0
             jp   p,$+4
@@ -444,7 +442,7 @@ MDSZ2:      ld   hl,0
 MDXX:       ld   de,0
             ld   a,(PCORD)
             sub  #77
-            neg  
+            neg
             ld   l,a
             ld   h,0
             jp   p,$+4
@@ -460,9 +458,9 @@ MDXX:       ld   de,0
 ; ПОПАДАНИЕ
             ld   a,1
             ld   (FLL+1),a
-            exx  
+            exx
             ld   (SHUT+1),hl
-            exx  
+            exx
 LLLK2:
 ; НАВЕДЕНИЕ ПРИЦЕЛА
             ld   a,(RETPRI+1)
@@ -491,14 +489,14 @@ MDYY:       ld   de,0
             and  a
             ld   a,c
             jp   p,$+5
-            neg  
+            neg
             add  a,#77
             ld   c,a
             ld   a,(TY+2)
             and  a
             ld   a,e
             jp   p,$+5
-            neg  
+            neg
             add  a,#2B
             ld   e,a
 
@@ -506,7 +504,7 @@ MDYY:       ld   de,0
 ; КООРДИНАТЫ ПРОЦЕЛА
             ld   a,l
             sub  c
-            neg  
+            neg
             inc  a
 ; ЕСЛИ = #FF, ЧТО БЫ НЕ ПРИБАВИТЬ #7F
             jr   z,$+3
@@ -517,7 +515,7 @@ MDYY:       ld   de,0
             ld   l,a
             ld   a,h
             sub  e
-            neg  
+            neg
             inc  a
             jr   z,$+3
             dec  a
@@ -557,11 +555,11 @@ MDYY:       ld   de,0
             MESAG _ALLTARGET
             jp   LLLK
 CSA1:
-            exx  
+            exx
             ld   a,l
             ex   af,af'
             ld   a,h
-            exx  
+            exx
             ld   h,a
             ex   af,af'
             ld   l,a
@@ -569,13 +567,12 @@ CSA1:
             add  hl,bc
             ld   a,h
             sla  l
-            rla  
+            rla
             sla  l
-            rla  
+            rla
 ;              sla    l
 ;              rla
             ld   (de),a
-
 
 
 LLLK:
@@ -689,7 +686,7 @@ LA2FD:      ld   sp,#0000
             call VSMASK
             jr   z,LA339
             ld   b,a
-            cpl  
+            cpl
             and  #F0
             jr   nz,LA339
             ld   a,b
@@ -706,7 +703,6 @@ LA33B:      cp   #01
             jp   LA2D8
 
 
-
 ; СТОЛКНОВЕНИЕ
 CRASH:      ld   a,0
             and  a
@@ -714,9 +710,9 @@ CRASH:      ld   a,0
             ret  nz
 
 
-            exx  
+            exx
             push hl
-            exx  
+            exx
             pop  ix
             ld   a,(ix+TYPE)
             cp   T_ROKET
@@ -753,7 +749,4 @@ CRSH:
             ret  nz
             xor  a
             ld   (SHILD),a
-            ret  
-
-
-
+            ret

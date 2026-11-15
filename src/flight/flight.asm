@@ -1,7 +1,4 @@
             DEVICE ZXSPECTRUM128
-            ; create $M,29   (ZASM auto-label family)
-            ; create $J,76   (ZASM auto-label family)
-            ; create $R,10   (ZASM auto-label family)
             include "MACRO.asm"
             include "EQUS.asm"
             include "../common/disk.asm"
@@ -17,7 +14,6 @@ ASM:        equ  ON
 
 
             org  #6000
-            ; ent $   (ZASM entry point marker)
 
 ; ПРОЦЕДУРА ЗАГРУЗКИ СТРАНИЦ
             include "LOADI2.asm"
@@ -27,10 +23,6 @@ ASM:        equ  ON
             ent
 
 ZM8:        equ  $-ZM9
-
-
-
-
 
 
             disp #6000
@@ -58,7 +50,6 @@ ZM25:       equ  $-#8C00
             else
             incbin "DATAS.C"
             endif
-
 
 
 ; ОСНОВНОЕ ТЕЛО ИГРЫ
@@ -96,12 +87,6 @@ END_:
             savebin "ACTION.C",#6000,$-#6000      ; main image (loaded to #6000 by the previous stage)
 
 
-
-
-
-
-
-
             if   ASM
 
 MAKE_0:          equ  #C000
@@ -135,14 +120,6 @@ MAKE_1:          equ  NEXTL1
             include "VOXEL~37.asm"
 
 END_S:
-
-
-
-
-
-
-
-
 
 
             if   ASM
@@ -180,7 +157,6 @@ FONT:
             include "STARHSUN.asm"
 
 
-
 NEXTL2:
 
             endif
@@ -189,7 +165,6 @@ NEXTL2:
             savebin "CONTROL0.C",MAKE_2,$-MAKE_2
 MAKE_3:          equ  NEXTL2
             org  MAKE_3
-
 
 
 ; ПРОЦЕДУРЫ УСТАНОВКИ ПАРАМЕТРОВ СРЕДЫ
@@ -206,8 +181,6 @@ MAKE_3:          equ  NEXTL2
 
 ; ВЫВОД СООБЩЕНИЙ В КОМПЬЮТЕР
             include "COMPUTE.asm"
-
-
 
 
 ; ОБЪЕКТЫ

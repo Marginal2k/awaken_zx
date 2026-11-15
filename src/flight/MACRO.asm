@@ -1,23 +1,4 @@
-;ADRXX00          ■NEXTLINE
-;PREVLINE         ■PAGE
-;ADDIXIX          ■ADDIYIY
-;ADPHLDE          ■NEGHL
-;NEGDE            ■NEGBC
-;ABSHL            ■ABSDE
-;ABSBC            ■CYCL1
-;MULAB            ■MULAC
-;MULAD            ■ADPAXH
-;SBPAXH           ■DIVED
-;SM1              ■SM2
-;SM3              ■MESAG
-;MVOX             ■HIDEM
-;ADDHLHL          ■SUB_DE
-;SUB_BC           ■ACPL_A
 ;EXD
-
-
-
-
 
 
 ; МАКРОСЫ
@@ -93,30 +74,30 @@
 ; ИНВЕРСИЯ hl
             MACRO NEGHL
             ld   a,l
-            cpl  
+            cpl
             ld   l,a
             ld   a,h
-            cpl  
+            cpl
             ld   h,a
             inc  hl
             ENDM
 ; ИНВЕРСИЯ de
             MACRO NEGDE
             ld   a,e
-            cpl  
+            cpl
             ld   e,a
             ld   a,d
-            cpl  
+            cpl
             ld   d,a
             inc  de
             ENDM
 ; ИНВЕРСИЯ bc
             MACRO NEGBC
             ld   a,c
-            cpl  
+            cpl
             ld   c,a
             ld   a,b
-            cpl  
+            cpl
             ld   b,a
             inc  bc
             ENDM
@@ -147,7 +128,7 @@
             ld   e,h
             add  hl,sp
             ld   a,(de)
-            exx  
+            exx
             ld   c,a
             ld   b,high(VXTAB)
             ld   a,(bc)
@@ -177,7 +158,7 @@
             ld   a,l
             sub  d
             ld   l,a
-            exx  
+            exx
             ENDM
 
 ; УМНОЖЕНИЕ ЗНАКОВОЕ a=a*b
@@ -226,7 +207,7 @@
             MACRO ADPAXH
             add  a,ixh
             jp   po,$+9
-            neg  
+            neg
             jp   po,$+4
             dec  a
             ENDM
@@ -235,7 +216,7 @@
             MACRO SBPAXH
             sub  ixh
             jp   po,$+9
-            neg  
+            neg
             jp   po,$+4
             dec  a
             ENDM
@@ -244,7 +225,7 @@
             MACRO DIVED
             rept 8
             rl   e
-            rla  
+            rla
             sub  d
             jr   nc,$+3
             add  a,d
@@ -265,7 +246,7 @@
             ENDM
             MACRO SM2
             adc  hl,hl
-            rla  
+            rla
             cp   d
             ENDM
             MACRO SM3
@@ -287,13 +268,13 @@
             add  hl,sp
             ld   a,(de)
             and  #F0
-            exx  
+            exx
             ld   l,a
-            exx  
+            exx
             ld   e,h
             add  hl,sp
             ld   a,(de)
-            exx  
+            exx
             jr   z,$+39
             and  d
             jr   z,$+32
@@ -348,19 +329,19 @@
             or   (hl)
             ld   (bc),a
             inc  c
-            exx  
+            exx
 
             ld   e,h
             add  hl,sp
             ld   a,(de)
             and  #F0
-            exx  
+            exx
             ld   l,a
-            exx  
+            exx
             ld   e,h
             add  hl,sp
             ld   a,(de)
-            exx  
+            exx
             jr   z,$+39
             and  d
             jr   z,$+32
@@ -415,10 +396,9 @@
             or   (hl)
             ld   (bc),a
             inc  c
-            exx  
+            exx
 
             ENDM
-
 
 
             MACRO HIDEM par1,par2
@@ -429,7 +409,7 @@
             pop  de
             pop  ix
             ex   af,af'
-            exx  
+            exx
             pop  af
             pop  bc
             pop  de
@@ -442,7 +422,7 @@
             push bc
             push af
             ex   af,af'
-            exx  
+            exx
             push ix
             push de
             push bc
@@ -454,7 +434,7 @@
             pop  de
             pop  ix
             ex   af,af'
-            exx  
+            exx
             pop  af
             pop  bc
             pop  de
@@ -468,7 +448,7 @@
             res  4,l
             inc  h
             ex   af,af'
-            exx  
+            exx
             push ix
             push de
             push bc
@@ -493,10 +473,9 @@
             MACRO ACPL_A
             or   a
             jp   p,$+4
-            cpl  
+            cpl
             ENDM
 
             MACRO EXD
             ex   de,hl
             ENDM
-

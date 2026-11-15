@@ -1,23 +1,4 @@
-;CLRHD            ■MULADE
-;POLYGON          ■RENOBJ
-;RENDOT2          ■DRWPOL
-;DRWPOL2          ■DRWLIN
-;DRAWL1           ■VSMASK
 ;VSPOLY
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
             ADRXX00
@@ -38,7 +19,7 @@ CLRHD:      ld   (LC529+1),sp
             endr
             djnz $-16
 LC529:      ld   sp,0
-            ret  
+            ret
 
 ;MUL hl=a*de
 MULADE:     ld   l,a
@@ -48,7 +29,7 @@ MULADE:     ld   l,a
             ld   a,l
             and  a
             jp   p,$+5
-            neg  
+            neg
             ld   c,0
             ld   h,c
             ld   l,c
@@ -89,7 +70,6 @@ MULADE:     ld   l,a
             jp   (ix)
 
 
-
             org  (low((high($)))*256)+#C0
 
             rept 31
@@ -108,7 +88,7 @@ MSK:        xor  #00
             ld   (bc),a
 LC608:      inc  h
             res  1,h
-            exx  
+            exx
             add  ix,bc
             jr   c,JJJ1
 JJJ2:
@@ -125,7 +105,7 @@ LC622:      sub  #00
 LC626:      add  a,#00
             add  iy,sp
             ld   h,a
-            exx  
+            exx
 
 
             ld   a,d
@@ -160,7 +140,7 @@ LC654:
             or   (hl)
             inc  l
             ld   e,a
-            cpl  
+            cpl
             and  (hl)
             ld   l,a
             ld   a,(bc)
@@ -173,20 +153,19 @@ MSK2:       xor  #00
             ex   af,af'
             jp   LC608
 
-JJJ1:       exx  
+JJJ1:       exx
             inc  b
-            exx  
+            exx
             jp   JJJ2
 LC66B:
 JMP1:       equ  $-JUMP-2
             ld   sp,#0000
             pop  hl
-            ret  
+            ret
 
 LC66E:
 JMP3:       equ  $-JUMP-2
             jp   LC6C0
-
 
 
 LC6B9:      ld   a,(LC6CC)
@@ -212,10 +191,10 @@ LC67F:      ld   a,(hl)
             ld   (LC675),hl
             ld   d,a
             ld   (LC61A+1),a
-            rra  
-            exx  
+            rra
+            exx
             ld   l,a
-            exx  
+            exx
             ld   a,(hl)
             ld   (LC632+1),a
             dec  l
@@ -233,21 +212,21 @@ LC67F:      ld   a,(hl)
             and  a
             jr   z,LC75E
             sub  d
-            neg  
+            neg
             ld   (LC616+1),a
             ld   a,e
-            neg  
+            neg
             srl  a
-            exx  
+            exx
             ld   c,#00
             rr   c
-            rra  
+            rra
             rr   c
-            rra  
+            rra
             rr   c
             add  a,#20
             ld   b,a
-            exx  
+            exx
             pop  hl
             ld   d,l
             ld   a,d
@@ -256,9 +235,9 @@ LC67F:      ld   a,(hl)
 LC75E:
             ld   (LC616+1),a
             ld   a,e
-            cpl  
-            rra  
-            exx  
+            cpl
+            rra
+            exx
             ld   c,#00
             rr   c
             sra  a
@@ -267,24 +246,24 @@ LC75E:
             rr   c
             add  a,#20
             ld   b,a
-            exx  
+            exx
             pop  hl
             ld   d,l
             ld   a,d
             jp   LC635
 
 LC763:      sub  d
-            neg  
+            neg
             ld   (LC616+1),a
-            exx  
+            exx
             ld   c,#20
             ld   b,c
-            exx  
+            exx
             pop  hl
             ld   d,l
             ld   a,d
             jp   LC635
-LC76A:      neg  
+LC76A:      neg
             cp   d
             jr   c,LC7B1
             ld   e,a
@@ -296,9 +275,9 @@ LC76A:      neg
             ld   (LC616+1),a
             ld   a,e
             inc  a
-            scf  
-            rra  
-            exx  
+            scf
+            rra
+            exx
             ld   c,#00
             rr   c
             sra  a
@@ -307,7 +286,7 @@ LC76A:      neg
             rr   c
             add  a,#20
             ld   b,a
-            exx  
+            exx
             pop  hl
             ld   d,l
             ld   a,d
@@ -325,15 +304,14 @@ LC635:      ld   l,#00
 
 LC7B1:
             ld   (LC616+1),a
-            exx  
+            exx
             ld   c,#00
             ld   b,#20
-            exx  
+            exx
             pop  hl
             ld   d,l
             ld   a,d
             jp   LC635
-
 
 
 LC70B:      ld   l,#01
@@ -360,9 +338,9 @@ LC6D1:      ld   a,(hl)
             ld   d,a
             ld   (LC626+1),a
             srl  a
-            exx  
+            exx
             ld   h,a
-            exx  
+            exx
             ld   a,(hl)
             ld   (LC635+1),a
             dec  l
@@ -380,21 +358,21 @@ LC6D1:      ld   a,(hl)
             and  a
             jr   z,LC625L
             sub  d
-            neg  
+            neg
             ld   (LC622+1),a
             ld   a,e
-            neg  
+            neg
             srl  a
-            exx  
+            exx
             ld   e,#00
             rr   e
-            rra  
+            rra
             rr   e
-            rra  
+            rra
             rr   e
             add  a,#20
             ld   d,a
-            exx  
+            exx
             pop  hl
             ld   d,l
             jp   NXTE2
@@ -402,9 +380,9 @@ LC6D1:      ld   a,(hl)
 LC625L:
             ld   (LC622+1),a
             ld   a,e
-            cpl  
-            rra  
-            exx  
+            cpl
+            rra
+            exx
             ld   e,#00
             rr   e
             sra  a
@@ -413,23 +391,23 @@ LC625L:
             rr   e
             add  a,#20
             ld   d,a
-            exx  
+            exx
             pop  hl
             ld   d,l
             jp   NXTE2
 
 LC763L:     sub  d
-            neg  
+            neg
             ld   (LC622+1),a
-            exx  
+            exx
             ld   e,#20
             ld   d,e
-            exx  
+            exx
             pop  hl
             ld   d,l
             jp   NXTE2
 
-LC76AL:     neg  
+LC76AL:     neg
             cp   d
             jp   c,LC7B1L
             ld   e,a
@@ -439,11 +417,11 @@ LC76AL:     neg
             ld   (LC622+1),a
 
             ld   a,e
-            rla  
+            rla
             inc  a
-            scf  
-            rra  
-            exx  
+            scf
+            rra
+            exx
             ld   e,#00
             rr   e
             sra  a
@@ -452,7 +430,7 @@ LC76AL:     neg
             rr   e
             add  a,#20
             ld   d,a
-            exx  
+            exx
             pop  hl
             ld   d,l
 
@@ -486,19 +464,13 @@ NXTE4:
 
 LC7B1L:
             ld   (LC622+1),a
-            exx  
+            exx
             ld   e,#00
             ld   d,#20
-            exx  
+            exx
             pop  hl
             ld   d,l
             jp   NXTE2
-
-
-
-
-
-
 
 
 LC7B4:      ex   af,af'
@@ -511,7 +483,7 @@ LC7BB:      ld   l,#01
 
 
 LLC:        pop  hl
-            ret  
+            ret
 
 
 ; ВЫВОД ПОЛИГОНА
@@ -584,14 +556,14 @@ TEXTU_R:    equ  $+1
             xor  a
             srl  b
             rr   e
-            rra  
+            rra
             srl  b
             rr   e
-            rra  
-            scf  
+            rra
+            scf
             rr   b
             rr   e
-            rra  
+            rra
             add  a,c
             ld   ixl,a
             ld   ixh,e
@@ -601,14 +573,14 @@ TEXTU_R:    equ  $+1
             xor  a
             srl  d
             rr   e
-            rra  
+            rra
             srl  d
             rr   e
-            rra  
-            scf  
+            rra
+            scf
             rr   d
             rr   e
-            rra  
+            rra
             add  a,c
             add  a,#10
             ld   iyl,a
@@ -628,9 +600,6 @@ TEXTU_R:    equ  $+1
             ld   a,d
             ld   sp,#FFE0
             jp   BORD
-
-
-
 
 
 RENOBJ:
@@ -720,10 +689,10 @@ MVX3:       equ  $-2
             add  hl,bc
             ld   (XB2+1),hl
             ld   a,l
-            neg  
+            neg
             ld   l,a
             ld   a,h
-            neg  
+            neg
             ld   h,a
             ld   (XB5+1),hl
             add  hl,bc
@@ -747,7 +716,7 @@ MVZ1:       equ  $-2
             ld   iyl,a
             add  a,d
             ld   ixl,a
-            neg  
+            neg
             ld   (CTL+1),a
             add  a,d
             ld   (ZB4+1),a
@@ -765,13 +734,13 @@ XB0:        ld   de,0
             ld   hl,$+6
             jp   CALCD
             ld   a,ixh
-            neg  
+            neg
             ld   ixh,a
             ld   a,d
-            neg  
+            neg
             ld   d,a
             ld   a,e
-            neg  
+            neg
             ld   e,a
 LD62F:
             ld   a,ixh
@@ -824,16 +793,16 @@ ENDC:
             ld   a,l
             ld   (ADT+1),a
 STKC:       ld   sp,0
-            ret  
+            ret
 
 ; ПЕРЕВОТ КООРДИНАТ В 2D
 CALCD:
-            exx  
+            exx
 TZ:         ld   de,0
             ld   l,a
-            rlca 
+            rlca
             and  1
-            neg  
+            neg
             ld   h,a
 JMP4:       jr   $
             ADDHLHL 5
@@ -843,13 +812,13 @@ JMP4:       jr   $
             jp   m,LD73D
 
             EXD
-            exx  
+            exx
             ld   a,e
-            exx  
+            exx
             ld   l,a
-            rlca 
+            rlca
             and  1
-            neg  
+            neg
             ld   h,a
 TY:         ld   bc,0
 JMP5:       jr   $
@@ -901,7 +870,7 @@ JMP5:       jr   $
             jp   c,PP1+91
             ld   b,a
             jp   PP9
-PP1:        rla  
+PP1:        rla
             cp   d
             jr   nc,PP2
             SM2
@@ -934,7 +903,7 @@ PP1:        rla
             SM2
             jr   nc,PP2+98
             adc  hl,hl
-            rla  
+            rla
             SM1
             jp   PP4+105
 
@@ -975,37 +944,37 @@ PP0:        ld   a,l
             sbc  hl,de
             jp   nc,LD73D
             add  hl,de
-            rla  
+            rla
             adc  hl,hl
 PP3:        sbc  hl,de
             jp   nc,LD73D
             add  hl,de
-            rla  
+            rla
             adc  hl,hl
 PP4:        sbc  hl,de
             jr   nc,$+3
             add  hl,de
             rept 6
-            rla  
+            rla
             adc  hl,hl
             sbc  hl,de
             jr   nc,$+3
             add  hl,de
             endr
-            rla  
+            rla
             add  hl,hl
             ld   b,a
             sbc  hl,de
             jr   nc,$+3
             add  hl,de
             rept 7
-            rla  
+            rla
             add  hl,hl
             sbc  hl,de
             jr   nc,$+3
             add  hl,de
             endr
-            rla  
+            rla
 PP9:        ld   c,a
             ex   af,af'
             ld   hl,(YEND+1)/2      ;MIDLE Y
@@ -1015,13 +984,13 @@ PP9:        ld   c,a
             add  hl,bc
 
             push hl
-            exx  
+            exx
             ld   a,d
-            exx  
+            exx
             ld   l,a
-            rlca 
+            rlca
             and  1
-            neg  
+            neg
             ld   h,a
 TX:         ld   bc,0
 JMP6:       jr   $
@@ -1073,7 +1042,7 @@ ZZZ:        ld   de,0
             jp   c,OO1+91
             ld   b,a
             jp   OO9
-OO1:        rla  
+OO1:        rla
             cp   d
             jr   nc,OO2
             SM2
@@ -1106,7 +1075,7 @@ OO1:        rla
             SM2
             jr   nc,OO2+98
             adc  hl,hl
-            rla  
+            rla
             SM1
             jp   OO4+105
 
@@ -1147,37 +1116,37 @@ OO0:        ld   a,l
             sbc  hl,de
             jp   nc,LD73C
             add  hl,de
-            rla  
+            rla
             adc  hl,hl
 OO3:        sbc  hl,de
             jp   nc,LD73C
             add  hl,de
-            rla  
+            rla
             adc  hl,hl
 OO4:        sbc  hl,de
             jr   nc,$+3
             add  hl,de
             rept 6
-            rla  
+            rla
             adc  hl,hl
             sbc  hl,de
             jr   nc,$+3
             add  hl,de
             endr
-            rla  
+            rla
             add  hl,hl
             ld   b,a
             sbc  hl,de
             jr   nc,$+3
             add  hl,de
             rept 7
-            rla  
+            rla
             add  hl,hl
             sbc  hl,de
             jr   nc,$+3
             add  hl,de
             endr
-            rla  
+            rla
 OO9:        ld   c,a
             ex   af,af'
             ld   hl,#0080           ;MIDLE X
@@ -1187,14 +1156,14 @@ OO9:        ld   c,a
             ld   hl,9
             add  hl,sp
             ld   sp,hl
-            exx  
+            exx
             jp   (hl)
             add  hl,bc
             push hl
             ld   hl,9
             add  hl,sp
             ld   sp,hl
-            exx  
+            exx
             jp   (hl)
 
 
@@ -1206,7 +1175,7 @@ LD73D:
             ld   hl,9
             add  hl,sp
             ld   sp,hl
-            exx  
+            exx
             jp   (hl)
 LD73C:
             ld   d,#80
@@ -1214,7 +1183,7 @@ LD73C:
             ld   hl,9
             add  hl,sp
             ld   sp,hl
-            exx  
+            exx
             jp   (hl)
 
 
@@ -1231,15 +1200,15 @@ DRWPOL:
             ld   (L91+#5A),a
             call LDA9F
             jr   c,LD8AA
-            cpl  
+            cpl
             and  #F0
             jr   nz,LD8AA
             ld   a,(hl)
             inc  hl
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             and  #07
             ld   (TEXTU_R),a
             ld   a,c
@@ -1250,7 +1219,7 @@ DRWPOL:
             add  a,a
             ld   (LOW_CORDS_BUF),a
             ld   b,L9C
-            rrca 
+            rrca
             ex   af,af'
             ld   c,(hl)
             inc  hl
@@ -1346,7 +1315,7 @@ LD907:      ld   a,(hl)
             jr   z,LD967
             or   b
             ld   b,a
-            cpl  
+            cpl
             and  #F0
             jr   nz,LD967
             ld   a,b
@@ -1409,10 +1378,10 @@ DRWPOL2:
             ld   (L91+#5A),a
             ld   a,(hl)
             inc  hl
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             and  #07
             ld   (TEXTU_R),a
             ld   de,low(L9E)*256
@@ -1420,7 +1389,7 @@ DRWPOL2:
             add  a,a
             ld   (LOW_CORDS_BUF),a
             ld   b,L9C
-            rrca 
+            rrca
             ex   af,af'
             ld   c,(hl)
             inc  hl
@@ -1514,11 +1483,11 @@ LDAA8:      ld   a,(de)
             djnz LDAA8
             pop  hl
             ld   b,ixl
-            ret  
-LDAB9:      scf  
+            ret
+LDAB9:      scf
             pop  hl
             ld   b,ixl
-            ret  
+            ret
 
 
 ; РИСОВАНИЕ ЛИНИИ
@@ -1537,7 +1506,7 @@ DRAWL1:
             sub  h
             jr   nc,LDAD8
             EXD
-            neg  
+            neg
 LDAD8:      ld   d,a
             ld   a,l
             and  #07
@@ -1554,7 +1523,7 @@ LDADD:      equ  $-#0001
             rr   l
             srl  h
             rr   l
-            scf  
+            scf
             rr   h
             rr   l
             sub  e
@@ -1572,7 +1541,7 @@ LDADD:      equ  $-#0001
             ld   a,(L91+#4F)        ;COMAND 2
             ld   (LDB10),a
             ld   a,(hl)
-LDB0D:      nop  
+LDB0D:      nop
             rlc  c
 LDB10:      jr   c,LDB1D
 LDB12:      ex   af,af'
@@ -1603,7 +1572,7 @@ LDB2D:      ld   e,a
             ld   a,(L91+#4F)
             ld   (LDB4A),a
 LDB3F:      ld   a,(hl)
-LDB40:      nop  
+LDB40:      nop
             ld   (hl),a
             add  hl,sp
             ex   af,af'
@@ -1619,7 +1588,7 @@ LDB52:      dec  l
             ex   af,af'
             djnz LDB3F
             jp   LDBBA
-LDB59:      neg  
+LDB59:      neg
             cp   d
             jr   c,LDB91
             ld   e,d
@@ -1632,7 +1601,7 @@ LDB59:      neg
             ld   a,(L91+#4F)
             ld   (LDB74),a
             ld   a,(hl)
-LDB71:      nop  
+LDB71:      nop
             rrc  c
 LDB74:      jr   c,LDB81
 LDB76:      ex   af,af'
@@ -1663,7 +1632,7 @@ LDB91:      ld   e,a
             ld   a,(L91+#4F)
             ld   (LDBAE),a
 LDBA3:      ld   a,(hl)
-LDBA4:      nop  
+LDBA4:      nop
             ld   (hl),a
             add  hl,sp
             ex   af,af'
@@ -1680,15 +1649,13 @@ LDBB6:      inc  l
             djnz LDBA3
 LDBBA:      ld   sp,#0000
 LDBBB:      equ  $-#0002
-            ret  
-
-
+            ret
 
 
 LD85D:
             pop  hl
             xor  a
-            ret  
+            ret
 
 ; ПРОСЧЕТ МАТРИЦЫ ВИДЕНИЯ ОБЪЕКТА
 VSMASK:
@@ -1719,10 +1686,10 @@ LD814:      ld   c,#00
             jr   nc,LD844
             inc  l
             ld   a,c
-            rlca 
-            rlca 
-            rlca 
-            rlca 
+            rlca
+            rlca
+            rlca
+            rlca
             xor  #F0
             or   c
             ld   (hl),a
@@ -1736,7 +1703,7 @@ LD814:      ld   c,#00
             jp   nz,LD814
             pop  hl
             ex   af,af'
-            ret  
+            ret
 
 LD826:      set  1,c
             ld   a,(hl)
@@ -1750,10 +1717,10 @@ LD826:      set  1,c
             jr   nc,LD844
             inc  l
             ld   a,c
-            rlca 
-            rlca 
-            rlca 
-            rlca 
+            rlca
+            rlca
+            rlca
+            rlca
             xor  #F0
             or   c
             ld   (hl),a
@@ -1767,15 +1734,15 @@ LD826:      set  1,c
             jp   nz,LD814
             pop  hl
             ex   af,af'
-            ret  
+            ret
 
 LD844:      set  2,c
             inc  l
             ld   a,c
-            rlca 
-            rlca 
-            rlca 
-            rlca 
+            rlca
+            rlca
+            rlca
+            rlca
             xor  #F0
             or   c
             ld   (hl),a
@@ -1789,7 +1756,7 @@ LD844:      set  2,c
             jp   nz,LD814
             pop  hl
             ex   af,af'
-            ret  
+            ret
 
 LD82B:      set  0,c
             ld   a,(hl)
@@ -1803,10 +1770,10 @@ LD82B:      set  0,c
             jr   nc,LD844
             inc  l
             ld   a,c
-            rlca 
-            rlca 
-            rlca 
-            rlca 
+            rlca
+            rlca
+            rlca
+            rlca
             xor  #F0
             or   c
             ld   (hl),a
@@ -1820,15 +1787,15 @@ LD82B:      set  0,c
             jp   nz,LD814
             pop  hl
             ex   af,af'
-            ret  
+            ret
 
 LD83F:      set  3,c
             inc  l
             ld   a,c
-            rlca 
-            rlca 
-            rlca 
-            rlca 
+            rlca
+            rlca
+            rlca
+            rlca
             xor  #F0
             or   c
             ld   (hl),a
@@ -1842,7 +1809,7 @@ LD83F:      set  3,c
             jp   nz,LD814
             pop  hl
             ex   af,af'
-            ret  
+            ret
 
 ; ПРОСЧЕТ ВОДИМОСТИ ПОЛИГОНА
 ;retFS-mPOLY VISIBLE
@@ -1870,19 +1837,19 @@ LDA62:      ld   h,L9C
             ld   (LDA7A),sp
             ld   sp,hl
             pop  bc
-            exx  
+            exx
             pop  bc
-            exx  
+            exx
             ld   l,e
             ld   sp,hl
             pop  de
-            exx  
+            exx
             pop  de
-            exx  
+            exx
             ld   l,a
             ld   sp,hl
             pop  hl
-            exx  
+            exx
             pop  hl
             ld   sp,#0000
 LDA7A:      equ  $-#0002
@@ -1890,17 +1857,17 @@ LDA7A:      equ  $-#0002
             EXD
             sbc  hl,bc
             push hl
-            exx  
+            exx
             sbc  hl,bc
             EXD
             sbc  hl,bc
             ex   (sp),hl
-            exx  
+            exx
             pop  hl
             call MULL
             push hl
             push de
-            exx  
+            exx
             call MULL
             EXD
             pop  bc
@@ -1910,7 +1877,7 @@ LDA7A:      equ  $-#0002
             sbc  hl,bc
             pop  hl
             pop  bc
-            ret  
+            ret
 
 ; ВСЯКИЕ МАСКИ
             ds   ($-1)/16*16-$+16
@@ -1923,4 +1890,3 @@ MASKS:
             dw   #EFDF
             dw   #FBF7
             dw   #FEFD
-

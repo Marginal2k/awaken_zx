@@ -1,33 +1,11 @@
-;START            ■DEHRUST
-;SETTING          ■PEREWOROT
-;BORT             ■FDIV
-;RECORD           ■SHMTRX
-;TURNMATR         ■CALCRCORD
-;ATAGDIV          ■CALCUNGLE
-;CALC2D3D         ■MMATRX
-;WAYUNGLE         ■KORNI_
-;SETVARS          ■REMOVEOBJ
-
-
-
-
-
-
-
-
-
-
-
-
-
 START:
-            di   
+            di
 
             PAGE_ FREE+8
             ld   hl,#C000
             ld   de,#4000
             ld   bc,#1B00
-            ldir 
+            ldir
             PAGE___NOARG
 
 ; УСТАНОВКА ИНДИКАТОРОВ И ВРЕМЕНИ ПАНЕЛИ
@@ -159,7 +137,7 @@ IIO1:
             jr   z,IIO3
 ; ПУСК РАКЕТЫ ПО ИГРОКУ
             ld   a,%10000000
-            rrca 
+            rrca
             ld   ($-2),a
             ld   a,%00000101
             jr   nc,IIO4
@@ -339,8 +317,7 @@ PODSWET:
             PAGE___NOARG
 
 
-            ret  
-
+            ret
 
 
 ; ПРОВЕРКА ВЫХОДА В АСМ
@@ -379,8 +356,7 @@ SIZEOBJ:
             ld   h,(hl)
             ld   l,a
             PAGE___NOARG
-            ret  
-
+            ret
 
 
 ; ПЕРЕБРОС ДАННЫХ ОБЪЕКТА В БУФЕР
@@ -393,19 +369,19 @@ REMOVEOBJ:
             ld   l,a
             PAGE_ OBJ3D
             ld   de,OBJBUF
-            ldi  
-            ldi  
+            ldi
+            ldi
 ZJ72:
             ld   a,(hl)
             or   a
             jr   z,ZJ71
-            ldi  
-            ldi  
-            ldi  
-            ldi  
+            ldi
+            ldi
+            ldi
+            ldi
             jp   ZJ72
 ZJ71:
-            ldi  
+            ldi
 ZJ73:
             ld   a,(hl)
             and  #0F
@@ -413,13 +389,12 @@ ZJ73:
             inc  a
             ld   c,a
             ld   b,0
-            ldir 
+            ldir
             jp   ZJ73
 ZJ74:
-            ldi  
+            ldi
             PAGE___NOARG
-            ret  
-
+            ret
 
 
 Page_:
@@ -429,7 +404,7 @@ Page_:
             ld   bc,#7FFD
             out  (c),a
             pop  bc
-            ret  
+            ret
 
 
 ; ДЕПАКЕР
@@ -459,7 +434,7 @@ DEHRUST:
             jr   c,$+4
             ld   d,h
             ld   e,l
-            lddr 
+            lddr
             EXD
             pop  de
             ld   c,#0C
@@ -475,16 +450,16 @@ DEHRUST:
             dec  a
             jr   nz,$-6
             ld   b,a
-            exx  
+            exx
             ld   d,#BF
             ld   c,#10
             call LL4115
 LL4036:     ld   a,(ix+#00)
             inc  ix
-            exx  
+            exx
 LL403C:     ld   (de),a
             inc  de
-LL403E:     exx  
+LL403E:     exx
 LL403F:     add  hl,hl
             djnz $+5
             call LL4115
@@ -494,7 +469,7 @@ LL4049:     ld   a,#80
             add  hl,hl
             djnz $+5
             call LL4115
-            rla  
+            rla
             jr   c,$-7
             cp   #03
             jr   c,$+7
@@ -507,15 +482,15 @@ LL4049:     ld   a,#80
             jr   z,LL40C4
             adc  a,#FF
             cp   #02
-            exx  
+            exx
 LL4067:     ld   c,a
-LL4068:     exx  
+LL4068:     exx
             ld   a,#BF
             jr   c,LL4082
 LL406D:     add  hl,hl
             djnz $+5
             call LL4115
-            rla  
+            rla
             jr   c,LL406D
             jr   z,LL407D
             inc  a
@@ -525,14 +500,14 @@ LL406D:     add  hl,hl
 LL407D:     inc  a
             jr   nz,LL408D
             ld   a,#EF
-LL4082:     rrca 
+LL4082:     rrca
             cp   a
 LL4084:     add  hl,hl
             djnz $+5
             call LL4115
-            rla  
+            rla
             jr   c,LL4084
-LL408D:     exx  
+LL408D:     exx
             ld   h,#FF
             jr   z,LL409B
             ld   h,a
@@ -542,14 +517,14 @@ LL408D:     exx
             jr   z,LL40A6
 LL409B:     ld   l,a
             add  hl,de
-            ldir 
+            ldir
 LL409F:     jr   LL403E
-LL40A1:     exx  
+LL40A1:     exx
             rrc  d
             jr   LL403F
 LL40A6:     cp   #E0
             jr   c,LL409B
-            rlca 
+            rlca
             xor  c
             inc  a
             jr   z,LL40A1
@@ -558,7 +533,7 @@ LL40B1:     ld   l,a
             ld   c,a
             ld   h,#FF
             add  hl,de
-            ldi  
+            ldi
             ld   a,(ix+#00)
             inc  ix
             ld   (de),a
@@ -578,7 +553,7 @@ LL40C6:     add  hl,hl
 LL40D5:     ld   b,a
             ld   c,(ix+#00)
             inc  ix
-            ccf  
+            ccf
             jr   LL4068
 LL40DE:     cp   #0F
             jr   c,LL40D5
@@ -592,16 +567,16 @@ LL40E7:     pop  de
             inc  hl
             djnz LL40E7
             ld   hl,#2758
-            exx  
-            ret  
+            exx
+            ret
 LL40F3:     sbc  a,a
             ld   a,#EF
 LL40F6:     add  hl,hl
             djnz $+5
             call LL4115
-            rla  
+            rla
             jr   c,LL40F6
-            exx  
+            exx
             jr   nz,LL40B1
             bit  7,a
             jr   z,LL40DE
@@ -619,8 +594,7 @@ LL4115:     ld   b,c
             inc  ix
             ld   h,(ix+#00)
             inc  ix
-            ret  
-
+            ret
 
 
 ; ЗАДАНИЕ ПАРАМЕТРОВ СРЕДЫ В ЗАВИСИМОСТИ
@@ -634,7 +608,7 @@ SETTING:
             xor  a
             ld   (STATGEN),a
             ld   (NOSTAT),a
-            ret  
+            ret
 
 ; ЗАДАТЬ ПЕРЕМЕННЫЕ ВЕРОЯТНОСТЕЙ И ДР.
 SETVARS:
@@ -684,36 +658,17 @@ SETVARS:
             inc  hl
             ld   a,(hl)
             ld   (PSSK+1),a
-            ret  
+            ret
 
 BORT:
 ; ПЕРЕХОД И ЗАГРУЗКА БОРТ КОМПА
 
 
-            ret  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            ret
 
 
 ;------------------------------------
 ; МАТЕМАТИКА
-
 
 
 RECORD:
@@ -738,7 +693,7 @@ RECORD:
             ld   bc,(TZ+1)
             pop  iy
             pop  ix
-            ret  
+            ret
 
 PEREWOROT:
 ; СДЕЛАТЬ МАТРИЦУ ОБРАТНОЙ
@@ -754,7 +709,7 @@ PEREWOROT:
             ld   de,(SM_32+1)
             ld   (SM_32+1),hl
             ld   (SM_23+1),de
-            ret  
+            ret
 
 
 KORNI_:
@@ -768,7 +723,7 @@ KORNI_:
             PAGE___NOARG
             ex   af,af'
             pop  bc
-            ret  
+            ret
 
 
 WAYUNGLE:
@@ -804,9 +759,9 @@ WAYUNGLE:
             call MULL
             EXD
             pop  bc
-            exx  
+            exx
             push hl
-            exx  
+            exx
             pop  hl
             sra  h
             rr   l
@@ -827,7 +782,7 @@ WAYUNGLE:
             ld   h,a
             ld   l,0
             push hl
-            exx  
+            exx
             EXD
 
             sra  h
@@ -838,14 +793,14 @@ WAYUNGLE:
             SUB_BC
 
             push hl
-            exx  
+            exx
             pop  de
 ;de-DZ
             pop  hl
             call ATAGDIV
             or   a
             jp   p,$+5
-            neg  
+            neg
 
             pop  hl
             pop  de
@@ -857,13 +812,13 @@ WAYUNGLE:
             ld   c,a
 
             pop  ix
-            ret  
+            ret
 MMATRX:
 ; ВЫЗОВ РАСЧЕТА МАТРИЦЫ ПРОСТРАНСТВА
             PAGE_ VOXAL
             call GMATRX
             PAGE___NOARG
-            ret  
+            ret
 
 CALC2D3D:
 ; ИЗ 3D В 2D
@@ -903,15 +858,12 @@ CALC2D3D:
             add  hl,de
             pop  de
             xor  a
-            ret  
+            ret
 LD3:
             pop  af
             xor  a
             inc  a
-            ret  
-
-
-
+            ret
 
 
 CALCUNGLE:
@@ -922,11 +874,11 @@ CALCUNGLE:
 ; ДЕЛАЕМ DX,DY
             SUB_DE
             EXD
-            exx  
+            exx
             ld   a,l
             ex   af,af'
             ld   a,h
-            exx  
+            exx
             ld   h,a
             ex   af,af'
             ld   l,a
@@ -948,7 +900,7 @@ ATAGDIV:
             ld   a,l
             rept 4
             srl  h
-            rra  
+            rra
             endr
             ld   l,a
             ld   a,h
@@ -962,18 +914,18 @@ ATAGDIV:
             bit  7,b
             ret  nz
             add  a,#80
-            ret  
+            ret
             bit  7,b
             ret  z
             add  a,#80
-            ret  
+            ret
 
 CUG1:
             pop  af
             ld   a,#40
             ret  p
             ld   a,#C0
-            ret  
+            ret
 
 FDIV:
 ;FAST DIVISING
@@ -1003,10 +955,10 @@ FDV1:       ld   h,high(TBLOG2)
             add  hl,bc
             EXD
             ld   a,h
-            rla  
+            rla
             jr   nc,FDV2
             NEGHL
-            scf  
+            scf
 FDV2:       ex   af,af'
             ld   bc,#0800
             inc  h
@@ -1049,7 +1001,7 @@ FDV3:       ld   h,high(TBLOG2)
 FDV4:
             ld   hl,0
             and  a
-            ret  
+            ret
 FDV5:       ld   a,#0F
             sub  b
             ret  c
@@ -1060,8 +1012,7 @@ FDV7:       ex   af,af'
             jr   nc,$+9
             NEGHL
             and  a
-            ret  
-
+            ret
 
 
 ; ПОВЕРНУТЬ КООРДИНАТНУЮ СИСТЕМУ ПО
@@ -1161,7 +1112,7 @@ TURNMATR:
             ld   hl,0
             SUB_DE
             ld   (LA31),hl
-            ret  
+            ret
 SHMTRX:
 ;CALC SHIP MATRIX VECTOR
 EYEA_:      ld   a,0
@@ -1217,7 +1168,7 @@ EYEG_:      ld   a,0
             MULAD
             ADPAXH
             ld   (HM_33+1),a
-            ret  
+            ret
 
 KORNI:
 ; ДАННЫЕ de
@@ -1230,7 +1181,7 @@ KORNI:
             ld   a,(hl)
             inc  h
             ld   c,a
-            cpl  
+            cpl
             ex   af,af'
             ld   b,#FF
             inc  bc
@@ -1253,7 +1204,7 @@ KORNI:
             add  hl,bc
             ret  nc
             inc  a
-            ret  
+            ret
 KOR:
 ; ПОДСЧЕТ КОРНЯ БЕЗ ТАБЛИЦЫ, ДЛЯ МАЛЕНЬКИХ
 ; ЧИСЕЛ
@@ -1272,10 +1223,8 @@ KOR:
             add  hl,bc
             ret  nc
             inc  a
-            ret  
+            ret
 ; ТАБЛИЦА ДЛЯ ПОДСЧЕТА КОРНЯ
 ; ПЕРВЫЙ БАЙТ КОРЕНЬ ИЗ "КРУГЛОГО" ЧИСЛА
 ; ВТОРОЕ СЛОВО ИНВЕРСНОЕ ПО ЗНАКУ ЧИСЛО
 ; КАК ОСТАТОК
-
-

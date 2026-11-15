@@ -1,32 +1,10 @@
-;MNUMS_     ■PNUM           ■PNUM2
-;MESAG_     ■GAMEOVER       ■NEWROKET
-;RKN11      ■REPANEL        ■KILLTRASH
-;TRASHINI   ■RNDTURN        ■ONWAY
-;TURNUP     ■CHNPOL         ■CHARCO
-;STABL      ■SHUT           ■FLINE
-;DROPCARGO  ■NEWCARGO       ■CHCA
-;NEWORD     ■UPIRA          ■OTSHE
-;ARMY_      ■TOUFO          ■UFO__
-;UUFO_      ■TRADE          ■HUNTE
-;POLIC      ■POLIC2         ■PIRAT
-;TOPEACE    ■DATAL_         ■DATALINES
-;NWSUN      ■BLACKSUN       ■SUNB
-;MVSUN      ■SIMILARSYS     ■CALCPCD
-;OUTSUN     ■OUTEAR         ■GGALD
-;RETST      ■NEWVSPR        ■MOVEON
-;EXPL       ■CHSTAT_        ■CHSTATUS
-;GOSTA      ■MVSTT          ■FARSUN
-;FAREAR     ■VISPLAN        ■STATCOMPOS
-
-
-
 MNUMS_:
             ex   af,af'
             PAGE_ CONTR
             ex   af,af'
             call MNUMS
             PAGE___NOARG
-            ret  
+            ret
 
 
 PNUM:
@@ -42,7 +20,7 @@ PNUM:
             inc  hl
             ld   (hl),0
             PAGE___NOARG
-            ret  
+            ret
 PNUM2:
 ; ВЫВОД ЧИСЛА В КОМПЕ БЕЗ СКРОЛА
 ; А-ЧИСЛО
@@ -57,7 +35,7 @@ PNUM2:
             inc  a
             ld   (hl),a
             PAGE___NOARG
-            ret  
+            ret
 
 
 MESAG_:
@@ -70,8 +48,7 @@ MESAG_:
             pop  hl
             pop  bc
             pop  af
-            ret  
-
+            ret
 
 
 GAMEOVER:
@@ -90,10 +67,10 @@ EBEG:
             ld   l,a
             ld   h,#05
             ld   bc,#0C00
-            ldir 
-            ei   
-            halt 
-            di   
+            ldir
+            ei
+            halt
+            di
             PAGE_ CONTR
             call OHIDE
             call PRINT
@@ -131,16 +108,16 @@ NEWROKET:
             ld   (SFXA+1),hl
             MESAG _LOSTTARGET
             and  a
-            ret  
+            ret
 RKN12:
             push bc
-            exx  
+            exx
             ld   hl,0
             ld   d,h
             ld   e,l
             ld   bc,400
             call RECORD
-            exx  
+            exx
             pop  bc
             ld   a,1
             ex   af,af'
@@ -164,14 +141,14 @@ RKN11:
             pop  bc
             ret  z
 
-            exx  
+            exx
             ld   (iy+0),l
             ld   (iy+1),h
             ld   (iy+2),e
             ld   (iy+3),d
             ld   (iy+4),c
             ld   (iy+5),b
-            exx  
+            exx
 
             xor  a
             ld   (iy+INDI),IROK
@@ -205,8 +182,8 @@ ENROK:      ld   (iy+ENERGY),0
             call GETINDY
 ; НОМЕР РАКЕТЫ В СПИСКЕ
             ld   (de),a
-            scf  
-            ret  
+            scf
+            ret
 
 
 REPANEL:
@@ -294,7 +271,7 @@ TRASHINI:
             ld   (iy+SPT),2
             ld   (iy+RSPD),2
             ld   (iy+MSPD),2
-            ret  
+            ret
 
 RNDTURN:
 ; СЛУЧАЙНЫЕ ПОВОРТЫ
@@ -328,13 +305,13 @@ JL14:
             ld   a,(ix+GAMA)
             and  a
             jp   p,$+5
-            neg  
+            neg
             cp   #40
             ret  c
             ld   a,(ix+POWOR)
             xor  #80
             ld   (ix+POWOR),a
-            ret  
+            ret
 
 
 ONWAY:
@@ -366,7 +343,7 @@ ONWAY2:
             sub  b
             ld   e,a
             jp   p,$+5
-            neg  
+            neg
             ld   l,a
             cp   2
             jr   c,JLK1
@@ -374,12 +351,12 @@ ONWAY2:
             cp   l
             jr   c,OY1
             jr   z,OY1
-            rra  
+            rra
             jp   $-6
 OY1:
             bit  7,e
             jr   nz,$+4
-            neg  
+            neg
             add  a,d
             ld   (ix+BETA),a
 JLK1:
@@ -388,7 +365,7 @@ JLK1:
             sub  c
             ld   e,a
             jp   p,$+5
-            neg  
+            neg
             ld   h,a
             cp   (ix+SPT)
             ret  c
@@ -396,15 +373,15 @@ JLK1:
             cp   h
             jr   z,OY2
             jr   c,OY2
-            rra  
+            rra
             jp   $-6
 OY2:
             bit  7,e
             jr   nz,$+4
-            neg  
+            neg
             add  a,d
             ld   (ix+GAMA),a
-            ret  
+            ret
 
 TURNUP:
             pop  bc
@@ -418,7 +395,7 @@ TURNUP:
             ld   (ix+POWOR),a
             ld   (ix+MODE),C_TURNOUT
             ld   bc,#8080
-            ret  
+            ret
 
 
 CHNPOL:
@@ -467,7 +444,7 @@ ECN2:
 ECN1:
             ld   a,b
             cp   2
-            ret  
+            ret
 
 
 CHARCO:
@@ -484,9 +461,9 @@ CHARCO:
             jr   nc,RSP1
             ld   a,e
             srl  d
-            rra  
+            rra
             srl  d
-            rra  
+            rra
             srl  a
 RSP1:
             ld   e,a
@@ -498,11 +475,11 @@ RSP1:
             ld   a,h
             add  hl,bc
             ACPL_A
-            exx  
+            exx
             or   c
             ld   c,a
-            exx  
-            ret  
+            exx
+            ret
 
 STABL:
 ; ТАБЛИЦА ИНДЕКСИРОВАНИЕ СТАТУСА ПРИ
@@ -578,7 +555,7 @@ CHSTATUS:
             set  5,c
             ld   a,c
             ld   (STATUS),a
-            ret  
+            ret
 
 
 FLINE:
@@ -607,7 +584,7 @@ PSTLI:      add  a,50
             and  1
             bit  4,c
             jr   z,$+4
-            neg  
+            neg
             ld   e,a
             ld   a,(PCORD)
             add  a,8
@@ -618,7 +595,7 @@ PSTLI:      add  a,50
             and  1
             bit  4,c
             jr   z,$+4
-            neg  
+            neg
             ld   d,a
             ld   a,(PCORD+1)
             add  a,6
@@ -657,10 +634,10 @@ DROPCARGO:
             set  7,l
             ld   a,h
             and  %01110000
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             inc  a                  ;TONS
 
 
@@ -671,7 +648,7 @@ NEWCARGO:
             ex   af,af'
             call FINDFREE
             ret  z
-            exx  
+            exx
             ld   l,(ix+0)
             ld   h,(ix+1)
             ld   de,200
@@ -712,7 +689,7 @@ NEWCARGO:
             ld   (iy+LZS),a         ;TONNS
             ld   (iy+TYPE),T_CARGO
             ld   (iy+ENERGY),20
-            exx  
+            exx
             bit  7,b
             ld   a,#10
             jr   nz,$+3
@@ -732,20 +709,20 @@ NXTCA:
             jr   c,CHCA
             ret  z
             ld   (hl),e
-            ret  
+            ret
 
 
 CHCA:
 ; ПРОВЕРКА ГРУЗА НА СУЩЕСТВОВАНИЕ
-            exx  
+            exx
             call GETADR
             inc  l
             ld   a,(hl)
             cp   #80
-            exx  
+            exx
             jp   nz,NXTCA
             ld   (hl),e
-            ret  
+            ret
 
 NEWORD:
 ; НОВОЕ ЗАДАНИЕ В ЗАВИСИМОСТИ ОТ ТИПА
@@ -776,7 +753,7 @@ INTEL:
             endr
 
 NOTHING:
-            ret  
+            ret
 UPIRA:
             call TOSUBJ
             ret  nz
@@ -810,7 +787,7 @@ TOUFO:
             call FINDUFO
             ret  z
             ld   (ix+SUBJ),a
-            ret  
+            ret
 UFO__:
             call TOSUBJ
             ret  nz
@@ -822,7 +799,7 @@ UFO__:
             call FINDALL
             ret  z
             ld   (ix+SUBJ),a
-            ret  
+            ret
 UUFO_:
             call TOSUBJ
             ret  nz
@@ -846,7 +823,7 @@ TRADE:
             call TOPEACE
             ret  z
             ld   (ix+TYPE),T_PIRAT
-            ret  
+            ret
 
 HUNTE:
             call TOSUBJ
@@ -859,19 +836,19 @@ HUNTE:
             call FINDPIRAT
             ret  z
             ld   (ix+SUBJ),a
-            ret  
+            ret
 MIKR_:
             ld   a,(ix+OMODE)
             cp   C_BACKTOASTER
             jr   nz,$+6
 ; СМЕНА ЗАДАНИЯ НА ПОДЗАДАНИЕ
             ld   (ix+MODE),a
-            ret  
+            ret
             ld   a,r
             cp   #70
             ld   (ix+MODE),C_GOPLANET
             ld   (ix+SUBJ),#FF
-            ret  
+            ret
 POLIC:
             call TOSUBJ
             ret  nz
@@ -883,7 +860,7 @@ PWNPP:      cp   6
             call FINDPIRAT
             ret  z
             ld   (ix+SUBJ),a
-            ret  
+            ret
 
 ; ПРОВЕРКА СТАТУСА ИГРОКА
 POLIC2:
@@ -899,7 +876,7 @@ POLIC2:
             cp   3
             ret  nc
             ld   (ix+SUBJ),SPLAYER
-            ret  
+            ret
 PIRAT:
             call TOSUBJ
             ret  nz
@@ -913,7 +890,7 @@ TOPEACE:
             ret  z
             ld   (ix+SUBJ),a
             ld   (ix+MODE),C_FIGHT
-            ret  
+            ret
 
 
 TOSUBJ:
@@ -925,8 +902,7 @@ TOSUBJ:
             dec  a
             ld   (ix+SUBJ),a
             ld   (ix+MODE),C_FIGHT
-            ret  
-
+            ret
 
 
 DATAL_:
@@ -935,7 +911,7 @@ DATAL_:
             ex   af,af'
             call DATAL
             PAGE___NOARG
-            ret  
+            ret
 
 DATALINES:
 ; ВЫЗОВ РИСОВАНИЯ ДАТАЛИНИЙ
@@ -952,7 +928,7 @@ FFUEL:      ld   a,0
             and  a
             jr   z,FFIRE
             call AFUEL
-            rra  
+            rra
             ld   hl,#49E1
             call DATAL_
 
@@ -1003,8 +979,7 @@ FSPEED:     ld   a,0
             ld   hl,#49B9
             call DATAL_
 FSPD:
-            ret  
-
+            ret
 
 
 MVSTT:
@@ -1044,9 +1019,7 @@ MVSTT:
             sbc  a,c
             ret  pe
             ld   (SSZ+2),a
-            ret  
-
-
+            ret
 
 
 NWSUN:
@@ -1162,13 +1135,13 @@ SSUN:
             bit  7,h
             ld   a,l
             jr   z,$+4
-            neg  
+            neg
             ld   e,a
             ld   hl,(SNY+1)
             bit  7,h
             ld   a,l
             jr   z,$+4
-            neg  
+            neg
             cp   e
             jr   c,$+3
             ld   e,a
@@ -1176,13 +1149,13 @@ SSUN:
             bit  7,h
             ld   a,l
             jr   z,$+4
-            neg  
+            neg
             cp   e
             jr   c,$+3
             ld   e,a
 ; МЕНЯЕМ ТЕМПЕРТУРУ
             ld   a,e
-            neg  
+            neg
             srl  a
             cp   47
             jr   c,$+4
@@ -1196,7 +1169,7 @@ SSUN:
             ret  z
 ; ЕСЛИ ОСНАЩЕНИЕ ЗАПРАВКИ ЕСТЬ
             ld   a,#80
-            rrca 
+            rrca
             ld   ($-2),a
             jp   nc,MVPLN
             call AFUEL
@@ -1342,7 +1315,7 @@ KP2:
             jr   nz,MSL2
 ; ИЗМЕНЯЕМ ВЫСОТУ
             ld   a,h
-            neg  
+            neg
             srl  a
             cp   47
             jr   c,$+4
@@ -1350,7 +1323,7 @@ KP2:
             ld   (HIGH_+1),a
             ld   a,1
             ld   (FHIGH+1),a
-            ret  
+            ret
 MSL2:
             ld   a,(HIGH_+1)
             and  a
@@ -1368,7 +1341,6 @@ MSL2:
             jp   SETIT
 
 
-
 ; ПРОВЕРКА СОВПАДЕНИЯ СИСТЕМЫ НАХОЖДЕНИЯ
 ; И СИСТЕМЫ ПЕРЕЛЕТА
 ;retFZ-ON ЕСЛИ СОВПАДАЮТ
@@ -1380,8 +1352,7 @@ SIMILARSYS:
             ld   hl,(PLACE+2)
             ld   de,(WHERE+2)
             SUB_DE
-            ret  
-
+            ret
 
 
 FARSUN:
@@ -1400,8 +1371,7 @@ FARSUN:
             cp   l
             jr   c,$+3
             ld   l,a
-            ret  
-
+            ret
 
 
 FAREAR:
@@ -1427,17 +1397,17 @@ FE1:
             djnz FE3
             ld   l,#7F
             pop  iy
-            ret  
+            ret
 FE2:
             ld   e,(iy+1)
             ld   d,(iy+2)
             bit  7,(iy+3)
             jr   z,$+8
             ld   a,d
-            cpl  
+            cpl
             ld   d,a
             ld   a,e
-            cpl  
+            cpl
             ld   e,a
             ld   l,d
             ld   h,e
@@ -1446,10 +1416,10 @@ FE2:
             bit  7,(iy+7)
             jr   z,$+8
             ld   a,d
-            cpl  
+            cpl
             ld   d,a
             ld   a,e
-            cpl  
+            cpl
             ld   e,a
             ld   a,d
             cp   l
@@ -1461,10 +1431,10 @@ FE2:
             bit  7,(iy+11)
             jr   z,$+8
             ld   a,d
-            cpl  
+            cpl
             ld   d,a
             ld   a,e
-            cpl  
+            cpl
             ld   e,a
             ld   a,d
             cp   l
@@ -1475,7 +1445,7 @@ FE2:
             sub  b
             ld   e,a
             pop  iy
-            ret  
+            ret
 
 
 ; ПРОЦЕДУРА ПРОВЕРКИ ВИДЕНИЯ ПЛАНЕТЫ
@@ -1487,10 +1457,10 @@ VISPLAN:
             bit  7,h
             jr   z,$+8
             ld   a,h
-            cpl  
+            cpl
             ld   h,a
             ld   a,l
-            cpl  
+            cpl
             ld   l,a
             ld   a,h
             or   a
@@ -1503,10 +1473,10 @@ VISPLAN:
             bit  7,h
             jr   z,$+8
             ld   a,h
-            cpl  
+            cpl
             ld   h,a
             ld   a,l
-            cpl  
+            cpl
             ld   l,a
             ld   a,h
             or   a
@@ -1519,17 +1489,17 @@ VISPLAN:
             bit  7,h
             jr   z,$+8
             ld   a,h
-            cpl  
+            cpl
             ld   h,a
             ld   a,l
-            cpl  
+            cpl
             ld   l,a
             ld   a,h
             or   a
             ret  nz
             ld   a,l
             cp   FARPLAN
-            ret  
+            ret
 
 
 ; ПРОЦЕДУРА ПОДГОТОВКИ ВЫВОДА ПЛАНЕТЫ
@@ -1538,7 +1508,7 @@ OUTSUN:
             ld   hl,SNX
             ld   de,SUNX
             rept 9
-            ldi  
+            ldi
             endr
             ld   hl,(SUNX+1)
             ld   (DX+1),hl
@@ -1566,10 +1536,10 @@ STK9:       ld   sp,0
             ld   hl,(TY+1)
             ld   a,h
             ld   (STY),a
-            cpl  
+            cpl
             ld   h,a
             ld   a,l
-            cpl  
+            cpl
             ld   l,a
             inc  hl
             bit  7,h
@@ -1593,7 +1563,7 @@ STK9:       ld   sp,0
             PAGE_ CONTR
             call CIRCLE
             PAGE___NOARG
-            ret  
+            ret
 
 
 ; ВЫВОД ПЛАНЕТЫ И НАСТРОЙКА КООРДИНАТ
@@ -1644,7 +1614,7 @@ OE7:
             add  iy,de
             djnz OE2
             pop  iy
-            ret  
+            ret
 
 OE4:
             push de
@@ -1658,7 +1628,7 @@ OE4:
             sra  b
             rr   h
             rr   l
-            rra  
+            rra
             endr
             ld   (SUNX),a
             ld   (SUNX+1),hl
@@ -1670,7 +1640,7 @@ OE4:
             sra  b
             rr   h
             rr   l
-            rra  
+            rra
             endr
             ld   (SUNY),a
             ld   (SUNY+1),hl
@@ -1682,7 +1652,7 @@ OE4:
             sra  b
             rr   h
             rr   l
-            rra  
+            rra
             endr
             ld   (SUNZ),a
             ld   (SUNZ+1),hl
@@ -1694,17 +1664,17 @@ OE1:
             push iy
             pop  hl
             ld   de,SUNX
-            ldi  
-            ldi  
-            ldi  
+            ldi
+            ldi
+            ldi
             inc  hl
-            ldi  
-            ldi  
-            ldi  
+            ldi
+            ldi
+            ldi
             inc  hl
-            ldi  
-            ldi  
-            ldi  
+            ldi
+            ldi
+            ldi
 OE3:
             ld   hl,(SUNX+1)
             ld   (DX+1),hl
@@ -1740,7 +1710,7 @@ STK10:      ld   sp,0
             NEGHL
             set  7,h
             ld   (SUNZ+1),hl
-            ret  
+            ret
 
 ; ВЫВОД КРУГА ПЛАНЕТЫ
 OE5:
@@ -1748,8 +1718,7 @@ OE5:
             PAGE_ CONTR
             call CIRCLE
             PAGE___NOARG
-            ret  
-
+            ret
 
 
 ; НАСТРОЙКА КООРДИНАТ КОМПАСА НА СТАНЦИЮ
@@ -1772,21 +1741,20 @@ STK11:      ld   sp,0
             ld   hl,(TX+1)
             ld   a,l
             sra  h
-            rra  
+            rra
             sra  h
-            rra  
+            rra
             ld   (TTX),a
             ld   hl,(TY+1)
             ld   a,l
             sra  h
-            rra  
+            rra
             sra  h
-            rra  
+            rra
             ld   (TTY),a
             ld   a,(TZ+2)
             ld   (TTZ),a
-            ret  
-
+            ret
 
 
 GGALD:
@@ -1794,7 +1762,7 @@ GGALD:
             PAGE_ CONTR
             call GALD
             PAGE___NOARG
-            ret  
+            ret
 
 ; ЗАЛЕТ В СТАНЦИЮ
 RETST:
@@ -1802,7 +1770,7 @@ MTRK:       ld   de,0
             PAGE_ CONTR
             call RETSTAT
             PAGE___NOARG
-            ret  
+            ret
 
 NEWVSPR:
 ; ЗАНЕСЕНИЕ В БУФЕР ДАННЫХ О НОВОМ
@@ -1819,7 +1787,7 @@ NEWVSPR:
             push de
             jp   (hl)
             PAGE___NOARG
-            ret  
+            ret
 
 
 MOVEON:
@@ -1848,8 +1816,7 @@ HM_33:      ld   a,0
             jp   MULADE
             ld   (STPZ_+1),hl
             pop  ix
-            ret  
-
+            ret
 
 
 ; ВЫВОД ВЗРЫВОВ
@@ -1903,7 +1870,7 @@ CX2:
             SUB_BC
             ld   (ix+2),l
             ld   (ix+3),h
-            exx  
+            exx
             ld   e,(ix+8)
             ld   d,(ix+9)
 ; АДРЕС СПРАЙТА
@@ -1921,7 +1888,7 @@ CX2:
 ; ЗАПОМНИЛИ АДРЕС СЛЕД. КАДРА
             ld   (ix+8),l
             ld   (ix+9),h
-            exx  
+            exx
             ld   (STK7+1),sp
             ld   iy,$+7
 ; ПРЕОБРАЗУЕМ ПО МАТРИЦЕ
@@ -1942,23 +1909,23 @@ STK7:       ld   sp,0
 ; МАСШТАБ
             ld   a,(ix+6)
             ex   af,af'
-            exx  
+            exx
 ; РАЗМЕР ИСХОДНОГО СПРАЙТА
             ld   l,(ix+16)          ;SIZE
             ld   h,(ix+17)
             ld   e,(ix+8)           ;АДРЕС
             ld   d,(ix+9)           ;СПРАЙТА
             ld   a,l
-            exx  
+            exx
             push bc
             srl  a
             ld   c,a
             ld   b,0
             SUB_BC
             push hl
-            exx  
+            exx
             ld   a,h
-            exx  
+            exx
             srl  a
             ld   c,a
             EXD
@@ -2026,8 +1993,4 @@ NGF2:
             ld   a,2                ;КОНФЕДЕРАЦИЯ
             ret  c
             ld   a,3                ;СВОБОДНЫЕ ЗЕМЛИ
-            ret  
-
-
-
-
+            ret

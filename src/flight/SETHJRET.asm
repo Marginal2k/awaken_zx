@@ -12,14 +12,6 @@
 ;PINFO
 
 
-
-
-
-
-
-
-
-
 ZM18:
             disp ADHDP
 ZM19:
@@ -28,51 +20,51 @@ ZM19:
             ld   a,FREE
             ld   bc,#7FFD
             out  (c),a
-            exx  
+            exx
             ld   hl,#8C00
             ld   de,#C000
             ld   bc,#C000-#8C00
-            ldir 
-            exx  
+            ldir
+            exx
             ld   a,CONTR
             out  (c),a
-            exx  
+            exx
             ld   hl,JL1
             ld   bc,JL2
             ld   de,#8000
             push bc
             push de
-            ldir 
+            ldir
             ld   de,#E000
             ld   hl,#6000
             ld   bc,#2000
-            ldir 
+            ldir
             pop  hl
             pop  bc
             ld   de,#6400
             push de
-            ldir 
+            ldir
             pop  hl
             ld   d,h
             ld   e,l
             call DEHRUST
             ld   sp,#6000
             call #6500
-            di   
+            di
             ld   bc,#7FFD
             ld   a,FREE
             out  (c),a
-            exx  
+            exx
             ld   hl,#C000
             ld   de,#8C00
             ld   bc,#C000-#8C00
-            ldir 
-            exx  
+            ldir
+            exx
             ld   a,MAIN
             out  (c),a
-            exx  
+            exx
             call CLRHD
-            exx  
+            exx
             ld   a,CONTR
             out  (c),a
             push bc
@@ -80,7 +72,7 @@ ZM19:
             ld   hl,#E000
             ld   de,#6000
             ld   bc,#2000
-            ldir 
+            ldir
 
 TS_CON:     ld   de,0
 SL_CON:     ld   b,0
@@ -103,8 +95,8 @@ STK77:      ld   sp,0
             ld   a,%11011011
             out  (c),a
             pop  ix
-            di   
-            ret  
+            di
+            ret
 LOAD_:
             ld   a,d
             srl  a
@@ -114,7 +106,7 @@ LOAD_:
             call TOTD_
             push de
             push bc
-            exx  
+            exx
             pop  bc
             pop  de
 LOD1_:
@@ -135,7 +127,7 @@ LOD1_:
             ld   a,e
             ld   c,#5F
             call TOREG_
-            exx  
+            exx
 RETL_:
             push hl
             ld   a,#80
@@ -144,9 +136,9 @@ RETL_:
             ld   c,#7F
             ld   ix,#3FE5
             call TOTD_
-            exx  
+            exx
             ld   a,d
-            exx  
+            exx
             srl  a
             ld   d,a
             ld   a,1
@@ -158,7 +150,7 @@ RETL_:
             pop  hl
             jr   nz,RETL_
             inc  h
-            exx  
+            exx
             inc  e
             ld   a,e
             cp   #11
@@ -167,17 +159,17 @@ RETL_:
             ld   e,1
             bit  0,d
             jr   nz,LOD2_
-            exx  
+            exx
             ld   a,#58              ;STEP ON
             ld   c,#1F
             call TOREG_
             ld   ix,#2F59           ;WAIT
             call TOTD_
-            exx  
+            exx
 LOD2_:
             dec  b
             jp   nz,LOD1_
-            ret  
+            ret
 TOREG_:
             ld   ix,#2A53
 TOTD_:
@@ -214,37 +206,33 @@ ZM20:       equ  $-ZM19
 ; СВОБОДНЫЕ ЗЕМЛИ
 
 
-
-
-
-
             include "gen/NDATA.inc"   ; GENERATED from assets/data/newgame_flight.csv
 
 
 RETSTT:
 ; ВОЗВРАЩЕНИЕ НА СТАНЦИЮ С ОБНУЛЕНИЕМ ВСЕХ ДАННЫХ
-            exx  
+            exx
             ld   hl,NDATA
             ld   de,TIME
             ld   bc,#200
-            ldir 
-            exx  
+            ldir
+            exx
 RETSTAT:
 ; ВОЗВРАТ НА СТАНЦИЮ
 ;de-MTRK
-            exx  
+            exx
             ld   sp,#6000
             ld   hl,#5800
             ld   de,#5801
             ld   bc,#2FF
             ld   (hl),l
-            ldir 
+            ldir
             ld   hl,RSTT
             ld   de,#4200
             push de
             ld   bc,LNRSTT
-            ldir 
-            ret  
+            ldir
+            ret
 RSTT:
             disp #4200
 RSTT2:
@@ -261,12 +249,12 @@ RSTT2:
             ld   de,#C001
             ld   bc,#1AFF
             ld   (hl),l
-            ldir 
+            ldir
 
             ld   hl,TIME
             ld   de,STATE_BUF
             ld   bc,STATE_LEN
-            ldir 
+            ldir
 
 ; [glue] original: raw FDC track reads of the station image from the track in MTRK (protected loader),
 ; then a RET into it.  Replaced by an ordinary TR-DOS file load of STATIONF; the state record stays in
@@ -292,9 +280,6 @@ RSTT_NAME:  db   "STATIONFC"
 LNRSTT:     equ  $-RSTT2
 
             ent
-
-
-
 
 
 RNDD:
@@ -327,9 +312,7 @@ RNDD:
             xor  h
             xor  l
             pop  bc
-            ret  
-
-
+            ret
 
 
 CLRBUFS:
@@ -351,7 +334,7 @@ CLRBUFS:
             ld   hl,MODELPLANET
             ld   de,PLANETES
             ld   bc,72
-            ldir 
+            ldir
 
             ld   iy,CARSB-OLEN
             ld   de,OLEN
@@ -412,10 +395,10 @@ SETT:
             jr   nz,$+4
             ld   h,3
             ld   a,h
-            rlca 
-            rlca 
-            rlca 
-            rlca 
+            rlca
+            rlca
+            rlca
+            rlca
             ld   e,a
             ld   d,0
             ld   c,l
@@ -433,7 +416,7 @@ STIT1:
             ld   a,(hl)
             and  a
             jp   p,STIT2
-            neg  
+            neg
             dec  a
             jr   z,STIT3
             ld   b,a
@@ -471,9 +454,9 @@ STIT3:
             ex   af,af'
             dec  a
             jp   nz,STIT1
-            exx  
+            exx
             pop  bc
-            exx  
+            exx
             pop  de
             ld   hl,VERTAB
             add  hl,de
@@ -484,19 +467,19 @@ STIT3:
             ld   (hl),a
             add  hl,bc
             inc  de
-            exx  
+            exx
             ld   b,8
-            exx  
+            exx
             ld   a,(de)
-            exx  
+            exx
             add  a,c
-            exx  
+            exx
             ld   (hl),a
             add  hl,bc
             inc  de
-            exx  
+            exx
             djnz $-9
-            ret  
+            ret
 
 
 PINFO:
@@ -535,17 +518,17 @@ PINFO:
 
             call RNDD
             djnz $-3
-            cpl  
+            cpl
             ld   e,a
 ;%SSUUUUTT
             and  %00111100
-            rrca 
-            rrca 
+            rrca
+            rrca
             inc  a
             ld   l,a
             ld   a,e
-            rlca 
-            rlca 
+            rlca
+            rlca
             and  3
             dec  c
             jr   nz,$+4
@@ -556,8 +539,7 @@ PINFO:
             ld   e,a
             ex   af,af'
             pop  bc
-            ret  
-
+            ret
 
 
             include "gen/VERTAB.inc"   ; GENERATED from assets/data/spawn_types.csv
@@ -565,7 +547,6 @@ PINFO:
             include "gen/STROYTAB.inc"   ; GENERATED from assets/data/spawn_government.csv
 
             include "gen/LEVLTAB.inc"   ; GENERATED from assets/data/spawn_level.csv
-
 
 
 MODELSTAR:
@@ -618,5 +599,3 @@ MODELPLANET:
             db   #00,#00,#80,#FF
             db   #00,#00,#00,#00
             db   #00,#00,#84,#FF
-
-

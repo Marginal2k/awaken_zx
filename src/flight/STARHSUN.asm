@@ -6,20 +6,6 @@
 ;CIRCLE
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ; ВЫВОД ХАЙД СКРИНА
 
 ; И
@@ -28,13 +14,13 @@
 
 OHIDE:
             ld   hl,#400F
-            exx  
+            exx
             ld   hl,#8000
             ld   a,#08
             call LDC45
-            exx  
+            exx
             ld   h,#48
-            exx  
+            exx
             ld   a,4
 LDC45:      ld   (LDE4F+1),sp
 LDC4B:      ld   (LDE49+1),a
@@ -54,7 +40,7 @@ LDC4B:      ld   (LDE49+1),a
             pop  de
             pop  ix
             ex   af,af'
-            exx  
+            exx
             pop  af
             pop  bc
             pop  de
@@ -67,7 +53,7 @@ LDC4B:      ld   (LDE49+1),a
             push bc
             push af
             ex   af,af'
-            exx  
+            exx
             push ix
             push de
             push bc
@@ -79,7 +65,7 @@ LDC4B:      ld   (LDE49+1),a
             pop  de
             pop  ix
             ex   af,af'
-            exx  
+            exx
             pop  af
             pop  bc
             pop  de
@@ -93,7 +79,7 @@ LDC4B:      ld   (LDE49+1),a
             ld   de,#F910
             add  hl,de
             ex   af,af'
-            exx  
+            exx
             push ix
             push de
             push bc
@@ -103,9 +89,7 @@ LDE49:      ld   a,#00
             dec  a
             jp   nz,LDC4B
 LDE4F:      ld   sp,#0000
-            ret  
-
-
+            ret
 
 
 ;--------------------------------------
@@ -114,7 +98,7 @@ LDE4F:      ld   sp,#0000
 
 
 GEND:
-            exx  
+            exx
             ld   bc,0
             ld   h,b
             ld   l,c
@@ -140,8 +124,8 @@ GEND:
             dec  hl
             ld   (GEND+2),hl
             ld   a,l
-            exx  
-            ret  
+            exx
+            ret
 
 
 GALD:
@@ -172,7 +156,7 @@ GALD:
             ld   a,l
             cp   AMO
             jp   c,GALD+3
-            ret  
+            ret
 
 ;DOTS
 STARS:
@@ -199,15 +183,15 @@ DOT1:
             ld   a,c
             cp   AMO
             jp   c,DOT1
-            ret  
+            ret
 MOVESTARS:
             ld   hl,DOTB
             ld   a,(EYE_A)
             and  a
             jp   z,NSKY
             jp   m,PLX
-            rla  
-            rla  
+            rla
+            rla
 ;              rla
             inc  a
             inc  a
@@ -252,9 +236,9 @@ DT1:
             jp   c,DT11
             jp   NSKY
 PLX:
-            neg  
-            rla  
-            rla  
+            neg
+            rla
+            rla
 ;              rla
             ld   c,a
 DT22:
@@ -303,9 +287,9 @@ NSKY:
             and  a
             jp   z,NSKZ
             jp   p,PLY
-            neg  
-            rla  
-            rla  
+            neg
+            rla
+            rla
 ;              rla
             ld   c,a
 DT33:
@@ -350,8 +334,8 @@ DT3:
             jp   c,DT33
             jp   NSKZ
 PLY:
-            rla  
-            rla  
+            rla
+            rla
 ;             rla
             inc  a
             inc  a
@@ -372,7 +356,7 @@ DT44:
             jr   c,$+4
             ld   a,XMAX-XMIN
             sub  XMAX+1
-            neg  
+            neg
             ld   (hl),a
             ld   a,r
             and  #7F
@@ -400,21 +384,21 @@ DT4:
             jp   c,DT44
 NSKZ:
             ld   a,(EYE_G)
-            neg  
+            neg
             and  a
             ret  z
             ld   l,a
             jp   p,$+5
-            neg  
-            rla  
-            rla  
+            neg
+            rla
+            rla
 ;              rla
             ld   (FORC+1),a
             ld   (FORC2+1),a
             ld   h,SINTB
             ld   a,(hl)
             ld   (SS+1),a
-            neg  
+            neg
             ld   (SS2+1),a
             ld   a,l
             add  a,#40
@@ -433,7 +417,7 @@ NSKZ:
 NAMO:
             ld   a,(hl)
             sub  YMID
-            exx  
+            exx
             ld   c,a
 CS:         ld   e,0
             xor  e
@@ -441,19 +425,19 @@ CS:         ld   e,0
             ld   a,e
             and  a
             jp   p,$+6
-            neg  
+            neg
             ld   e,a
             ld   a,c
             and  a
             jp   p,$+6
-            neg  
+            neg
             ld   c,a
             xor  a
             rept 7
             rr   e
             jr   nc,$+3
             add  a,c
-            rra  
+            rra
             endr
             inc  a
             ld   e,a
@@ -462,15 +446,15 @@ CS:         ld   e,0
             jp   p,$+8
             dec  d
             ld   a,e
-            cpl  
+            cpl
             ld   e,a
             inc  de
             EXD
-            exx  
+            exx
             inc  l
             ld   a,(hl)
             sub  XMID
-            exx  
+            exx
             ld   c,a
 SS:         ld   e,0
             xor  e
@@ -478,19 +462,19 @@ SS:         ld   e,0
             ld   a,e
             and  a
             jp   p,$+6
-            neg  
+            neg
             ld   e,a
             ld   a,c
             and  a
             jp   p,$+6
-            neg  
+            neg
             ld   c,a
             xor  a
             rept 7
             rr   e
             jr   nc,$+3
             add  a,c
-            rra  
+            rra
             endr
             inc  a
             ld   e,a
@@ -499,7 +483,7 @@ SS:         ld   e,0
             jp   p,$+8
             dec  d
             ld   a,e
-            cpl  
+            cpl
             ld   e,a
             inc  de
             add  hl,de
@@ -514,7 +498,7 @@ SS:         ld   e,0
             cp   YMAX
             jr   c,FNNZ
 FNZ:
-            exx  
+            exx
 CLU1:       call NZZK
             ld   (hl),d
             dec  l
@@ -524,13 +508,13 @@ CLU1:       call NZZK
             ld   a,l
             cp   AMO
             jp   c,NAMO
-            ret  
+            ret
 FNNZ:
             ld   (KOX+1),a
-            exx  
+            exx
             ld   a,(hl)
             sub  XMID
-            exx  
+            exx
             ld   c,a
 CS2:        ld   e,0
             xor  e
@@ -538,19 +522,19 @@ CS2:        ld   e,0
             ld   a,e
             and  a
             jp   p,$+6
-            neg  
+            neg
             ld   e,a
             ld   a,c
             and  a
             jp   p,$+6
-            neg  
+            neg
             ld   c,a
             xor  a
             rept 7
             rr   e
             jr   nc,$+3
             add  a,c
-            rra  
+            rra
             endr
             inc  a
             ld   e,a
@@ -559,15 +543,15 @@ CS2:        ld   e,0
             jp   p,$+8
             dec  d
             ld   a,e
-            cpl  
+            cpl
             ld   e,a
             inc  de
             EXD
-            exx  
+            exx
             dec  l
             ld   a,(hl)
             sub  YMID
-            exx  
+            exx
             ld   c,a
 SS2:        ld   e,0
             xor  e
@@ -575,19 +559,19 @@ SS2:        ld   e,0
             ld   a,e
             and  a
             jp   p,$+6
-            neg  
+            neg
             ld   e,a
             ld   a,c
             and  a
             jp   p,$+6
-            neg  
+            neg
             ld   c,a
             xor  a
             rept 7
             rr   e
             jr   nc,$+3
             add  a,c
-            rra  
+            rra
             endr
             inc  a
             ld   e,a
@@ -596,7 +580,7 @@ SS2:        ld   e,0
             jp   p,$+8
             dec  d
             ld   a,e
-            cpl  
+            cpl
             ld   e,a
             inc  de
             add  hl,de
@@ -611,7 +595,7 @@ SS2:        ld   e,0
             cp   XMAX
             jr   c,FNNZ2
 FNZ2:
-            exx  
+            exx
 CLU2:       call NZZK
             ld   (hl),e
             inc  l
@@ -620,9 +604,9 @@ CLU2:       call NZZK
             ld   a,l
             cp   AMO
             jp   c,NAMO
-            ret  
+            ret
 FNNZ2:
-            exx  
+            exx
 KOX:        ld   (hl),0
             inc  l
             ld   (hl),a
@@ -630,7 +614,7 @@ KOX:        ld   (hl),0
             ld   a,l
             cp   AMO
             jp   c,NAMO
-            ret  
+            ret
 
 NZZK:
             ld   a,0
@@ -654,7 +638,7 @@ FORC:       ld   c,0
             jr   c,$+4
             sub  XMIN
             ld   d,a
-            ret  
+            ret
 NZZKL:
             ld   a,r
             cp   c
@@ -665,14 +649,14 @@ NZZKL:
             jr   c,$+4
             ld   a,YMAX-YMIN
             sub  YMAX               ;+1
-            neg  
+            neg
             ld   e,a
             ld   a,r
             cp   XMIN
             jr   nc,$+4
             add  a,XMIN
             ld   d,a
-            ret  
+            ret
 NZZK2:
             ld   a,0
             xor  1
@@ -694,7 +678,7 @@ FORC2:      ld   c,0
             jr   nc,$+4
             add  a,XMIN
             ld   d,a
-            ret  
+            ret
 NZZKL2:
             ld   a,r
             cp   c
@@ -705,7 +689,7 @@ NZZKL2:
             jr   c,$+4
             ld   a,YMAX-YMIN
             sub  YMAX               ;+1
-            neg  
+            neg
             ld   e,a
             ld   a,r
             add  a,#80
@@ -713,8 +697,7 @@ NZZKL2:
             jr   c,$+4
             sub  XMIN
             ld   d,a
-            ret  
-
+            ret
 
 
 L5E36:      ld   l,d
@@ -723,7 +706,7 @@ L5E36:      ld   l,d
             push hl
             add  a,a
             sub  #3E
-            neg  
+            neg
             ld   (ZJ2+1),a
             ld   a,ixl
 ZJ2:        jr   $
@@ -734,7 +717,7 @@ ZJ2:        jr   $
             pop  hl
 ZJ9:        ld   a,(L8628)
             and  a
-            ret  
+            ret
 
 ZJ52:       db   0
 
@@ -747,11 +730,11 @@ CIRCLE:
             ret  z
 ;CIRCLE
             call ZJ17
-            ret  
+            ret
 
-ZJ19:       exx  
+ZJ19:       exx
             ld   bc,#0003
-            exx  
+            exx
             ld   a,(ZJ52)
             and  a
             jp   nz,ZJ3
@@ -770,9 +753,9 @@ ZJ19:       exx
             ld   a,h
             bit  7,a
             jr   nz,ZJ5
-            exx  
+            exx
             set  0,b
-            exx  
+            exx
 ZJ5:        and  #7F
             ld   h,a
             call ZJ20
@@ -788,17 +771,17 @@ ZJ5:        and  #7F
             ld   a,h
             bit  7,a
             jr   nz,ZJ6
-            exx  
+            exx
             set  1,b
-            exx  
+            exx
 ZJ6:        and  #7F
             ld   h,a
             call ZJ20
             ld   a,d
             ld   (L861A),a
-            exx  
+            exx
             ld   a,b
-            exx  
+            exx
             ld   (L861C),a
             ld   a,(SUNZ+2)
             and  a
@@ -825,9 +808,9 @@ ZJ12:       sla  c
             rl   b
             jr   c,ZJ11
             sla  e
-            rla  
+            rla
             jr   ZJ12
-ZJ11:       scf  
+ZJ11:       scf
             rr   b
             call ZJ21
             ld   a,d
@@ -857,9 +840,9 @@ ZJ3:        dec  a
             jr   z,ZJ13
             and  #7F
             ld   h,a
-            exx  
+            exx
             set  0,b
-            exx  
+            exx
 ZJ13:       jp   ZJ5
 ZJ15:       dec  a
             jp   nz,ZJ14
@@ -878,9 +861,9 @@ ZJ15:       dec  a
             ld   a,h
             bit  7,a
             jr   nz,ZJ24
-            exx  
+            exx
             set  0,b
-            exx  
+            exx
 ZJ24:       and  #7F
             ld   h,a
             call ZJ20
@@ -896,17 +879,17 @@ ZJ24:       and  #7F
             ld   a,h
             bit  7,a
             jr   nz,ZJ25
-            exx  
+            exx
             set  1,b
-            exx  
+            exx
 ZJ25:       and  #7F
             ld   h,a
             call ZJ20
             ld   a,d
             ld   (L861A),a
-            exx  
+            exx
             ld   a,b
-            exx  
+            exx
             ld   (L861C),a
             ld   a,(SUNX+2)
             and  a
@@ -933,9 +916,9 @@ ZJ29:       sla  c
             rl   b
             jr   c,ZJ30
             sla  e
-            rla  
+            rla
             jp   ZJ29
-ZJ30:       scf  
+ZJ30:       scf
             rr   b
             call ZJ21
             ld   a,d
@@ -959,22 +942,22 @@ ZJ14:       ld   a,(SUNX+2)
             ld   a,h
             bit  7,a
             jr   z,ZJ31
-            exx  
+            exx
             set  0,b
-            exx  
+            exx
 ZJ31:       jp   ZJ24
 ZJ23:       ld   (L861D),a
             ld   a,#01
-            ret  
+            ret
 ZJ32:       ld   h,l
             ld   l,c
             ld   d,e
             ld   e,b
             jp   ZJ33
 ZJ20:       push hl
-            exx  
+            exx
             dec  c
-            exx  
+            exx
             SUB_DE
             jp   c,ZJ34
             jp   z,ZJ35
@@ -1005,7 +988,7 @@ ZJ40:       sla  h
             sla  d
             dec  a
             jr   nz,ZJ40
-            ret  
+            ret
 ZJ35:       push bc
             ld   a,c
             sub  b
@@ -1015,12 +998,12 @@ ZJ35:       push bc
             jp   ZJ36
 ZJ41:       set  2,b
             jp   ZJ42
-ZJ34:       exx  
+ZJ34:       exx
             dec  c
             jr   nz,ZJ41
             set  3,b
 ZJ42:       inc  c
-            exx  
+            exx
             pop  hl
             ld   a,#17
 ZJ43:       sla  c
@@ -1033,12 +1016,12 @@ ZJ43:       sla  c
             pop  af
             dec  a
             jr   nz,ZJ43
-            ret  
+            ret
 ZJ38:       sla  b
             rl   e
             rl   d
             push af
-            scf  
+            scf
             rr   h
             rr   l
             pop  af
@@ -1047,28 +1030,28 @@ ZJ38:       sla  b
             SUB_DE
             jr   nc,ZJ46
             pop  hl
-ZJ45:       scf  
+ZJ45:       scf
             rr   d
             SUB_DE
             jr   ZJ47
 ZJ46:       pop  hl
             pop  af
 ZJ4:        xor  a
-            ret  
-ZJ48:       scf  
+            ret
+ZJ48:       scf
             rr   h
             jr   ZJ49
 ZJ44:       pop  af
             jr   c,ZJ48
             rr   h
-ZJ49:       scf  
+ZJ49:       scf
             rr   d
 ZJ47:       ld   a,h
             ld   b,d
 ZJ22:       ld   e,#00
 ZJ21:       ld   d,#FE
 ZJ50:       sla  e
-            rla  
+            rla
             jr   c,ZJ51
             cp   b
             jr   nc,ZJ51
@@ -1076,7 +1059,7 @@ ZJ50:       sla  e
             ret  nc
             jr   ZJ50
 ZJ51:       sub  b
-            scf  
+            scf
             rl   d
             ret  nc
             jr   ZJ50
@@ -1099,66 +1082,66 @@ SEDETECT:   db   0
 
 L862B:
             push af
-            exx  
+            exx
             ld   hl,#0000
             ld   d,h
             ld   b,#FF
-            exx  
+            exx
             ld   a,#01
             ld   (L8628),a
             ld   a,(SEDETECT)
             and  a
             jp   L8CF8
 L8643:      push af
-            exx  
+            exx
             ld   hl,#0000
             ld   d,h
             ld   b,#FF
-            exx  
+            exx
             xor  a
             ld   (L8628),a
             ld   a,(SEDETECT)
             and  a
             jp   L8CF8
 L865A:      push af
-            exx  
+            exx
             ld   hl,#0000
             ld   d,h
             ld   b,#FF
-            exx  
+            exx
             ld   a,#01
             ld   (L8628),a
             ld   a,(SEDETECT)
             and  a
             jp   L8BF8
 L8672:      push af
-            exx  
+            exx
             ld   hl,#0000
             ld   d,h
             ld   b,#FF
-            exx  
+            exx
             xor  a
             ld   (L8628),a
             ld   a,(SEDETECT)
             and  a
             jp   L8BF8
 L8689:      push af
-            exx  
+            exx
             ld   hl,#0000
             ld   d,h
             ld   b,#FF
-            exx  
+            exx
             ld   a,#01
             ld   (L8628),a
             ld   a,(SEDETECT)
             and  a
             jp   L8AF7
 L86A1:      push af
-            exx  
+            exx
             ld   hl,#0000
             ld   d,h
             ld   b,#FF
-            exx  
+            exx
             xor  a
             ld   (L8628),a
             ld   a,(SEDETECT)
@@ -1186,7 +1169,7 @@ ZJ18:       call LFB32
             ld   a,#01
             ld   (SEDETECT),a
 L86E9:      call L86EE
-            ret  
+            ret
 
 
 L86EE:      ld   bc,(L861A)
@@ -1311,7 +1294,7 @@ L87BF:      push hl
             inc  h
             ld   d,(hl)
             pop  hl
-            ret  
+            ret
 L87C8:      call L87D4
             call L86A1
             call L87D4
@@ -1319,11 +1302,11 @@ L87C8:      call L87D4
 L87D4:      ld   bc,(L8620)
             ld   de,(L861C)
             ld   a,d
-            neg  
-            exx  
+            neg
+            exx
             ld   c,a
             ld   e,#00
-            exx  
+            exx
             ld   a,b
             sub  d
             call L89D4
@@ -1365,7 +1348,7 @@ L8802:      ex   af,af'
             bit  0,a
             call z,L865A
             call nz,L862B
-            ret  
+            ret
 L8840:      ld   a,b
             add  a,MIDX-8
             ld   b,a
@@ -1392,7 +1375,7 @@ L884D:      ex   af,af'
             bit  0,a
             call z,L865A
             call nz,L862B
-            ret  
+            ret
 L8877:      ld   a,BRX-1
             call L86B8
             call L8A16
@@ -1401,7 +1384,7 @@ L8877:      ld   a,BRX-1
             bit  0,a
             call z,L8672
             call nz,L8643
-            ret  
+            ret
 L888E:      ld   a,b
             add  a,MIDX-8
             ld   (L861F),a
@@ -1435,16 +1418,16 @@ L88C5:      ex   af,af'
             call L8ACD
             ld   (L8622),a
             ld   a,c
-            exx  
+            exx
             ld   e,a
             ld   a,(L8622)
-            neg  
+            neg
             ld   c,a
-            exx  
+            exx
             bit  0,e
             jr   z,L8910
             ld   a,(L8622)
-            cpl  
+            cpl
             add  a,MIDX+1
             add  a,b
             ld   c,#00
@@ -1467,7 +1450,7 @@ L88EE:      call L89D4
             bit  1,a
             call nz,L862B
             call z,L8643
-            ret  
+            ret
 L8910:      ld   a,(L8622)
             add  a,MIDX
             sub  b
@@ -1490,18 +1473,18 @@ L8921:      call L89EF
             bit  1,a
             call nz,L865A
             call z,L8672
-            ret  
+            ret
 L893F:      ld   de,(L861C)
             ld   a,c
             call L8ACD
             ld   (L8622),a
             ld   a,c
-            exx  
+            exx
             ld   e,a
             ld   a,(L8622)
-            neg  
+            neg
             ld   c,a
-            exx  
+            exx
             xor  a
             bit  1,e
             jr   nz,L895B
@@ -1524,7 +1507,7 @@ L895B:      ld   (L8620),a
             bit  1,a
             call nz,L8689
             call z,L86A1
-            ret  
+            ret
 L8985:      call L89C3
             ld   a,(L8620)
             ld   c,a
@@ -1539,7 +1522,7 @@ L8985:      call L89C3
             or   #1F
             ld   l,a
             ld   c,#FF
-            ret  
+            ret
 L89A1:      call L89C3
             ld   a,(L8620)
             ld   c,a
@@ -1557,20 +1540,20 @@ L89A1:      call L89C3
             ld   a,b
 ;FILLED
             ld   b,0                ;#FF
-            ret  
+            ret
 
 ;UNFILLED
 L89C0:      ld   b,#7F
-            ret  
+            ret
 L89C3:      ld   bc,(L861E)
             ld   de,(L861C)
             ld   a,d
-            neg  
-            exx  
+            neg
+            exx
             ld   c,a
             ld   e,#00
-            exx  
-            ret  
+            exx
+            ret
 L89D4:
             ld   l,c
             ld   c,a
@@ -1593,10 +1576,10 @@ L89D4:
             dec  a
             jr   nz,$-3
             ld   a,b
-            cpl  
+            cpl
             ld   b,a
             ld   e,l
-            ret  
+            ret
 L89EF:      push af
             ld   a,b
             ld   (L8627),a
@@ -1612,7 +1595,7 @@ L89EF:      push af
             add  hl,bc
             and  7
             sub  #08
-            neg  
+            neg
             ld   c,a
             ld   a,(SEDETECT)
             and  a
@@ -1624,16 +1607,16 @@ L89EF:      push af
             jr   nz,$-3
             ld   a,(L8627)
             ld   b,a
-            ret  
+            ret
 L8A16:      ld   bc,(L861E)
             ld   a,MIDX+8
             sub  b
-            exx  
+            exx
             ld   c,a
             ld   a,(L8622)
             ld   e,a
-            exx  
-            ret  
+            exx
+            ret
 L8A25:      ld   a,(SEDETECT)
             and  a
 ;FILLED
@@ -1643,7 +1626,7 @@ L8A25:      ld   a,(SEDETECT)
             ld   e,a
             ld   c,#FF              ;#00
             ld   b,0                ;#FF
-            ret  
+            ret
 ;FILLED
 L8A37:      ld   hl,#FFE0           ;#257C
             ld   (L8A85+1),hl
@@ -1687,7 +1670,7 @@ L8A8B:      djnz L8A76
 L8A8D:      pop  bc
             pop  af
             pop  de
-            ret  
+            ret
 
 L8ACD:      push bc
             push de
@@ -1714,7 +1697,7 @@ L8AEF:      srl  b
             pop  hl
             pop  de
             pop  bc
-            ret  
+            ret
 ;FILLED
 L8AF7:      ld   a,e
             sub  l
@@ -1730,14 +1713,14 @@ L8B08:      ld   a,#8B
             cp   h
             jr   nc,L8B0F
 L8B0D:      pop  af
-            ret  
+            ret
 L8B0F:      ld   (L8623),sp
 L8B13:
             ld   a,c
             and  (hl)
             ld   d,a
             ld   a,c
-            cpl  
+            cpl
             and  ixl
             or   d
             ld   (hl),a
@@ -1747,7 +1730,7 @@ L8B13:
             and  (hl)
             ld   (hl),a
             ld   a,b
-            cpl  
+            cpl
             and  ixl
             or   (hl)
             ld   (hl),a
@@ -1766,24 +1749,24 @@ L8B13:
             call L8DEE
             jp   $+6
             call L8E08
-            exx  
+            exx
             add  hl,de
             inc  e
             add  hl,de
             bit  7,h
-            exx  
+            exx
             jr   nz,L8B6D
-            scf  
+            scf
             rr   b
             jr   c,L8B72
 L8B62:      sli  c
             jr   c,L8B7B
-L8B66:      exx  
+L8B66:      exx
             add  hl,bc
             inc  c
 L8B69:      add  hl,bc
             bit  7,h
-            exx  
+            exx
 L8B6D:      jp   nz,L8B13
             jr   L8B9C
 L8B72:      inc  e
@@ -1800,7 +1783,7 @@ L8B7B:      dec  l
             jr   L8B66
 L8B84:      ld   sp,(L8623)
             pop  af
-            ret  
+            ret
 L8B8A:      inc  e
             ld   a,l
             sub  e
@@ -1814,29 +1797,29 @@ L8B93:      dec  l
             ld   c,#01              ;#FE
             jr   L8BA4
 L8B9C:
-            scf  
+            scf
             rr   b
             jr   c,L8B8A
 L8BA0:      sli  c
             jr   c,L8B93
-L8BA4:      exx  
+L8BA4:      exx
             add  hl,bc
             inc  c
             jr   z,L8B84
 L8BA9:      add  hl,bc
             bit  7,h
-            exx  
+            exx
             jr   z,L8B9C
-            exx  
+            exx
             add  hl,de
             inc  e
             add  hl,de
-            exx  
+            exx
             ld   a,c
             and  (hl)
             ld   d,a
             ld   a,c
-            cpl  
+            cpl
             and  ixl
             or   d
             ld   (hl),a
@@ -1846,7 +1829,7 @@ L8BA9:      add  hl,bc
             and  (hl)
             ld   (hl),a
             ld   a,b
-            cpl  
+            cpl
             and  ixl
             or   (hl)
             ld   (hl),a
@@ -1862,7 +1845,7 @@ L8BA9:      add  hl,bc
             ld   a,0
 L8BC6:      ld   l,d
             sub  #11
-            cpl  
+            cpl
             ld   (L8BD3),a
             push de
             ld   e,ixl
@@ -1900,14 +1883,14 @@ L8C0C:      ld   a,#8B
             cp   h
             jr   nc,L8C13
 L8C11:      pop  af
-            ret  
+            ret
 L8C13:      ld   (L8623),sp
 L8C17:
             ld   a,c
             and  (hl)
             ld   d,a
             ld   a,c
-            cpl  
+            cpl
             and  ixl
             or   d
             ld   (hl),a
@@ -1926,16 +1909,16 @@ L8C24:      call L5E36
             call L8DEE
             jr   L8C54
 L8C51:      call L8E08
-L8C54:      exx  
+L8C54:      exx
             add  hl,de
             inc  e
             add  hl,de
             bit  7,h
-            exx  
+            exx
             jr   nz,L8C6D
             sli  c
             jr   c,L8C72
-L8C61:      exx  
+L8C61:      exx
             add  hl,bc
             inc  c
             ex   af,af'
@@ -1944,7 +1927,7 @@ L8C61:      exx
             ex   af,af'
             add  hl,bc
             bit  7,h
-            exx  
+            exx
 L8C6D:      jp   nz,L8C17
             jr   L8CA0
 L8C72:      dec  l
@@ -1955,22 +1938,22 @@ L8C72:      dec  l
             ld   c,#01              ;#FE
             jr   L8C61
 L8C7C:      ex   af,af'
-            exx  
+            exx
             ld   a,l
             sub  e
-            exx  
+            exx
             jr   z,L8C90
             jp   L8B69
 L8C86:      ex   af,af'
-            exx  
+            exx
             ld   a,l
             sub  e
-            exx  
+            exx
             jr   z,L8C90
             jp   L8BA9
 L8C90:      ld   sp,(L8623)
             pop  af
-            ret  
+            ret
 L8C96:      dec  l
             ld   a,l
             sub  e
@@ -1980,7 +1963,7 @@ L8C96:      dec  l
             jr   L8CA4
 L8CA0:      sli  c
             jr   c,L8C96
-L8CA4:      exx  
+L8CA4:      exx
             add  hl,bc
             inc  c
             jr   z,L8C90
@@ -1990,18 +1973,18 @@ L8CA4:      exx
             ex   af,af'
             add  hl,bc
             bit  7,h
-            exx  
+            exx
             jr   z,L8CA0
-            exx  
+            exx
             add  hl,de
             inc  e
             add  hl,de
-            exx  
+            exx
             ld   a,c
             and  (hl)
             ld   d,a
             ld   a,c
-            cpl  
+            cpl
             and  ixl
             or   d
             ld   (hl),a
@@ -2017,7 +2000,7 @@ L8CA4:      exx
             ld   a,0
 L8CC6:      ld   l,d
             sub  #11
-            cpl  
+            cpl
             ld   (L8CD3),a
             push de
             ld   e,ixl
@@ -2055,7 +2038,7 @@ L8D0C:      ld   a,#8B
             cp   h
             jr   nc,L8D13
 L8D11:      pop  af
-            ret  
+            ret
 L8D13:      ld   (L8623),sp
 L8D17:      ld   d,l
             ld   l,e
@@ -2063,7 +2046,7 @@ L8D17:      ld   d,l
             and  (hl)
             ld   (hl),a
             ld   a,b
-            cpl  
+            cpl
             and  ixl
             or   (hl)
             ld   (hl),a
@@ -2084,17 +2067,17 @@ L8D4C:      jr   nz,L8D53
             call L8DEE
             jr   L8D56
 L8D53:      call L8E08
-L8D56:      exx  
+L8D56:      exx
             add  hl,de
             inc  e
             add  hl,de
             bit  7,h
-            exx  
+            exx
             jr   nz,L8D6F
-            scf  
+            scf
             rr   b
             jr   c,L8D74
-L8D63:      exx  
+L8D63:      exx
             add  hl,bc
             inc  c
             ex   af,af'
@@ -2103,7 +2086,7 @@ L8D63:      exx
             ex   af,af'
             add  hl,bc
             bit  7,h
-            exx  
+            exx
 L8D6F:      jp   nz,L8D17
             jr   L8D94
 L8D74:      inc  e
@@ -2118,7 +2101,7 @@ L8D81:      ex   af,af'
             jp   L8BA9
 L8D85:      ld   sp,(L8623)
             pop  af
-            ret  
+            ret
 L8D8B:      inc  e
             ld   a,l
             sub  e
@@ -2126,10 +2109,10 @@ L8D8B:      inc  e
             ld   b,#80              ;#7F
             jr   L8D98
 L8D94:
-            scf  
+            scf
             rr   b
             jr   c,L8D8B
-L8D98:      exx  
+L8D98:      exx
             add  hl,bc
             inc  c
             jr   z,L8D85
@@ -2139,20 +2122,20 @@ L8D98:      exx
             ex   af,af'
             add  hl,bc
             bit  7,h
-            exx  
+            exx
             jr   z,L8D94
-            exx  
+            exx
             add  hl,de
             inc  e
             add  hl,de
-            exx  
+            exx
             ld   d,l
             ld   l,e
             ld   a,b
             and  (hl)
             ld   (hl),a
             ld   a,b
-            cpl  
+            cpl
             and  ixl
             or   (hl)
             ld   (hl),a
@@ -2168,7 +2151,7 @@ L8D98:      exx
             ld   a,0
 L8DBC:      ld   l,d
             sub  #11
-            cpl  
+            cpl
             ld   (L8DC9),a
             push de
             ld   e,ixl
@@ -2208,7 +2191,7 @@ L8DEE:
             pop  af
             ld   sp,(L8623)
             pop  af
-            ret  
+            ret
 L8E08:
             ld   a,ixl
             xor  ixh
@@ -2227,11 +2210,10 @@ L8E08:
             pop  af
             ld   sp,(L8623)
             pop  af
-            ret  
+            ret
 
             db   #00,#00
 TXTR:       db   #00,#00
-
 
 
 ZJ16:       call ZJ19
@@ -2246,7 +2228,7 @@ LD7CE:      push iy
             call nz,LFBE0
             pop  iy
             pop  ix
-            ret  
+            ret
 LED57:
             db   0,0
             db   #81,#41,#42,#22,#23,#13,#14
@@ -2284,7 +2266,7 @@ LFB03:      ld   e,a
             ld   a,(hl)
             and  #F8
             ld   (LA8FA),a
-            ret  
+            ret
 LFB31:      ld   a,#AF
 LFB32:      equ  $-1
             ex   af,af'
@@ -2320,7 +2302,7 @@ LFB32:      equ  $-1
             cp   l
             jr   nc,$+4
 LFB6A:      xor  a
-            ret  
+            ret
             ld   a,MID
             add  a,l
             rrc  b
@@ -2362,7 +2344,7 @@ LFB83:      push af
 LFB98:      push hl
             ld   a,(ix+#00)
             ld   b,#08
-            rlca 
+            rlca
             rr   h
             djnz $-3
             add  a,a
@@ -2372,7 +2354,7 @@ LFB98:      push hl
             ld   b,a
             xor  a
             add  hl,hl
-            rla  
+            rla
             djnz $-2
             ld   b,d
             EXD
@@ -2381,7 +2363,7 @@ LFB98:      push hl
             jr   c,LFBBA
             dec  hl
             ld   ($+7),a
-            cpl  
+            cpl
             and  (hl)
             ld   (hl),a
             ld   a,0
@@ -2390,7 +2372,7 @@ LFB98:      push hl
             ld   (hl),a
             inc  hl
 LFBBA:      ld   a,d
-            cpl  
+            cpl
             and  (hl)
             ld   (hl),a
             ld   a,d
@@ -2401,7 +2383,7 @@ LFBBA:      ld   a,d
             jr   c,LFBC8
             inc  hl
             ld   a,e
-            cpl  
+            cpl
             and  (hl)
             ld   (hl),a
             ld   a,e
@@ -2423,7 +2405,7 @@ LFBD8:      dec  ix
             dec  a
             jr   nz,LFB83
             pop  ix
-            ret  
+            ret
 LFBE0:      ld   de,#0003
             add  iy,de
             ld   a,(iy+#02)
@@ -2440,8 +2422,6 @@ LFBE0:      ld   de,#0003
             cp   (iy+#01)
             jr   c,LFC03
 LFC00:      or   #01
-            ret  
+            ret
 LFC03:      xor  a
-            ret  
-
-
+            ret

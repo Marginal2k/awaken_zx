@@ -1,4 +1,3 @@
-
 ; ИНИЦИАЛИЗАЦИЯ ПЕРЕМЕННЫХ
 INITV1:
             ld   hl,#C9F1
@@ -36,7 +35,7 @@ INITV1:
             ld   a,46
             ld   (PEREGREV+1),a
 
-            ret  
+            ret
 
 ;GEN TABLE Y.B=2^(X/256)-1 ,X=(0;1)
 GEN2X:      ld   ix,TB2X
@@ -47,33 +46,33 @@ GN2X:       ld   a,h                ;ROUNDING
             inc  a
             ld   (ix),a
             xor  a
-            exx  
+            exx
             ld   l,a
             ld   h,a
             ld   e,a
             ld   bc,#00B2           ;(2^1/256)*#10000
-            exx  
+            exx
             ld   bc,#1801
 GN2X1:      rr   c
             rr   h
             rr   l
-            exx  
+            exx
             jr   nc,GN2X2
             add  hl,bc
             adc  a,1
-GN2X2:      rra  
+GN2X2:      rra
             rr   h
             rr   l
-            exx  
+            exx
             djnz GN2X1
             ld   a,c
-            rra  
-            exx  
+            rra
+            exx
             ld   h,l
             ld   l,a
             inc  ixl
             jr   nz,GN2X
-            ret  
+            ret
 ;GEN TABLE Y.W=LOG2(X) ,X=(1,255)
 GENLOG2:    ld   hl,TBLOG2
             xor  a
@@ -97,11 +96,11 @@ GNLG1:      ld   (hl),d
             rr   d
             xor  a
             ld   hl,#B8AA
-            exx  
+            exx
             ld   h,a
             ld   l,a
             ld   b,#10
-GNLG2:      exx  
+GNLG2:      exx
             add  hl,hl
             adc  a,a
             sbc  hl,de
@@ -109,8 +108,8 @@ GNLG2:      exx
             jr   nc,GNLG3
             add  hl,de
             adc  a,c
-GNLG3:      exx  
-            ccf  
+GNLG3:      exx
+            ccf
             rl   l
             rl   h
             djnz GNLG2
@@ -122,7 +121,7 @@ GNLG3:      exx
             pop  hl
             inc  l
             jr   nz,GNLG1
-            ret  
+            ret
 GENTBXY:
 ; ГЕНЕРИМ ТАБЛИЦУ ПЕРЕВОД КООРДИНАТ В
 ; АДРЕС С #8000
@@ -151,7 +150,7 @@ MT2:
             ex   af,af'
             inc  h
             ld   (hl),a
-            rrca 
+            rrca
             dec  h
             ex   af,af'
             inc  l
@@ -159,5 +158,4 @@ MT2:
             inc  a
             cp   32
             jr   c,MT3
-            ret  
-
+            ret

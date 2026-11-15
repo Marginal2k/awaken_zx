@@ -1,36 +1,35 @@
-
 ;  ПpoГPAMA ПEPEБPOCKИ ПpoГPAMMЫ ПOДГpУ3KИ
             xor  a
             out  (#FE),a
             ld   bc,#7FFD
             ld   a,#17
             out  (c),a
-            exx  
+            exx
             ld   hl,#C000
             ld   de,#C001
             ld   bc,#1AFF
             ld   (hl),l
-            ldir 
-            exx  
+            ldir
+            exx
             ld   a,#18
             out  (c),a
             ld   hl,#4000
             ld   de,#4001
             ld   bc,#1800
             ld   (hl),l
-            ldir 
+            ldir
             ld   (hl),#38
             ld   bc,#180
-            ldir 
+            ldir
             ld   (hl),7
             ld   bc,#17F
-            ldir 
+            ldir
             ld   hl,ZM9
             ld   de,#4200
             push de
             ld   bc,ZM8
-            ldir 
-            ret  
+            ldir
+            ret
 
 ZM9:
             disp #4200
@@ -39,7 +38,7 @@ ZM10:
             push hl
             ld   de,#6000
             ld   bc,ZM14
-            ldir 
+            ldir
             PAGE_ FREE+8
             ld   a,9
             ld   (TRDOS_DRIVE),a
@@ -96,14 +95,14 @@ ZM10:
 RRFILE:
             ld   de,TRDOS_FNAME
             ld   bc,9
-            ldir 
+            ldir
             DISK_FIND
             ld   a,c
             DISK_INFO
             ld   hl,(TRDOS_SECTOR)
             inc  l
             ld   a,(TRDOS_SECCNT)
-            ret  
+            ret
 RDFILE:
             ld   hl,#C000
             ld   a,3
@@ -121,4 +120,3 @@ ZM22:
             db   "PANEL   C"
 ZM29:
             db   "OBJECT3DC"
-

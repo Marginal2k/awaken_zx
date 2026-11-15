@@ -1,23 +1,4 @@
-;PRECORD    ■GETADRY        ■GETADR
-;GETINDX    ■GETINDY        ■GETIND
-;FINDOB     ■FINDPEACE      ■FINDALL
-;FINDUFO    ■FINDPIRAT      ■TESTSUBJ
-;OPONE      ■FIREING        ■FLOTSTART
-;FLOTSTART2 ■SFXA           ■CHECKALL
-;FINDOBJ    ■FINDASTER      ■FINDFREE
-;NEARCARGO  ■CHECKOBJ       ■YESCARGO
-;MAKEEXPLO  ■RASTOY         ■OUTLINE
-;RND        ■RNDW           ■RNDK1
-;RNDK2      ■RNDK3          ■RNDT2
-;RNDT1      ■RNDL1          ■RNDL2
-;RNDL3      ■RNDL4          ■RNDL5
-;RNDL7      ■RNDL8          ■RNDL9
 ;VSLINE
-
-
-
-
-
 
 
 PRECORD:
@@ -78,7 +59,7 @@ STPX:       ld   de,0
             jp   pe,EXES
             ld   a,h
             jp   p,$+4
-            cpl  
+            cpl
             cp   b
             jp   nc,EXES
             push hl
@@ -93,7 +74,7 @@ STPY:       ld   de,0
             jp   pe,EXES
             ld   a,h
             jp   p,$+4
-            cpl  
+            cpl
             cp   b
             jr   nc,EXES
             push hl
@@ -108,7 +89,7 @@ STPZ:       ld   de,0
             jp   pe,EXES
             ld   a,h
             jp   p,$+4
-            cpl  
+            cpl
             cp   b
             jr   nc,EXES
             push hl
@@ -180,7 +161,7 @@ RSTPY:      ld   hl,0
             ld   (STPY+1),hl
 RSTPZ:      ld   hl,0
             ld   (STPZ+1),hl
-            ret  
+            ret
 
 
 GETADRY:
@@ -191,7 +172,7 @@ GETADRY:
             push hl
             pop  iy
             pop  hl
-            ret  
+            ret
 
 
 GETADR:
@@ -205,8 +186,7 @@ GETADR:
             rr   l
             add  a,high(CARSB)
             ld   h,a
-            ret  
-
+            ret
 
 
 GETINDX:
@@ -218,7 +198,7 @@ GETINDX:
             pop  hl
             call GETIND
             pop  hl
-            ret  
+            ret
 
 
 GETINDY:
@@ -230,7 +210,7 @@ GETINDY:
             pop  hl
             call GETIND
             pop  hl
-            ret  
+            ret
 
 
 GETIND:
@@ -240,10 +220,10 @@ GETIND:
             ld   a,h
             sub  high(CARSB)
             sla  l
-            rla  
+            rla
             sla  l
-            rla  
-            ret  
+            rla
+            ret
 
 
 ;----------------------
@@ -262,7 +242,7 @@ FINDOB:
             ld   a,(iy)
             cp   #80
             jp   nz,FINDOB
-            ret  
+            ret
 
 
 FINDPEACE:
@@ -289,7 +269,7 @@ FP2L:
             jr   nc,FP2L
             call GETINDY
             inc  e                  ;cБPOC FZ
-            ret  
+            ret
 
 
 FINDALL:
@@ -307,7 +287,7 @@ FP6L:
             jr   z,FP6L
             call GETINDY
             inc  e                  ;cБPOC FZ
-            ret  
+            ret
 
 
 FINDUFO:
@@ -325,7 +305,7 @@ FP3L:
             jr   nz,FP3L
             call GETINDY
             inc  e
-            ret  
+            ret
 
 
 FINDPIRAT:
@@ -343,7 +323,7 @@ FP2:
             jr   nz,FP2
             call GETINDY
             inc  e
-            ret  
+            ret
 ;---------------------------------
 
 
@@ -373,7 +353,7 @@ TS2:
             ld   l,(ix+4)
             ld   h,(ix+5)
             ld   (DDZ+1),hl
-            ret  
+            ret
 OPONE:      ld   iy,0
             ld   a,(ix+SUBJ)
             cp   SPLAYER
@@ -389,11 +369,11 @@ OPONE:      ld   iy,0
             ld   (TZ+1),de
             ld   iy,PLAYER
             and  a
-            ret  
+            ret
 FG2:
             ld   a,(iy+PX+1)
             cp   #80
-            scf  
+            scf
             ret  z
             and  a
             ld   l,(iy+0)
@@ -414,7 +394,7 @@ FG2:
             ld   e,(iy+PZ)
             ld   d,(iy+PZ+1)
             ld   (TZ+1),de
-            ret  
+            ret
 
 
 FIREING:
@@ -423,7 +403,7 @@ FIREING:
 ;SUBJ & ACTN
             ld   a,(ix+PX+1)
             cp   #80
-            scf  
+            scf
             ret  z
             ld   b,a
             ld   c,(ix+PX)
@@ -431,7 +411,7 @@ FIREING:
             ld   h,(ix+PY+1)
             ld   e,(ix+PZ)
             ld   d,(ix+PZ+1)
-            exx  
+            exx
             call OPONE
             ret  c
             ld   a,r
@@ -446,20 +426,20 @@ PWPPI:      cp   #4A
             ld   (iy+SUBJ),a
 FG1:
             ld   a,d
-            exx  
+            exx
             and  d
             ret  m
             push hl
             ld   hl,(TX+1)
             SUB_BC
             pop  hl
-            scf  
+            scf
             ret  pe
             push hl
             ld   hl,(TZ+1)
             SUB_DE
             pop  hl
-            scf  
+            scf
             ret  pe
             push hl
             push de
@@ -467,13 +447,13 @@ FG1:
             SUB_DE
             pop  de
             pop  hl
-            scf  
+            scf
             ret  pe
             push ix
             call OUTLINE
             pop  ix
             and  a
-            ret  
+            ret
 
 
 FLOTSTART:
@@ -502,7 +482,7 @@ FLOTSTART2:
             inc  a
             ld   b,a
 FLT1:
-            exx  
+            exx
             call FINDFREE
 ; НЕТ СВОБОДНОГО МЕСТА В БУФЕРЕ
             ret  z
@@ -538,7 +518,7 @@ FLT1:
 
             ld   c,IMIK1
             ld   a,r
-            rla  
+            rla
             jr   c,$+4
             ld   c,IMIK2
             ld   (iy+INDI),c
@@ -563,12 +543,10 @@ A_MODE:     ld   (iy+MODE),C_FIGHT
             ld   (iy+ENERGY),50
             ld   (iy+RSPD),1
             ld   (iy+SPT),2
-            exx  
+            exx
             dec  b
             jp   nz,FLT1
-            ret  
-
-
+            ret
 
 
 CHECKALL:
@@ -585,8 +563,8 @@ CHECKALL:
             call NEARCARGO
             ld   (ix+MODE),C_GETCARGO
             ld   (ix+SUBJ),a
-            scf  
-            ret  
+            scf
+            ret
 CHECKA2:
             call RNDK3
             ld   a,h
@@ -622,9 +600,7 @@ FS3:
             ld   (ix+MODE),C_FLYAROUND
 ; ВРЕМЯ ОБЛЕТА
             ld   (ix+POWOR),TIMEOBL
-            ret  
-
-
+            ret
 
 
 ; ПОСИК АСТЕРОИДА
@@ -635,7 +611,6 @@ FINDASTER:
             call GETINDY
             ld   (ix+BSUBJ),a
             jp   GOSIMPLY
-
 
 
 FINDOBJ:
@@ -651,8 +626,7 @@ FIND2:
             cp   d
             jp   nz,FIND2
             inc  a
-            ret  
-
+            ret
 
 
 FINDFREE:
@@ -673,7 +647,7 @@ HHH3:
             ld   (iy+SETUP),0
             inc  a
             jr   z,HHH3
-            ret  
+            ret
 
 
 NEARCARGO:
@@ -689,7 +663,7 @@ NXTCA2:
             inc  a
             jp   z,$-7
             dec  a
-            exx  
+            exx
             call GETADR
             inc  l
             ld   a,(hl)
@@ -702,19 +676,19 @@ NXTCA2:
 NEARC:      cp   #FF
             jr   nc,$+11
             ld   (NEARC+1),a
-            exx  
+            exx
             ld   a,(hl)
-            exx  
+            exx
             ld   (NRC1+1),a
-            exx  
+            exx
             jp   NXTCA2
 NOCA1:
-            exx  
+            exx
             ld   (hl),#FF
             jp   NXTCA2
 NRC1:
             ld   a,0
-            ret  
+            ret
 
 
 CHECKOBJ:
@@ -732,7 +706,7 @@ CHECKOBJ:
             cp   T_TRADER
             ret  z
             cp   T_MIKR
-            ret  
+            ret
 
 
 YESCARGO:
@@ -743,7 +717,7 @@ YESCARGO:
             call CHECKOBJ
             jr   z,$+4
             xor  a
-            ret  
+            ret
             ld   hl,CARGS-1
             inc  hl
             ld   a,(hl)
@@ -751,7 +725,7 @@ YESCARGO:
             ret  z
             inc  a
             jp   z,$-6
-            ret  
+            ret
 
 
 MAKEEXPLO:
@@ -778,7 +752,7 @@ MAKEEXPLO:
             ld   c,(ix+4)
             ld   b,(ix+5)
             ld   a,EXTIME
-            exx  
+            exx
             ld   hl,NWVOS
             push ix
             call NEWVSPR
@@ -811,12 +785,12 @@ JJ12:
             ld   d,ixh
             ld   e,ixl
             EXD
-            ldi  
-            ldi  
-            ldi  
-            ldi  
-            ldi  
-            ldi  
+            ldi
+            ldi
+            ldi
+            ldi
+            ldi
+            ldi
             ld   a,IOSKOL
             ld   (de),a
             inc  e
@@ -908,8 +882,7 @@ RASTOY:
             cp   d
             ret  nc
             ld   a,d
-            ret  
-
+            ret
 
 
 ;------------------------
@@ -922,16 +895,16 @@ OUTLINE:
             ret  nz
             ld   (L9C*256),hl
             ld   (L9C*256+2),de
-            exx  
+            exx
             call CALC2D3D
             ret  nz
             ld   (L9C*256+5),hl
             ld   (L9C*256+7),de
-            exx  
+            exx
             call VSLINE
             ret  z
             ld   b,a
-            cpl  
+            cpl
             and  #F0
             ret  nz
             ld   a,b
@@ -943,66 +916,65 @@ MASKLINE:
             db   %10110010,0,5,0
 
 
-
 RND:
-            exx  
+            exx
             ld   hl,SDO
             jp   RNDO
 RNDW:
-            exx  
+            exx
             ld   hl,SDW
             jp   RNDO
 RNDK1:
-            exx  
+            exx
             ld   hl,SDK1
             jp   RNDO
 RNDK2:
-            exx  
+            exx
             ld   hl,SDK2
             jp   RNDO
 RNDK3:
-            exx  
+            exx
             ld   hl,SDK3
             jp   RNDO
 RNDT2:
-            exx  
+            exx
             ld   hl,SDT2
             jp   RNDO
 RNDT1:
-            exx  
+            exx
             ld   hl,SDT1
             jp   RNDO
 RNDL1:
-            exx  
+            exx
             ld   hl,SDL1
             jp   RNDO
 RNDL2:
-            exx  
+            exx
             ld   hl,SDL2
             jp   RNDO
 RNDL3:
-            exx  
+            exx
             ld   hl,SDL3
             jp   RNDO
 
 RNDL4:
-            exx  
+            exx
             ld   hl,SDL4
             jp   RNDO
 RNDL5:
-            exx  
+            exx
             ld   hl,SDL5
             jp   RNDO
 RNDL7:
-            exx  
+            exx
             ld   hl,SDL7
             jp   RNDO
 RNDL8:
-            exx  
+            exx
             ld   hl,SDL8
             jp   RNDO
 RNDL9:
-            exx  
+            exx
             ld   hl,SDL9
             jp   RNDO
 
@@ -1093,10 +1065,9 @@ RNDO:
             dec  hl
             ld   (hl),e
             push de
-            exx  
+            exx
             pop  hl
-            ret  
-
+            ret
 
 
 VSLINE:
@@ -1133,10 +1104,10 @@ LD84:       ld   c,#00
             set  2,c
             inc  l
             ld   a,c
-            rlca 
-            rlca 
-            rlca 
-            rlca 
+            rlca
+            rlca
+            rlca
+            rlca
             xor  #F0
             or   c
             ld   (hl),a
@@ -1149,12 +1120,10 @@ LD83:       inc  l
             cp   b
             jp   nz,LD84
             ex   af,af'
-            ret  
+            ret
 LD85:       inc  l
             ld   (hl),c
             jp   LD83
-
-
 
 
 ; ПЛЕЙЕР СЕМПЛОВ
@@ -1167,12 +1136,12 @@ SFXA:
             xor  a
             out  (c),a
             ld   b,#BF
-            outi 
+            outi
             ld   b,#FF
             ld   a,1
             out  (c),a
             ld   b,#BF
-            outi 
+            outi
             ld   b,#FF
             ld   a,7
             out  (c),a
@@ -1186,7 +1155,7 @@ SFXA:
             ld   b,#FF
             out  (c),a
             ld   b,#BF
-            outi 
+            outi
             ld   (SFXA+1),hl
             ld   a,(hl)
             or   a
@@ -1208,12 +1177,12 @@ SFXB:
             ld   a,2
             out  (c),a
             ld   b,#BF
-            outi 
+            outi
             ld   b,#FF
             ld   a,3
             out  (c),a
             ld   b,#BF
-            outi 
+            outi
             ld   b,#FF
             ld   a,7
             out  (c),a
@@ -1221,7 +1190,7 @@ SFXB:
             and  %11101101
             ld   b,a
             ld   a,(hl)
-            rlca 
+            rlca
             or   b
             ld   b,#BF
             out  (c),a
@@ -1230,7 +1199,7 @@ SFXB:
             ld   b,#FF
             out  (c),a
             ld   b,#BF
-            outi 
+            outi
             ld   (SFXB+1),hl
             ld   a,(hl)
             or   a
@@ -1251,8 +1220,8 @@ SFXN:
             out  (c),a
             ld   b,#BF
             ld   a,(NUNU+1)
-            rlca 
-            rlca 
+            rlca
+            rlca
             and  %00111100
             or   3
             out  (c),a
@@ -1293,6 +1262,5 @@ NUNU:       ld   a,0
             jr   nc,$+4
             ld   a,4
             out  (c),a
-            ret  
+            ret
             include "gen/EFFECTS.inc"   ; GENERATED from assets/sound/effects.txt
-

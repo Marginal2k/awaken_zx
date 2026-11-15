@@ -4,22 +4,6 @@
 ;LIGHTER
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 COMPOS:
             ld   (STK08+1),sp
 ; ЧИСТИМ ПОЛЕ КОМПАСА
@@ -196,24 +180,24 @@ MINISPRITE:
 ; В bcКООРДИНАТЫ НА ЭКРАНЕ
             ld   a,b
             and  a
-            rra  
-            scf  
-            rra  
+            rra
+            scf
+            rra
             and  a
-            rra  
+            rra
             xor  b
             and  #F8
             xor  b
             ld   h,a
             ld   a,c
-            rlca 
-            rlca 
-            rlca 
+            rlca
+            rlca
+            rlca
             xor  b
             and  #C7
             xor  b
-            rlca 
-            rlca 
+            rlca
+            rlca
             ld   l,a
             ld   a,c
             and  7
@@ -249,7 +233,7 @@ MINISPRITE:
             ld   a,(de)
             or   (hl)
             ld   (hl),a
-            ret  
+            ret
             include "gen/RADAR_COMPASS.inc"   ; GENERATED from assets/gfx/radar_sprites.png
 
 
@@ -274,7 +258,6 @@ ADDES:
             dw   LNPA*15+1+EXP2
 
 
-
 RADAR:
             ld   ix,CARSB-OLEN
             ld   (STK4+1),sp
@@ -288,7 +271,7 @@ RADAR:
             ld   b,1
             jr   z,$+6
             ld   b,#FF
-            neg  
+            neg
 RDR_:       ld   l,0
             add  a,l
             ld   (RDR_+1),a
@@ -297,11 +280,11 @@ RDR_:       ld   l,0
             ld   c,b
 EXP3:       ld   a,0
             sub  c
-            exx  
+            exx
             and  15
             ld   (EXP3+1),a
             ld   (EXP1+1),a
-            rlca 
+            rlca
             ld   l,a
             ld   h,0
             ld   b,h
@@ -312,7 +295,7 @@ EXP3:       ld   a,0
             ld   de,#5555
             ld   a,5
             ex   af,af'
-            ret  
+            ret
             ex   af,af'
 EXP2:
             ex   af,af'
@@ -364,7 +347,7 @@ EXP1:
             ld   l,a
             ld   a,16
             sub  l
-            rlca 
+            rlca
             ld   l,a
             xor  a
             ld   h,a
@@ -376,7 +359,7 @@ EXP1:
             ld   hl,#5555
             EXD
             ex   af,af'
-            ret  
+            ret
 
 STK4:       ld   sp,0
             ld   hl,#572C
@@ -418,26 +401,26 @@ RDR11:
             ld   c,a
             and  a
             jp   p,$+5
-            neg  
+            neg
             cp   RADFAR
             jr   nc,RDR11
             ld   a,(ix+PY+1)
             ld   b,a
             and  a
             jp   p,$+5
-            neg  
+            neg
             cp   RADFAR
             jr   nc,RDR11
             ld   a,(ix+PZ+1)
             ld   e,a
             and  a
             jp   p,$+5
-            neg  
+            neg
             cp   RADFAR
             jr   nc,RDR1
             ld   a,e
             ld   e,c
-            neg  
+            neg
             ld   c,a
             sra  c
             sra  c
@@ -467,53 +450,53 @@ RDR11:
             ld   e,a
             ld   a,c
             and  a
-            rra  
-            scf  
-            rra  
+            rra
+            scf
+            rra
             and  a
-            rra  
+            rra
             xor  c
             and  #F8
             xor  c
-            exx  
+            exx
             ld   d,a
-            exx  
+            exx
             ld   a,e
-            rlca 
-            rlca 
-            rlca 
+            rlca
+            rlca
+            rlca
             xor  c
             and  #C7
             xor  c
-            rlca 
-            rlca 
-            exx  
+            rlca
+            rlca
+            exx
             ld   e,a
-            exx  
+            exx
             ld   a,e
-            exx  
+            exx
             and  7
             ld   c,a
             ld   b,0
             ld   hl,MPALKA
             add  hl,bc
             ld   c,(hl)
-            exx  
+            exx
             ld   a,b
-            exx  
+            exx
             sra  a
             sra  a
             jp   z,MRAD2
             jp   p,DOWNLINE
 ;UPLINE
-            neg  
+            neg
             ld   b,a
-            exx  
+            exx
             ld   a,c
-            exx  
+            exx
             sub  b
             cp   #90-#28+3
-            ccf  
+            ccf
             jr   c,$+13
             sub  #90-#28+3
             add  a,b
@@ -564,15 +547,15 @@ UPL1:
             jp   MRAD
 DOWNLINE:
             ld   b,a
-            exx  
+            exx
             ld   a,c
-            exx  
+            exx
             add  a,b
             cp   #90+#28-3
             jr   c,$+14
             sub  #90+#28-3
             sub  b
-            neg  
+            neg
             ld   b,a
             and  a
             jr   z,MRAD2
@@ -598,14 +581,14 @@ MRAD:
             ex   af,af'
             jp   nc,RDR1
 MRAD2:
-            exx  
+            exx
             ld   a,e
             and  7
             add  a,a
             ld   e,a
             add  a,a
             add  a,e
-            exx  
+            exx
             ld   c,a
             ld   b,0
 ; ЕСЛИ ЕСТЬ ПРИБОР ИДЕНТИФИКАЦИИ ЦЕЛЕЙ ТО
@@ -739,16 +722,16 @@ DATAL:
             and  a
 ; ЕСЛИ РОВНО НУЛЮ ЗНАЧЕНИЕ
             jr   z,ZR1
-            cpl  
+            cpl
             and  7
             ld   a,c
             jr   nz,$+7
             add  a,8
             and  %11111000
             ld   c,a
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
             and  7
             jr   z,ZR1
             ld   b,a
@@ -792,13 +775,13 @@ ZR2:
             ld   a,c
             jr   z,$+4
             add  a,8
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
             and  7
             sub  6
             ret  nc
-            neg  
+            neg
             ld   b,a
             ld   de,#0005
             xor  a
@@ -818,7 +801,7 @@ ZR2:
             ld   h,a
             inc  l
             djnz $-15
-            ret  
+            ret
 TABR:
             db   %10000000
             db   %10000000
@@ -845,10 +828,10 @@ LIGHTER:
             ld   hl,#844E
             ld   de,#8451
             ld   bc,#20
-            exx  
+            exx
             ld   l,7
 ZR3:
-            exx  
+            exx
             ld   a,#80
             xor  (hl)
             ld   (hl),a
@@ -859,18 +842,18 @@ ZR3:
             ld   (hl),a
             add  hl,bc
             EXD
-            exx  
+            exx
             dec  l
             jp   nz,ZR3
-            exx  
+            exx
 
             ld   hl,#870E
             ld   de,#8711
 
-            exx  
+            exx
             ld   l,7
 ZR5:
-            exx  
+            exx
             ld   a,#80
             xor  (hl)
             ld   (hl),a
@@ -881,7 +864,7 @@ ZR5:
             ld   (hl),a
             add  hl,bc
             EXD
-            exx  
+            exx
             dec  l
             jp   nz,ZR5
 
@@ -892,7 +875,7 @@ ZR5:
 
             ld   b,14
             ld   a,(hl)
-            cpl  
+            cpl
             ld   (hl),a
             dec  l
             djnz $-4
@@ -900,10 +883,10 @@ ZR5:
             ld   hl,#8129
             ld   de,#8136
             ld   bc,#20
-            exx  
+            exx
             ld   l,#57
 ZR4:
-            exx  
+            exx
             ld   a,#80
             xor  (hl)
             ld   (hl),a
@@ -914,7 +897,7 @@ ZR4:
             ld   (hl),a
             add  hl,bc
             EXD
-            exx  
+            exx
             dec  l
             jp   nz,ZR4
 
@@ -1009,9 +992,9 @@ ZR7:
             pop  de
             ld   a,h
             sla  l
-            rla  
+            rla
             sla  l
-            rla  
+            rla
             ld   l,a
             ld   a,(ROKETN1)
             cp   l
@@ -1031,14 +1014,14 @@ ZR9:
             ld   d,a
 ZR10:
             ld   a,c
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
             and  %00011111
             ld   c,a
             ld   a,b
             sub  4
-            rlca 
+            rlca
             ld   l,a
             ld   h,8
             ADDHLHL 4
@@ -1067,4 +1050,3 @@ ZR10:
             ld   (hl),a
             jp   ZR6
             include "gen/RADAR_TARGET.inc"   ; GENERATED from assets/gfx/radar_sprites.png
-

@@ -7,19 +7,6 @@
 ;D3D2
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 NWTEL:
 ; ИНИЦИАЛИЗАЦИЯ НОВОГО ТЕЛЕПОРТА
             ld   hl,VSPR2
@@ -59,7 +46,7 @@ ZJ1:
             and  a
             ret  m
             jr   nz,ZJ1
-            exx  
+            exx
             ld   (iy+0),l
             ld   (iy+1),h
             ld   (iy+2),e
@@ -69,7 +56,7 @@ ZJ1:
             ex   af,af'
 ; ВРЕМЯ ЖИЗНИ
             ld   (iy+7),a
-            exx  
+            exx
 MASHT:      ld   (iy+6),0
 ; ТЕКУЩИЙ АДРЕС ФРЕЙМА
             ld   (iy+8),l
@@ -91,13 +78,12 @@ VLL3:       ld   a,0
 VLL1:       ld   (iy+16),0
 ; ВЫСОТА ПО Y
 VLL2:       ld   (iy+17),0
-            ret  
+            ret
 
 
 ; ПРОЦЕДУРА ВЫВОДА ВОКС. СПРАЙТА С
 ; С МАСШТАБИРОВАНИЕМ И ПРОЗРАЧНОСТЬЮ
 ; ПОРИТ РЕГ. i
-
 
 
 ;VOXEL
@@ -119,9 +105,9 @@ VOX:
             ld   iyl,c              ;SZX
             ld   iyh,b              ;SZY
             ld   e,b
-            exx  
+            exx
             ld   bc,0
-            exx  
+            exx
             ld   b,0
 VX:         ld   hl,0
             ld   a,h
@@ -138,13 +124,13 @@ VX:         ld   hl,0
             ld   c,a                ;NEW LEN OF X
             sub  b
             ld   b,l
-            neg  
+            neg
 ; В "А" БУДЕТ СМЕЩЕНИЕ ПО ШИРИНЕ ДЛЯ
 ; ИЗМЕНЕНИЯ АДРЕСА СПРАЙТА
-            exx  
+            exx
             ld   (DBV+1),a
             set  0,c                ;МЕТКА КЛИПИНГА СЛЕВА
-            exx  
+            exx
             jp   VX2
 VX1:
             ret  nz                 ;ЗА ЭКРАНОМ СПРАВА
@@ -163,7 +149,7 @@ VX2:
 ; КЛИПИРУЕМ
             sub  Xend
             sub  c
-            neg  
+            neg
 ; НОВАЯ ДЛИННА СПРАЙТА
             ld   c,a
 ; ПРОВЕРКИ ПО У
@@ -183,13 +169,13 @@ VY:         ld   hl,0
             ld   e,a                ;НОВАЯ ВЫСОТА СПРАЙТА
             sub  d
             ld   d,l
-            neg  
-            exx  
+            neg
+            exx
 ; В "А" КОЛИЧЕСТВО СТРОК ПОДДВЕРГНУТЫХ
 ; КЛИППИНГУ, КОТОРЫЕ НЕ ВИДИМЫ
             ld   b,a
             set  1,c                ;МАРКЕР КЛИПИНГА ПО У
-            exx  
+            exx
             jp   VX4
 VX3:
             ret  nz                 ;ВЕСЬ СПРАЙТ НИЖЕ СКРИНА
@@ -208,21 +194,20 @@ VX4:
 ; СНИЗУ
             sub  Yend
             sub  e
-            neg  
+            neg
             ld   e,a                ;НОВАЯ ВЫСОТА
-
 
 
 VX5:
 ; ДЕЛАЕМ НУЖНЫЕ КООРДИНАТЫ ЕСЛИ БЫЛИ
 ; КЛИППИНГИ
-            exx  
+            exx
             ld   a,(VX+1)
             bit  0,c
             jr   z,$+3
             xor  a
             bit  1,c
-            exx  
+            exx
             ld   b,a                ;КООРДИНАТА Х СПРАЙТА ВЫВД
             ld   a,(VY+1)
             jr   z,$+3
@@ -264,9 +249,9 @@ VX5:
 
 
 ; РАСЧИТЫВАЕМ КОЭФ. МАСШТАБИРОВАНИЯ ПО Х
-            exx  
+            exx
             ld   a,l                ;РЕАЛЬНАЯ ШИРИНА СПРАЙТА
-            exx  
+            exx
             ld   b,a                ;ЗАПОМНИЛИ
 ; ИЗНАЧАЛЬНО ЗАДАННАЯ ВЫВОДИМАЯ ШИРИНА
             ld   e,iyl
@@ -276,12 +261,10 @@ VX5:
 ; В "HL"-КОЭФ. МАСШТАБИРОВАНИЯ ПО X
 
 
-
-
 ; КОЕФ. МАСШТАБИРОВАНИЯ ПО У
-            exx  
+            exx
             ld   a,h                ;РЕАЛЬНАЯ ВЫСОТА
-            exx  
+            exx
             ld   e,iyh              ;ЗАДАННАЯ
             push hl
             call DIVV
@@ -289,15 +272,12 @@ VX5:
             ld   a,e
 ; СТАР.БАЙТ КОЕФ.МАСШ.ПО У
             ld   ixl,d
-            exx  
+            exx
             ld   c,a
 ; В "C" МЛАДШ. БАЙТ КОЕФ. МАСШТ. ПО У
 
 
-
-
-
-            exx  
+            exx
 ; ИЗНАЧАЛЬНАЯ ШИРИНА СПРАЙТА
 ; НЕОБХОДИМО СДЕЛАТЬ ЕЕ КРАТНОЙ 2^n
 ; Т.Е. ЕСЛИ ОНА = 20 ,ТО БУДЕТ 32
@@ -308,8 +288,7 @@ VX5:
             jr   $+4
             ld   a,32
             ld   b,a
-            exx  
-
+            exx
 
 
 ; В bКОЛИЧЕСТВО ВИДИМЫХ СТРОК КЛИПНУТЫХ
@@ -336,9 +315,9 @@ VX5:
             and  a
             jr   z,VX6
             ld   b,a
-            exx  
+            exx
             ld   a,b
-            exx  
+            exx
 
 ; УМНОЖИМ ДЛИННУ В БАЙТАХ СТРОКИ НА
 ; КОЛИЧЕСТВО СТРОК СПРАЙТА КОТОРЫЕ НАДО
@@ -357,7 +336,7 @@ VX5:
             add  hl,de
             EXD
 VX6:
-            exx  
+            exx
 DBV:        ld   a,0                ;КОЛ.КЛИПНУТЫХ ДАБЛ
 ; ВОКСЕЛЕЙ ПО ШИРИНЕ
 ; СЛЕВА
@@ -373,7 +352,7 @@ DBV:        ld   a,0                ;КОЛ.КЛИПНУТЫХ ДАБЛ
 ; ДАБЛ ВОКСЕЛЕЙ
 
             ld   hl,0
-            rla  
+            rla
             ld   c,a
             xor  a
             rept 6
@@ -382,7 +361,7 @@ DBV:        ld   a,0                ;КОЛ.КЛИПНУТЫХ ДАБЛ
             add  hl,de
             adc  a,0
             add  hl,hl
-            rla  
+            rla
             endr
             rl   c
             jr   nc,$+5
@@ -392,13 +371,13 @@ DBV:        ld   a,0                ;КОЛ.КЛИПНУТЫХ ДАБЛ
             ex   af,af'
 
             ld   a,h
-            exx  
+            exx
             ld   l,a
             ex   af,af'
             ld   h,a
             add  hl,de
             EXD
-            exx  
+            exx
             EXD
 P1:
             ld   a,b
@@ -437,14 +416,14 @@ VOXOUT:
             ld   b,0
 
             ld   hl,0
-            rla  
+            rla
             rept 6
-            rla  
+            rla
             jr   nc,$+3
             add  hl,bc
             add  hl,hl
             endr
-            rla  
+            rla
             jr   nc,$+3
             add  hl,bc
 
@@ -470,7 +449,7 @@ P2:
 ; ЗАПОЛНЯЕТСЯ
 XX:         ld   a,0
             add  a,c
-            rra  
+            rra
             ld   a,#0F
             jr   nc,Q2
             ld   a,(AW3)
@@ -513,7 +492,7 @@ Q1:
             ld   iyl,e              ;ДУБЛИРУЕМ МЛ.БАЙТ АДРЕСА
             ld   c,e
             ld   b,d
-            rra  
+            rra
             ld   h,high(VXTAB)+3
             ld   a,#A9              ;res5,c
             jr   c,$+8
@@ -526,7 +505,7 @@ Q1:
             ld   (AW5+1),a
 
             ld   d,#0F
-            exx  
+            exx
             xor  a
             ld   b,e
 Vxl3:
@@ -557,13 +536,13 @@ VXL4:
             add  hl,sp
             ld   a,(de)
             and  #F0
-            exx  
+            exx
             ld   l,a
-            exx  
+            exx
             ld   e,h
             add  hl,sp
             ld   a,(de)
-            exx  
+            exx
             jr   z,$+39             ;K1
             and  d
             jr   z,$+32             ;K2
@@ -623,7 +602,7 @@ VXL4:
             ld   (bc),a
 ;K0
             inc  c
-            exx  
+            exx
 
 ;LEN 84b
 
@@ -631,13 +610,13 @@ VXL4:
             add  hl,sp
             ld   a,(de)
             and  #F0
-            exx  
+            exx
             ld   l,a
-            exx  
+            exx
             ld   e,h
             add  hl,sp
             ld   a,(de)
-            exx  
+            exx
             jr   z,$+39
             and  d
             jr   z,$+32
@@ -692,7 +671,7 @@ VXL4:
             or   (hl)
             ld   (bc),a
             inc  c
-            exx  
+            exx
 
 
             MVOX
@@ -715,13 +694,13 @@ VXL4:
             add  hl,sp
             ld   a,(de)
             and  #F0
-            exx  
+            exx
             ld   l,a
-            exx  
+            exx
             ld   e,h
             add  hl,sp
             ld   a,(de)
-            exx  
+            exx
             jr   z,$+39
             and  d
             jr   z,$+32
@@ -776,8 +755,7 @@ VXL4:
             or   (hl)
             ld   (bc),a
             inc  c
-            exx  
-
+            exx
 
 
 ;-LAST
@@ -785,13 +763,13 @@ VXL4:
             add  hl,sp
             ld   a,(de)
             and  #F0
-            exx  
+            exx
             ld   l,a
-            exx  
+            exx
             ld   e,h
             add  hl,sp
             ld   a,(de)
-            exx  
+            exx
             jr   z,$+40
 AW1:        and  #0F
             jr   z,$+32
@@ -847,7 +825,6 @@ AW2:        and  #0F
             ld   (bc),a
 
 
-
 ;157 TAKTS ONE CYCLE
 
             ld   a,iyl
@@ -858,7 +835,7 @@ AW2:        and  #0F
             inc  b
 AW4:        set  5,c
 AW5:        ld   h,0
-            exx  
+            exx
             ex   af,af'
             add  a,c
             ld   l,a
@@ -885,10 +862,9 @@ VXL3:       ld   hl,0
             ld   (hl),#F0
 
 STKV:       ld   sp,0
-            ret  
+            ret
 V3:         inc  d
             jp   V4
-
 
 
 MULABC:
@@ -896,18 +872,17 @@ MULABC:
 ; a= (0-127) (UNSIGNED)
 ; bc(UNSIGNED)
             ld   hl,0
-            rla  
+            rla
             rept 6
-            rla  
+            rla
             jr   nc,$+3
             add  hl,bc
             add  hl,hl
             endr
-            rla  
+            rla
             ret  nc
             add  hl,bc
-            ret  
-
+            ret
 
 
 DIVV:
@@ -931,7 +906,7 @@ DIVV:
             jp   M1+(7*6)
 M1:
             rept 7
-            rla  
+            rla
             sbc  a,e
             jr   nc,$+3
             add  a,e
@@ -949,12 +924,12 @@ M1:
             endr
 
             ld   a,l
-            cpl  
+            cpl
             ld   e,a
             ld   a,c
-            cpl  
+            cpl
             ld   d,a
-            ret  
+            ret
 
 
 D3D2_:
@@ -972,13 +947,13 @@ D3D2_:
             bit  7,d
             jp   nz,ED_
 
-            exx  
+            exx
             ld   a,h
-            exx  
+            exx
             ld   l,a
-            rlca 
+            rlca
             and  1
-            neg  
+            neg
             ld   h,a
 JmP1:       jr   $
             ADDHLHL 9
@@ -996,13 +971,13 @@ JmP1:       jr   $
             pop  bc
 
             push hl
-            exx  
+            exx
             ld   a,l
-            exx  
+            exx
             ld   l,a
-            rlca 
+            rlca
             and  1
-            neg  
+            neg
             ld   h,a
 JmP2:       jr   $
             ADDHLHL 9
@@ -1018,13 +993,13 @@ JmP2:       jr   $
             adc  hl,bc
 
             pop  de
-            ret  
+            ret
 ED_:
 ;  ЭКСТРЕННЫЙ ВЫХОД
             pop  hl
             ld   a,3
             or   a
-            ret  
+            ret
 
 
 D3D2:
@@ -1035,7 +1010,7 @@ D3D2:
 ;DE'-АДРЕС СПРАЙТА
 ;a-МАСШТАБ
             sub  6
-            neg  
+            neg
             ld   (JmP1+1),a
             ld   (JmP2+1),a
 
@@ -1048,15 +1023,15 @@ D3D2:
             ld   (X_+1),hl
             ld   (Y_+1),bc
             ld   (Z_+1),de
-            exx  
+            exx
             add  hl,hl
             ld   a,l
-            neg  
+            neg
             ld   l,a
             ld   a,h
-            neg  
+            neg
             ld   h,a
-            exx  
+            exx
             call D3D2_
             ret  pe
             push de
@@ -1064,20 +1039,20 @@ D3D2:
 X_:         ld   hl,0
 Z_:         ld   de,0
 Y_:         ld   bc,0
-            exx  
+            exx
             ld   a,l
-            neg  
+            neg
             ld   l,a
             ld   a,h
-            neg  
+            neg
             ld   h,a
-            exx  
+            exx
             call D3D2_
             pop  bc
             jp   po,ZJ76
 ZJ75:
             pop  bc
-            ret  
+            ret
 ZJ76:
             SUB_BC
             jr   z,ZJ75
@@ -1120,10 +1095,10 @@ ZJ76:
             sra  d
             rr   e
 
-            exx  
+            exx
             srl  h
             srl  l
-            exx  
+            exx
 
 ;DE'-ADR OF OBJ
 ;HL'-REAL SIZE SPRITE L-X,H-Y
@@ -1131,5 +1106,3 @@ ZJ76:
 ;hl-X,de-Y
 
             jp   VOX
-
-

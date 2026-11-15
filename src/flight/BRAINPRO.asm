@@ -1,23 +1,4 @@
-;ITAB             ■NTH
-;OBLET            ■WOZWRAT
-;FORSAGE          ■NOCARGO
-;GETCARGO         ■BACKAS
-;SROKA            ■GOAWAY
-;GOSUN            ■GOEAR
-;GOSIMPLY         ■FIGHT
-;NAVODFIRE        ■FIROK
-;JTYPE            ■DEFENCE
-;BACKUP           ■BACKALL
-;TOTHEALL         ■TURNOUT
-;OTLET            ■STARTPOLICE
-;STATDEF          ■STYSTAT
-;STAYSTATION      ■NAVODROKET
-;JUMPING          ■FREEFLY
-;GOASTER          ■JUMPOUT
 ;SHIPINTELEGENT
-
-
-
 
 
 ITAB:
@@ -44,9 +25,7 @@ ITAB:
             dw   OBLET
             dw   WOZWRAT
 NTH:
-            ret  
-
-
+            ret
 
 
 OBLET:
@@ -85,7 +64,7 @@ FORSAGE:
             cp   T_HERMIT
             jr   nc,FS4
             ld   a,#11
-            rrca 
+            rrca
             ld   ($-2),a
             jr   nc,FS1
             ld   a,(ix+FORSAG)
@@ -162,7 +141,7 @@ DEATHY:
             ld   (iy+1),#80
             ld   (iy+0),0
             ld   (iy+SETUP),#FF
-            ret  
+            ret
 
 
 BACKAS:
@@ -182,8 +161,6 @@ BACKAS:
             jp   DEATHX
             call TOTHEALL_
             jp   GOSIMPLY
-
-
 
 
 SROKA:
@@ -232,7 +209,6 @@ GOS1:
             inc  a
             ld   (ix+BETA),a
             jp   GOSIMPLY
-
 
 
 GOEAR:
@@ -385,14 +361,11 @@ FGH1:
 DDX:        ld   de,0
 DDY:        ld   bc,0
             ld   hl,(DX+1)
-            exx  
+            exx
             ld   hl,(DY+1)
             ld   de,(DZ+1)
 DDZ:        ld   bc,0
-            exx  
-
-
-
+            exx
 
 
 ; ОРГАНИЗАЦИЯ ОГНЯ ЛАЗЕРОМ ИЛИ РАКЕТАМИ
@@ -449,14 +422,14 @@ FIROK2:
             jp   GOSIMPLY
 FIROK22:
             ld   c,(ix+SUBJ)
-            exx  
+            exx
             ld   l,(ix+0)
             ld   h,(ix+1)
             ld   e,(ix+2)
             ld   d,(ix+3)
             ld   c,(ix+4)
             ld   b,(ix+5)
-            exx  
+            exx
             ex   af,af'
             xor  a
             ex   af,af'
@@ -574,14 +547,12 @@ FGH11:
             ld   de,(DX+1)
             ld   bc,(DY+1)
             ld   hl,(DDX+1)
-            exx  
+            exx
             ld   hl,(DDY+1)
             ld   de,(DDZ+1)
             ld   bc,(DZ+1)
-            exx  
+            exx
             jp   NAVODFIRE
-
-
 
 
 BACKUP:
@@ -599,14 +570,14 @@ TOTHEALL:
             jp   GOSIMPLY
 
 TOTHEALL_:
-            exx  
+            exx
             ld   l,(iy+2)
             ld   h,(iy+3)
             ld   e,(iy+4)
             ld   d,(iy+5)
             ld   c,(ix+4)
             ld   b,(ix+5)
-            exx  
+            exx
             ld   e,(ix+0)
             ld   d,(ix+1)
             ld   l,(iy+0)
@@ -618,7 +589,7 @@ DEATHX:
             ld   (ix+1),#80
             ld   (ix+0),0
             ld   (ix+SETUP),#FF
-            ret  
+            ret
 
 TURNOUT:
 ; ПОВОРОТ КУДАТО
@@ -706,8 +677,8 @@ STARTPOLICE:
             ld   hl,(PLACE)
             call GOSTA
 
-            rlca 
-            rlca 
+            rlca
+            rlca
             add  a,IPLS1
 
             ld   (iy+INDI),a
@@ -743,12 +714,12 @@ STATDEF:
 ; УНИЧТОЖЕНИЕ ТРЕХ РАКЕТ НАПРАВЛЕННЫХ НА
 ; НЕЕ
             ld   a,%10010010
-            rrca 
+            rrca
             ld   ($-2),a
             jp   nc,STAYSTATION
-            exx  
+            exx
             ld   e,3
-            exx  
+            exx
             ld   hl,CARSB-OLEN+1
             ld   de,OLEN
             jp   STD1
@@ -785,19 +756,19 @@ STD1:
             cp   T_ROKET
             jr   nz,STD1
             ld   a,b
-            exx  
+            exx
             call GETADR
             ld   a,l
             add  a,TYPE
             ld   l,a
             ld   a,(hl)
             cp   T_STATION
-            exx  
+            exx
             jr   nz,STD1
 ;makeEXPL.
-            exx  
+            exx
             push de
-            exx  
+            exx
             push hl
             push de
             push ix
@@ -808,10 +779,10 @@ STD1:
             pop  ix
             pop  de
             pop  hl
-            exx  
+            exx
             pop  de
             dec  e
-            exx  
+            exx
             jr   nz,STD1
 STD2:
 ; РЕЖИМ ВЫПУСК ПОЛИЦИИ НА НАПАДАЮЩЕГО
@@ -831,7 +802,6 @@ STD2:
 
 ; ПЕРЕХОД В РЕЖИМ STAYSTATION, ЧТО БЫ
 ; ЧАСТИ СТАНЦИИ СТОЯЛИ НА МЕСТЕ
-
 
 
 STYSTAT:
@@ -885,7 +855,7 @@ STAYSTATION:
             ld   (STPX_+1),hl
             ld   (STPY_+1),hl
             ld   (STPZ_+1),hl
-            ret  
+            ret
 
 
 NAVODROKET:
@@ -913,9 +883,9 @@ ZM21:
             jp   EXPLO2
 NR1:
             ld   b,a
-            exx  
+            exx
             ld   c,0
-            exx  
+            exx
             ld   l,(ix+0)
             ld   h,(ix+1)
             call CHARCO
@@ -935,9 +905,9 @@ NR1:
             call CHARCO
             ld   e,iyl
             ld   d,iyh
-            exx  
+            exx
             ld   a,c
-            exx  
+            exx
             and  a
             jr   z,EXPLO1
             ld   (ix+4),l
@@ -952,7 +922,7 @@ NR1:
             ld   (STPX_+1),hl
             ld   (STPY_+1),hl
             ld   (STPZ_+1),hl
-            ret  
+            ret
 
 EXPLO1:
 ; ПРОВЕРИМ ЕСЛИ ЭТО ИГРОК ПО МРКЕРУ
@@ -979,7 +949,7 @@ EXPLO2:
             ld   ixl,e
             call MAKEEXPLO
             pop  ix
-            ret  
+            ret
 
 
 JUMPING:
@@ -1002,21 +972,20 @@ STAY:
             dec  a
             ld   (ix+RSPD),a
             call GOSIMPLY
-            ret  
+            ret
             jp   SY2
 SY1:
             ld   hl,0
             ld   (STPX_+1),hl
             ld   (STPY_+1),hl
             ld   (STPZ_+1),hl
-            ret  
+            ret
 SY2:
             call RND
             ld   de,#F000
             SUB_DE
             ret  c
             jp   NEWORD
-
 
 
 FREEFLY:
@@ -1064,7 +1033,7 @@ JUMPOUT:
             ld   c,(ix+4)
             ld   b,(ix+5)
             ld   a,26
-            exx  
+            exx
             ld   hl,NWTEL
             call NEWVSPR
             ld   a,1
@@ -1078,12 +1047,7 @@ JUMPOUT:
 ; ИНИЦИИРУЕМ ВРЕМЯ ЖИЗНИ ПЕРЕД
 ; ИСЧЕЗНОВЕНИЕМ
             ld   (ix+LZS),18
-            ret  
-
-
-
-
-
+            ret
 
 
 ;---------------------------------------
@@ -1302,5 +1266,3 @@ SINT3:
             pop  ix
             call PRECORD
             jp   SINT1
-
-

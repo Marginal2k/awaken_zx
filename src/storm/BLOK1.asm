@@ -1,3 +1,13 @@
+;==============================================================================
+; BLOK1 - получение адресов объектов, перемещение (часть S3D)
+;
+; Getadr/Getind - адрес записи по индексу, Moveon - применение приращений,
+; Fline - лазер игрока, Fdiv - деление.
+;
+; Часть набора STORM (прототип Awaken 1997/98), не входит в основную игру. Подробности: docs/STORM.md,
+; таблица переименований меток: docs/STORM_LABELS.md. Собирается sjasmplus (см. make_*.asm).
+;==============================================================================
+
 Getadr
         ; Получение адреса и3 индекса
         ; A-index
@@ -149,10 +159,10 @@ Pstli   add  a,70
         ld   d,a
         push de
         ld   hl,#5F40
-        call Drawl1
+        call DrawLineHLDE
         ld   hl,#5FC0
         pop  de
-        call Drawl1
+        call DrawLineHLDE
         scf
         ret
 
@@ -170,23 +180,23 @@ Moveon
         ld   a,(ix+Gama)
         ld   (Eyeg_+1),a
         push de
-        call Shmtrx
+        call ShipMatrix
         pop  de
 Hm_13   ld   a,0
         push de
         ld   ix,$+7
-        jp   MULL
+        jp   MulADE
         pop  de
         ld   (Stpx_+1),hl
 Hm_23   ld   a,0
         push de
         ld   ix,$+7
-        jp   MULL
+        jp   MulADE
         pop  de
         ld   (Stpy_+1),hl
 Hm_33   ld   a,0
         ld   ix,$+7
-        jp   MULL
+        jp   MulADE
         ld   (Stpz_+1),hl
         pop  ix
         ret

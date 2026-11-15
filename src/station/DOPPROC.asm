@@ -1,33 +1,26 @@
-;CLINW      ■READKEY       ■TCODE
-;TOCODE     ■TOPORT        ■SCROL
-;DELMK      ■TESTM2        ■TESTM_
-;TESTM      ■CHOOSE        ■DELCH
-;MARKO      ■MARKo         ■LIST1
-;LIST0      ■LIST          ■FLIST1
-;FLIST      ■PLIN          ■STOREW
-;RESTORW    ■PINFO2        ■PINFO
-;RETSCR     ■HIDESCR       ■TESTSZ
-;LINE2      ■HIDEP1 2 3 4 5 6 7
-;AMPLAN     ■NATISNU       ■KOLLIN
-;FROMLIN    ■OPENER        ■OPENER_L
-;RND        ■RNDW          ■RNDD
-;RNDK1      ■RNDK2         ■RNDK3
-;RNDT2      ■RNDT1         ■NORT
-;RANDTT     ■NUMSHIP       ■PINFOL
-;PINFOL2    ■INWIN
+;==============================================================================
+; DOPPROC - вспомогательные процедуры: окна, списки, ввод кода клавиши, торговля, ГСЧ
+;
+; Где живёт: основной образ STATIONF.C, после BODY.
+;
+; Содержит: очистку окна по знакоместам (ClearWindowChars), ReadKey / PortToCode / PortsToCodes /
+; CodesToPorts (настройка клавиш, TBKP), прокрутку списков и пометки строк (ScrollList, MarkRow*, EraseMark),
+; вывод текста по индексу (PrintTextByIndex, FindTextByIndex), параметры окна (SaveWindowParams),
+; данные планет (PlanetInfo*), пункты системного меню (MenuHideAll ... MenuRestore, кнопка M),
+; окно ошибки (OpenErrorWindow), генераторы случайных чисел (Random, RandomSeed, RNDD),
+; генерацию таблицы количеств и цен товаров (RandomizeTrade). См. GAME_DESIGN 3.1, 5.3, 1.3.
+;==============================================================================
 
+; Вывод спрайта в окне
+; hl-спрайт 4Х4
 
-
-
-
-; ВЫВОД СПРАЙТА В ОКНЕ
-;hl-СПРАЙТ 4Х4
-INWIN:
+DrawSpriteInWindow   ; orig: INWIN
+; Вывод спрайта 4x4 в окне
             push hl
-            ld   a,(Byw+1)
+            ld   a,(WinBeginY+1)
             add  a,#05
             ld   l,a
-            ld   a,(Bxw+1)
+            ld   a,(WinBeginX+1)
             add  a,#05
             ld   e,a
             ld   h,high(TBXX)
@@ -40,28 +33,29 @@ INWIN:
             ld   e,a
             pop  hl
             ld   a,32
-I_W1:
+.I_W1
             ex   af,af'
             ld   a,e
-            ldi  
-            ldi  
-            ldi  
-            ldi  
+            ldi
+            ldi
+            ldi
+            ldi
             ld   e,a
             NEXTLINEDE
             ex   af,af'
             dec  a
-            jp   nz,I_W1
-            ret  
+            jp   nz,.I_W1
+            ret
 
-CLINW:
-;  СТЕРЕТЬ В ОКНЕ ПО ЗНАКОМЕСТАМ РАСПОЛОЖЕ
-;  ННОЕ ОКНО
+ClearWindowChars   ; orig: CLINW
+; Стереть окно по знакоместам
+;  Стереть в окне по знакоместам расположе
+;  Нное окно
 ;  ВСЕ ДАННЫЕ В Bxyw,Exyw
-            ld   a,(Byw+1)
+            ld   a,(WinBeginY+1)
             add  a,#0D
             ld   l,a
-            ld   a,(Bxw+1)
+            ld   a,(WinBeginX+1)
             add  a,#05
             ld   e,a
             ld   h,high(TBXX)
@@ -72,39 +66,40 @@ CLINW:
             ld   l,e
             add  a,(hl)
             ld   e,a
-            ld   a,(Exw+1)
-            rra  
-            rra  
-            rra  
+            ld   a,(WinEndX+1)
+            rra
+            rra
+            rra
             and  #1F
             sub  31
-            neg  
+            neg
             add  a,a
             ld   c,a
             ld   b,0
             ld   hl,JJ7_7
             add  hl,bc
 
-            ld   a,(Eyw+1)
+            ld   a,(WinEndY+1)
             sub  #0D
-            rra  
-            rra  
-            rra  
+            rra
+            rra
+            rra
             and  #1F
             ld   b,a
 
             ld   a,(INVERSE)
-            rra  
+            rra
             ld   a,#FF
             jr   nc,$+3
             inc  a
             ld   (CW00+1),a
 
             ld   (STK9+1),sp
-CW1:
+CW1
             ld   sp,STKO
-CW00:       ld   a,#FF
-CW2:
+CW00
+            ld   a,#FF
+CW2
             rept 8
             ld   c,e
             jp   (hl)
@@ -118,10 +113,11 @@ CW2:
             ld   d,a
             djnz CW1
 
-STK9:       ld   sp,0
-            ret  
+STK9
+            ld   sp,0
+            ret
 
-JJ7_7:
+JJ7_7
             rept 29
             ld   (de),a
             inc  e
@@ -129,10 +125,10 @@ JJ7_7:
             ld   (de),a
             ld   e,c
             inc  d
-            ret  
+            ret
 
             dw   0
-STKO:
+STKO
             dw   CW2+2
             dw   CW2+4
             dw   CW2+6
@@ -143,37 +139,39 @@ STKO:
             dw   CW2+16
             dw   CW2+18
 
-READKEY:
-;  ЧТЕНИЕ КОД КЛАВИШИ НЕ ВЫХОДИТ ПОКА НЕ
-;  НАЖТО ЧТО НИБУДЬ
+ReadKey   ; orig: READKEY
+; Ждать и прочитать код клавиши
+;  Чтение код клавиши не выходит пока не
+;  Нажто что нибудь
             push bc
             push hl
             push de
             ld   b,10
-            halt 
+            halt
             djnz $-1
             ld   bc,#7FFE
-R_K1:
+.R_K1
             ld   e,#80
             in   a,(c)
             rept 5
             rlc  e
-            rrca 
-            jr   nc,R_K2
+            rrca
+            jr   nc,.R_K2
             endr
             rrc  b
-            jr   R_K1
-R_K2:
+            jr   .R_K1
+.R_K2
             ld   c,e
-            call TCODE
+            call PortToCode
             pop  de
             pop  hl
             pop  bc
-            ret  
+            ret
 
-TCODE:
-;b-PORT,c-MASK
-;reta-CODE
+PortToCode   ; orig: TCODE
+; Порт и маска -> код клавиши
+; b-PORT,c-MASK
+; reta-CODE
             ld   hl,TBKP-2
             INC_HL 2
             ld   a,(hl)
@@ -189,82 +187,59 @@ TCODE:
             ld   a,l
             srl  a
             add  a,29
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-TOCODE:
-;  ПРЕОБР. ПОРТЫ В КОДЫ
-;bc-КОДЫ,de-ПОРТЫ
+PortsToCodes   ; orig: TOCODE
+; Преобразовать порты в коды
+;  Преобр. порты в коды
+; bc-коды,de-порты
             push hl
-T_R2:
+.T_R2
             ld   a,(bc)
             and  a
-            jr   z,T_R1
+            jr   z,.T_R1
             push bc
             ld   a,(de)
             cp   #7F
-            jr   nc,T_R4
+            jr   nc,.T_R4
             add  a,"0"
-            jr   T_R3
-T_R4:
+            jr   .T_R3
+.T_R4
             cp   #80
             ld   a,"N"
-            jr   z,T_R3
+            jr   z,.T_R3
             ld   a,(de)
             cp   #81
             ld   a,"Y"
-            jr   z,T_R3
+            jr   z,.T_R3
             ld   a,(de)
             ld   b,a
             inc  de
             ld   a,(de)
             ld   c,a
             dec  de
-            call TCODE
-T_R3:
+            call PortToCode
+.T_R3
             INC_DE 2
             pop  bc
             ld   (bc),a
             inc  bc
-            jr   T_R2
-T_R1:
+            jr   .T_R2
+.T_R1
             pop  hl
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-TOPORT:
-;  ПРЕОБР. КОДЫ В ПОРТЫ И МАСКИ
-;bc-КОДЫ,de-ПОРТЫ
+CodesToPorts   ; orig: TOPORT
+; Преобразовать коды в порты и маски
+;  Преобр. коды в порты и маски
+; bc-коды,de-порты
             push hl
-T_T2:
+.T_T2
             ld   a,(bc)
             and  a
-            jr   z,T_T1
+            jr   z,.T_T1
             sub  29
             add  a,a
             add  a,low(TBKP)
@@ -274,69 +249,59 @@ T_T2:
             ld   h,a
             ld   a,(de)
             cp   #7F
-            jr   c,T_T6
-            jr   z,T_T4
+            jr   c,.T_T6
+            jr   z,.T_T4
             cp   #82
-            jr   nc,T_T4
+            jr   nc,.T_T4
             ld   a,(bc)
             cp   "Y"
             ld   a,#81
-            jr   z,T_T5
+            jr   z,.T_T5
             ld   a,(bc)
             cp   "N"
             ld   a,#80
-            jr   z,T_T5
-T_T6:
+            jr   z,.T_T5
+.T_T6
             ld   a,(bc)
             sub  "0"
-T_T5:
+.T_T5
             ld   (de),a
             inc  de
-            jr   T_T3
-T_T4:
+            jr   .T_T3
+.T_T4
             ld   a,(hl)
             ld   (de),a
             inc  de
             inc  hl
             ld   a,(hl)
             ld   (de),a
-T_T3:
+.T_T3
             inc  de
             inc  bc
-            jr   T_T2
-T_T1:
+            jr   .T_T2
+.T_T1
             pop  hl
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-
-
-
-
-Sct3:
+Sct3
             pop  de
             ld   (Mcoord),de
-            call OUTC
-            ret  
+            call CursorDrawSafe
+            ret
 
 
-SCROL:
-;hl-ИНДЕКС В СПИСКЕ С КОТОРОГО ВИДИМ
-;  СПИСОК
-;a-СМЕЩЕНИЕ, КОТ. НУЖНО ОТСТУПИТЬ
-;  ЧТО Б НЕ СТИРАТЬ
-;rethl-ИНДЕКС
-;  НАДО ЗАДАТЬ АДРЕС В ПЕРЕМЕННОЙ PROOUT
-;  КОТ. ВЫХОДИТ НА ПРОЦЕДУРУ ВЫВОДА В ОКНЕ
-;  ВСЕГО ТЕКСТА
-;  ТАК ЖЕ НАДО ЗАДАТЬ EINDX = ЧИСЛУ СТРОК
+ScrollList   ; orig: SCROL
+; Прокрутка списка в окне
+; hl-индекс в списке с которого видим
+;  Список
+; a-смещение, кот. нужно отступить
+;  Что б не стирать
+; rethl-ИНДЕКС
+;  Надо задать адрес в переменной PROOUT
+;  Кот. выходит на процедуру вывода в окне
+;  Всего текста
+;  Так же надо задать EINDX = числу строк
             ld   (SCRLS+1),a
             ld   c,a
 
@@ -346,38 +311,38 @@ SCROL:
             ld   hl,#5800
             ld   de,#D800
             ld   bc,#0300
-            ldir 
+            ldir
             PAGE___NOARG
             pop  hl
             pop  bc
 
-;  ФЛАЖОК ЧТО ЕЩЕ НЕ БЫЛО ПЕРЕПЕЧАТКИ
-;  ЭКРАНА
-            ld   a,(Eyw+1)
+;  Флажок что еще не было перепечатки
+;  Экрана
+            ld   a,(WinEndY+1)
             sub  c
             ret  c
             ret  z
             ld   (Amlin+1),a
 
-            rra  
-            rra  
-            rra  
+            rra
+            rra
+            rra
             and  %00011111
             ld   c,a
             ld   de,(Mcoord)
             push de
-            call WOST
-Sct1:
-            call Tfire
+            call CursorRestoreSafe
+Sct1
+            call ReadFireCancel
             jr   z,Sct3
             ld   a,c
             and  a
             jr   z,Sct1
             ld   a,(Mcoord+1)
             ld   d,a
-            ld   a,(Byw+1)
+            ld   a,(WinBeginY+1)
             ld   e,a
-            ld   a,(Eyw+1)
+            ld   a,(WinEndY+1)
             srl  a
             add  a,e
             ld   b,a
@@ -385,16 +350,17 @@ Sct1:
             srl  a
             add  a,b
             cp   d
-            jp   c,Sct2
-;CAT UP, SCRL DOWN
+            jp   c,.Sct2
+; Cat up, scrl down
             ld   a,l
             or   h
             jr   z,Sct1
             dec  hl
             jp   Sct28
-Sct2:
-;CAT DOWN, SCRL UP
-EINDX:      ld   de,0
+.Sct2
+; Cat down, scrl up
+EINDX
+            ld   de,0
             EXD
             SUB_DE
             ld   b,0
@@ -403,85 +369,76 @@ EINDX:      ld   de,0
             jr   z,Sct1
             jr   c,Sct1
             inc  hl
-Sct28:
+Sct28
             push bc
             push hl
-;  ПЕРЕПЕЧАТКА БЫЛА
+;  Перепечатка была
             PAGE_ #17
             ld   hl,#4000
             ld   de,#C000
             ld   bc,#1800
-            ldir 
+            ldir
             PAGE_ #18
 
-            halt 
+            halt
 
-Amlin:      ld   a,0
-;KOЛИЧ CTPOK ДЛЯ CTИp* 8
-            call Clinwin
+Amlin
+            ld   a,0
+; Колич строк для стир* 8
+            call ClearInWindow
 
             pop  hl
             push hl
 
-;  ПРОЦЕДУРА ВЫВОДА В ОКНЕ ВСЕГО СПИСАК
-;  В ЗАВИСИМОСТИ ОТ ИНДЕКСА В hl
-PROOUT:     call 0
+;  Процедура вывода в окне всего списак
+;  В зависимости от индекса в hl
+PROOUT
+            call 0
             pop  hl
-            call RETSCR+3           ;БЕЗ ВЫВОД КУРСОРА
+            call ShowCursorBack+3           ; Без вывод курсора
             pop  bc
 
             jp   Sct1
 
 
+;  Удалить последнюю пометку
+; a-номер ее,ix-вектор
 
-
-
-
-
-
-
-
-
-
-
-
-
-;  УДАЛИТЬ ПОСЛЕДНЮЮ ПОМЕТКУ
-;a-НОМЕР ЕЕ,ix-ВЕКТОР
-DELMK:
+DeleteLastMark   ; orig: DELMK
+; Удалить последнюю пометку
             inc  a
             ret  z
             dec  a
             push af
             call TESTM_
-            call WOST
+            call CursorRestoreSafe
             pop  af
-            call DELCH
-            jp   OUTC
+            call EraseMark
+            jp   CursorDrawSafe
 
-TESTM2:
-;  ПОЛУЧАЕМ Y КООРДИНАТУ
+TESTM2
+;  Получаем Y координату
             ld   a,(Mcoord+1)
             ld   c,a
             ld   a,(ix+1)
-            rlca 
-            rlca 
-            rlca 
+            rlca
+            rlca
+            rlca
             and  #F8
-;  СМЕЩАЕМ К СТРОКАМ МЕНЮ
+;  Смещаем к строкам меню
             add  a,e
             ld   b,a
-            ret  
+            ret
 
-TESTM_:
-;  ТОЛЬКО ДЛЯ ОКОН СО СМЕННЫМ РАЗМЕРОМ
-;  ОПРЕДЕЛЯЕМ КОЛИЧЕСТВО ВИДИМЫХ ПУНКТОВ
-;d-КОЛ.ПУНКТОВ ВСЕГО В СПИСКЕ
-;ix-ВЕКТОР
+TESTM_
+;  Только для окон со сменным размером
+;  Определяем количество видимых пунктов
+; d-кол.пунктов всего в списке
+; ix-вектор
             ld   a,(ix+3)
-            rlca 
-            rlca 
-            rlca 
+            rlca
+            rlca
+            rlca
             sub  e
             sub  5
             and  #F8
@@ -491,72 +448,71 @@ TESTM_:
             cp   d
             ret  nc
             ld   d,a
-            ret  
+            ret
 
 
-TESTM:
-;ix-ВЕКТОР
-;e-СМЕЩЕНИЕ ПО ВЕРТИКАЛИ ОТ НАЧАЛА ОКНА
-;  И ДО НАЧАЛА МЕНЮ В ПИКСЕЛЯХ
-;d-КОЛ.ПУНКТОВ*8
-;ret:
-;FC-ON ВЫЛЕТ КАКОЙ ТО
-;c-НОМЕР ПУНКТА
+TESTM
+; ix-вектор
+; e-смещение по вертикали от начала окна
+;  И до начала меню в пикселях
+; d-кол.пунктов*8
+; ret:
+; Fc-on вылет какой то
+; c-номер пункта
             call TESTM2
             ld   a,c
             sub  b
-            ret  c                  ;СЛИШКОМ ВЫСОКО
-            cp   d                  ;КОЛ.ПУНКТОВ*ВЫСОТА
-            ccf  
-            ret  c                  ;СЛИШКОМ НИЗКО
-            rrca 
-            rrca 
-            rrca 
+            ret  c                  ; Слишком высоко
+            cp   d                  ; Кол.пунктов*высота
+            ccf
+            ret  c                  ; Слишком низко
+            rrca
+            rrca
+            rrca
             and  #1F
             ld   c,a
-            ret  
+            ret
 
 
-
-
-
-
-CHOOSE:
-;  ВЫВОД ПОМЕТКИ
-;ix-ВЕКТОР ОКОШКА
-;e-СМЕЩЕНИЕ ПО ВЕРТИКАЛИ ОТ НАЧАЛА ОКНА
-;  И ДО НАЧАЛА МЕНЮ В ПИКСЕЛЯХ
-;d-КОЛ.ПУНКТОВ*8
-;retd-НОМЕР ПУНКТА
+DrawMark   ; orig: CHOOSE
+; Вывод пометки строки
+;  Вывод пометки
+; ix-вектор окошка
+; e-смещение по вертикали от начала окна
+;  И до начала меню в пикселях
+; d-кол.пунктов*8
+; retd-НОМЕР ПУНКТА
             call TESTM
             ret  c
             ld   d,a
             jr   $+7
-DELCH:
-;  УДАЛЕНИЕ ПОМЕТКИ
-;a-НОМЕР ПУНКТА
+
+EraseMark   ; orig: DELCH
+; Удаление пометки
+;  Удаление пометки
+; a-номер пункта
             ld   d,a
             call TESTM2
             ld   a,d
-            rlca 
-            rlca 
-            rlca 
+            rlca
+            rlca
+            rlca
             add  a,b
             cp   192-8
-            ret  nc                 ;ВЫЛЕТ СНИЗУ
+            ret  nc                 ; Вылет снизу
             ld   b,a
-;  В "D"-НОМЕР ПУНКТА
-;  В "B"-РЕАЛЬНАЯ КООРДИНАТА Y ПУНКТА
+;  В "D"-номер пункта
+;  В "B"-реальная координата Y пункта
 
 
-;  АДРЕС НА ЭКРАНЕ
-            ld   a,(ix+0)           ;КООРД.X ОКНА
+;  Адрес на экране
+            ld   a,(ix+0)           ; Коорд.X окна
             and  a
             jp   p,$+4
             xor  a
-            rlca 
-            rlca 
-            rlca 
+            rlca
+            rlca
+            rlca
             ld   c,a
 
             ld   h,high(TBXX)
@@ -574,184 +530,178 @@ DELCH:
             ld   a,(ix+0)
             add  a,b
             sub  #21
-            jr   c,Q_2
+            jr   c,.Q_2
             sub  b
-            cpl  
+            cpl
             dec  a
             ld   e,%10101010
-            jr   Q_1
-Q_2:
+            jr   .Q_1
+.Q_2
             ld   a,b
             sub  2
             ld   e,0
             bit  7,(ix+0)
-            jr   z,Q_1
+            jr   z,.Q_1
             inc  a
             add  a,(ix+0)
             ld   e,%01010101
-Q_1:
+.Q_1
             ld   b,a
 
             PAGES PGKRT
-            call CHHS
+            call PaintMarkRow
             PAGES__NOARG
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-MARKO:
-;  МАРКИРУЕТ СТРОКУ И СТИРАЕТ СТАРЫЙ МАРК
-;  ТОЛЬКО ДЛЯ РАСТЯГИВАЕМЫХ ОКОН!!!!
-;a-НОМЕР ПУНКТА
-;d-КОЛ. ВИДИМЫХ ПУНКТОВ,Е-ВЕРХНЕЕ
-;hl-ШОУ АДРЕС ОКНА
-;  СМЕЩЕНИЕ ДО ПЕРВОЙ СТРОКИ
-;ix-ВЕКТОР
-;retFZ-ON ЕСЛИ НЕ НАДО ЗАПОМИНАТЬ
-;  НОВЫЙ НОМЕР ПУНКТА
-;reta-НОВЫЙ НОМЕР ПУНКТА
+MarkRowStretch   ; orig: MARKO
+; Пометить строку (окна с изменяемым размером)
+;  Маркирует строку и стирает старый марк
+;  Только для растягиваемых окон!!!!
+; a-номер пункта
+; d-кол. видимых пунктов,е-верхнее
+; hl-шоу адрес окна
+;  Смещение до первой строки
+; ix-вектор
+; Retfz-on если не надо запоминать
+;  Новый номер пункта
+; Reta-новый номер пункта
             push af
             push de
             EXD
-            call LASTOBJ
+            call LastDeskObject
             SUB_DE
             pop  de
-            jr   nz,MO1
+            jr   nz,.MO1
             call TESTM_
             call TESTM
             jr   nc,$+5
-MO1:        pop  af
+.MO1
+            pop  af
             xor  a
-            ret  
+            ret
             pop  af
             cp   c
             ret  z
-            call WOST
+            call CursorRestoreSafe
             inc  a
             jr   z,$+8
             dec  a
             push de
-            call DELCH
+            call EraseMark
             pop  de
-            call CHOOSE
-            call OUTC
+            call DrawMark
+            call CursorDrawSafe
             xor  a
             inc  a
             ld   a,d
-            ret  
+            ret
 
 
-MARKo:
-;  МАРКИРУЕТ СТРОКУ И СТИРАЕТ СТАРЫЙ МАРК
-;  ТОЛЬКО ДЛЯ НЕ РАСТЯГИВАЕМЫХ ОКОН!!!!
-;a-НОМЕР ПУНКТА
-;d-КОЛ. ВИДИМЫХ ПУНКТОВ,Е-ВЕРХНЕЕ
-;hl-ШОУ АДРЕС ОКНА
-;  СМЕЩЕНИЕ ДО ПЕРВОЙ СТРОКИ
-;ix-ВЕКТОР
-;retFZ-ON ЕСЛИ НЕ НАДО ЗАПОМИНАТЬ
-;  НОВЫЙ НОМЕР ПУНКТА
-;reta-НОВЫЙ НОМЕР ПУНКТА
+MarkRowFixed   ; orig: MARKo
+; Пометить строку (окна с фиксированным размером)
+;  Маркирует строку и стирает старый марк
+;  Только для не растягиваемых окон!!!!
+; a-номер пункта
+; d-кол. видимых пунктов,е-верхнее
+; hl-шоу адрес окна
+;  Смещение до первой строки
+; ix-вектор
+; Retfz-on если не надо запоминать
+;  Новый номер пункта
+; Reta-новый номер пункта
             push af
             push de
             EXD
-            call LASTOBJ
+            call LastDeskObject
             SUB_DE
             pop  de
-            jr   nz,MO2
+            jr   nz,.MO2
             call TESTM
             jr   nc,$+5
-MO2:        pop  af
+.MO2
+            pop  af
             xor  a
-            ret  
+            ret
             pop  af
             cp   c
             ret  z
-            call WOST
+            call CursorRestoreSafe
             inc  a
             jr   z,$+8
             dec  a
             push de
-            call DELCH
+            call EraseMark
             pop  de
-            call CHOOSE
-            call OUTC
+            call DrawMark
+            call CursorDrawSafe
             xor  a
             inc  a
             ld   a,d
-            ret  
+            ret
 
 
+PrintTextByIndex1   ; orig: LIST1
+; Вывод текста по индексу, раздел 1
+;  Вывод текста по индексу в ас 0
+; hl-весь текст, разд. 1
+            call FindTextByIndex1
+            jp   OutText
 
+PrintTextByIndex0   ; orig: LIST0
+; Вывод текста по индексу, раздел 0 (через OTXT)
+            call FindTextByIndex
+            jp   PrintText
 
+PrintTextByIndex   ; orig: LIST
+; Вывод текста по индексу, раздел 0
+;  Вывод текста по индексу в ас 0
+; hl-весь текст, разд. 0
+            call FindTextByIndex
+            jp   OutText
 
-
-
-
-LIST1:
-;  ВЫВОД ТЕКСТА ПО ИНДЕКСУ В aС 0
-;hl-ВЕСЬ ТЕКСТ, РАЗД. 1
-            call FLIST1
-            jp   Outtxt
-
-LIST0:
-            call FLIST
-            jp   OTXT
-
-LIST:
-;  ВЫВОД ТЕКСТА ПО ИНДЕКСУ В aС 0
-;hl-ВЕСЬ ТЕКСТ, РАЗД. 0
-            call FLIST
-            jp   Outtxt
-
-FLIST1:
+FindTextByIndex1   ; orig: FLIST1
+; Поиск текста по индексу, раздел 1
             push af
             ld   a,CR
             ld   (RAZD+1),a
             pop  af
-            call FLIST
+            call FindTextByIndex
             ld   a,ET
             ld   (RAZD+1),a
-            ret  
-FLIST:
-;  ПОИСК ТЕКСТА ПО ИНДЕКСУ
+            ret
+
+FindTextByIndex   ; orig: FLIST
+; Поиск текста по индексу
+;  Поиск текста по индексу
             push de
             push bc
             inc  a
             ld   e,a
             ld   b,#FF
-RAZD:       ld   a,ET
-            cpir 
+RAZD
+            ld   a,ET
+            cpir
             dec  e
             jp   nz,$-3
             pop  bc
             pop  de
-            ret  
+            ret
 
 
-PLIN:
-;  ВЫВОД ИНФО О ПЛНЕТЕ
-;hl,de-ДАННЫЕ ГЕНЕРАЦИИ СИСТЕМЫ
+PrintPlanetInfo   ; orig: PLIN
+; Вывод информации о планете
+;  Вывод инфо о плнете
+; hl,de-данные генерации системы
 
             ld   a,h
             cp   4
-            jr   nz,U_1
-;  СТРОЙ НЕИЗВЕСТНЫЙ
+            jr   nz,.U_1
+;  Строй неизвестный
             ld   a,4
-U_3:
+.U_3
             ld   hl,STROY
-            call LIST
+            call PrintTextByIndex
             ld   a,(Cord+1)
             add  a,8
             ld   h,a
@@ -764,18 +714,18 @@ U_3:
             ld   l,#22
             ld   (Cord),hl
             RST_ "-"
-            ret  
+            ret
 
-U_1:
-;  ПОЛУЧЕНИЕ ДАННЫХ О ПЛАНЕТЕ
-;  ЕСЛИ НЕОБИТАЕМАЯ ТО НИКАКИХ УРОВНЕЙ
+.U_1
+;  Получение данных о планете
+;  Если необитаемая то никаких уровней
             cp   3
-            jr   z,U_3
+            jr   z,.U_3
 
             push hl
 
             ld   hl,STROY
-            call LIST
+            call PrintTextByIndex
 ;  ТИП
             ld   a,(Cord+1)
             add  a,8
@@ -784,8 +734,8 @@ U_1:
             ld   (Cord),hl
             ld   a,e
             ld   hl,TYPE
-            call LIST
-;  УРОВЕНЬ
+            call PrintTextByIndex
+;  Уровень
             pop  bc
             ld   a,(Cord+1)
             add  a,8
@@ -794,27 +744,24 @@ U_1:
             ld   (Cord),hl
             ld   b,0
             xor  a
-            call Onum5
-            ret  
+            call PrintNumberPad
+            ret
 
 
-
-
-
-
-STOREW:
-;  ЗАПОМНИТЬ ДАННЫЕ ОКНА
-            ld   a,(Bxw+1)
+SaveWindowParams   ; orig: STOREW
+; Запомнить параметры окна
+;  Запомнить данные окна
+            ld   a,(WinBeginX+1)
             ld   (BXW+1),a
-            ld   a,(Byw+1)
+            ld   a,(WinBeginY+1)
             ld   (BYW+1),a
-            ld   a,(Bxh+1)
+            ld   a,(WinBeginXHi+1)
             ld   (BXH+1),a
-            ld   a,(Byh+1)
+            ld   a,(WinBeginYHi+1)
             ld   (BYH+1),a
-            ld   a,(Exw+1)
+            ld   a,(WinEndX+1)
             ld   (EXW+1),a
-            ld   a,(Eyw+1)
+            ld   a,(WinEndY+1)
             ld   (EYW+1),a
             ld   a,(Cord)
             ld   (_Cord+1),a
@@ -822,112 +769,124 @@ STOREW:
             ld   (_Cord2+1),a
             ld   a,(Mode+1)
             ld   (_Mode+1),a
-            ret  
+            ret
 
-RESTORW:
-;  ВОССТАНОВИТЬ ДАННЫЕ ОКНА
-BXW:        ld   a,0
-            ld   (Bxw+1),a
-BYW:        ld   a,0
-            ld   (Byw+1),a
-BXH:        ld   a,0
-            ld   (Bxh+1),a
-BYH:        ld   a,0
-            ld   (Byh+1),a
-EXW:        ld   a,0
-            ld   (Exw+1),a
-EYW:        ld   a,0
-            ld   (Eyw+1),a
-_Mode:      ld   a,0
+RestoreWindowParams   ; orig: RESTORW
+; Восстановить параметры окна
+;  Восстановить данные окна
+BXW
+            ld   a,0
+            ld   (WinBeginX+1),a
+BYW
+            ld   a,0
+            ld   (WinBeginY+1),a
+BXH
+            ld   a,0
+            ld   (WinBeginXHi+1),a
+BYH
+            ld   a,0
+            ld   (WinBeginYHi+1),a
+EXW
+            ld   a,0
+            ld   (WinEndX+1),a
+EYW
+            ld   a,0
+            ld   (WinEndY+1),a
+_Mode
+            ld   a,0
             ld   (Mode+1),a
-_Cord:      ld   a,0
+_Cord
+            ld   a,0
             ld   (Cord),a
-_Cord2:     ld   a,0
+_Cord2
+            ld   a,0
             ld   (Cord+1),a
-            ret  
+            ret
 
 
-
-PINFO2:
-;  ДАННЫЕ О ПЛАНЕТЕ НАХОЖДЕНИЯ
+PlanetInfoHere   ; orig: PINFO2
+; Данные планеты текущего местонахождения
+;  Данные о планете нахождения
             ld   hl,(PLACE)
             ld   de,(PLACE+2)
             ld   a,(PLANET)
-PINFO:
-;  ДАЧА ИНФО О ПЛАНЕТЕ НА СИСТЕМЕ
-;hl,de-ДАННЫЕ СИСТЕМЫ
-;a-НОМЕР ПЛАНЕТЫ С 0
-;ret
-;a=0-В СИСТЕМЕ НЕТ ПЛАНЕТ
-;a-КОЛ. ПЛАНЕТ
-;l-УРОВЕНЬ 1-16
-;h-СТРОЙ 0-4
-;e-ТИП 0-3
+
+PlanetInfo   ; orig: PINFO
+; Данные планеты системы по номеру
+;  Дача инфо о планете на системе
+; hl,de-данные системы
+; a-номер планеты с 0
+; ret
+; a=0-в системе нет планет
+; a-кол. планет
+; l-уровень 1-16
+; h-строй 0-4
+; e-ТИП 0-3
             ex   af,af'
             PAGES PGKRT
             ex   af,af'
-            call PINFO_
+            call GetSystemData
             ex   af,af'
             PAGES__NOARG
             ex   af,af'
-            ret  
+            ret
 
-; ДЛЯ ВЫЗОВА ИЗ СТРАНИЦЫ ЯЗЫКА
-PINFOL2:
-            call PINFO2
+; Для вызова из страницы языка
+
+PlanetInfoHereLang   ; orig: PINFOL2
+; PINFO2 для вызова из страницы языка
+            call PlanetInfoHere
             ex   af,af'
             PAGES PGLANG
             ex   af,af'
-            ret  
-; ДЛЯ ВЫЗОВА ИЗ СТРАНИЦЫ ЯЗЫКА
-PINFOL:
-            call PINFO
+            ret
+; Для вызова из страницы языка
+
+PlanetInfoLang   ; orig: PINFOL
+; PINFO для вызова из страницы языка
+            call PlanetInfo
             ex   af,af'
             PAGES PGLANG
             ex   af,af'
-            ret  
+            ret
 
 
-
-
-RETSCR:
-            call OUTC
+ShowCursorBack   ; orig: RETSCR
+; Вернуть курсор после вывода
+            call CursorDrawSafe
             PAGE___NOARG
-            ret  
+            ret
 
-HIDESCR:
+HideCursor   ; orig: HIDESCR
+; Убрать курсор перед выводом в экран
             push hl
             push de
             push bc
             ld   a,1
-            ld   (FWOST+1),a
+            ld   (CursorBusy+1),a
             PAGE_ #17
             ld   hl,#4000
             ld   de,#C000
             ld   bc,#1B00
-HS1:
+.HS1
             rept 256
-            ldi  
+            ldi
             endr
-            jp   pe,HS1
-            call WOST
+            jp   pe,.HS1
+            call CursorRestoreSafe
             pop  bc
             pop  de
             pop  hl
             PAGE_ #18
-            ret  
+            ret
 
 
-
-
-
-
-
-TESTSZ:
-;hl-НОМЕР ОБЪЕКТА
-;retFC-OFF ЕСЛИ ВЫЛЕТ ОКНА
+TestWindowOut   ; orig: TESTSZ
+; Проверка вылета окна за экран
+; hl-номер объекта
+; Retfc-off если вылет окна
             xor  a
-            call TOOBJ
+            call ObjFieldAddr
             ld   e,(hl)
             inc  hl
             bit  7,e
@@ -950,25 +909,20 @@ TESTSZ:
             ret  nc
             ld   a,l
             cp   4
-            ccf  
+            ccf
             ret  nc
             ld   a,h
             cp   4
-            ccf  
-            ret  
+            ccf
+            ret
 
 
-
-
-
-
-
-
-LINE2:
+LineWindow2   ; orig: LINE2
+; Описатель линии (нижняя строка)
             jp   $+3
-            ret  
+            ret
 
-LINE2_:
+LINE2_
             ld   hl,0
             ld   a,1
             ld   (Mode+1),a
@@ -984,10 +938,10 @@ LINE2_:
             ld   bc,(TIME)
             ld   a,b
             and  #F0
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             add  a,"0"
             RST___NOARG
             ld   a,b
@@ -996,10 +950,10 @@ LINE2_:
             RST___NOARG
             ld   a,c
             and  #F0
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             add  a,"0"
             RST___NOARG
             ld   a,c
@@ -1012,10 +966,10 @@ LINE2_:
             ld   a,(TIME+2)
             ld   c,a
             and  #F0
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             add  a,"0"
             RST___NOARG
             ld   a,c
@@ -1028,45 +982,38 @@ LINE2_:
             ld   a,(TIME+3)
             ld   c,a
             and  #F0
-            rrca 
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
+            rrca
             add  a,"0"
             RST___NOARG
             ld   a,c
             and  #0F
             add  a,"0"
             RST___NOARG
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-
-
-
-HIDEP1:
-;  СКРЫТЬ ВСЕ
-            ld   hl,RET_
-            ld   (ZADACHA+1),hl
+MenuHideAll   ; orig: HIDEP1
+; Пункт меню: скрыть все
+;  Скрыть все
+            ld   hl,DoNothing
+            ld   (TaskCall+1),hl
             ld   a,1
-            ld   (ACTIV+1),a
+            ld   (SurroundActivate+1),a
             rept 5
-            halt 
+            halt
             endr
-            ret  
-HIDEP2:
-;  ЗАКРЫТЬ ОКНА
-            ld   hl,RET_
-            ld   (ZADACHA+1),hl
+            ret
+
+MenuCloseWindows   ; orig: HIDEP2
+; Пункт меню: закрыть окна
+;  Закрыть окна
+            ld   hl,DoNothing
+            ld   (TaskCall+1),hl
             ld   ix,Sur1
-HP_2:
+.HP_2
             ld   h,(ix+1)
             dec  h
             ret  z
@@ -1078,7 +1025,7 @@ HP_2:
             ld   h,(hl)
             ld   l,a
             push hl
-            call TOOBJ4
+            call ObjFieldAddr4
             ld   a,(hl)
             and  %11000000
             pop  de
@@ -1086,20 +1033,21 @@ HP_2:
             inc  ix
             jr   z,$+8
             ld   a,(hl)
-            cpl  
+            cpl
             and  %01100000
-            jr   nz,HP_2
-            call ERSOBJ2
+            jr   nz,.HP_2
+            call CloseObject
             dec  ix
             dec  ix
-            jp   HP_2
+            jp   .HP_2
 
 
-HIDEP3:
-;  ЗАПОМНИТЬ СРЕДУ
+MenuSaveSurround   ; orig: HIDEP3
+; Пункт меню: запомнить среду
+;  Запомнить среду
             ld   ix,Objvec
             ld   de,16
-H_11:
+.H_11
             ld   a,(ix+0)
             cp   #80
             ret  z
@@ -1112,31 +1060,35 @@ H_11:
             ld   a,(ix+3)
             ld   (ix+11),a
             add  ix,de
-            jr   H_11
-HIDEP4:
-;  РАССТАВИТЬ
-            jp   SETCRDS
-HIDEP5:
-;  УСТАНОВКИ СРЕДЫ
+            jr   .H_11
+
+MenuArrange   ; orig: HIDEP4
+; Пункт меню: расставить
+;  Расставить
+            jp   SetupCoords
+
+MenuSetupSurround   ; orig: HIDEP5
+; Пункт меню: установки среды
+;  Установки среды
             ld   hl,WSETS_
-            jp   NEWOBJ
-HIDEP6:
-;  УСТАНОВКИ ИГРЫ
+            jp   OpenObject
+
+MenuSetupGame   ; orig: HIDEP6
+; Пункт меню: установки игры
+;  Установки игры
             ld   hl,WSETG_
-            jp   NEWOBJ
-HIDEP7:
-;  ВОССТАНОВИТЬСЯ
+            jp   OpenObject
+
+MenuRestore   ; orig: HIDEP7
+; Пункт меню: восстановиться
+;  Восстановиться
             ld   hl,WWOS_
-            jp   NEWOBJ
+            jp   OpenObject
 
 
-
-
-
-
-
-AMPLAN:
-;  КОЛИЧЕСТВО ПЛАНЕТ В СИСТЕМЕ
+PlanetCount   ; orig: AMPLAN
+; Количество планет в системе
+;  Количество планет в системе
             ld   hl,(WHERE)
             ld   de,(WHERE+2)
             ld   a,h
@@ -1147,148 +1099,149 @@ AMPLAN:
             dec  a
             ret  p
             xor  a
-            ret  
+            ret
 
 
-NATISNU:
-;de-ТЕКУЩАЯ КНОПКА
-;hl-ДРУГАЯ КНОПКА
+PressButtonPair   ; orig: NATISNU
+; Нажатие одной кнопки и отжатие другой
+; de-текущая кнопка
+; hl-другая кнопка
             push de
             ld   e,l
             ld   d,h
-            call TOOBJ4
+            call ObjFieldAddr4
             res  0,(hl)
             ld   h,d
             ld   l,e
-            call WOST
-            call Outbut
-            call OUTC
+            call CursorRestoreSafe
+            call OutButton
+            call CursorDrawSafe
             pop  hl
             ld   e,l
             ld   d,h
-            call TOOBJ4
+            call ObjFieldAddr4
             set  0,(hl)
             ld   h,d
             ld   l,e
-            call WOST
-            call Outbut
-            call OUTC
-            ret  
+            call CursorRestoreSafe
+            call OutButton
+            call CursorDrawSafe
+            ret
 
 
-
-
-
-
-KOLLIN:
-;  СЧИТАЕТ КОЛИЧЕСТВО СТРОК В ТЕКСТЕ
-;hl-ТЕКСТ
-;retde-КОЛ.
+CountTextLines   ; orig: KOLLIN
+; Количество строк в тексте
+;  Считает количество строк в тексте
+; hl-текст
+; retde-КОЛ.
             ld   de,0
             xor  a
             ld   (Cord),a
-D_I1:
+.D_I1
             ld   a,#08
             ld   (Cord+1),a
             push de
-            call VTXT
+            call VirtualPrint
             pop  de
             inc  de
-            jp   nc,D_I1
-            ret  
-FROMLIN:
-;  ВЫВОД ТЕКСТА С НОМЕРА ЛИНИИ
-;e-НОМЕР
-;hl-ТЕКСТ
-;bc-КООРД. ВЫВОДА
+            jp   nc,.D_I1
+            ret
+
+PrintFromLine   ; orig: FROMLIN
+; Вывод текста с номера строки
+;  Вывод текста с номера линии
+; e-номер
+; hl-текст
+; bc-коорд. вывода
             ld   (Cord),bc
             ld   a,e
             and  a
-            jp   z,OTXT
-D_I2:
+            jp   z,PrintText
+.D_I2
             push de
             push bc
-            call VTXT
+            call VirtualPrint
             pop  bc
             pop  de
             ld   (Cord),bc
             ret  c
             dec  e
-            jp   nz,D_I2
-            jp   OTXT
+            jp   nz,.D_I2
+            jp   PrintText
 
 
-OPENER:
-;  ГОТОВИТ ОКНО ОШИБКИ И ВЫВОДИТ ЕГО
-;a-НОМЕР ОШИБКИ С 0
+OpenErrorWindow   ; orig: OPENER
+; Подготовить и вывести окно ошибки
+;  Готовит окно ошибки и выводит его
+; a-номер ошибки с 0
             push af
             ld   (NERR+1),a
             ld   hl,WERR_
-            call NEWOBJ
+            call OpenObject
             pop  af
-            ret  
+            ret
 
-OPENER_L:
+OpenErrorWindowLang   ; orig: OPENER_L
+; OPENER для вызова из страницы языка
             push af
             PAGES PGNORM
             pop  af
-            call OPENER
+            call OpenErrorWindow
             PAGES PGLANG
-            ret  
-
-
-
-
-
+            ret
 
 
 ; ────────────────────────────────────────
 
-; ГЕНЕРАТОРЫ
-RND:
-            exx  
+; Генераторы
+
+Random   ; orig: RND
+; Генератор случайных чисел
+            exx
             ld   hl,Sdo
-            jp   RNDO
-RNDW:
-            exx  
-            ld   hl,Sdw
-            jp   RNDO
-RNDK1:
-            exx  
+            jp   RandomSeed
+.RNDW
+            exx
+            ld   hl,.Sdw
+            jp   RandomSeed
+.RNDK1
+            exx
             ld   hl,Sdk1
-            jp   RNDO
-RNDK2:
-            exx  
+            jp   RandomSeed
+.RNDK2
+            exx
             ld   hl,Sdk2
-            jp   RNDO
-RNDK3:
-            exx  
+            jp   RandomSeed
+.RNDK3
+            exx
             ld   hl,Sdk3
-            jp   RNDO
-RNDT2:
-            exx  
+            jp   RandomSeed
+.RNDT2
+            exx
             ld   hl,Sdt2
-            jp   RNDO
-RNDT1:
-            exx  
+            jp   RandomSeed
+.RNDT1
+            exx
             ld   hl,Sdt1
-            jp   RNDO
-Sdw:
+            jp   RandomSeed
+.Sdw
             db   7,8,0
-Sdo:
+Sdo
             db   101,0,0
-Sdt2:
+Sdt2
             db   44,0,0
-Sdt1:
+Sdt1
             db   21,0,0
-Sdk1:
+Sdk1
             db   247,0,0
-Sdk2:
+Sdk2
             db   93,0,0
-Sdk3:
+Sdk3
             db   29,0,0
-RNDO:
-;inhlADR OF SEED
+
+RandomSeed   ; orig: RNDO
+; Генератор по адресу семени в HL
+; inhlADR OF SEED
             ld   c,(hl)
             inc  hl
             ld   b,(hl)
@@ -1326,7 +1279,7 @@ RNDO:
             ld   d,h
             ld   e,l
             ld   l,h
-            ld   h,a                ;0
+            ld   h,a                ; 0
             ld   b,0
             ld   c,e
             SUB_BC
@@ -1343,44 +1296,32 @@ RNDO:
             dec  hl
             ld   (hl),e
             push de
-            exx  
+            exx
             pop  hl
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-NORT:
-; НЕТ ПЛАНЕТ ВСЮ ТАБЛИЦУ ЗАБИТЬ ПУСТЫМИ
-; ДАННЫМИ
+TradeEmpty   ; orig: NORT
+; Нет планет: таблица торговли пуста
+; Нет планет всю таблицу забить пустыми
+; Данными
 
             ld   hl,TWRS
             ld   de,TWRS+1
             ld   bc,TKOL*2-1
             ld   (hl),0
-            ldir 
-            ret  
+            ldir
+            ret
 
-RANDTT:
-; ГЕНЕРИЛКА ТАБЛИЦЫ КОЛИЧ. ТОВАРОВ И ЦЕН
-            call PINFO2
-            jr   z,NORT
+RandomizeTrade   ; orig: RANDTT
+; Генерация таблицы количеств и цен товаров
+; Генерилка таблицы колич. товаров и цен
+            call PlanetInfoHere
+            jr   z,TradeEmpty
 
             ld   a,h
             cp   4
-            jr   z,NORT
+            jr   z,TradeEmpty
             ld   (PSTROY+1),a
 
             ld   a,e
@@ -1397,40 +1338,41 @@ RANDTT:
 ; ТОВАРЫ ПРОПУСКАЯ АРТЕФАКТЫ, технологии и
 ; уникумы
             ld   hl,SPECTO
-            exx  
+            exx
             ld   ix,CENS2
             ld   hl,TWRS+1
             ld   b,TKOL-3
-RTB1:
+RTB1
             push hl
-            exx  
+            exx
             push hl
-            exx  
-            call RND
-            exx  
+            exx
+            call Random
+            exx
             pop  hl
-            exx  
+            exx
             ld   a,l
             and  #07
             bit  7,l
             jr   z,$+4
-            neg  
+            neg
             add  a,(ix+0)
             ld   e,h
             pop  hl
             ld   d,a
-            exx  
-PTYPE:      ld   a,0
+            exx
+PTYPE
+            ld   a,0
             cp   (hl)
             inc  hl
             ld   e,0
             jr   nz,$+4
             ld   e,8
-            exx  
+            exx
             ld   a,d
-            exx  
+            exx
             sub  e
-            exx  
+            exx
             jr   z,$+4
             jr   nc,$+4
             ld   a,5
@@ -1442,38 +1384,40 @@ PTYPE:      ld   a,0
             ld   d,#3F
             jr   z,RTB3
             dec  a
-            jr   nz,RTB4
+            jr   nz,.RTB4
             ld   a,e
             and  %11000000
             ld   d,#BF
             jr   z,RTB3
             ld   d,#3F
             jr   RTB3
-RTB4:
+.RTB4
             dec  a
             ld   d,#BF
             jr   z,RTB3
-PSTROY:     ld   a,0
+PSTROY
+            ld   a,0
             and  a
             jr   nz,RTB3
             set  7,e
             res  5,e
             res  4,e
-RTB3:
+RTB3
             ld   a,e
             and  d
             ld   c,a
             res  7,c
-ZAPRET:     and  #80
+ZAPRET
+            and  #80
             ld   d,a
             ld   a,c
-            exx  
+            exx
             add  a,e
-            sub  10                 ;ДЛЯ ТОГО что б БЫЛО
-; БОЛЬШЕ ПУСТЫХ СТРОЧЕК
+            sub  10                 ; ДЛЯ ТОГО что б БЫЛО
+; Больше пустых строчек
             jr   nc,$+3
             xor  a
-            exx  
+            exx
             or   d
             ld   d,a
             ld   a,(ZAPRET+1)
@@ -1482,9 +1426,9 @@ ZAPRET:     and  #80
             or   d
             ld   (hl),a
             inc  hl
-; ИЗМЕНЕНИЕ ЦЕНЫ ОТ КОЛИЧЕСТВА НА СТАНЦИИ
-; ПРЯМО ПРОПОРЦИОНАЛЬНО
-            rra  
+; Изменение цены от количества на станции
+; Прямо пропорционально
+            rra
             and  #3F
             cp   8
             jr   c,$+4
@@ -1492,7 +1436,7 @@ ZAPRET:     and  #80
             sub  (hl)
             jr   c,$+4
             ld   a,#FB
-            neg  
+            neg
             ld   (hl),a
             inc  hl
             inc  hl
@@ -1515,13 +1459,10 @@ ZAPRET:     and  #80
             inc  hl
             ld   a,(ix+4)
             ld   (hl),a
-            ret  
+            ret
 
 
-
-
-
-RNDD:
+RNDD
             push bc
             ld   hl,(RNDD1)
             ld   de,(RNDD2)
@@ -1551,18 +1492,18 @@ RNDD:
             xor  h
             xor  l
             pop  bc
-            ret  
+            ret
 
-NUMSHIP:
-; ПОЛУЧЕТ НОМЕР КОРАБЛЯ ИЛИ СКИМЕРА
-; ТЕКУЩГО ВЫБРАННОГО В СПИСКЕ
-;bc-НОМЕР
+SelectedShipNumber   ; orig: NUMSHIP
+; Номер выбранного корабля/скимера
+; Получет номер корабля или скимера
+; Текущго выбранного в списке
+; bc-номер
             PAGES PG3D
-            ld   bc,(SHIPIND+1)
-            ld   a,(FROMS+1)
+            ld   bc,(ShipIndex+1)
+            ld   a,(ShipListFrom+1)
             add  a,c
             ld   c,a
             ld   b,0
             PAGES PGLANG
-            ret  
-
+            ret

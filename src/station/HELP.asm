@@ -1,34 +1,26 @@
-;DHLP2_
-;DHLP3_
-;SETHIND
-;DHLPL1
+;==============================================================================
+; HELP - меню и тексты справки (оверлей HELP.C)
+;
+; Где живёт: HELP.C, ORG #DB00, страница PGHLP (#17); MAKE_3 в station.asm.
+;
+; Что делает: HelpDrawList выводит список из HKOL пунктов (THLPL, меню из 8 глав), HelpDrawItem - текст
+; главы (THELP = gen/help.tok), HelpSetIndex задаёт текущий пункт. Вызывается из OBR.asm (WHELP, WHELPL).
+; Тексты генерируются из assets/text/help.txt. См. GAME_DESIGN 1.3.
+;==============================================================================
 
+HelpDrawList   ; orig: DHLP2_
+; Вывод списка пунктов справки
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-DHLP2_:
-HLPIND:     ld   a,0
+HelpIndex   ; orig: HLPIND
+; Индекс первого видимого пункта справки
+            ld   a,0
             ld   hl,THELP
-            call FLIST
+            call FindTextByIndex
             ld   de,0
             xor  a
             ld   (Cord),a
             ld   ix,LINES
-D_H1:
+.D_H1
             ld   (ix+0),l
             ld   (ix+1),h
             inc  ix
@@ -36,10 +28,10 @@ D_H1:
             ld   a,#08
             ld   (Cord+1),a
             push de
-            call VTXT
+            call VirtualPrint
             pop  de
             inc  de
-            jp   nc,D_H1
+            jp   nc,.D_H1
             push de
             push ix
             ld   hl,1024
@@ -53,12 +45,13 @@ D_H1:
             ld   (hl),0
             inc  de
             dec  bc
-            ldir 
+            ldir
             pop  de
-            ret  
+            ret
 
 
-DHLP3_:
+HelpDrawItem   ; orig: DHLP3_
+; Вывод описания пункта справки
             ld   bc,#0800
             ld   (Cord),bc
             add  hl,hl
@@ -70,27 +63,28 @@ DHLP3_:
             ld   l,a
             or   h
             ret  z
-            jp   OTXT
+            jp   PrintText
 
 
-SETHIND:
-            ld   (HLPIND+1),a
-            ret  
+HelpSetIndex   ; orig: SETHIND
+; Задать индекс пункта справки
+            ld   (HelpIndex+1),a
+            ret
 
 
+HelpDrawLine   ; orig: DHLPL1
+; Вывод строки справки
 
-DHLPL1:
-
-;hl-ИНДЕКС ВЫВОДА
+; hl-индекс вывода
             EXD
 
-;  КОРД.Y НА САМУЮ ПЕРВУЮ СТРОКУ
+;  Корд.Y на самую первую строку
             ld   hl,#0800
             ld   (Cord),hl
 
             ld   hl,THLPL
             ld   a,e
-            call LIST1
+            call PrintTextByIndex1
             ld   a,(Cord+1)
             sub  8
             srl  a
@@ -100,16 +94,15 @@ DHLPL1:
             ex   af,af'
             ld   a,8
             ld   (Cord+1),a
-            ret  
+            ret
 
-LINES:
+LINES
             ds   2048
 
 
 THLPL:      include "gen/THLPL.inc"   ; GENERATED from assets/text/help.txt
 
-THELP:
-;  ОПИСАНИЕ КАЖДОГО ПУНКТА ПО ПОРАДКУ
+THELP
+;  Описание каждого пункта по порадку
             db   ET
             incbin "gen/help.tok"   ; GENERATED from assets/text/help.txt
-

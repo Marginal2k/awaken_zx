@@ -1,5 +1,15 @@
+;==============================================================================
+; XCLP - клиппирование полигонов и линий (часть S3D)
+;
+; ClipPolygon, ClipLine, умножение/квадрат/деление 16 бит (MulHLDE и др.).
+;
+; Часть набора STORM (прототип Awaken 1997/98), не входит в основную игру. Подробности: docs/STORM.md,
+; таблица переименований меток: docs/STORM_LABELS.md. Собирается sjasmplus (см. make_*.asm).
+;==============================================================================
+
 ; Процедуры клиппирования
-Clip    xor  a
+ClipPolygon                     ; orig: Clip
+        xor  a
         ld   (L91+#2F),a
         ld   (L91+#0A),a
         ld   (L91+#2E),a
@@ -766,7 +776,7 @@ Lcec8   pop  af
 Lcef0   ld   d,h
         ld   e,l
 ; Умножение hlde=hl*de
-Mull
+MulHLDE                         ; orig: Mull
 Lcef2   ld   a,h
         xor  d
         push af
@@ -1133,7 +1143,7 @@ Ld086   ld   ixl,#00
         ret
 
 ; Lines clipping
-CLIPLIN
+ClipLine                        ; orig: CLIPLIN
         ld   a,#01
         ld   (L91+#2F),a
         ld   a,(L91+#0F)

@@ -1,28 +1,15 @@
-;ADRXX00         ■ADDIXIX
-;SUB_BC          ■SUB_DE
-;INC_HL          ■INC_DE
-;DEC_HL          ■DEC_DE
-;NEXTLINE        ■NEXTZNAK
-;NEXTLINEDE      ■PREVLINE
-;PAGE            ■PAGES
-;ADPHLDE         ■NEGHL
-;NEGDE           ■NEGBC
-;ABSHL           ■ABSDE
-;ABSBC           ■ADPAXH
-;SBPAXH          ■SM1
-;SM2             ■SM3
-;SPRO1           ■PUTDOT
-;GETADR          ■LDX_HL_A
-;ADDHLHL         ■EXD
-;RST_
+;==============================================================================
+; MACRO - макросы станции
+;
+; Подключается всеми модулями после EQUS. Группы: выравнивание (ADRXX00), 16-битные операции (SUB_BC,
+; SUB_DE, INC_HL, DEC_HL, ADDHLHL, EXD, NEGHL, ABSHL...), переходы по страницам (PAGE_, PAGES, PAGE___NOARG,
+; PAGES__NOARG), сдвиг/выбор адреса экрана (NEXTLINE, NEXTLINEDE, NEXTZNAK, PUTDOT, GETADR, LDX_HL_A).
+; Имена макросов оставлены оригинальными: их использует весь код.
+;==============================================================================
 
+; Макросы
 
-
-
-
-; МАКРОСЫ
-
-; ВЫРАВНИВАНИЕ АДРЕСА
+; Выравнивание адреса
             MACRO ADRXX00
             ds   (low((high(($-1))))*256)-$+256
             ENDM
@@ -61,7 +48,7 @@
             ENDM
 
 
-; СЛЕДУЮЩАЯ ЛИНИЯ В СКРИНЕ
+; Следующая линия в скрине
             MACRO NEXTLINE
             inc  h
             ld   a,h
@@ -70,7 +57,7 @@
             NEXTZNAK
             ENDM
 
-; СЛЕД.ЗНАКОМЕСТ
+; След.знакомест
             MACRO NEXTZNAK
             ld   a,l
             add  a,32
@@ -81,7 +68,7 @@
             ld   h,a
             ENDM
 
-; СЛЕДУЮЩАЯ ЛИНИЯ В СКРИНЕ РЕГ. de
+; Следующая линия в скрине рег. de
             MACRO NEXTLINEDE
             inc  d
             ld   a,d
@@ -96,7 +83,7 @@
             ld   d,a
             ENDM
 
-; ПРЕДЫДУЩАЯ ЛИНИЯ В СКРИНЕ
+; Предыдущая линия в скрине
             MACRO PREVLINE
             ld   a,h
             dec  h
@@ -111,27 +98,27 @@
             ld   h,a
             ENDM
 
-; ВЫЗОВ ПЕРЕКЛЮЧЕНИЯ СТРАНИЦЫ
+; Вызов переключения страницы
             MACRO PAGE_ par1
             ld   a,par1
-            call PG
+            call SetPage
             ENDM
             MACRO PAGE___NOARG
             ld   a,PGNORM
-            call PG
+            call SetPage
             ENDM
 
             MACRO PAGES par1
             ld   a,par1
-            call PGS
+            call SetBank
             ENDM
             MACRO PAGES__NOARG
             ld   a,PGNORM
-            call PGS
+            call SetBank
             ENDM
 
-; ОПЕРАЦИЯ СЛОЖЕНИЯ hl,deС ПРОВЕРКОЙ
-; ФЛАГА ПЕРЕПОЛНЕНИЯ И КОРРЕКЦИЕЙ
+; Операция сложения hl,dес проверкой
+; Флага переполнения и коррекцией
             MACRO ADPHLDE par1
             adc  hl,de
             jp   po,$+14
@@ -144,52 +131,52 @@
             ld   (par1+1),hl
             ENDM
 
-; ИНВЕРСИЯ hl
+; Инверсия hl
             MACRO NEGHL
             ld   a,l
-            cpl  
+            cpl
             ld   l,a
             ld   a,h
-            cpl  
+            cpl
             ld   h,a
             inc  hl
             ENDM
-; ИНВЕРСИЯ de
+; Инверсия de
             MACRO NEGDE
             ld   a,e
-            cpl  
+            cpl
             ld   e,a
             ld   a,d
-            cpl  
+            cpl
             ld   d,a
             inc  de
             ENDM
-; ИНВЕРСИЯ bc
+; Инверсия bc
             MACRO NEGBC
             ld   a,c
-            cpl  
+            cpl
             ld   c,a
             ld   a,b
-            cpl  
+            cpl
             ld   b,a
             inc  bc
             ENDM
 
-; АБСОЛЮТНОЕ ЗНАЧЕНИЕ hl
+; Абсолютное значение hl
             MACRO ABSHL
             bit  7,h
             jr   z,$+9
             NEGHL
             ENDM
 
-; АБСОЛЮТНОЕ ЗНАЧЕНИЕ de
+; Абсолютное значение de
             MACRO ABSDE
             bit  7,d
             jr   z,$+9
             NEGDE
             ENDM
 
-; АБСОЛЮТНОЕ ЗНАЧЕНИЕ bc
+; Абсолютное значение bc
             MACRO ABSBC
             bit  7,b
             jr   z,$+9
@@ -197,31 +184,31 @@
             ENDM
 
 
-; СЛОЖЕНИЕ a=a+xhС УЧЕТОМ ПЕРЕПОНЕНИЯ
+; Сложение a=a+хнс учетом перепонения
             MACRO ADPAXH
             add  a,ixh
             jp   po,$+9
-            neg  
+            neg
             jp   po,$+4
             dec  a
             ENDM
 
-; ВЫЧИТАНИЕ a=a-xhС УЧЕТОМ ПЕРЕПОНЕНИЯ
+; Вычитание a=a-хнс учетом перепонения
             MACRO SBPAXH
             sub  ixh
             jp   po,$+9
-            neg  
+            neg
             jp   po,$+4
             dec  a
             ENDM
 
 
 ; ДЛЯ
-; ДЕЛЕНИЕ БЫСТРОЕ ТОЧНОЕ ОПТИМИЗИРОВАННОЕ
-; ДЕЛИМ hl=hl/de
-; ЕДИНСТВЕННЫЙ ПАРАМЕТР ДОЛЖЕН БЫТЬ АДРЕС
-; ПРОЦЕДУРЫ ОБРАБОТКИ ПЕРЕПОЛНЕНИЯ
-; ПРИ ДЕЛЕНИИ НА 0 И Т.Д.
+; Деление быстрое точное оптимизированное
+; Делим hl=hl/de
+; Единственный параметр должен быть адрес
+; Процедуры обработки переполнения
+; При делении на 0 и т.д.
             MACRO SM1
             ld   c,a
             ld   a,l
@@ -230,7 +217,7 @@
             ENDM
             MACRO SM2
             adc  hl,hl
-            rla  
+            rla
             cp   d
             ENDM
             MACRO SM3
@@ -253,7 +240,7 @@
             NEXTLINEDE
             ENDM
 
-; РИСОВАТЬ ТОЧКУ НА ЭКРАНЕ
+; Рисовать точку на экране
 ; В a,b- Y,X
             MACRO PUTDOT
             ld   l,a
@@ -271,7 +258,7 @@
             ld   (de),a
             ENDM
 
-; ПОЛУЧИТЬ АДРЕС НА ЭКРАНЕ ИЗ КООРДИНАТ
+; Получить адрес на экране из координат
 ; В l,e-Y,X
             MACRO GETADR
             ld   h,high(TBXX)
@@ -285,8 +272,7 @@
             ENDM
 
 
-
-; МАКРОС ДЛЯ ВЫВОДА ШРИФТА
+; Макрос для вывода шрифта
             MACRO LDX_HL_A
             xor  (hl)
             ld   (hl),a
@@ -303,12 +289,11 @@
             ex   de,hl
             ENDM
 
-; ПЕЧАТЬ СИМВОЛА
+; Печать символа
             MACRO RST_ par1
             ld   a,par1
-            call Pntpro
+            call PrintGlyph
             ENDM
             MACRO RST___NOARG
-            call Pntpro
+            call PrintGlyph
             ENDM
-

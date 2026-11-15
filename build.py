@@ -21,7 +21,7 @@ def asm(src, cwd, extra=()):
 
 def generate_assets():
     """assets/ (human-editable) -> build/gen/ (game form: db/inc/bin files that the sources include).  tools/assets/*.py"""
-    import gen_text, gen_tables, gen_gfx, gen_models, gen_flight, gen_math
+    import gen_text, gen_tables, gen_gfx, gen_models, gen_flight, gen_math, gen_music
     shutil.rmtree(B + '/gen', ignore_errors=True)
     os.makedirs(B + '/gen', exist_ok=True)
     gen_text.generate(ROOT, B + '/gen')
@@ -30,6 +30,7 @@ def generate_assets():
     gen_models.generate(ROOT, B + '/gen')
     gen_flight.generate(ROOT, B + '/gen')
     gen_math.generate(ROOT, B + '/gen')
+    gen_music.generate(ROOT, B + '/gen')
 
 
 TEST = '--test-return' in sys.argv
@@ -62,7 +63,7 @@ def main():
       code(B + '/station/D3D.C', 'D3D', 0xC000)
       code(B + '/station/KARTA.C', 'KARTA', 0xC000)
       code(B + '/station/HELP.C', 'HELP', 0xDB00)
-      code(ROOT + '/assets/MUZ1.C', 'MUZ1', 0xDB00)
+      code(B + '/gen/MUZ1.C', 'MUZ1', 0xDB00)
       # stscr = 16 packed pictures one after another (239 sectors, SECTAB in station/LOADER.asm); like the demo the catalogue
       # length is that of the first picture only (3230) while the sector count covers the whole file.
       d.add_file('stscr', 'C', open(B + '/gen/stscr.C', 'rb').read(), start=0xC000, length=int(open(B + '/gen/stscr.len').read().split()[0]))

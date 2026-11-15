@@ -1,729 +1,708 @@
-; VXXX -- restored from awk2/VXXX.C (5171 bytes, STORM tokenized)
-; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
-;ПРОЦЕДУРА ВЫВОДА ВОКС. СПРАЙТА С
-;С МАСШТАБИРОВАНИЕМ И ПРОЗРАЧНОСТЬЮ
-;ПОРИТ РЕГ. I
+; Процедура вывода вокс. спрайта с
+; С масштабированием и прозрачностью
+; Порит рег. i
 
-XEND    EQU 64
-YEND    EQU 24
+XEND            equ 64
+YEND            equ 24
 
-
-;VOXEL
+; Voxel
 VOX
-;DE'-ADR OF OBJ
-;HL'-REAL SIZE SPRITE L-X,H-Y
-;B-SIZE Y,C-SIZE X
-;HL-X,DE-Y
-        LD A,B
-        OR A
-        RET Z
-        LD A,C
-        OR A
-        RET Z
-        XOR A
-        LD I,A
-        LD (Vx+1),HL
-        LD (Vy+1),DE
-        LD IYL,C ;SZX
-        LD IYH,B ;SZY
-        LD E,B
-        EXX
-        LD BC,0
-        EXX
-        LD B,0
-Vx      LD HL,0
-        LD A,H
-        AND A
-        JP P,Vx1
-;ЕСЛИ ЧАСТЬ СПРАЙТА ЗА ЭКРАНОМ СЛЕВА
-        ADC HL,BC
-        RET M ;ВЕСЬ СПРАЙТ ЗА ЭКРАНОМ
-        RET Z ;TOЖE
-;КЛИПИРУЕМ
-        LD A,L
-        LD HL,0 ;X=0
-        LD B,C
-        LD C,A ;NEW LEN OF X
-        SUB B
-        LD B,L
-        NEG
-;В "А" БУДЕТ СМЕЩЕНИЕ ПО ШИРИНЕ ДЛЯ
-;ИЗМЕНЕНИЯ АДРЕСА СПРАЙТА
-        EXX
-        LD I,A
-        SET 0,C ;МЕТКА КЛИПИНГА СЛЕВА
-        EXX
-        JP Vx2
+        ; De'-adr of obj
+        ; Hl'-real size sprite l-X,h-Y
+        ; B-size Y,c-size X
+        ; Hl-X,de-Y
+        ld   a,b
+        or   a
+        ret  z
+        ld   a,c
+        or   a
+        ret  z
+        xor  a
+        ld   i,a
+        ld   (Vx+1),hl
+        ld   (Vy+1),de
+        ld   iyl,c              ; SZX
+        ld   iyh,b              ; SZY
+        ld   e,b
+        exx
+        ld   bc,0
+        exx
+        ld   b,0
+Vx      ld   hl,0
+        ld   a,h
+        and  a
+        jp   p,Vx1
+        ; Если часть спрайта за экраном слева
+        adc  hl,bc
+        ret  m                  ; Весь спрайт за экраном
+        ret  z                  ; Тоже
+        ; Клипируем
+        ld   a,l
+        ld   hl,0               ; X=0
+        ld   b,c
+        ld   c,a                ; New LEN of X
+        sub  b
+        ld   b,l
+        neg
+        ; В "а" будет смещение по ширине для
+        ; Изменения адреса спрайта
+        exx
+        ld   i,a
+        set  0,c                ; Метка клипинга слева
+        exx
+        jp   Vx2
 Vx1
-        RET NZ ;ЗА ЭКРНОМ СПРАВА
-        LD A,L
-        CP XEND
-        RET NC ;ТОЖЕ
+        ret  nz                 ; За экрном справа
+        ld   a,l
+        cp   XEND
+        ret  nc                 ; Тоже
 Vx2
-        ADD HL,BC
-        LD A,H
-        OR A
-        LD A,L
-        JR NZ,$+6
-        CP XEND+1
-        JR C,Vy ;ВЕСЬ СПР НА ЭКРАНЕ ПО X
-;ПРАВАЯ ЧАСТЬ СПРАЙТА ЗА ЭКРАНОМ СПРАВА
-;КЛИПИРУЕМ
-        SUB XEND
-        SUB C
-        NEG
-;НОВАЯ ДЛИННА СПРАЙТА
-        LD C,A
-;ПРОВЕРКИ ПО У
-Vy      LD HL,0
-        LD D,0
-        LD A,H
-        AND A
-        JP P,Vx3
-;ЕСЛИ СПРАЙТ ВЫХОДИТ СВЕРХУ ЗА ЭКРАН
-        ADC HL,DE
-        RET M ;ВЫЛЕТ ПО У ВВЕРХУ ВСЕГО
-;СПРАЙТА
-        RET Z ;ТОЖЕ
-        LD A,L
-        LD HL,0 ;У=0
-        LD D,E
-        LD E,A ;НОВАЯ ВЫСОТА СПРАЙТА
-        SUB D
-        LD D,L
-        NEG
-        EXX
-;В "А" КОЛИЧЕСТВО СТРОК ПОДДВЕРГНУТЫХ
-;КЛИППИНГУ, КОТОРЫЕ НЕ ВИДИМЫ
-        LD B,A
-        SET 1,C ;МАРКЕР КЛИПИНГА ПО У
-        EXX
-        JP Vx4
+        add  hl,bc
+        ld   a,h
+        or   a
+        ld   a,l
+        jr   nz,$+6
+        cp   XEND+1
+        jr   c,Vy               ; Весь спр на экране по X
+        ; Правая часть спрайта за экраном справа
+        ; Клипируем
+        sub  XEND
+        sub  c
+        neg
+        ; Новая длинна спрайта
+        ld   c,a
+; Проверки по у
+Vy      ld   hl,0
+        ld   d,0
+        ld   a,h
+        and  a
+        jp   p,Vx3
+        ; Если спрайт выходит сверху за экран
+        adc  hl,de
+        ret  m                  ; Вылет по у вверху всего
+        ; Спрайта
+        ret  z                  ; Тоже
+        ld   a,l
+        ld   hl,0               ; У=0
+        ld   d,e
+        ld   e,a                ; Новая высота спрайта
+        sub  d
+        ld   d,l
+        neg
+        exx
+        ; В "а" количество строк поддвергнутых
+        ; Клиппингу, которые не видимы
+        ld   b,a
+        set  1,c                ; Маркер клипинга по у
+        exx
+        jp   Vx4
 Vx3
-        RET NZ ;ВЕСЬ СПРАЙТ НИЖЕ СКРИНА
-        LD A,L
-        CP YEND
-        RET NC ;ТОЖЕ
+        ret  nz                 ; Весь спрайт ниже скрина
+        ld   a,l
+        cp   YEND
+        ret  nc                 ; Тоже
 Vx4
-        ADD HL,DE
-        LD A,H
-        OR A
-        LD A,L
-        JR NZ,$+6
-        CP YEND+1
-        JR C,Vx5
-;СПРАЙТ ВЫШЕ ВЫСОТЫ СКРАНА ИЛИ ВЫЛЕЗ
-;СНИЗУ
-        SUB YEND
-        SUB E
-        NEG
-        LD E,A ;НОВАЯ ВЫСОТА
+        add  hl,de
+        ld   a,h
+        or   a
+        ld   a,l
+        jr   nz,$+6
+        cp   YEND+1
+        jr   c,Vx5
+        ; Спрайт выше высоты скрана или вылез
+        ; Снизу
+        sub  YEND
+        sub  e
+        neg
+        ld   e,a                ; Новая высота
 Vx5
-;ДЕЛАЕМ НУЖНЫЕ КООРДИНАТЫ ЕСЛИ БЫЛИ
-;КЛИППИНГИ
-        EXX
-        LD A,(Vx+1)
-        BIT 0,C
-        JR Z,$+3
-        XOR A
-        BIT 1,C
-        EXX
-        LD B,A ;КООРДИНАТА Х СПРАЙТА ВЫВД
-        LD A,(Vy+1)
-        JR Z,$+3
-        XOR A
-;"А"-КООРД. У СПРАЙТА ДЛЯ ВЫВОДА
-;РАСЧ. АДР. НА ХАЙД СЛРИНЕ
-        SRL A
-        LD L,D
-        RR L
-        LD H,A ;HL=КООРД. ВЫВОДА У/2
-        LD IXH,E ;КОЛИЧЕСТВО СТРОК
-;КООРД. ВЫВОДА X ПОСЛЕ КЛИППИНГА
-        LD E,B
+        ; Делаем нужные координаты если были
+        ; Клиппинги
+        exx
+        ld   a,(Vx+1)
+        bit  0,c
+        jr   z,$+3
+        xor  a
+        bit  1,c
+        exx
+        ld   b,a                ; Координата х спрайта вывд
+        ld   a,(Vy+1)
+        jr   z,$+3
+        xor  a
+        ; "А"-коорд. у спрайта для вывода
+        ; Расч. адр. на хайд слрине
+        srl  a
+        ld   l,d
+        rr   l
+        ld   h,a                ; Hl=коорд. вывода у/2
+        ld   ixh,e              ; Количество строк
+        ; Коорд. вывода X после клиппинга
+        ld   e,b
 
-;ЗАПОМНИМ КООРД. ВЫВОДА Х
-        LD A,E
-        LD (XX+1),A
+        ; Запомним коорд. вывода х
+        ld   a,e
+        ld   (XX+1),a
 
-        SRL E
+        srl  e
 
-;ПОДГОТОВКА К ВЫВОДУ ВОКСЕЛЯ
-;ВО ВТОРОМ ПОЛУБАЙТЕ
-        LD A,#30 ;JR NC,
-        JR NC,$+6
-        INC C
-        INC C
-        LD A,#38 ;JR C,
-        LD (AW3),A
+        ; Подготовка к выводу вокселя
+        ; Во втором полубайте
+        ld   a,#30              ; Jr nc,
+        jr   nc,$+6
+        inc  c
+        inc  c
+        ld   a,#38              ; Jr c,
+        ld   (AW3),a
 
-        ADD HL,DE
-        SET 7,H
-        EX DE,HL
-;DE-АДР. В СКРИНЕ
-        PUSH DE
-        PUSH BC
-        EXX
-        LD A,L ;РЕАЛЬНАЯ ШИРИНА СПРАЙТА
-        EXX
-        LD B,A ;ЗАПОМНИЛИ
+        add  hl,de
+        set  7,h
+        ex   de,hl
+        ; De-адр. в скрине
+        push de
+        push bc
+        exx
+        ld   a,l                ; Реальная ширина спрайта
+        exx
+        ld   b,a                ; Запомнили
 
-;ИЗНАЧАЛЬНО ЗАДАННАЯ ВЫВОДИМАЯ ШИРИНА
-        LD E,IYL
-;РАСЧИТЫВАЕМ КОЭФ. МАСШТАБИРОВАНИЯ ПО Х
-        CALL DIVV
-;КОЭФ.ПО X=256*РЕАЛ.ШИРИНА/ЗАДАННАЯ
-        EX DE,HL
-;В "HL"-КОЭФ. МАСШТАБИРОВАНИЯ ПО X
-        EXX
-        LD A,H ;РЕАЛЬНАЯ ВЫСОТА
-        EXX
-        LD E,IYH ;ЗАДАННАЯ
-        PUSH HL
-;КОЕФ. МАСШТАБИРОВАНИЯ ПО У
-        CALL DIVV
-        POP HL
-        LD A,E
-        LD IXL,D ;СТАР.БАЙТ КОЕФ.МАСШ.ПО У
-        EXX
-        LD C,A
-;В "C'" МЛАДШ. БАЙТ КОЕФ. МАСШТ. ПО У
-        LD A,B
-        AND A
-        JR Z,Vx6
-;ИЗМЕНЯЕМ АДРЕС СПРАЙТА ЕСЛИ БЫЛ
-;КЛИППИНГ ПО ВЫСОТЕ СПРАЙТА
-;С ВЕРХУ, РЕЗАЛСЯ С ВЕРХУ
-        SLA B
-        LD HL,0
-        LD B,IXL
-        ADD HL,BC
-        DEC A
-        JP NZ,$-2
-        LD A,H
-        AND A
-        JR Z,Vx6
-        LD B,A
-        EXX
-        LD A,B
-        EXX
-        LD L,A
-        LD H,0
-        EX DE,HL
-        ADD HL,DE
-        DJNZ $-1
-        EX DE,HL
+        ; Изначально заданная выводимая ширина
+        ld   e,iyl
+        ; Расчитываем коэф. масштабирования по х
+        call DIVV
+        ; Коэф.по X=256*реал.ширина/заданная
+        ex   de,hl
+        ; В "hl"-коэф. масштабирования по X
+        exx
+        ld   a,h                ; Реальная высота
+        exx
+        ld   e,iyh              ; Заданная
+        push hl
+        ; Коеф. масштабирования по у
+        call DIVV
+        pop  hl
+        ld   a,e
+        ld   ixl,d              ; Стар.байт коеф.масш.по у
+        exx
+        ld   c,a
+        ; В "c'" младш. байт коеф. масшт. по у
+        ld   a,b
+        and  a
+        jr   z,Vx6
+        ; Изменяем адрес спрайта если был
+        ; Клиппинг по высоте спрайта
+        ; С верху, резался с верху
+        sla  b
+        ld   hl,0
+        ld   b,ixl
+        add  hl,bc
+        dec  a
+        jp   nz,$-2
+        ld   a,h
+        and  a
+        jr   z,Vx6
+        ld   b,a
+        exx
+        ld   a,b
+        exx
+        ld   l,a
+        ld   h,0
+        ex   de,hl
+        add  hl,de
+        djnz $-1
+        ex   de,hl
 Vx6
-        EXX
-        LD A,I ;КОЛ.КЛИПНУТЫХ ДАБЛ
-;ВОКСЕЛЕЙ ПО ШИРИНЕ
-;СЛЕВА
-        AND A
-        JR Z,P1
-;ИЗМЕНЯЕМ АДРЕС СПРАЙТА ЕСЛИ БЫЛ КЛИПИНГ
-;СЛЕВА ПО ШИРИНЕ
-        EX DE,HL
-;ПРОСУММИРУЕМ КОЕФ. МАСШТ. ПО ШИРИНЕ
-;СТОЛЬКО РАЗ СКОЛЬКО НУЖНО КЛИПНУТЬ
-;ДАБЛ ВОКСЕЛЕЙ
+        exx
+        ld   a,i                ; Кол.клипнутых дабл
+        ; Вокселей по ширине
+        ; Слева
+        and  a
+        jr   z,P1
+        ; Изменяем адрес спрайта если был клипинг
+        ; Слева по ширине
+        ex   de,hl
+; Просуммируем коеф. масшт. по ширине
+; Столько раз сколько нужно клипнуть
+; Дабл вокселей
 
-        LD HL,0
-        EX AF,AF'
-        XOR A
-        EX AF,AF'
-        EX AF,AF'
-        ADD HL,DE
-        ADC A,0
-        EX AF,AF'
-        DEC A
-        JP NZ,$-6
+        ld   hl,0
+        ex   af,af'
+        xor  a
+        ex   af,af'
+        ex   af,af'
+        add  hl,de
+        adc  a,0
+        ex   af,af'
+        dec  a
+        jp   nz,$-6
 
-        LD A,H
-        EXX
-        LD L,A
-        EX AF,AF'
-        LD H,A
-        ADD HL,DE
-        EX DE,HL
-        EXX
-        EX DE,HL
+        ld   a,h
+        exx
+        ld   l,a
+        ex   af,af'
+        ld   h,a
+        add  hl,de
+        ex   de,hl
+        exx
+        ex   de,hl
 P1
-        LD A,B
-        POP BC
-        POP DE
+        ld   a,b
+        pop  bc
+        pop  de
 
-;ВЫВОД ВОКСЕЛЯ С МАСШТАБИРОВАНИЕМ
-;C-КОЛИЧЕСТВО ВОКСЕЛЕЙ В СТРОКЕ
-;DE-АДРЕС НА СКРИНЕ
-;HX-КОЛ. СТРОК
-;HL-КОЕФ. СМЕЩЕНИЯ ПО Х
-;C'-МЛАДШИЙ БАЙТ ПРОРЕЖИВАНИЯ ПО У
-;LX-СТАРШИЙ БАЙТ ПРОРЕЖИВАНИЯ ПО У
-;DE'-АДРЕС СПРАЙТА, #XX00
-;A-РЕАЛЬНОЕ КОЛ. ВОКСЕЛЕЙ В СТРОКЕ
-;СПРАЙТА
+; Вывод вокселя с масштабированием
+; C-количество вокселей в строке
+; De-адрес на скрине
+; Hx-кол. строк
+; Hl-коеф. смещения по х
+; C'-младший байт прореживания по у
+; Lx-старший байт прореживания по у
+; De'-адрес спрайта, #xx00
+; A-реальное кол. вокселей в строке
+; Спрайта
 Voxout
-        LD (Stkv+1),SP
+        ld   (Stkv+1),sp
 
-        LD (Vxll+1),A ;РЕАЛЬНАЯ ШИРИНА
+        ld   (Vxll+1),a         ; Реальная ширина
 
-        LD SP,HL ;КОЕФ. МАСШ. ПО Х
-;УМНОЖАЕМ СТАРШИЙ БАЙТ КОЕФ.
-;ПРОРЕЖИВАНИЯ НА РЕАЛЬНУЮ ДЛИННУ СТРОКИ
-;ЧТО БЫ ПОЛУЧИТЬ КОЕФ. ПРОРЕЖ. ПО У
-;КРАТНЫЙ ДЛИННЕ СТРОКИ
-        LD B,A
-        LD A,IXL
-        OR A
-        JR Z,P2
-        LD HL,0
-        EX AF,AF'
-        LD A,C
-        EX AF,AF'
-        LD C,B
-        LD B,0
-        ADD HL,BC
-        DEC A
-        JP NZ,$-2
-        EX AF,AF'
-        LD C,A
+        ld   sp,hl              ; Коеф. масш. по х
+        ; Умножаем старший байт коеф.
+        ; Прореживания на реальную длинну строки
+        ; Что бы получить коеф. прореж. по у
+        ; Кратный длинне строки
+        ld   b,a
+        ld   a,ixl
+        or   a
+        jr   z,P2
+        ld   hl,0
+        ex   af,af'
+        ld   a,c
+        ex   af,af'
+        ld   c,b
+        ld   b,0
+        add  hl,bc
+        dec  a
+        jp   nz,$-2
+        ex   af,af'
+        ld   c,a
 
-        LD A,L
-        LD IXL,A
-        LD A,H
-;"А"-СМЕЩЕНИЕ ДЛЯ СТ.БАЙТА АДРЕСА СПРАЙТ
+        ld   a,l
+        ld   ixl,a
+        ld   a,h
+; "А"-смещение для ст.байта адреса спрайт
 P2
-        LD (WE1+1),A
+        ld   (WE1+1),a
 
-;РАСЧИТЫВАЕМ АДРЕС НАЧАЛА ВЫВОДА ВОКСЕЛЯ
-;В РАЗВЕРНУТОМ ЦИКЛЕ ПРОЦЕДУРЫ
+; Расчитываем адрес начала вывода вокселя
+; В развернутом цикле процедуры
 
-;ПОДГОТОВКА К ВЫВОДУ ОДНОГО ВОКСЕЛЯ
-;В ПЕРВОМ ПОЛУБЙТЕ
-;НАХОДИМ СЛЕД. КООРД. Х ПОСЛЕ СПРАЙТА
-;ЕСЛИ 0 БИТ ЕЕ =0 ТО ВЕСЬ ЗНАКОМЕСТ
-;В ВОКСЕЛЯХ
-;ИНАЧЕ ТОЛЬКО ОДИН ПЕРВЫЙ ПОЛУЗНАКОМЕСТ
-;ЗАПОЛНЯЕТСЯ
-XX      LD A,0
-        ADD A,C
-        RRA
-        LD A,#0F
-        JR NC,Q2
-        LD A,(AW3)
-        CP #38
-        JR Z,$+3
-        INC C
-        XOR A
+; Подготовка к выводу одного вокселя
+; В первом полубйте
+; Находим след. коорд. х после спрайта
+; Если 0 бит ее =0 то весь знакомест
+; В вокселях
+; Иначе только один первый полузнакомест
+; Заполняется
+XX      ld   a,0
+        add  a,c
+        rra
+        ld   a,#0F
+        jr   nc,Q2
+        ld   a,(AW3)
+        cp   #38
+        jr   z,$+3
+        inc  c
+        xor  a
 Q2
-        LD (AW1+1),A
-        LD (AW2+1),A
+        ld   (AW1+1),a
+        ld   (AW2+1),a
 
-        SRL C
-        LD A,#20
-        SUB C
-        JP NC,$+4
-        XOR A
-        LD L,A
-        LD H,0
-        LD C,L
-        LD B,H
-;84b
+        srl  c
+        ld   a,#20
+        sub  c
+        jp   nc,$+4
+        xor  a
+        ld   l,a
+        ld   h,0
+        ld   c,l
+        ld   b,h
+; 84b
 
-        DUP 2
-            ADD HL,HL
-        EDUP
-        ADD HL,BC
-        DUP 2
-            ADD HL,HL
-        EDUP
-        ADD HL,BC
-        DUP 2
-            ADD HL,HL
-        EDUP
-        LD BC,VXL4
-        ADD HL,BC
-        LD (VXL3+1),HL
-AW3     JR NC,Q1
-        INC HL
-        INC HL
-        INC HL
-        INC HL
-        LD (HL),0
-        DEC HL
+        dup  2
+        add  hl,hl
+        edup
+        add  hl,bc
+        dup  2
+        add  hl,hl
+        edup
+        add  hl,bc
+        dup  2
+        add  hl,hl
+        edup
+        ld   bc,VXL4
+        add  hl,bc
+        ld   (VXL3+1),hl
+AW3     jr   nc,Q1
+        inc  hl
+        inc  hl
+        inc  hl
+        inc  hl
+        ld   (hl),0
+        dec  hl
 Q1
-        LD (VXL2+1),HL
-        LD IYL,E ;ДУБЛИРУЕМ МЛ.БАЙТ АДРЕСА
-        LD C,E
-        LD B,D
-        RRA
-        LD H,high(VXTAB)+3
-        LD A,#A9 ;RES 5,C
-        JR C,$+8
-        SET 5,C
-        LD H,high(VXTAB)
-        LD A,#E9 ;SET 5,C
-        LD (AW4+1),A
-        LD A,H
-        LD (AW5+1),A
+        ld   (VXL2+1),hl
+        ld   iyl,e              ; Дублируем мл.байт адреса
+        ld   c,e
+        ld   b,d
+        rra
+        ld   h,high(VXTAB)+3
+        ld   a,#A9              ; Res 5,c
+        jr   c,$+8
+        set  5,c
+        ld   h,high(VXTAB)
+        ld   a,#E9              ; Set 5,c
+        ld   (AW4+1),a
+        ld   a,h
+        ld   (AW5+1),a
 
-        LD D,#0F
-        EXX
-        XOR A
-        LD B,E
+        ld   d,#0F
+        exx
+        xor  a
+        ld   b,e
 Vxl3
-;A'-СЧЕТЧИК СМЕЩЕНИЯ ПО СТРОКАМ
-;LX-СТАРШИЙ БАЙТ ПРОРЕЖ. ПО У,КРАТЕН КОЛ
-;ВОКСЕЛЕЙ В СТРОКЕ
-        EX AF,AF'
-        LD H,B
-        LD L,0
+        ; A'-счетчик смещения по строкам
+        ; Lx-старший байт прореж. по у,кратен кол
+        ; Вокселей в строке
+        ex   af,af'
+        ld   h,b
+        ld   l,0
 
-
-;SP-ПРОРЕЖ. ПО Х
-;H-МЛАДШИЙ БАЙТ АДРЕСА СПРАЙТА
-;L-ЕГО СЧЕТЧИК К УВЕЛИЧЕНИЮ
-;D-СТАРШИЙ БАЙТ АДРЕСА СПРАЙТА
-VXL2    JP 0
+; Sp-прореж. по х
+; H-младший байт адреса спрайта
+; L-его счетчик к увеличению
+; D-старший байт адреса спрайта
+VXL2    jp   0
 
 VXL4
-        INCLUDE "VOXP.asm"
+        include "VOXP.asm"
 
+; 157 Takts one cycle
 
-;157 TAKTS ONE CYCLE
-
-        LD A,IYL
-        ADD A,#80
-        LD C,A
-        LD IYL,A
-        JR NC,$+3
-        INC B
-AW4     SET 5,C
-AW5     LD H,0
-        EXX
-        EX AF,AF
-        ADD A,C
-        LD L,A
-        LD A,B
-        JR NC,$+6
-Vxll    ADD A,0 ;LEN OF STRING
-        JR C,V3
+        ld   a,iyl
+        add  a,#80
+        ld   c,a
+        ld   iyl,a
+        jr   nc,$+3
+        inc  b
+AW4     set  5,c
+AW5     ld   h,0
+        exx
+        ex   af,af
+        add  a,c
+        ld   l,a
+        ld   a,b
+        jr   nc,$+6
+Vxll    add  a,0                ; LEN of string
+        jr   c,V3
 V4
-        ADD A,IXL
-        LD B,A
-        LD A,D
-WE1     ADC A,0
-        LD D,A
-        LD A,L
-        DEC IXH
-        JP NZ,Vxl3
-VXL3    LD HL,0
-        DUP 4
-            INC HL
-        EDUP
-        LD (HL),#F0
+        add  a,ixl
+        ld   b,a
+        ld   a,d
+WE1     adc  a,0
+        ld   d,a
+        ld   a,l
+        dec  ixh
+        jp   nz,Vxl3
+VXL3    ld   hl,0
+        dup  4
+        inc  hl
+        edup
+        ld   (hl),#F0
 
-Stkv    LD SP,0
-        RET
-V3      INC D
-        JP V4
-
-
-
+Stkv    ld   sp,0
+        ret
+V3      inc  d
+        jp   V4
 
 DIVV
-;DE=A/E
-        LD L,A
-        XOR A
-        SLL L
-        SLL L
-        JR C,M1
-        SLL L
-        JR C,M1+7
-        SLL L
-        JR C,M1+(7*2)
-        SLL L
-        JR C,M1+(7*3)
-        SLL L
-        JR C,M1+(7*4)
-        SLL L
-        JR C,M1+(7*5)
-        SLL L
-        JP M1+(7*6)
+        ; De=a/e
+        ld   l,a
+        xor  a
+        sll  l
+        sll  l
+        jr   c,M1
+        sll  l
+        jr   c,M1+7
+        sll  l
+        jr   c,M1+(7*2)
+        sll  l
+        jr   c,M1+(7*3)
+        sll  l
+        jr   c,M1+(7*4)
+        sll  l
+        jr   c,M1+(7*5)
+        sll  l
+        jp   M1+(7*6)
 M1
-        RLA
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        RLA
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        RLA
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        RLA
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        RLA
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        RLA
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        RLA
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        LD C,L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        ADD A,A
-        SBC A,E
-        JR NC,$+3
-        ADD A,E
-        RL L
-        LD A,L
-        CPL
-        LD E,A
-        LD A,C
-        CPL
-        LD D,A
-        RET
-
+        rla
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        rla
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        rla
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        rla
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        rla
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        rla
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        rla
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        ld   c,l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        add  a,a
+        sbc  a,e
+        jr   nc,$+3
+        add  a,e
+        rl   l
+        ld   a,l
+        cpl
+        ld   e,a
+        ld   a,c
+        cpl
+        ld   d,a
+        ret
 
 D3D2_
-;РАСЧЕТ ИЗ 3D В 2D
-;HL-X,DE-Z,BC-Y
-;L'-ПОЛУ ВЫСОТА СПРАЙТА
-;H'-ПОЛУ ШИРИНА СПРАЙТА
-;DE-Z
-;BC-Y
+; Расчет из 3d в 2d
+; Hl-X,de-z,bc-Y
+; L'-полу высота спрайта
+; H'-полу ширина спрайта
+; De-z
+; Bc-Y
 
-        PUSH HL
+        push hl
 
-        BIT 7,D
-        JP NZ,ED_
+        bit  7,d
+        jp   nz,ED_
 
+        exx
+        ld   a,h
+        exx
+        ld   l,a
+        rlca
+        and  1
+        neg
+        ld   h,a
+Jmp1    jr   $
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
 
-        EXX
-        LD A,H
-        EXX
-        LD L,A
-        RLCA
-        AND 1
-        NEG
-        LD H,A
-Jmp1    JR $
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
+        add  hl,hl
 
-        ADD HL,HL
+        and  a
+        adc  hl,bc
+        jp   p,$+10
+        ld   a,l
+        cpl
+        ld   l,a
+        ld   a,h
+        cpl
+        ld   h,a
+        inc  hl
+        ex   af,af'
+; DIV
 
-        AND A
-        ADC HL,BC
-        JP P,$+10
-        LD A,L
-        CPL
-        LD L,A
-        LD A,H
-        CPL
-        LD H,A
-        INC HL
-        EX AF,AF'
-;DIV
+        pop  bc
 
+        push hl
+        exx
+        ld   a,l
+        exx
+        ld   l,a
+        rlca
+        and  1
+        neg
+        ld   h,a
+Jmp2    jr   $
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
+        add  hl,hl
 
+        add  hl,hl
 
+        and  a
+        adc  hl,bc
+        jp   p,$+10
+        ld   a,l
+        cpl
+        ld   l,a
+        ld   a,h
+        cpl
+        ld   h,a
+        inc  hl
+        ex   af,af'
+; DIV
 
-
-
-        POP BC
-
-        PUSH HL
-        EXX
-        LD A,L
-        EXX
-        LD L,A
-        RLCA
-        AND 1
-        NEG
-        LD H,A
-Jmp2    JR $
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-        ADD HL,HL
-
-        ADD HL,HL
-
-        AND A
-        ADC HL,BC
-        JP P,$+10
-        LD A,L
-        CPL
-        LD L,A
-        LD A,H
-        CPL
-        LD H,A
-        INC HL
-        EX AF,AF'
-;DIV
-
-
-
-
-
-
-        POP DE
-        RET
+        pop  de
+        ret
 ED_
-;ЭКСТРЕННЫЙ ВЫХОД
-        POP HL
-        LD A,3
-        OR A
-        RET
-
+        ; Экстренный выход
+        pop  hl
+        ld   a,3
+        or   a
+        ret
 
 D3D2
-;ПОИСК КООРД. ВЫВОДА СПРАЙТА И РАЗМЕРА
-;И ВЫВОД СПРАЙТА
-;BC-Z,DE-Y,HL-X
-;HL'-РЕАЛЬН. РАЗМЕРЫ
-;DE'-АДРЕС СПРАЙТА
-;A-МАСШТАБ
-        SUB 6
-        NEG
-        LD (Jmp1+1),A
-        LD (Jmp2+1),A
+        ; Поиск коорд. вывода спрайта и размера
+        ; И вывод спрайта
+        ; Bc-z,de-Y,hl-X
+        ; Hl'-реальн. размеры
+        ; De'-адрес спрайта
+        ; A-масштаб
+        sub  6
+        neg
+        ld   (Jmp1+1),a
+        ld   (Jmp2+1),a
 
-        LD A,C
-        LD C,E
-        LD E,A
-        LD A,B
-        LD B,D
-        LD D,A
-        LD (X_+1),HL
-        LD (Y_+1),BC
-        LD (Z_+1),DE
-        EXX
-        LD A,L
-        NEG
-        LD L,A
-        LD A,H
-        NEG
-        LD H,A
-        EXX
-        CALL D3D2_
-        RET PE
-        PUSH DE
-        PUSH HL
-X_      LD HL,0
-Z_      LD DE,0
-Y_      LD BC,0
-        EXX
-        LD A,L
-        NEG
-        LD L,A
-        LD A,H
-        NEG
-        LD H,A
-        EXX
-        CALL D3D2_
-        RET PE
-        POP BC
-        OR A
-        SBC HL,BC
-        RET Z
-        SRL H
-        RR L
-        SRL H
-        RET NZ
-        RR L
-        LD H,B
-        LD A,C
-        LD C,L
-        LD L,A
-        LD A,C
-        EX AF,AF'
-        EX DE,HL
-        POP BC
-        OR A
-        SBC HL,BC
-        RET Z
-        SRL H
-        RR L
-        SRL H
-        RET NZ
-        RR L
-        LD A,H
-        OR A
-        RET NZ
-        EX AF,AF'
-        LD H,B
-        LD B,L
-        LD L,C
-        LD C,A
-        EX DE,HL
-        SRA H
-        RR L
-        SRA D
-        RR E
-        SRA H
-        RR L
-        SRA D
-        RR E
-        CALL VOX
-        RET
+        ld   a,c
+        ld   c,e
+        ld   e,a
+        ld   a,b
+        ld   b,d
+        ld   d,a
+        ld   (X_+1),hl
+        ld   (Y_+1),bc
+        ld   (Z_+1),de
+        exx
+        ld   a,l
+        neg
+        ld   l,a
+        ld   a,h
+        neg
+        ld   h,a
+        exx
+        call D3D2_
+        ret  pe
+        push de
+        push hl
+X_      ld   hl,0
+Z_      ld   de,0
+Y_      ld   bc,0
+        exx
+        ld   a,l
+        neg
+        ld   l,a
+        ld   a,h
+        neg
+        ld   h,a
+        exx
+        call D3D2_
+        ret  pe
+        pop  bc
+        or   a
+        sbc  hl,bc
+        ret  z
+        srl  h
+        rr   l
+        srl  h
+        ret  nz
+        rr   l
+        ld   h,b
+        ld   a,c
+        ld   c,l
+        ld   l,a
+        ld   a,c
+        ex   af,af'
+        ex   de,hl
+        pop  bc
+        or   a
+        sbc  hl,bc
+        ret  z
+        srl  h
+        rr   l
+        srl  h
+        ret  nz
+        rr   l
+        ld   a,h
+        or   a
+        ret  nz
+        ex   af,af'
+        ld   h,b
+        ld   b,l
+        ld   l,c
+        ld   c,a
+        ex   de,hl
+        sra  h
+        rr   l
+        sra  d
+        rr   e
+        sra  h
+        rr   l
+        sra  d
+        rr   e
+        call VOX
+        ret
 
-        ORG (($+255)&#FF00)
+        org  (($+255)&#FF00)
 VXTAB
-        INCBIN "assets/VOX2.bin"
+        incbin "assets/VOX2.bin"

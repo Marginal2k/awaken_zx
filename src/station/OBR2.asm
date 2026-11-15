@@ -1,62 +1,46 @@
-;BSDEL      ■BTSHIP
-;BBSHIP     ■BABON
-;BHELP      ■BNEWS
-;BMAP       ■BBUY
-;BTRD       ■BPERE
-;BMEM       ■BMAR
-;BCMAR      ■BNMEM
-;BNABO      ■BCENT
-;BAWAY      ■BTALL
-;BTTW       ■BMISS
-;BTWR       ■BWKRB
-;BWSKM      ■BKRB
-;BSKM       ■BEXIT
-;LINE
-
-
-
-
-
-
-
+;==============================================================================
+; OBR2 - обработчики кнопок станции
+;
+; Где живёт: основной образ STATIONF.C (цепочка BODYOCUR, OBR, OBR2).
+;
+; B<имя> - обработчик кнопки (начинается с jp $+3, подменяется при активации), B<имя>_ - дескриптор вывода
+; (ld hl,0 / jp OutButton). Из названий и комментариев: BMEM - запомнить звезду, BNMEM - следующая звезда
+; в памяти, BMAR - проложить маршрут, BCMAR - стереть маршрут, BCENT - центр карты, BPERE - перелёт на
+; другую систему (копирует WHERE в PLACE и идёт на StationStart), BNABO - следующий персонаж, BEXIT -
+; вылет ([glue]: LaunchFlight), BMAP, BNEWS, BHELP, BBUY/BTRD, BWKRB/BWSKM/BKRB/BSKM (оборудование).
+; Подробнее: GAME_DESIGN 1.3, 4, 5.4; соглашения об именах: docs/STATION_LABELS.md.
+;==============================================================================
 
 ;--------------------------------
-; ОБРАБОТЧИК СОБЫТИЙ ОБЪЕКТОВ КНОПОК
-; ПЕРЕДАЮТСЯ
-; НОМЕР ОБЪЕКТА В de
-;a-CODE OF KEY,1-LEFT,0-RIGHT
+; Обработчик событий объектов кнопок
+; Передаются
+; Номер объекта в de
+; a-CODE of key,1-left,0-right
 ;--------------------------------
-; ПОСЛЕ ОБРАБОТЧИКА СРАЗУ ИДЕТ ШОУ
-; ПРОЦЕДУРА
+; После обработчика сразу идет шоу
+; Процедура
 ;--------------------------------
-; ВЫВОД ОБЪЕКТОВ И ИНФЫ В НИХ
+; Вывод объектов и инфы в них
 ;--------------------------------
 
 
-
-
-
-
-
-
-
-
-BSDEL:
+BSDEL
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
-; СДЕЛКА
+            call ButtonHandler
+            ret
+; Сделка
             ld   a,(NSHIP+1)
             inc  a
             ret  z
 
             PAGES PG3D
             ld   a,(NSHIP+1)
-            ld   (SHIPIND+1),a
+            ld   (ShipIndex+1),a
             PAGES__NOARG
 
-BT2:        ld   a,0
+BT2
+            ld   a,0
             or   a
             ld   c,1
             jr   z,$+3
@@ -70,33 +54,32 @@ BT2:        ld   a,0
             PAGES PGLANG
             call PARADOX
             PAGES__NOARG
-            call HIDESCR
+            call HideCursor
             call LINE_
-            call RETSCR
-; ЗАКРЫТЬ ВСЕ
+            call ShowCursorBack
+; Закрыть все
 
             ld   de,(WSHIP_+1)
-            call ERSOBJ2
+            call CloseObject
             call ERASH
             xor  a
             ld   (Unclick+1),a
-            ret  
+            ret
 
 
-BSDEL_:
+BSDEL_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-BTSHIP:
+BTSHIP
             jp   $+3
             ld   hl,$+6
-            call BUTOBR1
+            call ButtonHandler
             ret  c
             PAGES PG3D
             xor  a
-            ld   (SHIPIND+1),a
+            ld   (ShipIndex+1),a
             PAGES__NOARG
             ld   a,1
             ld   (WSHIPZ+1),a
@@ -112,229 +95,150 @@ BTSHIP:
             ld   a,1
             ld   (BT2+1),a
             EXD
-            jp   NATISNU
-BTSHIP_:
+            jp   PressButtonPair
+BTSHIP_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-BBSHIP:
+BBSHIP
             jp   $+3
             ld   hl,$+6
-            call BUTOBR1
+            call ButtonHandler
             ret  c
             PAGES PG3D
             xor  a
-            ld   (SHIPIND+1),a
+            ld   (ShipIndex+1),a
             PAGES__NOARG
             ld   a,1
             ld   (WSHIPZ+1),a
-Bb:
+Bb
             xor  a
             ld   (BT2+1),a
             ld   hl,(BTSHIP_+1)
-            jp   NATISNU
-BBSHIP_:
+            jp   PressButtonPair
+BBSHIP_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-BABON:
-;de-NUMBER
-;PROC OBRAB
+BABON
+; de-number
+; Proc obrab
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
-; ОБРАБОТЧИК
+            call ButtonHandler
+            ret
+; Обработчик
             ld   hl,WFOTO_
-            call NEWOBJ
+            call OpenObject
             ld   hl,WABON_
-            jp   NEWOBJ
+            jp   OpenObject
 
-BABON_:
+BABON_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-
-
-BHELP:
+BHELP
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
             ld   hl,WHELP_
-            call NEWOBJ
+            call OpenObject
             ld   hl,WHELPL_
-            jp   NEWOBJ
-BHELP_:
+            jp   OpenObject
+BHELP_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-BNEWS:
+BNEWS
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
             ld   hl,WNEWS_
-            jp   NEWOBJ
+            jp   OpenObject
 
-BNEWS_:
+BNEWS_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-BMAP:
+BMAP
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
 
             ld   a,1
             ld   (WPLANZ+1),a
 
             ld   hl,BPERE_
-            call NEWOBJ
+            call OpenObject
             ld   hl,BNABO_
-            call NEWOBJ
+            call OpenObject
             ld   hl,WINFS_
-            call NEWOBJ
+            call OpenObject
             ld   hl,BMEM_
-            call NEWOBJ
+            call OpenObject
             ld   hl,BMAR_
-            call NEWOBJ
+            call OpenObject
             ld   hl,BCMAR_
-            call NEWOBJ
+            call OpenObject
             ld   hl,BNMEM_
-            call NEWOBJ
+            call OpenObject
             ld   hl,BCENT_
-            call NEWOBJ
+            call OpenObject
             ld   hl,BAWAY_
-            call NEWOBJ
+            call OpenObject
             ld   hl,WMAP_
-            call NEWOBJ
+            call OpenObject
             ld   hl,WPLAN_
-            jp   NEWOBJ
-BMAP_:
+            jp   OpenObject
+BMAP_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-BBUY:
+BBUY
             jp   $+3
             ld   hl,$+6
-            call BUTOBR1
+            call ButtonHandler
             ret  c
             xor  a
             ld   (BT1+1),a
             ld   hl,(BTRD_+1)
-            jp   NATISNU
+            jp   PressButtonPair
 
 
-BBUY_:
+BBUY_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-BTRD:
+BTRD
             jp   $+3
             ld   hl,$+6
-            call BUTOBR1
+            call ButtonHandler
             ret  c
             ld   a,1
             ld   (BT1+1),a
             ld   hl,(BBUY_+1)
-            jp   NATISNU
+            jp   PressButtonPair
 
-BTRD_:
+BTRD_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-BPERE:
+BPERE
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
             ld   hl,(WHERE)
             ld   (PLACE),hl
             ld   hl,(WHERE+2)
@@ -342,41 +246,26 @@ BPERE:
             ld   a,(WPLANET)
             ld   (PLANET),a
             pop  hl
-            jp   Dalee
-BPERE_:
+            jp   StationStart
+BPERE_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-; ЗАПОМНИТЬ ЗВЕЗДУ
-BMEM:
+; Запомнить звезду
+BMEM
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
-; УСТАНОВКА ПЕРЕРИСОВКИ ОКНА КАРТЫ ПЛАНЕТ
-; ПОСЛЕ ОТЖАТИЯ ЭТОЙ КНОПКИ
+            call ButtonHandler
+            ret
+; Установка перерисовки окна карты планет
+; После отжатия этой кнопки
             ld   a,1
             ld   (WPLANZ+1),a
 
-; ПОИСК ЗВЕЗДЫ ТЕКУЩЕЙ В СПИСКЕ ПАМЯТИ
+; Поиск звезды текущей в списке памяти
             PAGES PGKRT
-            call FSTAR
+            call FindStarInMemory
             ex   af,af'
             PAGES__NOARG
             ex   af,af'
@@ -403,79 +292,65 @@ BMEM:
             inc  hl
             ld   a,(WPLANET)
             ld   (hl),a
-B_M1:
-            call HIDESCR
+B_M1
+            call HideCursor
             call WINF_S
             call WMAP_
-            call RETSCR
-            ret  
-BMEM_:
+            call ShowCursorBack
+            ret
+BMEM_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
-; ЗАБЫТЬ ЗВЕЗДУ
-FGOT:
+; Забыть звезду
+FGOT
             DEC_DE 3
             ld   a,#FF
             ld   (de),a
             jr   B_M1
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-; ПРОЛОЖИТЬ МАРШРУТ
-BMAR:
+; Проложить маршрут
+BMAR
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
 
             ld   a,1
             ld   (WPLANZ+1),a
 
-; ПОИСК ЗВЕЗДЫ ТЕКУЩЕЙ В МАРШРУТНОМ
-; СПИСКЕ
+; Поиск звезды текущей в маршрутном
+; Списке
             PAGES PGKRT
-            call FSTAR2
+            call FindStarInRoute
             ex   af,af'
             PAGES__NOARG
             ex   af,af'
 
             jp   p,FGOT2
-; ВКЛЮЧЕНИЕ ЗВЕЗДЫ
+; Включение звезды
             ld   hl,(AWAYS)
-;hl-АДР. ЗВЕЗДЫ С КОТОРОЙ ИДЕТ
-; ПОСТРОЙКА
+; hl-адр. звезды с которой идет
+; Постройка
             ld   a,(hl)
             inc  a
-            jr   z,B_R1
+            jr   z,.B_R1
             ld   de,5
             add  hl,de
-;hl-АДР. СЛЕДУЮЩЕЙ
-; ПРОВЕРИМ ЕСЛИ ЭТО КОНЕЦ СПИСКА
+; hl-адр. следующей
+; Проверим если это конец списка
             ld   a,(hl)
             inc  a
-            ret  m                  ;НЕТ МЕСТА
-            jr   z,B_R1             ;НАШЛИ СВОБОДНОЕ
-; ИЩЕМ ПЕРВОЕ СВОБОДНОЕ МЕСТО
+            ret  m                  ; Нет места
+            jr   z,.B_R1             ; Нашли свободное
+; Ищем первое свободное место
             ld   bc,5
             push hl
             add  hl,bc
             ld   a,(hl)
             inc  a
-            jp   m,B_R2             ;НЕТ МЕСТА
+            jp   m,.B_R2             ; Нет места
             jr   nz,$-6
             pop  de
             push hl
@@ -488,11 +363,11 @@ BMAR:
             EXD
             pop  hl
             dec  hl
-            lddr 
+            lddr
             inc  hl
-;hl-ПОКАЖЕТ НА СВОБОДНОЕ МЕСТО
-B_R1:
-; ВПИСЫВАЕМ НА СВОБОДНОЕ
+; hl-покажет на свободное место
+.B_R1
+; Вписываем на свободное
             ld   de,(WHERE)
             ld   (AWAYS),hl
             ld   (hl),e
@@ -507,25 +382,25 @@ B_R1:
             ld   a,(WPLANET)
             ld   (hl),a
             jr   B_M19
-; НЕТ МЕСТА
-B_R2:
+; Нет места
+.B_R2
             pop  hl
-            ret  
-BMAR_:
+            ret
+BMAR_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
-; ЗАБЫТЬ ЗВЕЗДУ В МАРШРУТЕ
-FGOT2:
+; Забыть звезду в маршруте
+FGOT2
             DEC_DE 3
-; АДРЕС СТИРАЕМОЙ ЗВЕЗДЫ
+; Адрес стираемой звезды
             ld   h,d
             ld   l,e
             ld   bc,5
             add  hl,bc
             ld   a,(hl)
             inc  a
-            jp   m,B_R3
+            jp   m,.B_R3
             push de
             push hl
             add  hl,bc
@@ -538,37 +413,31 @@ FGOT2:
             ld   c,l
             EXD
             pop  de
-            ldir 
-B_R3:
+            ldir
+.B_R3
             ld   bc,0-5
             add  hl,bc
             ld   (hl),#FF
-B_M19:
+B_M19
             PAGES PGKRT
-            call MARKOL
+            call MarkRouteLine
             PAGES__NOARG
             jp   B_M1
 
 
-
-
-
-
-
-
-; СТЕРЕТЬ МАРШРУТ
-BCMAR:
+; Стереть маршрут
+BCMAR
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
 
             ld   a,1
             ld   (WPLANZ+1),a
 
             ld   hl,WAY
-; ВПИСАЛИ ДРЕС ЗВЕЗДЫ КОТ. НЕТ НО ПЕРВОЙ
-; С КОТ. ПОСТРОЙКА БУДЕТ
+; Вписали дрес звезды кот. нет но первой
+; С кот. постройка будет
             ld   (AWAYS),hl
             ld   bc,5
             ld   a,(hl)
@@ -579,27 +448,17 @@ BCMAR:
             jr   $-8
             jr   B_M19
 
-BCMAR_:
+BCMAR_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-
-; СЛЕД. ЗВЕЗДА В СПИСКЕ ПАМЯТИ
-BNMEM:
+; След. звезда в списке памяти
+BNMEM
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
 
             ld   a,1
             ld   (WPLANZ+1),a
@@ -608,16 +467,17 @@ BNMEM:
             inc  a
             ret  z
 
-B_E1:       ld   hl,MSTARS
+.B_E1
+            ld   hl,MSTARS
             ld   de,5
-B_E2:
+.B_E2
             add  hl,de
             ld   a,(hl)
             inc  a
             jp   p,$+6
             ld   hl,MSTARS
-            jr   z,B_E2
-            ld   (B_E1+1),hl
+            jr   z,.B_E2
+            ld   (.B_E1+1),hl
             ld   e,(hl)
             inc  hl
             ld   d,(hl)
@@ -628,35 +488,32 @@ B_E2:
             ld   l,a
             jr   B_E10
 
-BNMEM_:
+BNMEM_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-; СЛЕД. ПЕРСОНАЖ В СПИСКЕ ПАМЯТИ
-BNABO:
+; След. персонаж в списке памяти
+BNABO
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
 
             ld   a,1
             ld   (WPLANZ+1),a
 
-B_E7:       ld   hl,ABONS
+.B_E7
+            ld   hl,ABONS
 
-B_E8:
+.B_E8
             inc  hl
             ld   a,(hl)
             and  a
             jp   p,$+6
             ld   hl,ABONS
-            jr   z,B_E8
-            ld   (B_E7+1),hl
+            jr   z,.B_E8
+            ld   (.B_E7+1),hl
             ld   a,(hl)
             and  a
             ret  z
@@ -675,274 +532,166 @@ B_E8:
             ld   l,a
             jr   B_E10
 
-BNABO_:
+BNABO_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-BCENT:
+BCENT
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
 
             ld   a,1
             ld   (WPLANZ+1),a
 
             ld   de,(PLACE)
             ld   hl,(PLACE+2)
-B_E10:
+B_E10
             PAGE_ PGKRT
-            call CENTRE
+            call CenterMap
             PAGE___NOARG
 
             jp   B_M1
-BCENT_:
+BCENT_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-BAWAY:
+BAWAY
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
 
             ld   a,1
             ld   (WPLANZ+1),a
             PAGES PGKRT
-            call FSTAR2
+            call FindStarInRoute
             ex   af,af'
             PAGES__NOARG
             ex   af,af'
 
-            ret  m                  ;ЗВЕЗДА НЕ НА ЛИНИИ
+            ret  m                  ; Звезда не на линии
             DEC_DE 3
             ld   (AWAYS),de
             jp   B_M1
-BAWAY_:
+BAWAY_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-BTTW:
+BTTW
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
             ld   a,11
             jp   F_S60
 
-BTTW_:
+BTTW_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-BMISS:
+BMISS
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
             ld   hl,WMISS2_
-            call NEWOBJ
-            ; ??? а%   hl,WMISS1_
-            jp   NEWOBJ
+            call OpenObject
+            ; ??? А%   hl,WMISS1_
+            jp   OpenObject
 
-BMISS_:
+BMISS_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-BTWR:
+BTWR
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
             ld   hl,BTTW_
-            call NEWOBJ
+            call OpenObject
             ld   hl,WTWR_
-            jp   NEWOBJ
-BTWR_:
+            jp   OpenObject
+BTWR_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-BWKRB:
+BWKRB
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
             xor  a
             ld   (ARMINF+1),a
             ld   hl,WINF_
-            call NEWOBJ
+            call OpenObject
             ld   hl,BTRD_
-            call NEWOBJ
+            call OpenObject
             ld   hl,BBUY_
-            call NEWOBJ
+            call OpenObject
             ld   hl,WWKRB_
-            jp   NEWOBJ
+            jp   OpenObject
 
-BWKRB_:
+BWKRB_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-BWSKM:
+BWSKM
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
             ld   a,WKKOL
             ld   (ARMINF+1),a
             ld   hl,WINF_
-            call NEWOBJ
+            call OpenObject
             ld   hl,BTRD_
-            call NEWOBJ
+            call OpenObject
             ld   hl,BBUY_
-            call NEWOBJ
+            call OpenObject
             ld   hl,WWSKM_
-            jp   NEWOBJ
+            jp   OpenObject
 
-BWSKM_:
+BWSKM_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-BKRB:
+BKRB
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
             xor  a
             call SET1_
 
             ld   hl,BSDEL_
-            call NEWOBJ
+            call OpenObject
             ld   hl,BBSHIP_
-            call NEWOBJ
+            call OpenObject
             ld   hl,BTSHIP_
-            call NEWOBJ
+            call OpenObject
             ld   hl,WSHIP_
-            call NEWOBJ
+            call OpenObject
             ld   hl,WISHIP_
-            call NEWOBJ
+            call OpenObject
             ld   hl,WDSHIP_
-            jp   NEWOBJ
-BKRB_:
+            jp   OpenObject
+BKRB_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-SET1_:
+SET1_
             ld   (T3D+1),a
             ld   a,1
             ld   (WSHIPZ+1),a
@@ -952,78 +701,52 @@ SET1_:
             ld   (BT2+1),a
             ld   hl,(BBSHIP_+1)
             ld   a,4
-            call TOOBJ
+            call ObjFieldAddr
             set  0,(hl)
             ld   hl,(BTSHIP_+1)
             ld   a,4
-            call TOOBJ
+            call ObjFieldAddr
             res  0,(hl)
             PAGES PG3D
             xor  a
-            ld   (SHIPIND+1),a
+            ld   (ShipIndex+1),a
             PAGES__NOARG
-            ret  
+            ret
 
 
-
-
-
-
-
-
-
-
-
-
-BSKM:
+BSKM
             jp   $+3
             ld   hl,$+7
-            call BUTOBR1
-            ret  
+            call ButtonHandler
+            ret
             ld   a,1
             call SET1_
 
             ld   hl,BSDEL_
-            call NEWOBJ
+            call OpenObject
             ld   hl,BBSHIP_
-            call NEWOBJ
+            call OpenObject
             ld   hl,BTSHIP_
-            call NEWOBJ
+            call OpenObject
             ld   hl,WSHIP_
-            call NEWOBJ
+            call OpenObject
             ld   hl,WISHIP_
-            call NEWOBJ
+            call OpenObject
             ld   hl,WDSHIP_
-            jp   NEWOBJ
-BSKM_:
+            jp   OpenObject
+BSKM_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-BEXIT:
+BEXIT
             jp   $+3
-            call BUTOBR1
+            call ButtonHandler
             ret  c
             ld   a,(KFC)
             and  a
             ret  m
-;EXIT TO XAS
+; Exit to XAS
 ; [glue] original: jp EXAS (back to the ZASM/XAS debugger); the game launches the flight part instead
             IFDEF TEST_ENDING           ; build.py --test-ending: the button starts the ending instead (the real trigger is unknown, see docs)
             jp   LaunchEnding
@@ -1031,75 +754,61 @@ BEXIT:
             jp   LaunchFlight
             ENDIF
 
-BEXIT_:
+BEXIT_
             ld   hl,0
-            jp   Outbut
+            jp   OutButton
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-LINE:
+LINE
             jp   $+3
-            call z,Movsiz
+            call z,MoveSizeObject
             ret  c
             push af
             call Unclick
-            call Mactive
-            jp   z,LN_1
-            call WOST
+            call ActivateObject
+            jp   z,.LN_1
+            call CursorRestoreSafe
             ld   de,$+5
             push de
             jp   (hl)
-            call OUTC
-LN_1:
+            call CursorDrawSafe
+.LN_1
             pop  af
-            ret  
+            ret
 
-LINE_:
+LINE_
             ld   hl,0
             ld   a,1
             ld   (Mode+1),a
-            call Outlin
+            call OutLine
             inc  hl
             ld   a,(hl)
             ld   hl,Lintxt
-            call FLIST
+            call FindTextByIndex
 
-            call Outtxt             ;STATUS
+            call OutText             ; Status
             push hl
             ld   a,(STATUS)
-            rlca 
-            rlca 
-            rlca 
+            rlca
+            rlca
+            rlca
             and  7
             cp   4
             jr   c,$+4
             ld   a,3
             ld   hl,Tstatus
-            call FLIST
-            call Outtxt             ;WITCH STATUS
+            call FindTextByIndex
+            call OutText             ; Witch status
             pop  hl
-            call Outtxt             ;MONEY
+            call OutText             ; Money
             ld   bc,(SUMM)
             xor  a
-            call Onum5
-            call Outtxt             ;TONASH
+            call PrintNumberPad
+            call OutText             ; Tonash
             ld   bc,(TONN)
             ld   b,0
-            call Onum2
+            call PrintNumber2
             RST_ ":"
             ld   bc,(TONN+1)
             ld   b,0
-            jp   Onum2
-
+            jp   PrintNumber2

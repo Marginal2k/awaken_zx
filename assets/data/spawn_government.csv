@@ -1,0 +1,9 @@
+# Per-government offsets of the 15 flight parameters PLANDICTAT (SETHJRET.asm SETT).  Signed bytes (-128..127).
+# value of parameter p = LEVLTAB base (spawn_level.csv) + this offset + level effect (see spawn_level.csv).  The parameters are the spawn/AI tuning numbers
+# of the system; their individual meaning is not documented in the sources (INFERRED: they scale the thresholds of the spawn types).
+# Generated label: STROYTAB (16 bytes per row, the last column "void" is never read; the last row has only 15 values, as in the original).
+government,p01,p02,p03,p04,p05,p06,p07,p08,p09,p10,p11,p12,p13,p14,p15,void
+democracy,0,-1,-1,0,0,0,-1,5,6,-2,-16,-10,10,10,0,0
+dictatorship,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+anarchy,0,1,2,0,0,0,1,-11,-6,-3,-18,10,-6,-6,0,0
+uninhabited,0,-1,-1,0,0,0,26,5,6,-2,-16,-10,10,10,0,

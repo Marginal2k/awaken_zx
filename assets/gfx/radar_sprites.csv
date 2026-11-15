@@ -1,0 +1,22 @@
+# Radar / compass sprites of the flight panel (PANEL.asm).  radar_sprites.png: 8 sprites per row, every sprite in a cell of 8 x 8 pixels, black = ink.
+# Only the shape of the sprite is stored; the 8 shifted copies (one per pixel column) are generated.  size = height in pixel rows
+# (the width is at most 3 for the blips and 8 for the two target highlights).  cell = position in the sheet (row-major, 8 per row).
+name,cell,size,meaning
+VISUN,0,3,"compass marker of the sun, in front (z >= 0)"
+UVISUN,1,3,"compass marker of the sun, behind"
+VIEAR,2,3,"compass marker of the planet, in front"
+UVIEAR,3,3,"compass marker of the planet, behind"
+MCARGO,4,3,"radar blip: cargo container"
+MROKET,5,3,"radar blip: rocket"
+MSTATION,6,3,"radar blip: station"
+MTRADER,7,3,"radar blip: trader (also types 10..15)"
+MARMY,8,3,"radar blip: military"
+MMIKR,9,3,"radar blip: micro ship"
+MOTSHEL,10,3,"radar blip: hermit"
+MHUNTER,11,3,"radar blip: hunter"
+MUFO,12,3,"radar blip: ufo"
+MUNKNOWN,13,3,"radar blip: unidentified object"
+MPIRAT,14,3,"radar blip: pirate"
+MPOLICE,15,3,"radar blip: police"
+MASPR,16,8,"highlight frame drawn around the target in the 3D view (8x8)"
+MLOCK,17,8,"the same highlight when a rocket is locked on that target (8x8 diamond; follows MASPR in memory)"

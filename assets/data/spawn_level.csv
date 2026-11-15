@@ -1,0 +1,20 @@
+# Planet-level dependence of the 15 flight parameters (LEVLTAB, SETHJRET.asm SETT).  One row per parameter p01..p15 (same order as spawn_government.csv).
+# With lv = planet level - 1 (0..15):  value = base + government offset + (k * lv) >> s   where k = (|mult| - 1) with the sign of mult (mult 1 -> 0),
+# and s = number of trailing zero bits of div (div 1 -> no shift, 2 -> 1, 4 -> 2, 8 -> 3).  base, div are unsigned bytes, mult is signed.
+# Generated label: LEVLTAB (3 bytes per row: base, mult, div).
+param,base,mult,div
+p01,20,1,1
+p02,3,2,8
+p03,23,2,8
+p04,78,1,1
+p05,70,1,1
+p06,60,1,1
+p07,229,-2,4
+p08,70,-2,4
+p09,220,-2,4
+p10,78,-2,4
+p11,14,-2,4
+p12,240,-2,2
+p13,50,2,1
+p14,150,2,1
+p15,55,2,1

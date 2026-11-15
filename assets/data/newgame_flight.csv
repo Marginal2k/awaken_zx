@@ -1,0 +1,21 @@
+# NDATA of the flight (SETHJRET.asm): an OLD, SHORT (215 bytes) version of the new-game record.  It is copied over the state record only by RETSTT, which no code
+# calls (dead code, see docs/GAME_DESIGN.md 6.5), so it has no effect on the game; the real new game is assets/data/newgame.csv (512 bytes, station).
+# Its field order differs from the real record (here PLANET and WPLANET follow WHERE; the real record has PLANET after PLACE), which is why it was abandoned.
+# Names for the fields after TONN are only a description of the byte pattern.  bytes = hex bytes, "XX*N" = N times XX (as in newgame.csv).
+# Generated label: NDATA.
+label,size,bytes,meaning
+TIME,4,22 01 10 10,"game time: day word (0x0122), hour 0x10, minute 0x10 (hex-coded decimal)"
+PLACE,4,38 4B F3 4A,"current system: map word 0x4B38, in-map word 0x4AF3"
+WHERE,4,38 4B F3 4A,"target system (same as PLACE)"
+PLANET,1,01,"planet number"
+WPLANET,1,01,"target planet number"
+SHIP,1,FF,"ship model: 0xFF"
+SKIMMER,1,FF,"skimmer model: 0xFF = none"
+STATUS,1,00,"legal status 0"
+SUMM,2,40 9C,"credits (word): 40000"
+TONN,2,00 00,"tonnage bytes"
+GOODS,58,00*34 FF*24,"old layout: 34 zero bytes then 24 x 0xFF (hold list of the old record)"
+BLOCK_A,51,00*31 FF*11 00*9,"old layout: 31 zero bytes, 11 x 0xFF, 9 zero bytes (equipment counts of the old record)"
+ORDER,64,FF 00*15 FF 00*15 FF 00*15 FF 00*15,"4 x (0xFF + 15 zero bytes): empty contract orders"
+SPEED_DALNO,4,00*4,"SPEED (2 bytes) and DALNO (2 bytes), all 0"
+TAIL_B,17,02 01 01 03 01 01 02 03 02 01*7 FF,"last 17 bytes: 2,1,1,3,1,1,2,3,2,1,1,1,1,1,1,1,0xFF (the old star-type / subscriber list)"

@@ -1185,5 +1185,5 @@ L8800       equ OverlayArea+#8800-#6E31
 L8F93       equ Depacker+#8F93-#8931
 L8F94       equ Depacker+#8F94-#8931
 OverlayArea: incbin "gen/intro_logo.scr"       ; 6912 bytes = ZX screen
-Depacker:   incbin "intro_depack.bin"      ; 1743 bytes
+Depacker:   incbin "gen/intro_depack.bin"      ; GENERATED from assets/gfx/intro_closing.png: depacker + packed picture (original: 1743 bytes)
             savebin "INTRO.C",#6400,$-#6400

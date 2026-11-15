@@ -67,6 +67,17 @@ def generate(root, outdir):
     else:
         data = zxgfx.image_to_scr(im, 'intro_logo.png')
     open(os.path.join(outdir, 'intro_logo.scr'), 'wb').write(data)
+    # --- intro closing picture: depacker + packed picture blob (original blob if the picture is unchanged, else our RLE packer)
+    im = Image.open(os.path.join(gfx, 'intro_closing.png'))
+    c = cache['intro_closing.png']
+    if c['pixels'] == zxgfx.pixels_hash(im):
+        blob = open(os.path.join(gfx, c['orig']), 'rb').read()
+    else:
+        import rlepack
+        blob = rlepack.pack(zxgfx.image_to_scr(im, 'intro_closing.png'))
+        if len(blob) > 0x1B00:
+            raise SystemExit('intro_closing.png packs to %d bytes; the intro copies at most 6912 bytes of the blob.  Simplify the picture (long runs of equal bytes pack well).' % len(blob))
+    open(os.path.join(outdir, 'intro_depack.bin'), 'wb').write(blob)
     # --- fonts and cursors (exact conversions)
     widths = []
     for l in open(os.path.join(gfx, 'pro_font_widths.csv'), encoding='utf-8'):

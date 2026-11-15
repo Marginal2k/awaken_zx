@@ -1,4 +1,8 @@
 {
+ "intro_closing.png": {
+  "orig": "orig/intro_depack.bin",
+  "pixels": "f428282560a950cd7051770fa02f2675a8771469285e7e6e928695337c55616a"
+ },
  "intro_logo.png": {
   "orig": "orig/intro_logo.scr",
   "pixels": "ff4400d6dc12ac134880b49ac8c4095747658f490b828a759dd70fd2497e19aa"

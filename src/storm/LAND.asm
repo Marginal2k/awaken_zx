@@ -1,3 +1,27 @@
+;==============================================================================
+; LAND - посадка на планету: поверхность, небо, скиммеры, дома, деревья
+;
+; Главная программа прототипа. Загружается по #7C00 (RAM-страница PAGE_NORMAL), вход: START.
+;
+; Что делает: очищает экран, LOADER подгружает в страницы #13 (VSPRIT.C, воксельный
+; рендер) и #11 (S3D.C, 3D-движок); BuildDropCode строит развёрнутый код быстрого
+; вывода скрытого экрана (DropScreen, исполняется по DROP_CODE_ADDR через DISP);
+; LandingInit создаёт 40 записей объектов (OBJ_COUNT x OBJ_LEN), GenerateSkimmers/
+; GenerateTrees расставляют скиммеры и деревья. Главный цикл MainLoop: VOX_OUT_ALL
+; (страница #13: фон, земля, небо, ночь) + ENG3D_OUT_ALL (страница #11: 3D-объекты) +
+; UpdateAI (поведение) + прицел, AY-эффекты, панель и таймер. Выход - по клавише
+; (полуряд #7F), перед выходом PAGE4/PAGE3 перегружаются через TR-DOS в страницы #14/#13.
+;
+; Карта памяти: #6000 шрифт+DATAM (END0), #6700 VARS (записи объектов и указатели),
+; #7C00..END_ код, после END_ - выровненные по странице текстуры планеты
+; (planet, CHAN6, DRV1, DRV2, DOMA1), #8000 HIDDEN_SCREEN (скрытый экран).
+; Использует: EQUS (константы), LOADER, DATAM, assets/*.bin; вызывает страницы по таблицам VOX_* и ENG3D_*.
+; Сборка: make_LAND.asm -> LAND.bin, LAND_data.bin. Готовой копии на дисках нет.
+;
+; Часть набора STORM (прототип Awaken 1997/98), не входит в основную игру. Подробности: docs/STORM.md,
+; таблица переименований меток: docs/STORM_LABELS.md. Собирается sjasmplus (см. make_*.asm).
+;==============================================================================
+
         include "EQUS.asm"
 
 ; Поверхность планеты и небо
@@ -17,15 +41,15 @@ START
 
         di
 
-MAKEDRP
+BuildDropCode                   ; orig: MAKEDRP
         ld   a,PAGE_VOXEL
-        call PG
-        ld   hl,MODUL
+        call SetPage
+        ld   hl,DropModule
         ld   de,DROP_CODE_ADDR
-        ld   bc,DS1-DROPSCR
+        ld   bc,DropLineEnd-DropScreen
         ldir
         ex   de,hl
-        ld   bc,191*DLEN
+        ld   bc,191*DROP_LINE_LEN
         add  hl,bc
         ex   de,hl
         ld   bc,4
@@ -33,19 +57,19 @@ MAKEDRP
 
         ld   bc,#0010
         exx
-        ld   de,DS1
+        ld   de,DropLineEnd
         ld   a,96
-        ld   hl,DS0
-        ld   bc,DLEN
+        ld   hl,DropLine
+        ld   bc,DROP_LINE_LEN
         ex   af,af'
-MDS1
+BuildDropLoop                   ; orig: MDS1
         exx
-        ld   hl,(DS0+1)
+        ld   hl,(DropLine+1)
         add  hl,bc
-        ld   (DS0+1),hl
-        ld   hl,(DS01+1)
+        ld   (DropLine+1),hl
+        ld   hl,(DropLineDst+1)
         add  hl,bc
-        ld   (DS01+1),hl
+        ld   (DropLineDst+1),hl
         exx
         push hl
         push bc
@@ -57,10 +81,10 @@ MDS1
         jr   z,.MDS2
         ex   af,af'
         exx
-        ld   hl,(DS0+1)
+        ld   hl,(DropLine+1)
         add  hl,bc
-        ld   (DS0+1),hl
-        ld   hl,(DS01+1)
+        ld   (DropLine+1),hl
+        ld   hl,(DropLineDst+1)
         or   a
         sbc  hl,bc
         inc  h
@@ -74,46 +98,46 @@ MDS1
         ld   a,h
         sub  8
         ld   h,a
-        ld   (DS01+1),hl
+        ld   (DropLineDst+1),hl
         exx
         push hl
         push bc
         ldir
         pop  bc
         pop  hl
-        jr   MDS1
+        jr   BuildDropLoop
 .MDS2
         ld   hl,#8000
-        ld   (DS0+1),hl
+        ld   (DropLine+1),hl
         ld   hl,#4010
-        ld   (DS01+1),hl
+        ld   (DropLineDst+1),hl
         ld   a,PAGE_NORMAL
-        call PG
+        call SetPage
 
         ld   hl,0
         ld   (Adtt+1),hl
-        ld   hl,Tbuf
+        ld   hl,TextBuf
         ld   (Atbuf+1),hl
         ld   (Frba+1),hl
         inc  hl
-        ld   de,Tbuf+2
+        ld   de,TextBuf+2
         ld   bc,#20
         ld   (hl),1
         ldir
         ld   (hl),0
-        ld   hl,DIRECTZ
-        ld   de,DIRECTZ+1
+        ld   hl,KeyState
+        ld   de,KeyState+1
         ld   bc,7
         ld   (hl),0
         ldir
-        jp   DALEE
+        jp   LandingInit
 
-MODUL
+DropModule                      ; orig: MODUL
         org  $
         disp DROP_CODE_ADDR
-DROPSCR
-        ld   ((STK92+1)+(191*DLEN)),sp
-DS0
+DropScreen                      ; orig: DROPSCR
+        ld   ((DropSavedSp+1)+(191*DROP_LINE_LEN)),sp
+DropLine                        ; orig: DS0
         ld   sp,#8000
         pop  hl
         pop  de
@@ -125,7 +149,8 @@ DS0
         pop  de
         pop  bc
         pop  af
-DS01    ld   sp,#4010
+DropLineDst                     ; orig: DS01
+        ld   sp,#4010
         push af
         push bc
         push de
@@ -136,60 +161,61 @@ DS01    ld   sp,#4010
         push bc
         push de
         push hl
-DS1
-DLEN            equ DS1-DS0
+DropLineEnd                     ; orig: DS1
+DROP_LINE_LEN   equ DropLineEnd-DropLine  ; orig: DLEN
 
-STK92   ld   sp,0
+DropSavedSp                     ; orig: STK92
+        ld   sp,0
         ret
 
         ent
         org  HIDDEN_SCREEN
 ; Defw
-DEFW_
+InitVarsImage                   ; orig: DEFW_
         ds   OBJ_LEN*(OBJ_COUNT-1)
         ds   OBJ_LEN
         dw   PLANET_
         dw   SKYS_
         db   #C3
-        dw   Messags
+        dw   MsgTable
         db   #C3
-        dw   NEWEFA_
+        dw   SetEffectA
         db   #C3
-        dw   NEWEFB_
+        dw   SetEffectB
         db   #C3
-        dw   Mnums_
+        dw   PrintOrdered
         dw   #2B7B
         db   #C3
-        dw   VOXOBJ_
-DDLEN           equ $-HIDDEN_SCREEN
+        dw   DrawVoxelObject
+INIT_VARS_LEN   equ $-HIDDEN_SCREEN     ; orig: DDLEN
 
         org  #8C00
 
-DALEE
+LandingInit                     ; orig: DALEE
         ld   a,PAGE_3D
-        call PG
+        call SetPage
         call ENG3D_INIT
         ld   a,PAGE_NORMAL
-        call PG
+        call SetPage
 
-        ld   hl,DEFW_
+        ld   hl,InitVarsImage
         ld   de,VARS
-        ld   bc,DDLEN
+        ld   bc,INIT_VARS_LEN
         ldir
 
         ld   de,60*256          ; Z
-        ld   (ZET+1),de
+        ld   (CamZ+1),de
         ld   a,4                ; X
-        ld   (IKS+1),a
+        ld   (CamX+1),a
         ld   l,a
         ld   a,100              ; Y
-        ld   (IGR+1),a
+        ld   (CamY+1),a
         ld   h,a
-        call NEWPOS_
+        call NewPosPaged
         ld   de,40*256          ; Z
         ld   l,4                ; X
         ld   h,80               ; Y
-        call NEWPSS_
+        call NewPos2Paged
 
 E1
 
@@ -206,7 +232,7 @@ E1
         inc  l
         ld   (hl),#80
 
-        call GEND
+        call GenerateTrees
 
         ld   a,#FF
         ld   (PLAYER+Type),a
@@ -215,61 +241,61 @@ E1
         xor  a
         ld   (SPEED),a
 
-M2
+MainLoop                        ; orig: M2
 
         ; Генерить скимеры
-        call GENS
+        call GenerateSkimmers
 
         ld   a,PAGE_VOXEL
-        call PG
+        call SetPage
         call VOX_OUT_ALL
 
         ld   a,PAGE_3D
-        call PG
+        call SetPage
         call ENG3D_OUT_ALL
 
         ld   a,PAGE_NORMAL
-        call PG
+        call SetPage
 
         ; Интелект
-        call INTEL
+        call UpdateAI
 
-        call Pricel
-        call Sfxa
-        call Timer
+        call DrawSight
+        call SfxChannelA
+        call UpdateTimer
 
-        call Repanel
+        call RedrawPanel
 
         ld   a,#7F
         in   a,(PORT_ULA)
         rrca
         push af
-        call nc,UP
+        call nc,CamUp
         pop  af
         rrca
         push af
-        call nc,DOWN
+        call nc,CamDown
         pop  af
         rrca
         push af
-        call nc,RIGHT
+        call nc,CamRight
         pop  af
         rrca
         push af
-        call nc,LEFT
+        call nc,CamLeft
         pop  af
         rrca
         jp   nc,.EXIT
 
-        call SERVICE
+        call ServiceInput
 
         ld   a,PAGE_VOXEL
-        call PG
+        call SetPage
         call DROP_CODE_ADDR
         ld   a,PAGE_NORMAL
-        call PG
+        call SetPage
 
-        jp   M2
+        jp   MainLoop
 
 .EXIT
         im   1
@@ -278,8 +304,8 @@ M2
         ld   iy,SYSVAR_IY
 
         ld   a,#14
-        call PG
-        ld   hl,FILN4
+        call SetPage
+        ld   hl,FileNamePage4
         ld   de,23773
         ld   bc,9
         ldir
@@ -289,8 +315,8 @@ M2
         di
         call TRDOS_COMMAND
         ld   a,#13
-        call PG
-        ld   hl,FILN3
+        call SetPage
+        ld   hl,FileNamePage3
         ld   de,23773
         ld   bc,9
         ldir
@@ -301,14 +327,16 @@ M2
         call TRDOS_COMMAND
 
         ld   a,PAGE_NORMAL
-        call PG
+        call SetPage
         ei
         ret
 
-FILN4   db   "PAGE4   C"
-FILN3   db   "PAGE3   C"
+FileNamePage4                   ; orig: FILN4
+        db   "PAGE4   C"
+FileNamePage3                   ; orig: FILN3
+        db   "PAGE3   C"
 
-VOXOBJ_
+DrawVoxelObject                 ; orig: VOXOBJ_
         ; A-index
         ; Hl-X,de-Y,bc-z
         exx
@@ -321,7 +349,7 @@ VOXOBJ_
         ld   l,a
         srl  l
         ld   h,0
-        ld   de,VOXAD
+        ld   de,VoxelObjTable
         add  hl,de
         ld   e,(hl)
         inc  l
@@ -344,11 +372,11 @@ VOXOBJ_
         pop  hl
         ex   af,af'
         ld   a,PAGE_VOXEL
-        call PG
+        call SetPage
         ex   af,af'
         call VOX_DRAW_3D2
         ld   a,PAGE_3D
-        call PG
+        call SetPage
 
         exx
         pop  bc
@@ -358,41 +386,42 @@ VOXOBJ_
         exx
         jp   ENG3D_NEXT_OBJECT
 
-LEFT
-        ld   de,(ZET+1)
-        ld   a,(IKS+1)
+CamLeft                         ; orig: LEFT
+        ld   de,(CamZ+1)
+        ld   a,(CamX+1)
         inc  a
         ld   l,a
-        ld   (IKS+1),a
-        ld   a,(IGR+1)
+        ld   (CamX+1),a
+        ld   a,(CamY+1)
         ld   h,a
-        jp   NEWPOS_
+        jp   NewPosPaged
 
-RIGHT
-        ld   de,(ZET+1)
-        ld   a,(IKS+1)
+CamRight                        ; orig: RIGHT
+        ld   de,(CamZ+1)
+        ld   a,(CamX+1)
         dec  a
         ld   l,a
-        ld   (IKS+1),a
-        ld   a,(IGR+1)
+        ld   (CamX+1),a
+        ld   a,(CamY+1)
         ld   h,a
-        jp   NEWPOS_
+        jp   NewPosPaged
 
-NEWPOS_
+NewPosPaged                     ; orig: NEWPOS_
         ld   a,PAGE_VOXEL
-        call PG
+        call SetPage
         call VOX_NEW_POS
         ld   a,PAGE_NORMAL
-        jp   PG
-NEWPSS_
+        jp   SetPage
+NewPos2Paged                    ; orig: NEWPSS_
         ld   a,PAGE_VOXEL
-        call PG
+        call SetPage
         call VOX_NEW_POS2
         ld   a,PAGE_NORMAL
-        jp   PG
+        jp   SetPage
 
-UP
-ZET     ld   de,0
+CamUp                           ; orig: UP
+CamZ                            ; orig: ZET
+        ld   de,0
         ld   a,e
         add  a,#40
         ld   e,a
@@ -401,22 +430,24 @@ ZET     ld   de,0
         cp   68
         ret  nc
         ld   d,a
-        ld   (ZET+1),de
+        ld   (CamZ+1),de
 
 ;        Ld hl,(YPL)
 ;        Ld a,l:sub 6:ld l,a
 ;        Ld a,h:sbc a,0:ld h,a
 ;        Ld (YPL),hl
 
-IKS     ld   l,24
-IGR     ld   a,38
+CamX                            ; orig: IKS
+        ld   l,24
+CamY                            ; orig: IGR
+        ld   a,38
         add  a,4
         ld   h,a
-        ld   (IGR+1),a
-        jp   NEWPOS_
+        ld   (CamY+1),a
+        jp   NewPosPaged
 
-DOWN
-        ld   de,(ZET+1)
+CamDown                         ; orig: DOWN
+        ld   de,(CamZ+1)
         ld   a,e
         sub  #40
         ld   e,a
@@ -425,35 +456,35 @@ DOWN
         cp   57
         ret  c
         ld   d,a
-        ld   (ZET+1),de
+        ld   (CamZ+1),de
 
 ;        Ld hl,(YPL)
 ;        Ld a,l:add a,6:ld l,a
 ;        Ld a,h:adc a,0:ld h,a
 ;       Ld (YPL),hl
 
-        ld   a,(IKS+1)
+        ld   a,(CamX+1)
         ld   l,a
-        ld   a,(IGR+1)
+        ld   a,(CamY+1)
         sub  4
         ld   h,a
-        ld   (IGR+1),a
-        jp   NEWPOS_
+        ld   (CamY+1),a
+        jp   NewPosPaged
 
 ROLLT
         ; Перемещение фона влево всего что есть
         ld   a,PAGE_VOXEL
-        call PG
+        call SetPage
         call VOX_TURN_LEFT
         ld   a,PAGE_NORMAL
-        jp   PG
+        jp   SetPage
 ROLRT
         ; Перемещение фона вправо
         ld   a,PAGE_VOXEL
-        call PG
+        call SetPage
         call VOX_TURN_RIGHT
         ld   a,PAGE_NORMAL
-        jp   PG
+        jp   SetPage
 
 ROLUP
         ld   a,%10001000
@@ -466,7 +497,7 @@ ROLUP
         cp   MSPEED2
         ret  nc
         ld   (SPEED),a
-        call TAKSPD
+        call TakeSpeedPaged
         ret
 ROLDN
         ld   a,(ROLUP+1)
@@ -479,19 +510,19 @@ ROLDN
         cp   MSPEED
         ret  c
         ld   (SPEED),a
-        call TAKSPD
+        call TakeSpeedPaged
         ret
 
-TAKSPD
+TakeSpeedPaged                  ; orig: TAKSPD
         ex   af,af'
         ld   a,PAGE_VOXEL
-        call PG
+        call SetPage
         ex   af,af'
         call VOX_TAKE_SPEED
         ld   a,PAGE_NORMAL
-        jp   PG
+        jp   SetPage
 
-PG
+SetPage                         ; orig: PG
         push bc
         ld   bc,PORT_PAGE
         out  (c),a
@@ -500,43 +531,43 @@ PG
 
 ; Взять слово из адреса в hl
 ; В странице 3d
-TAKEW
+ReadWord3D                      ; orig: TAKEW
         ; Hl-адрес слова
         ; Ret de-слово
         ld   a,PAGE_3D
-        call PG
+        call SetPage
         ld   e,(hl)
         inc  hl
         ld   d,(hl)
         ld   a,PAGE_NORMAL
-        call PG
+        call SetPage
         ret
 
-NEWEFA_
+SetEffectA                      ; orig: NEWEFA_
 ; Задать эфект в канале а
 
         ret
-NEWEFB_
+SetEffectB                      ; orig: NEWEFB_
 ; Задать эфект в канале б
 
         ret
-VOXAD
+VoxelObjTable                   ; orig: VOXAD
         dw   DRV1
         dw   DRV2
         dw   DOMA1
 
-Messags
+MsgTable                        ; orig: Messags
         db   "AAAA", 0
 
-Mnums_
+PrintOrdered                    ; orig: Mnums_
         ; Numbers in ORDER print
         ; A-number
         ld   e,a
         ld   d,2
         jr   Frba
-Mesag
+FindMessage                     ; orig: Mesag
         ; A-number of mesag
-        ld   hl,Messags
+        ld   hl,MsgTable
         and  a
         jr   z,$+13
         ld   e,a
@@ -546,7 +577,7 @@ Mesag
         dec  e
         jr   nz,$-3
         ex   de,hl
-Frba    ld   hl,Tbuf
+Frba    ld   hl,TextBuf
         ld   b,#10
 .Mg3
         inc  hl
@@ -559,7 +590,7 @@ Frba    ld   hl,Tbuf
         djnz .Mg3
         ret
 .Mg11
-        ld   hl,Tbuf
+        ld   hl,TextBuf
         djnz .Mg3
         ret
 .Mg2
@@ -570,10 +601,11 @@ Frba    ld   hl,Tbuf
         inc  hl
         ld   (Frba+1),hl
         ret
-Tbuf    ds   #20, #01
+TextBuf                         ; orig: Tbuf
+        ds   #20, #01
         dw   #0000
 
-Print
+PrintText                       ; orig: Print
 ; Hl-txt,"@"-end
 Adtt    ld   hl,0
         ld   a,h
@@ -589,17 +621,17 @@ Atbuf   ld   hl,0
         ld   a,e
         push hl
         push bc
-        call Prntnum
+        call PrintNumber
         pop  bc
         pop  hl
-        ld   a,(Cord+1)
+        ld   a,(CursorX+1)
         inc  a
-        ld   (Cord+1),a
+        ld   (CursorX+1),a
         ld   a,1
 .Prt1
         and  a
         jr   nz,.Prt3
-        ld   hl,Tbuf
+        ld   hl,TextBuf
         ld   (Atbuf+1),hl
         ret
 .Prt3
@@ -622,7 +654,7 @@ Pnt3
         jr   z,.Pnte
         cp   1
         jr   z,.Pnt1
-        jp   Rst10
+        jp   PrintChar
 .Pnte
         ld   hl,0
         ld   (Adtt+1),hl
@@ -631,9 +663,9 @@ Pnt3
         inc  hl
         ld   (Adtt+1),hl
         xor  a
-        ld   (Cord+1),a
-        jp   Scroll
-Prntnum
+        ld   (CursorX+1),a
+        jp   ScrollText
+PrintNumber                     ; orig: Prntnum
         ; A-number
         cp   100
         jr   c,.Pnum1
@@ -648,7 +680,7 @@ Prntnum
         ld   a,c
         add  a,"0"
         push bc
-        call Rst10
+        call PrintChar
         pop  af
 .Pnum1
         ld   b,a
@@ -666,13 +698,13 @@ Prntnum
         ld   a,c
         add  a,"0"
         push bc
-        call Rst10
+        call PrintChar
         pop  af
         add  a,"0"
-        jp   Rst10
+        jp   PrintChar
 
-Scroll
-        ld   (Stk5+1),sp
+ScrollText                      ; orig: Scroll
+        ld   (ScrollSavedSp+1),sp
         ld   hl,0
         ld   sp,#5800
         dup  32
@@ -706,10 +738,11 @@ Scroll
         dup  32
         push hl
         edup
-Stk5    ld   sp,0
+ScrollSavedSp                   ; orig: Stk5
+        ld   sp,0
         ret
 
-Rst10
+PrintChar                       ; orig: Rst10
         ; A-code
         ld   bc,Font
         ld   l,a
@@ -722,12 +755,13 @@ Rst10
         inc  hl
         ex   de,hl
         ex   af,af
-Cord    ld   c,0
+CursorX                         ; orig: Cord
+        ld   c,0
         ld   a,c
         cp   #18
         jr   c,.Rst1
         push de
-        call Scroll
+        call ScrollText
         pop  de
         ld   c,0                ; BEGIN X of win for pr
 .Rst1
@@ -739,7 +773,7 @@ Cord    ld   c,0
         ld   l,a
         inc  c
         ld   a,c
-        ld   (Cord+1),a
+        ld   (CursorX+1),a
 Rst2
         bit  0,c
         ld   b,#F0
@@ -917,7 +951,7 @@ Rst2
         ld   (hl),a
         ret
 
-Pricel
+DrawSight                       ; orig: Pricel
         ; Рисование прицела b данных координатах
         ; Вывод на теневой скрин
         ld   bc,(Pcord)         ; #2B77
@@ -938,7 +972,7 @@ Pricel
         rla
         ld   l,a
         ld   h,0
-        ld   bc,Mpricel
+        ld   bc,MoveSight
         add  hl,bc
         ex   de,hl
         ld   bc,#0020
@@ -998,7 +1032,7 @@ Pricel
         ld   (hl),a
         ret
 
-Mpricel
+MoveSight                       ; orig: Mpricel
         ; Спрайт прицела
         db   %10000000
         db   %00011110, %00111100, %00000000
@@ -1017,7 +1051,7 @@ Mpricel
         db   %00000001
         db   %00000000, %00111100, %01111000
 
-Timer
+UpdateTimer                     ; orig: Timer
         ; Выводила времени на приб.панель,  так
         ; Же и3м. его
         ld   a,%10000000
@@ -1149,11 +1183,11 @@ Prnum
 ; "Sfx"-is a loop, which contains
 ; Is a address of the sound effect
 ;
-Sfxa
+SfxChannelA                     ; orig: Sfxa
         ld   hl,0
         ld   a,h
         or   a
-        jr   z,Sfxb
+        jr   z,SfxChannelB
         ld   bc,PORT_AY_REG
         xor  a
         out  (c),a
@@ -1178,11 +1212,11 @@ Sfxa
         out  (c),a
         ld   b,#BF
         outi
-        ld   (Sfxa+1),hl
+        ld   (SfxChannelA+1),hl
         ld   a,(hl)
         or   a
-        jr   nz,Sfxb
-        ld   (Sfxa+2),a
+        jr   nz,SfxChannelB
+        ld   (SfxChannelA+2),a
         ld   b,#FF
         ld   a,7
         out  (c),a
@@ -1190,11 +1224,11 @@ Sfxa
         or   %00001001
         ld   b,#BF
         out  (c),a
-Sfxb
+SfxChannelB                     ; orig: Sfxb
         ld   hl,0
         ld   a,h
         or   a
-        jr   z,Sfxn
+        jr   z,SfxNoise
         ld   bc,PORT_AY_REG
         ld   a,2
         out  (c),a
@@ -1222,11 +1256,11 @@ Sfxb
         out  (c),a
         ld   b,#BF
         outi
-        ld   (Sfxb+1),hl
+        ld   (SfxChannelB+1),hl
         ld   a,(hl)
         or   a
-        jr   nz,Sfxn
-        ld   (Sfxb+2),a
+        jr   nz,SfxNoise
+        ld   (SfxChannelB+2),a
         ld   b,#FF
         ld   a,7
         out  (c),a
@@ -1234,7 +1268,7 @@ Sfxb
         or   %00010010
         ld   b,#BF
         out  (c),a
-Sfxn
+SfxNoise                        ; orig: Sfxn
         ld   c,#FD
         ld   b,#FF
         ld   a,5
@@ -1273,21 +1307,21 @@ Nunu    ld   a,0
         ld   a,4
         out  (c),a
         ret
-Roka
+SfxRocket                       ; orig: Roka
         db   20, 2, %00001000, 11
         db   1, 1, %00001000, 10
         db   20, 2, %00001000, 9
         db   1, 1, %00001000, 10
         db   20, 2, %00001000, 11
         db   1, 1, %00001000, 10, 0
-Eff13
+SfxEff13                        ; orig: Eff13
         db   20, 0, %00000000, 10
         db   10, 0, %00000000, 9
         db   20, 0, %00000000, 8
         db   10, 0, %00000000, 7
         db   20, 0, %00000000, 6
         db   10, 0, %00000000, 5, 0
-Eff19
+SfxEff19                        ; orig: Eff19
         db   80, 1, %00001000, 8
         db   70, 1, %00001000, 8
         db   60, 1, %00001000, 8
@@ -1304,21 +1338,21 @@ Eff19
         db   70, 1, %00001000, 12
         db   60, 1, %00001000, 13
         db   70, 1, %00001000, 13, 0
-Eff1
+SfxEff1                         ; orig: Eff1
         db   40, 0, %00000000, 10
         db   50, 0, %00000000, 9
         db   40, 0, %00000000, 8
         db   50, 0, %00000000, 7
         db   40, 0, %00000000, 6
         db   50, 0, %00000000, 5, 0
-Eff14
+SfxEff14                        ; orig: Eff14
         db   20, 1, %00000000, 10
         db   10, 1, %00000000, 9
         db   20, 1, %00000000, 8
         db   10, 1, %00000000, 7
         db   20, 1, %00000000, 6
         db   10, 1, %00000000, 5, 0
-Eff2
+SfxEff2                         ; orig: Eff2
         ; Shoot1
         db   #10, 1, %00001000, 12
         db   #40, 1, %00001000, 11
@@ -1327,7 +1361,7 @@ Eff2
         db   #E0, 2, %00001000, 8
         db   #20, 3, %00001000, 7, 0
 
-Eff0
+SfxEff0                         ; orig: Eff0
         ; Explosion
         db   #10, 8, %00001000, 15
         db   #10, 8, %00001001, 15
@@ -1383,7 +1417,7 @@ Eff0
         db   1, 0, %00000001, 4
         db   1, 0, %00000001, 3, 0
 
-Eff11
+SfxEff11                        ; orig: Eff11
         db   100, 2, 4, 9
         db   100, 3, 4, 7
         db   100, 2, 4, 5
@@ -1391,14 +1425,14 @@ Eff11
         db   100, 2, 4, 2
         db   100, 3, 4, 1, 0
 
-Eff21
+SfxEff21                        ; orig: Eff21
         db   200, 1, 32, 12
         db   2, 0, 0, 11
         db   50, 0, 0, 12
         db   50, 0, 4, 7
         db   50, 0, 4, 1, 0
 
-Datal
+DrawGauge                       ; orig: Datal
         ; Hl-adr on screen
         ; A-MEAN
         ld   c,a
@@ -1493,57 +1527,61 @@ Tabr
         db   %10101000
         db   %10101010
 
-Repanel
+RedrawPanel                     ; orig: Repanel
         ; Вывод индикаторов панели , a так же вр
         ; Емени
         ld   a,1
-        ld   (Fspeed+1),a
-        ld   (Ffire+1),a
-        ld   (Fshild+1),a
-        ld   (Ffuel+1),a
-        call Datalin            ; Индикаторы
+        ld   (DrawSpeed+1),a
+        ld   (DrawFire+1),a
+        ld   (DrawShield+1),a
+        ld   (DrawFuel+1),a
+        call DrawStatusLine     ; Индикаторы
         ld   hl,(TIME+2)
         ld   de,(TIME)
         ld   b,#FF
         jp   Zerot1             ; Время
 
-Datalin
+DrawStatusLine                  ; orig: Datalin
 ; Вывод данных O 3ащите энергии и др.инф
 ; O b виде статус линии
-Fshild  ld   a,0
+DrawShield                      ; orig: Fshild
+        ld   a,0
         and  a
-        jr   z,Ffuel
+        jr   z,DrawFuel
         ld   a,(SHILD)
         ld   hl,#49A1
-        call Datal
+        call DrawGauge
         xor  a
-        ld   (Fshild+1),a
+        ld   (DrawShield+1),a
 
-Ffuel   ld   a,0
+DrawFuel                        ; orig: Ffuel
+        ld   a,0
         and  a
-        jr   z,Ffire
+        jr   z,DrawFire
         ;
         rra
         ld   hl,#49E1
-        call Datal
+        call DrawGauge
 
-Ffire   ld   a,0
+DrawFire                        ; orig: Ffire
+        ld   a,0
         and  a
-        jr   z,Fspeed
+        jr   z,DrawSpeed
         ;        LD A,(Peregrv+1)
         ld   hl,#5121
-        call Datal
+        call DrawGauge
         xor  a
-        ld   (Ffire+1),a
+        ld   (DrawFire+1),a
 
         ld   hl,#5181
         ld   hl,#51C1
 
-Fspeed  ld   a,0
+DrawSpeed                       ; orig: Fspeed
+        ld   a,0
         and  a
         jr   z,Fspd
         xor  a
-        ld   (Fspeed+1),a
+        ld   (DrawSpeed+1),a
         ld   hl,(SPEED)
         dup  5
         add  hl,hl
@@ -1571,7 +1609,7 @@ Fspeed  ld   a,0
         ld   l,46
         ld   a,l
         ld   hl,#49B9
-        call Datal
+        call DrawGauge
 Fspd
         ret
 
@@ -1587,7 +1625,7 @@ DRV2
 DOMA1
         incbin "assets/DOMA1.bin"
 
-INTEL
+UpdateAI                        ; orig: INTEL
         ; Интелект поведения кораблей
         ld   ix,Carsb-OBJ_LEN
         jr   I2
@@ -1605,7 +1643,7 @@ I2
         rlca
         ld   l,a
         ld   h,0
-        ld   de,MODES
+        ld   de,AiModeTable
         add  hl,de
         ld   a,(hl)
         inc  hl
@@ -1616,7 +1654,7 @@ I2
         jp   (hl)
 RET_
         ld   a,PAGE_3D
-        call PG
+        call SetPage
         ld   a,(ix+Rspd)
         or   a
         jr   z,.I4
@@ -1626,26 +1664,26 @@ RET_
 .I3
         call ENG3D_PRECORD
         ld   a,PAGE_NORMAL
-        call PG
+        call SetPage
         jp   I2
 .I4
         call ENG3D_NULL_MOVE
         jr   .I3
 
-MODES
-        dw   FREEFLY
+AiModeTable                     ; orig: MODES
+        dw   AiFreeFly
         dup  10
         dw   NTH
         edup
 
-FREEFLY
+AiFreeFly                       ; orig: FREEFLY
         ret
 
 NTH
         ret
 
 ; Генерить скиммеры
-GENS
+GenerateSkimmers                ; orig: GENS
         ld   a,#01
         rrca
         ld   ($-2),a
@@ -1653,7 +1691,7 @@ GENS
         ld   a,r
         cp   22
         ret  nc
-        call FNDFREE
+        call FindFreeObject
         ret  z
         push hl
         pop  ix
@@ -1721,7 +1759,7 @@ GENS
         ret
 
 ; Генерить деревья
-GEND
+GenerateTrees                   ; orig: GEND
         call RND
         ld   ix,Carsb-OBJ_LEN
         ld   a,l
@@ -1790,7 +1828,7 @@ G1
         inc  de
         ex   de,hl
 
-        call TAKEW
+        call ReadWord3D
 
         ld   (ix+Alfa),e
         ld   (ix+Beta),d
@@ -1805,7 +1843,7 @@ G1
         djnz G1
         ret
 
-FINDOBJ
+FindObject                      ; orig: FINDOBJ
         ; Поиск первого по типу b d
         ; Fz-on if not found
         ld   iy,Carsb-OBJ_LEN
@@ -1838,7 +1876,7 @@ FOBJ
         jr   z,$-10
         ret
 
-FNDFREE
+FindFreeObject                  ; orig: FNDFREE
         ; Find free space
         ; Ret fz-on if not found
         ld   hl,+(Carsb-OBJ_LEN)+1
@@ -2001,52 +2039,53 @@ Findob
         jp   nz,Findob
         ret
 
-SERVICE
-        call Servms
+ServiceInput                    ; orig: SERVICE
+        call ReadMouse
         call Servkj
         call Servqa
 
-        ld   a,(DIRECTZ)
+        ld   a,(KeyState)
         ld   c,a
-        ld   a,(DIRECTZ+5)
+        ld   a,(KeyState+5)
         or   c
         jr   z,.SV1
         ld   a,PAGE_3D
-        call PG
+        call SetPage
         call ENG3D_LINE
         ; Ret fc-on если был выстрел
         ex   af,af'
         ld   a,PAGE_NORMAL
-        call PG
+        call SetPage
         ex   af,af'
 .SV1
-        ld   a,(DIRECTZ+2)
+        ld   a,(KeyState+2)
         or   a
         call nz,ROLDN
-        ld   a,(DIRECTZ+1)
+        ld   a,(KeyState+1)
         or   a
         call nz,ROLUP
-        ld   a,(DIRECTZ+4)
+        ld   a,(KeyState+4)
         or   a
         call nz,ROLLT
-        ld   a,(DIRECTZ+3)
+        ld   a,(KeyState+3)
         or   a
         call nz,ROLRT
-        ld   a,(DIRECTZ+4)
+        ld   a,(KeyState+4)
         ld   c,a
-        ld   a,(DIRECTZ+3)
+        ld   a,(KeyState+3)
         or   c
         ex   af,af'
         ld   a,PAGE_VOXEL
-        call PG
+        call SetPage
         ex   af,af'
         call z,VOX_RETURN
         ld   a,PAGE_NORMAL
-        call PG
+        call SetPage
         ret
 
 ; MOUSE driver from zx-format
-DIRECTZ db   0                  ; Fire
+KeyState                        ; orig: DIRECTZ
+        db   0                  ; Fire
         db   0                  ; UP
         db   0                  ; DOWN
         db   0                  ; RIGHT
@@ -2054,10 +2093,12 @@ DIRECTZ db   0                  ; Fire
         db   0                  ; Cancel
         db   0                  ; Medium
 
-MCOORD  dw   0
+MouseCoord                      ; orig: MCOORD
+        dw   0
 
 ; Устанавливаются b 1 если нажато
-Mports  dw   0                  ; Cords мыхи
+MousePorts                      ; orig: Mports
+        dw   0                  ; Cords мыхи
 Nondef  and  3
         jr   z,Mdrv4
         cp   1
@@ -2070,12 +2111,12 @@ Nondef_ ld   hl,0
         ld   (Mdrv1),hl
         pop  ix
 ; Main
-Servms
+ReadMouse                       ; orig: Servms
         ld   a,0
         and  a
         ret  nz
         push ix
-        ld   hl,DIRECTZ
+        ld   hl,KeyState
         push hl
         pop  ix
         xor  a
@@ -2103,12 +2144,12 @@ Mdrv3   rl   (ix+5)
         rra
         rl   (ix+6)
 Mdrv4
-        ld   de,(Mports)
+        ld   de,(MousePorts)
         ld   bc,#FBDF
         in   a,(c)
-        ld   (Mports),a
+        ld   (MousePorts),a
         sub  e
-        ld   (MCOORD+1),a
+        ld   (MouseCoord+1),a
         jr   z,Mdrv9
         jp   p,Mdrv6
         ld   (ix+4),1
@@ -2117,9 +2158,9 @@ Mdrv6
         ld   (ix+3),1
 Mdrv9   ld   b,#FF
         in   a,(c)
-        ld   (Mports+1),a
+        ld   (MousePorts+1),a
         sub  d
-        ld   (MCOORD),a
+        ld   (MouseCoord),a
         jr   z,Mdrv14
         neg
         jp   p,Mdrv11
@@ -2186,31 +2227,31 @@ Gomove
         ld   d,a
         rrc  e
         adc  a,a
-        ld   hl,DIRECTZ+3
+        ld   hl,KeyState+3
         or   (hl)
         ld   (hl),a
         xor  a
         rrc  e
         adc  a,a
-        ld   hl,DIRECTZ+4
+        ld   hl,KeyState+4
         or   (hl)
         ld   (hl),a
         xor  a
         rrc  e
         adc  a,a
-        ld   hl,DIRECTZ+2
+        ld   hl,KeyState+2
         or   (hl)
         ld   (hl),a
         xor  a
         rrc  e
         adc  a,a
-        ld   hl,DIRECTZ+1
+        ld   hl,KeyState+1
         or   (hl)
         ld   (hl),a
         xor  a
         rrc  e
         adc  a,a
-        ld   hl,DIRECTZ
+        ld   hl,KeyState
         or   (hl)
         ld   (hl),a
         ret

@@ -392,7 +392,67 @@ Also: "Галактическая полиция предупреждает Ва
 
 ## 8. Unused and unusual
 
-(pending)
+Method: a script (`work/tech/unused.py`) lists labels that occur exactly once in all station/flight sources (definition only) and the result was checked by hand; plus greps for data that is never read.  "VERIFIED" = no reference found; whether the author *meant* to leave it out is INFERRED.
+
+### 8.1 Unreferenced routines, tables and data (current sources)
+| where | item | what it is |
+|--|--|--|
+| flight OBJGENER.asm:547 | `KREYSERS` | the table of 4 **cruiser** models (`IKRS1..4`, weights 10..1) is never indexed (`INDTABK` has 9 rows for types 0-8 only): **cruisers can never appear**, though 4 models (Kd7/Kd15/Kd19/Kd22) exist |
+| flight 3DTABS.asm | `IKIB`, `IKIBUFO`, `IREMDR`, `IASTER3`, `ITARGET`, `IUFO8`, `IROKUFO`, `ICRGUFO`, `IST_PIRAT`, `IPRISON`, `IST_U1`, `IST_U2`, `IST_SCINCE`, `IGIP_PL` | object-index names never used by code: cyber-killer, repair-droid, third asteroid, invisible target, an 8th UFO and 6 special stations (pirate base, prison, 2 UFO bases, science station, "hyper planet/gate") exist as models only |
+| flight SLOWPRO.asm:77 | `GAMEOVER` | reachable only from commented-out `jpc GAMEOVER` (BODY.asm:78, 84, 95, 151, 185): the player cannot die |
+| flight SETHJRET.asm:385 | `RETSTT` | "return to station with all data zeroed" (new-game record `NDATA`), commented out at BODY.asm:353 |
+| flight SETCONTR.asm:290 | `DROPDROID` | key "Выпуск дроида" = `ret` |
+| flight COMPUTE.asm | `_SYSTEMOK`, `_SYSTEMOFF`, `_SYSTEMSOFF`, `ZEROTIME` | messages "Все системы работают нормально / Выведена из строя система / Выведены из строя системы": **system damage was planned**, never used |
+| flight EQUS.asm | `C_STAY`, `C_GOSTAR`, `T_TARGET` (by name), `YES/NO` | modes/types defined by number elsewhere or unused |
+| flight BRAINPRO.asm:46, 593; SLOWPRO.asm:32, 46 | `NTH`, `BACKALL`, `PNUM`, `PNUM2` | helpers without callers |
+| station DATA_M.asm | `JLIST`, `ORDER`, `SPEED`, `DALNO` (data), DATAT `TMISS1` | contract data/text without code (section 4); `DALNO` is only read by the flight |
+| station DOPPROC.asm:1252-1272 | `RNDW`, `RNDK1..3`, `RNDT1/2` | the flight's random-number helpers copied into the station, unused there |
+| station OBJ.asm | `Objtl`, `Objtw`, `Obut`, `Gs9`, `Gs22`, `Gs23`, `R_MS2`, `SETSCRD` | window/button drawing variants without callers (older UI generation) |
+| station BODYOCUR.asm | `EXAS` | "return to the ZASM/XAS assembler" (the developer's exit); glue replaced the caller with `LaunchFlight` |
+| station PNT.asm | `Onum3`, `Onum4` | number printers not used |
+| station CIRCMATH.asm | `CLIP`, `PCOUNT1` | |
+| station FOTOS #E700 | portraits | referenced by `WFOTO_` but no data (section 4.3) |
+| station OBJECT.asm | 16 empty tooltip slots ("; 23") and button 40 "Перелет" etc. | reserved UI numbers |
+| text | news item 2 "Внимание! ... инопланетян!" | text without trigger |
+| text | `Txt` "Это есть прототип интерфейса" | a placeholder shown by the contract windows |
+
+### 8.2 Buttons and windows that do nothing (or something unintended)
+* **Контракт** (BMISS -> `WMISS1_`, `WMISS2_`): opens two windows with the placeholder text; no handler (section 4.1).
+* **Новости**: shows "Новостей нет." forever.  **Абонент**: lists persons, the photo window shows help-text garbage (FOTOS #E700 overlaps THELP), no call/dossier.
+* **Перелет** on the map: free teleport, no fuel/time (section 5.4).
+* **Выпуск дроида** (flight key): empty.  **Выпуск флота**: key label without handler.  Droid/cyber-fleet equipment can be bought and has no effect (`WKRBI` counters only; `Кибер Флот` is even removed by the start check).
+* **Скиммер** purchase/equipment/viewer work, but skimmers have no use: no landing, no skimmer flight (`TSETG1` lists 15 skimmer keys).
+* Parking-fee expulsion `WYDWOR` (BODY.asm:44-52) = empty branch.
+* Station "Установки среды/игры": the key tables `SETSD/SETGD` live outside the saved record (not saved/restored).
+* The galaxy map window cannot be closed (docs/TESTING.md); "Закрыть все" needs a free background spot.
+* `help.tok` chapters mention "Приложение абоненты ... Кнопка: прервать связь" and "Приложение контракты ... Подписание или расторжение" - documentation of unfinished features.
+
+### 8.3 Unusual / notable technical solutions (each seen in the code)
+* **Procedural galaxy** with a PRNG seeded by coordinates (section 5); star names, planets, governments, price tables are never stored.
+* **A scripting language in a 1999 Spectrum game** ("Paradox v1.0, 13.11.99", `LANG.asm`, 2181 lines): interpreted at every trade; rules as text (`C_SCENAR.t`); language manual `LANGUAGE.C`.
+* **Station <-> flight swap by TR-DOS reload**, state of 512 bytes handed over (originally the developer started the parts from the assembler `ZASM`/`XAS`; glue rebuilt, ANALYSIS 14).
+* **Self-modifying code everywhere** (`ld (X+1),a` patterns, `$+4` jumps), unrolled `rept` drawing code (`SPRP..SQUADR`, `S00..`), compiled effect code `EFF.c` (generated machine code of the hyperjump effect).
+* **Banking**: 128K pages (`#7FFD`), IM2 in the station; the station is spread over 6 banks (main + LANG/KARTA/D3D/HELP/MUZ + stscr).
+* **Proportional-font justified text formatter** (`OTXT`: even word spacing in 255-pixel windows), Hrust-packed pictures (`DEPACK`/`DEHRUST`), a PT3 player with a third-party tune.
+* **Windowing system**: movable/resizable windows and buttons with mouse/joystick/keyboard cursor (object records of 16 bytes), "Скрыть все / Запомнить среду / Расставить" (window layout memory).
+* **Voxel sprites and voxel animation** in flight (explosions, hyperjump tunnel) and a **black hole** that spawns at one exact random value.
+* **Elite homages**: model names `KOBRA`/`Kobrad` (Cobra), the station with a "docking block" you fly into, fuel and hyperjump (INFERRED homage, not stated anywhere); the "Дьявол" ("Devil") hyper system is the old name of 'Гипер Система Фостэр'.
+* Credits found in the data: the **PT3 player "by Nick of GDC"** and the tune "ProTracker 3.4 compilation of Virtual Agression by Mast/FtL 24.03.99" in `MUZ1.C`; the legacy intro source "**SOURCE CODE OF GOA 4K INTRO, 1998 EXPLODER/EXTREMELY, 1999 SOME REMAKES BY MYTHOS**" (`src/legacy/flight_unused/TUNEL.asm`, entry #6400, hyperspace tunnel; `HIPER.asm` derives from it).
+* **Two starts / two game versions in one source** (section 7.2): `DATA_M.asm` defaults (wanted, relic ship) vs `NDATA` (clean, 40000 cr, no ship).
+* **Inconsistent duplicates** (section 2.1: ship stats; star state labels in `GOSTA` comments vs code; `Кридон/Кридан`).
+* `LANG.asm` header comment lists `_WYDWOR` (expel) and `_TONN` commands: the expulsion is a designed game event.
+
+### 8.4 Legacy modules (not built; `src/legacy`, `original_src`)
+| module | what | value for the finished game |
+|--|--|--|
+| `src/legacy/station_unused/BLOCK2.asm` (686 lines) | **the old mission generator**: `INIMIS` (10 missions, seeds from `MISTAB`: 2,25,51,77,101,124,153,172,207,228), `NEWJ` (new job: random direction among the 8 neighbouring map tiles + current, steps back while the tile is "free lands" (state 3) so missions stay in civilised space; random star of the tile, random inhabited planet (retries until planets exist), distance by `FARER`, arrival time = now + BCD interval derived from the distance (`daa`; TIME is **BCD**), generation time stored, reward = f(distance) + random, weight = random 5..33 t (low bits)), `OMLIN` (prints one mission line: star name, planet name, weight, time, price) | **directly reusable** to implement the contract list: fills exactly the `JLIST` format (16 bytes) of DATA_M.asm and uses `TNAME`, `PRLNAM`, `GOSTA`, `FARER` that exist in the current KARTA/CIRCMATH |
+| `PEREKOD.asm`, `SCR_3eTOKN.asm`, awk6 `DOS.asm` | one-shot tools: text converter for the scenario text format (`@`, `#`; produces ET separated texts = the converter `LANGUAGE.C` talks about), screen-to-token tool, old station build driver | the **converter** for scenario texts is `PEREKOD` (67 lines): text `@/#` -> `TXTES`; reuse for `assets/text/scenario.txt` |
+| `flight_unused/DOOM.asm`, `HIPER.asm` | a Doom-like texture raycaster experiment and a hyperspace effect (GOA intro derivative) | optional visual effects |
+| `flight_unused/TUNEL.asm` | the 4K intro tunnel (1998/1999) | credit / possible hyperjump effect replacement |
+| `flight_unused/vOXEL.asm`, `CNVVOXVD.asm` | older voxel renderer and converter | none |
+| `src/legacy/awk3`, `awk4` | older flight/3D versions (e.g. `3DTABS_`, `OBJECTS_`, `BODY_`); `awk4` also the STORM text export | history; the newest (awk1) is used |
+| `src/storm` (STORM era 1997/98) | **landing prototype** (`LAND.asm`): voxel landscape + sky + skimmers (Sturm, Istr, Turi, Trad vehicles = the station viewer's skimmer models) + houses/trees + AY effects + HUD; engine `S3D`/`VSPRITE` byte-exact; `DATAM.asm` = early copy of the goods/equipment tables (28 goods, 31+14 items) | the only code for *landing on a planet / skimmer* gameplay; not in any shipped demo; integration plan in `docs/STORM.md` §5 |
+| `assets/unused/` (17 files) | demo v0.2 leftovers: 6 full 16K RAM banks `BANK0-5`, 4 banks `BD0-3` (about 50 % zero bytes: data/graphics banks, e.g. levels, voxel data), `BAR.C`, `PANELF/PANELFF/PANELMET` (panel variants: "F" = ? "MET" = metal), `choose1/2` (two SCREEN$: probably a ship/skimmer or character choice screens), `scene1po.s` (18.6 KB scene) | material for later parts (character selection, scene = intro/story?), not referenced anywhere (assets/unused/README.md); a **picture viewer** is the quickest way to see whether `choose1/2`, `scene1po` carry story art |
 
 ## 9. Gap list for a full game
 

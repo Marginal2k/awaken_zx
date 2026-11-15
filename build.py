@@ -86,4 +86,16 @@ def main():
         make_disk(B + '/boot/AWAKEN_nointro.B', 'awaken_nointro.trd')    # same disk without the intro (for the emulator scenarios)
 
 
-main()
+def build_storm():
+    """python build.py --storm : assemble the STORM prototype block (src/storm/make_*.asm -> work/storm/out/); verify: tools/verify_storm.py"""
+    src = ROOT + '/src/storm'
+    os.makedirs(ROOT + '/work/storm/out', exist_ok=True)
+    for mk in sorted(f for f in os.listdir(src) if f.startswith('make_') and f.endswith('.asm')):
+        asm(mk, src, ['-I', src])
+        print('OK storm ' + mk)
+
+
+if '--storm' in sys.argv:
+    build_storm()
+else:
+    main()

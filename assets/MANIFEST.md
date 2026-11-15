@@ -21,3 +21,7 @@ Blobs `incbin`ed by the sources. Source = file extracted from the developer disk
 | MUZ1.C | 6054 | - | demo/awk6 disk file MUZ1 | station (loaded to bank 3 #DB00, music player) |
 | FINALF.C | 19114 | 67e4ff62 (md5 prefix) | demo v0.2 disk file FINALF (identical in AWAK_SDC) | station `LaunchEnding` (self-contained ending program at #6000, no disk access) |
 | intro_depack.bin | 1743 | - | demo v0.2 AWAKEN.B payload #8931..#8FFF | boot/intro.asm: depacker + packed closing picture (copied over the logo area, called by the tail stub) |
+
+Round 2 (asset technician): no longer files in assets/ (now generated into build/gen/ from editable sources): D9200.d, station_D9200.d, 0E0200.d, CSTB.d (gen_math.py),
+ways.d (data/map_rings.txt), MUZ1.C (music/pt3player.bin + music/station.pt3), FINALF.C (ending/finalf_code.bin + gfx/ending_*.png), intro_depack.bin (kept as gfx/orig/intro_depack.bin;
+picture gfx/intro_closing.png).  Models: models/.  Flight tables, radar sprites, sound effects: data/, gfx/radar_sprites.*, sound/effects.txt.  Still binary: D9000.d, KORNI.d, ATAGTAB.d, EFF.c, VOX.d, EXPLOSIO.v, HIPERJMP.v.

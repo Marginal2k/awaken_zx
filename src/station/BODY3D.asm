@@ -1,29 +1,19 @@
-;INITCLP
-;OSHIP
-;SETZET
-;TSHIP
-;SSHIND
-;NSHIP_
-;ISHIPI
-;ISHIP
-;SHIPI
+;==============================================================================
+; BODY3D - просмотр 3D-моделей кораблей (оверлей D3D)
+;
+; Где живёт: оверлей D3D.C, ORG #C000, страница PG3D (#14); собирается: DATA3D, XR2, BODY3D, CLPXR1, OBJX.
+;
+; Что делает: окно "Корабль"/"Скиммер"/"3D обзор": InitClip3D задаёт границы клиппирования, DrawShip3D
+; вращает и выводит модель (XR2 + CLPXR1), DrawShipMenu выводит список кораблей, DrawShipInfo - описание
+; (тексты TISHIP/TISKIM). ShipIndex/ShipListFrom - текущий корабль и начало списка.
+; Вызывается из OBR.asm (WSHIP, WISHIP...) через PAGES PG3D. См. GAME_DESIGN 2.2.
+;==============================================================================
 
-
-
-
-
-
-
-
-
-
-
-
-
-INITCLP:
-;  ИНИЦИАЛИЗАЦИЯ ПРЕДЕЛОВ КЛИППИРОВАНИЯ
-;h-yh,l-xh;hl-YHXH
-;d-yl,e-xl;de-YLXL
+InitClip3D   ; orig: INITCLP
+; Установка границ клиппирования 3D-вывода
+;  Инициализация пределов клиппирования
+; h-yh,l-xh;hl-YHXH
+; d-yl,e-xl;de-YLXL
 
             ld   a,h
             inc  a
@@ -72,17 +62,16 @@ INITCLP:
             ld   (XL4+1),a
             ld   (XL5+1),a
             ld   (XL6+1),a
-            ret  
+            ret
 
 
-
-
-OSHIP:
-;  ВЫВОД КОРАБЛЕЙ
-;  ЦИКЛ ВЫВОДА 3D
-;a-T3D
+DrawShip3D   ; orig: OSHIP
+; Цикл вывода 3D-модели корабля
+;  Вывод кораблей
+;  Цикл вывода 3D
+; a-T3D
             dec  a
-            jr   nz,OSH1
+            jr   nz,.OSH1
             ld   a,8
             ld   (ALFA),a
             xor  a
@@ -90,8 +79,8 @@ OSHIP:
             ld   a,(ALFA+1)
             add  a,2
             ld   (ALFA+1),a
-            jr   OSH2
-OSH1:
+            jr   .OSH2
+.OSH1
             ld   a,(ALFA)
             add  a,1
             ld   (ALFA),a
@@ -101,18 +90,17 @@ OSH1:
             ld   a,(ALFA+2)
             add  a,3
             ld   (ALFA+2),a
-OSH2:
+.OSH2
             call Ren3d
-            ei   
+            ei
             call MERZ
-            ret  
+            ret
 
 
-
-
-SETZET:
-;  ПРИРАЩАЕТ КООРД. ЗЕТ ДЛЯ ОКБЪЕКТА
-;hl-СМЕЩЕНИЕ z
+AddModelZ   ; orig: SETZET
+; Прибавить смещение к координате Z объекта
+;  Приращает коорд. зет для окбъекта
+; hl-смещение z
             ld   de,(ZET)
             add  hl,de
             ld   a,h
@@ -121,18 +109,16 @@ SETZET:
             cp   #10
             ret  nc
             ld   (ZET),hl
-            ret  
+            ret
 
 
+;  Вывод всего меню кораблей
 
-
-
-
-;  ВЫВОД ВСЕГО МЕНЮ КОРАБЛЕЙ
-NSHIP_:
-;A'-КОЛ. ПУНКТОВ ПРОПУСТИТЬ
-;a-T3D
-;h-BT2 =0 ПОКУПКА, =1 ПРОДАЖА
+DrawShipMenu   ; orig: NSHIP_
+; Вывод всего меню кораблей
+; A'-кол. пунктов пропустить
+; a-T3D
+; h-BT2 =0 покупка, =1 продажа
             push hl
             push af
             ld   a,ET
@@ -140,13 +126,13 @@ NSHIP_:
             ld   hl,#0800
             ld   (Cord),hl
             ld   hl,TSHIP
-            call Outtxt
+            call OutText
 
             ld   hl,#1800
             ld   (Cord),hl
 
-;A'-ИНДЕКС С КОТОРОГО ВЫВОДИТЬ КОРАБЛИ В
-;  МЕНЮ, ЗАВ. ОТ УРОВНЯ
+; A'-индекс с которого выводить корабли в
+;  Меню, зав. от уровня
 
             pop  af
             dec  a
@@ -155,14 +141,14 @@ NSHIP_:
             ld   hl,NAMSK
             pop  af
             or   a
-            jr   z,I1
+            jr   z,.I1
             push hl
             ex   af,af'
             ld   c,a
             ex   af,af'
             ld   a,c
-; СМОТРИМ ЕСЛИ НОМЕР НА РОХЛЮ ТО ДАДИМ
-; ЕЙ ВЫВЕСТИСЬ
+; Смотрим если номер на рохлю то дадим
+; Ей вывестись
             cp   6
             jr   nz,$+7
             ld   a,CR
@@ -170,65 +156,73 @@ NSHIP_:
 
             ld   a,c
             inc  a
-            call FLIST1
+            call FindTextByIndex1
             dec  hl
             ld   a,(hl)
             ld   (hl),ET
             EXD
             pop  hl
             ex   af,af'
-            ld   (FROMS+1),a
-            call LIST1
+            ld   (ShipListFrom+1),a
+            call PrintTextByIndex1
             ex   af,af'
             ld   (de),a
-            jr   I2
-I1:
+            jr   .I2
+.I1
             ex   af,af'
-;  ЗАПОМНИТЬ НОМЕР С КОТОРОГО ВСЕ КОРАБЛИ
-            ld   (FROMS+1),a
-            call LIST1
-I2:
+;  Запомнить номер с которого все корабли
+            ld   (ShipListFrom+1),a
+            call PrintTextByIndex1
+.I2
             ld   a,(Cord+1)
             sub  #18
-            rrca 
-            rrca 
-            rrca 
+            rrca
+            rrca
+            rrca
             and  #1F
             inc  a
             ex   af,af'
-            ret  
+            ret
 
-ISHIPI:
-;  ПОДСЧЕТ СТРОК
-;a-T3D
+CountShipLines   ; orig: ISHIPI
+; Подсчёт строк описания корабля
+;  Подсчет строк
+; a-T3D
             ld   hl,TISHIP
             dec  a
             jr   nz,$+5
             ld   hl,TISKIM
-            ld   a,(SHIPIND+1)
+            ld   a,(ShipIndex+1)
             ld   c,a
-            ld   a,(FROMS+1)
+            ld   a,(ShipListFrom+1)
             add  a,c
-            call FLIST
-            call KOLLIN
-            ret  
+            call FindTextByIndex
+            call CountTextLines
+            ret
 
 
-ISHIP:
-;  ПОДГОТОВКА ИНИЦИАЛИЗАЦИЯ ВЫВОДА КОРАБЛ
-;h-yh,l-xh;hl-YHXH
-;d-yl,e-xl;de-YLXL
-;DE'-КООРД. ОКНА
-;a-T3D-0-SHIPS, 1-SKIMMERS
+InitShipView   ; orig: ISHIP
+; Подготовка вывода корабля
+;  Подготовка инициализация вывода корабл
+; h-yh,l-xh;hl-YHXH
+; d-yl,e-xl;de-YLXL
+; DE'-коорд. окна
+; a-T3D-0-ships, 1-skimmers
             push af
-            call INITCLP
-            exx  
+            call InitClip3D
+            exx
             call MTBXX2
             pop  bc
-SHIPIND:    ld   a,0
-;  ПРИБАВИМ НОМЕР С КОТОРОГО ВЕСЬ СПИСОК
-;  ПОКАЗЫВАЕТ КОРАБЛИ
-FROMS:      add  a,0
+
+ShipIndex   ; orig: SHIPIND
+; Номер показываемого корабля (самомодиф.)
+            ld   a,0
+;  Прибавим номер с которого весь список
+;  Показывает корабли
+
+ShipListFrom   ; orig: FROMS
+; Номер, с которого показывается список
+            add  a,0
             add  a,a
             add  a,a
             dec  b
@@ -236,25 +230,25 @@ FROMS:      add  a,0
             add  a,28
             ld   (Indexx),a
 
-            ret  
+            ret
 
 
-SHIPI:
-;  ВЫВОД ИНФО О КОРАБЛЕ
-;a-T3D
-;hl-НОМЕР СТРОКИ
+DrawShipInfo   ; orig: SHIPI
+; Вывод информации о корабле
+;  Вывод инфо о корабле
+; a-T3D
+; hl-номер строки
             push hl
             ld   hl,TISHIP
             dec  a
             jr   nz,$+5
             ld   hl,TISKIM
-            ld   a,(SHIPIND+1)
+            ld   a,(ShipIndex+1)
             ld   c,a
-            ld   a,(FROMS+1)
+            ld   a,(ShipListFrom+1)
             add  a,c
-            call FLIST
+            call FindTextByIndex
             pop  de
             ld   bc,#0800
-            call FROMLIN
-            ret  
-
+            call PrintFromLine
+            ret

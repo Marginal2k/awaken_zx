@@ -400,4 +400,88 @@ Also: "Галактическая полиция предупреждает Ва
 
 ## 10. Asset inventory
 
-(pending)
+Goal of the next phase: every text and every non-code asset becomes a human-editable file under `assets/` and a script converts it to the in-game form before the build.  Difficulty: **E** = easy (plain 1:1 conversion), **M** = medium (a small converter with a checksum test against the current binary), **H** = hard (needs a packer, or the layout references itself / the code).  "db-in-asm" = the data lives as `db`/`dw` lines in a source file, "incbin" = a binary file in `assets/`.  Sizes in bytes.  Line numbers are in `work/tech/u8/src_*` (same as `src/*`).  A round-trip test for every converter is easy to add: build, `md5` the assembled `.C` bank files (`build/station/*`, `build/flight/*`) and compare with the pre-conversion build.
+
+### 10.1 Station texts (all db-in-asm; cp1251 source + `ENCODING "DOS"`; char set CP866 glyph codes; terminators ET `#0A`/CR `#0D`; control codes 1..6, `#FF` blank)
+| # | where | what | size | in-game form | proposed editable form | diff |
+|--|--|--|--|--|--|--|
+| T1 | DATAT.asm:4 MODELS, 24 WELCOME, 34 ERORS, 405 THIDE ... (all labels, section 1.4) | all UI texts: station models, welcome, messages M01-M16, save/load lists, settings labels, window titles, button help, status, info headers, goods/equipment names, tables of states/types | about 12 KB of strings, 28 KB of source | ET-separated item lists, `<ET>`=#0A `<CR>`=#0D `<1>..<6>` tab/stop codes, `ds 31,255` blank lines | `assets/text/station_ui.txt` (one `[LABEL]` section, one item per line group, escapes `\n` for CR, `\t2` for tab codes) | E |
+| T2 | DATAT.asm:82 TARMI | 47 encyclopaedia entries (33 ship + 14 skimmer equipment) | 5.5 KB | same | `assets/text/equipment_docs.txt` | E |
+| T3 | DATAT.asm:373-396 NABONS/TABON1/TNEWS | 16 subscribers (name + home star tab), 2 news items | 0.5 KB | same | `assets/text/subscribers.csv` (name, star), `assets/text/news.txt` | E |
+| T4 | HELP.asm:124 `help.tok` (incbin) + HELP.asm `THLPL` (db numbers) | manual (8 chapters) + chapter menu | 3646 + 90 | plain CP866 bytes, CR line break, ET end; THLPL as decimal CP866 numbers | `assets/text/help.txt` (UTF-8, chapters separated by a marker line) ; menu in the same file | E |
+| T5 | station.asm:74/76 `ship.tok`, `skim.tok` (incbin) | 7 ship + 4 skimmer descriptions (speed/tonnage/weight embedded as text) | 1623 + 657 | plain CP866 | `assets/text/ships.txt`, ideally generated from `ships.csv` (section 10.2) so the numbers cannot disagree | E |
+| T6 | DATA3D.asm:287-310 NAMSH/NAMSK/TSHIP | ship/skimmer buy list (name, price as *text*), header | ~300 | CP866 numbers + literal digits | generated from `ships.csv` | E (but prices are duplicated text) |
+| T7 | CIRCMATH.asm:1472 NAMTAB | 16 Greek-letter name parts for star names | 90 | CP866 numbers, ET separated | `assets/text/star_names.txt` | E |
+| T8 | PNT.asm:1512 SPECTB | key symbols ENT/SS/SP | 12 | ASCII | stay in asm | - |
+| T9 | LANG.asm:2172 `C_SCENAR.t` (incbin) | trade-rules script, Paradox language | 1500 | ASCII commands + CP866 comments | `assets/text/rules.paradox` (UTF-8 comments; converter maps to CP866) - note the message numbers M01..M16 index `ERORS` | E |
+| T10 | LANG.asm:2181 `TXTES` | converted scenario texts (dialogues) | **empty** | planned format in `LANGUAGE.C` (`_p1s1t1@ ... #`) | `assets/text/scenario.txt` + a converter (does not exist; the language manual defines it) | M (new tool) |
+| T11 | flight COMPUTE.asm:573-667 | 26 panel messages (`_SYSTEMREADY` ... `_NOCARGO`), cp866 as decimal numbers + CR + ED | ~700 | numbers | `assets/text/flight_messages.txt` | E |
+| T12 | `LANGUAGE.C`, `TREE.t` (awk6, not built) | language manual; dialogue-tree layout | 7934 + 494 | CP866 text | copy into `docs/` or `assets/text/` as reference | E |
+Counts: ~270 text items.  All Russian; the project wants an EN/RU option later: text files with a language suffix and the same converter would do (the game uses one fixed table per label, length differences matter only in the 255-byte-wide window layout, not in storage).
+
+### 10.2 Station data tables (db-in-asm; binary numbers; many are index-paired - edit as one spreadsheet)
+| # | where | what | size | proposed editable form | diff |
+|--|--|--|--|--|--|
+| D1 | DATA_M.asm:334 CENS2, 250 SPECTO, 290 TWRM (+ names T1) | 30 goods: price, ban level, cheap-where type, weight class, unit | 30 x 4 | `assets/data/goods.csv` (name, unit, price, ban, specialty, weight class); converter emits the 3 tables + names | E |
+| D2 | DATA_M.asm:376 CENS, 435 TONNS, 498 WKII, 163 KRBARM, 829 WKRBI defaults (+ names T1/T2) | 33 ship equipment: price, level, mass, family up/down, incompatible ships, start count | 33 x 12 | `assets/data/equipment_ship.csv` | E |
+| D3 | DATA_M.asm:412 CENS1, 473 TONSS, 535 WSII, 202 SKMARM, 869 WSKMI | 14 skimmer equipment | 14 x 12 | `assets/data/equipment_skimmer.csv` | E |
+| D4 | DATA_M.asm:691 CNKR, 716 CNSK, 221 SHIPDAT | 7 ships + 4 skimmers (tonnage, price, speed, legal, weight) and the offer-per-level skip table | 60 | `assets/data/ships.csv` (+ `shipdat.csv`); also feeds T5/T6 | E |
+| D5 | DATA_M.asm:766-960 TIME ... ABONS (initial values of the state record) | new-game defaults (see also `NDATA` in flight SETHJRET.asm:221 - two different starts, section 7.2) | 512 | `assets/data/newgame.csv` (field name, offset, value) → emitted into both images; must also decide NDATA | M |
+| D6 | DATA_M.asm:563-667 TBKP, SETSI, SETGI; 960-1026 SETSD, SETGD | keyboard port/mask tables, default keys of the settings windows | ~250 | `assets/data/keys.csv` | M |
+| D7 | flight SETHJRET.asm:724-920 VERTAB, STROYTAB, LEVLTAB; OBJGENER.asm:465-560 INDTABK etc. | spawn probabilities by government/level, ship tables per AI type | ~330 | `assets/data/spawn.csv` | M |
+| D8 | DATA_M.asm:8-160 Tabx | jump table of glyph routines (addresses) | 320 | stays asm (code table) | - |
+
+### 10.3 Station graphics, fonts, binary blobs
+| # | file / where | what | size | in-game form | proposed editable form | diff |
+|--|--|--|--|--|--|--|
+| G1 | `assets/PRO.f` (station.asm:24, `SZTB`) | station proportional font, CP866 codes, 9 bytes/char (8 rows + width) | 2304 | raw | `assets/gfx/pro_font.png` (glyph sheet, 16x16 chars, width encoded in a column or a `pro_font_widths.csv`) | M |
+| G2 | `assets/KSPOplus.s` (station.asm:10) | mouse cursor sprites (several cursors with masks) | 768 | raw 1-bit sprite+mask | `assets/gfx/cursors.png` | M |
+| G3 | `assets/stscr.C` (LOADER.asm:15,117, BODY.asm:847 `DEPACK`) | **16 station background pictures** in one file; sector counts `13,11,11,12,8,14,19,15,15,13,19,12,16,20,21,20` = 239 sectors; each is Hrust-packed (same depacker as the flight panel) | 61184 | packed, 16 chunks at fixed sector boundaries | `assets/gfx/station_bg_01..16.png` (256x192, 2 colours/cell attributes) + converter needing a **Hrust 1.x packer** (a Python packer must be written or an existing one used; the depacker is in the sources) and the sector-size padding | **H** |
+| G4 | `assets/MUZ1.C` (LOADER.asm FILE2, bank 3 at #DB00) | PT3 player v1.0 (Nick of GDC) + a ProTracker 3.4 module "compilation of Virtual Agression by Mast/FtL 24.03.99" (credit!) | 6054 | player code + module | split into `assets/music/station.pt3` (module) and player stays binary; converter = concatenate with the player prefix | M |
+| G5 | `assets/ways.d` (KARTA.asm:1609 `PWAYS`) | dotted-line patterns for route lines (6 patterns x several phases) | 702 | raw | generated by script from a pattern text or keep binary | M |
+| G6 | KARTA.asm:1615-2113 SPRP..SQUADR | six star-marker sprites as *generated drawing code* (`rept`/LDX), not data | ~10 KB code | code | stay asm; to change a marker redraw by hand | - |
+| G7 | `assets/station_D9200.d`, `D9000.d` | math tables (multiplication/sine, 768 + 512) | 1280 | raw | **regenerate by script** (not edited); write `tools/gen_tables.py` once and verify md5 | M |
+| G8 | `assets/0E0200.d`, `KORNI.d` (CIRCMATH.asm:1716-1719) | table #0E00/#0200 (512) and integer square-root table KORNI (768) | 1280 | raw | generated by script | M |
+| G9 | OBJX.asm (station) | 10 viewer 3D models | 10.8 KB | vertex/face bytes (section 2.3) | `assets/models/station_ships/*.obj` (+ converter and scale rules) or hand-editable `.txt` | M-H |
+| G10 | `FOTOS` #E700 | **missing**: 16 subscriber portraits (128 B each = 32x32, 1 bit) are expected here but not in the build | 2048 | n/a | `assets/gfx/portraits/pNN.png` 32x32 + converter (new) | M (new content) |
+| G11 | `src/storm`/awk5 | nothing used | - | - | - | - |
+
+### 10.4 Flight data
+| # | file / where | what | size | in-game form | proposed editable form | diff |
+|--|--|--|--|--|--|--|
+| F1 | OBJECTS.asm (1695 lines) | ~66 ship/object models (far KN + near Kd + sub-parts) | 5763 | vertex/face bytes | `assets/models/*.obj`-like text + converter; indices in `3DTABS.asm` L97 table stay | M-H |
+| F2 | OBJECTS2.asm | 14 older models (Kobra, Kryl, asteroids, rocket, container, UFO1, target, trash, debris) | 1063 | same | same | M-H |
+| F3 | OBJECTSS.asm | 22 stations (16 level stations + pirate/prison/UFO/science/hyper-gate) | 3754 | same | same | M-H |
+| F4 | `assets/EFF.c` (flight.asm:129) | **compiled** hyperjump effect procedure (machine code produced by a generator) | 1333 | code | keep binary (generator unknown) | H |
+| F5 | `assets/FONT.f` (flight.asm:174) | panel/message font | 624 | raw 1-bit | `assets/gfx/panel_font.png` | M |
+| F6 | `assets/PANEL.C` | HUD panel picture, Hrust-packed | 1463 | packed (unpacked to #6373 by `DEHRUST`, LOADI2) | `assets/gfx/panel.png` + Hrust packer | **H** |
+| F7 | `assets/VOX.d` (1024), `EXPLOSIO.v` (5120), `HIPERJMP.v` (3328) | voxel sprite data: effects (explosion animation, hyperspace tunnel) | 9.5 KB | raw voxel/sprite lists | binary stays (format `.v` = voxel sprite, tools in STORM `CNVVOX*`); optional PNG strips after format analysis | H |
+| F8 | `assets/D9000.d`, `D9200.d`, `CSTB.d`, `ATAGTAB.d`, `KORNI.d`, `0E0200.d` | math tables (sine/multiplication, atan, sqrt, cosine/sine-bin) | 512+512+512+256+768+512 | raw | regenerate by script (as G7/G8) | M |
+| F9 | PANEL.asm:194, 794-1130 | radar blip sprites (`MINISPRITE`, `MOTAB`.. per object type: station, trader, army, micro, asteroid, hunter, UFO, unknown, pirate, police) as `%` bit lines | ~900 | `db %...` | `assets/gfx/radar_sprites.png` | M |
+| F10 | BRAINDOP.asm:1297-1420 | AY sound effects (ROKA, EFF0/1/2/11/13/14/19/21) as 4-byte step lists (tone, noise, mixer, volume) | ~300 | numbers | `assets/sound/effects.txt` (text, one line per step) | E |
+| F11 | 3DTABS.asm:204-380, SETHJRET.asm:221 NDATA | default state record (flight copy) + the *intended new game* | 2 x 512 | numbers | covered by D5 | M |
+| F12 | `DATAS.C`, `3DPART.C` (flight.asm:59, 84) | **self-built** images: `savebin` then `incbin` of the same name (layout loop) | 2 images | machine code | stays asm (not an asset); do not touch | H |
+| F13 | flight object-index table 3DTABS.asm:470-700 | index → model addresses | ~280 | `dw` + `equ low($)` | generated with the models (F1-F3) if models become files | M |
+
+### 10.5 Boot, intro, ending, saves
+| # | file | what | size | form | proposed editable form | diff |
+|--|--|--|--|--|--|--|
+| B1 | `assets/intro_logo.scr` | the "Awaken" logo (SCREEN$) used by the intro | 6912 | ZX screen | `assets/gfx/intro_logo.png` (256x192, attribute cells) + converter | E-M |
+| B2 | `assets/intro_depack.bin` | depacker + **packed closing picture "Awaken - Second Breeze"** (copied over the logo area; the stub calls it) | 1743 | code + packed picture | picture as PNG + Hrust-like packer **if the packer format is identical** (the code at the start is the depacker; format not analysed) | **H** |
+| B3 | `src/boot/intro.asm` | intro effects (code ~2.1 KB; unrolled generated code; no text) | - | code | stays asm | - |
+| B4 | `assets/FINALF.C` | the ending program (#6000, 19114 B): galaxy picture + big pixel letters "ТЫ СДЕЛАЛ ЭТО" / "ТЫ СПАС МИР" / "НО НАДОЛГО" drawn from bitmaps (no text strings in the file); colours cycle; no disk access | 19114 | code + graphics mixed, banked | needs disassembly: `src/ending/finalf.asm` first; the texts exist only as bitmaps (to edit them, re-draw or add a string renderer) | **H** |
+| B5 | `build.py` SAVE0..SAVE5 | 512-byte state records written by the build | 6 x 512 | raw | generated from `newgame.csv` (D5) | E |
+| B6 | boot BASIC (`src/boot/boot.asm`) | loader | 123 | BASIC bytes | stays | - |
+
+### 10.6 STORM data (`src/storm`; code stays asm; the data blobs below are all `INCBIN`)
+| file | used by | size | what | editable form |
+|--|--|--|--|--|
+| `assets/D9000.bin`, `D9000_plus.bin`, `D9200.bin`, `korni.bin` | S3D.asm:20/36/48, INVTAB3D.asm:31, BLK5.asm:65 | 512/512/768/768 | math tables (same family as G7/G8) | regenerate |
+| `assets/VOX.bin`, `VOX2.bin`, `CHAN1.bin`, `CHAN6.bin`, `drv2.bin`, `DRV1.bin`, `DRV2_UC.bin`, `DOMA1.bin`, `planet.bin` | CNVVOXTB/VOXEL/VSPRITE/VXXX/LAND/CNVVOXS3/CNVVOXSP | 1024..3072 each | voxel sprite and terrain data: channels (landscape height/colour maps?), driver/units (skimmer/vehicle sprites DRV), house (DOMA = "дома") and planet sprites | binary; converting to PNG needs format analysis (INFERRED names) |
+| `assets/FONT.bin` | LAND.asm:2308 | 1024 | font of the STORM prototype | `assets/gfx/storm_font.png` |
+Total STORM data: 14 files, ~20 KB.  Not on the disk; only needed if the surface-landing part is revived.
+
+Contents of the math tables, `ways.d`, `KSPOplus.s`, `VOX.d` and the voxel/STORM blobs are INFERRED from names, sizes and the code that reads them; the sizes and incbin lines are VERIFIED (`assets/MANIFEST.md`, grep).
+
+### 10.7 Summary by effort
+Easy (text + tables as CSV/TXT, ~80 % of the "editable" value): T1-T7, T9, T11, D1-D4, F10, B5.  Medium: fonts/sprites as PNG (G1, G2, F5, F9), tables regenerated by script (G7, G8, F8), settings/new-game record (D5, D6, D7), models (G9, F1-F3, needs a model text format), music split (G4), intro logo (B1).  Hard: everything Hrust-packed (G3 stscr, F6 panel, B2 closing picture) - **a Hrust 1.x packer must exist first**; the ending (B4) and the voxel/sprite files (F7), compiled effect `EFF.c` (F4), self-referencing images (F12).  The pictures are small (16 backgrounds, one panel, one closing picture), so a Python Hrust packer or an "uncompressed store" mode (a depacker-compatible stream with literals only; larger but valid) is enough: INFERRED, the format must be read from `DEPACK` (BODY.asm:847).

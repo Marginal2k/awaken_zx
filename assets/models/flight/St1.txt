@@ -1,0 +1,49 @@
+# St1 (record of OBJECTSS)
+model St1
+radius 109
+scale 5
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 8 8 101 mirror=xyz        # v0..v7
+group 16 20 10 mirror=xyz        # v8..v15
+group 109 15 16 mirror=xyz        # v16..v23
+group 101 8 8 mirror=xyz        # v24..v31
+group 13 14 108 mirror=xyz        # v32..v39
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 2 6 38 39 7
+poly 2 36 37 5 4
+poly 1 36 4 7 39
+poly 1 17 25 26 18
+poly 1 27 24 16 19
+poly 2 0 32 33 1
+poly 2 34 35 3 2
+poly 1 28 20 23 31
+poly 2 28 27 19 20
+poly 1 34 2 1 33
+poly 1 6 5 37 38
+poly 2 24 31 23 16
+poly 1 0 3 35 32
+poly 2 15 12 28 31
+poly 2 18 26 29 21
+poly 2 14 13 5 6
+poly 1 21 29 30 22
+poly 2 0 8 11 3
+poly 2 17 22 30 25
+poly 2 2 10 9 1
+poly 1 14 9 25 30
+poly 1 26 10 13 29
+poly 2 15 7 4 12
+poly 1 31 24 8 15
+poly 1 27 28 12 11
+poly 2 9 10 26 25
+poly 2 11 8 24 27
+poly 1 9 8 0 1
+poly 1 11 10 2 3
+poly 2 13 14 30 29
+poly 0 10 11 12 13
+poly 0 9 14 15 8
+poly 3 21 22 17 18
+poly 3 23 20 19 16
+poly 1 13 12 4 5
+poly 1 14 6 7 15
+poly 3 37 36 39 38
+poly 3 35 34 33 32

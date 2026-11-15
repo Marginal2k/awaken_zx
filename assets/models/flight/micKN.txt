@@ -1,0 +1,11 @@
+# micKN (record of OBJECTS)
+model micKN
+radius 92
+scale 1
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 48 35 92 mirror=xyz        # v0..v7
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 3 1 6 7 0
+poly 3 3 4 5 2
+poly 3 1 2 5 6
+poly 3 0 7 4 3

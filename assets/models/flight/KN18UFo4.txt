@@ -1,0 +1,20 @@
+# KN18UFo4 (record of OBJECTS)
+model KN18UFo4
+radius 108
+scale 3
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 36 33 102 mirror=xy        # v0..v3
+group 31 22 50 mask=0xF0        # v4..v7
+group 0 0 108 mask=0x40        # v8
+group 13 15 45 mask=0xF0        # v9..v12
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 2 5 8 6
+poly 2 4 7 8
+poly 2 10 2 3 9
+poly 2 12 9 3 0
+poly 2 12 0 1 11
+poly 2 11 1 2 10
+poly 2 5 4 8
+poly 2 6 8 7
+label P00KN18UFo4
+poly 3 1 0 3 2

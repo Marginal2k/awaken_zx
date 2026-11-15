@@ -1,0 +1,19 @@
+# KN13ufo2 (record of OBJECTS)
+model KN13ufo2
+radius 95
+scale 2
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 0 0 90 mask=0x10        # v0
+group 0 46 0 mirror=y        # v1..v2
+group 63 0 95 mask=0x0C        # v3..v4
+group 80 0 18 mask=0xC0        # v5..v6
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 3 2 6 1 5
+poly 3 2 5 0
+poly 3 2 0 6
+poly 3 1 6 0
+poly 3 1 0 5
+poly 2 5 2 4
+poly 2 2 6 3
+poly 2 3 6 1
+poly 2 1 5 4

@@ -1,0 +1,36 @@
+# Kd14 (record of OBJECTS)
+model Kd14
+radius 109
+scale 2
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 28 24 20 mask=0x0C        # v0..v1
+group 34 8 109 mask=0x30        # v2..v3
+group 75 38 24 mask=0x30        # v4..v5
+group 14 32 9 mask=0xC0        # v6..v7
+group 0 23 108 mask=0x08        # v8
+group 63 24 72 mirror=xy        # v9..v12
+group 109 6 0 mirror=x        # v13..v14
+group 32 42 98 mirror=x        # v15..v16
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 2 13 5 1
+poly 2 4 14 0
+poly 3 0 7 2 4
+poly 3 6 1 5 3
+poly 3 12 13 1
+poly 2 13 12 9
+poly 2 11 14 10
+poly 3 0 14 11
+poly 2 7 6 3 2
+poly 1 0 1 6 7
+poly 1 5 4 2 3
+label P00Kd14
+poly 3 8 11 10
+poly 2 15 16 4 5
+poly 3 5 13 9 15
+poly 3 16 10 14 4
+poly 2 8 10 16
+poly 1 8 16 15
+poly 2 8 15 9
+label P01Kd14
+poly 3 8 9 12
+poly 2 1 0 11 8 12

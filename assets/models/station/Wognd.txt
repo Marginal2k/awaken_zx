@@ -1,0 +1,33 @@
+# Wognd (record of OBJX)
+model Wognd
+radius 109
+scale 2
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 9 20 109 mask=0xF0        # v0..v3
+group 26 44 105 mirror=xy        # v4..v7
+group 20 29 97 mirror=xy        # v8..v11
+group 39 27 30 mask=0xAA        # v12..v15
+group 28 62 75 mirror=yz        # v16..v19
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 1 15 2 19
+poly 1 14 18 1
+poly 3 10 6 5 9
+poly 2 7 11 8 4
+poly 1 13 14 15 12
+poly 1 7 13 6
+poly 4 1 18 0
+poly 3 17 13 7
+poly 1 6 10 11 7
+poly 3 12 16 4
+poly 1 9 5 4 8
+poly 1 5 12 4
+poly 4 19 2 3
+poly 3 3 0 18 19
+poly 2 12 15 19 16
+poly 1 19 18 17 7 4 16
+poly 3 14 1 2 15
+poly 2 2 1 0 3
+poly 2 17 18 14 13
+label P00kd4
+poly 2 9 8 11 10
+poly 2 6 13 12 5

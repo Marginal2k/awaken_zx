@@ -1,0 +1,23 @@
+# CRG1 (record of OBJECTS2)
+model CRG1
+radius 62
+scale 1
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 48 50 45 mirror=xyz        # v0..v7
+group 26 50 62 mirror=xyz        # v8..v15
+group 27 50 45 mirror=xyz        # v16..v23
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 2 5 21 22 6
+poly 1 21 13 14 22
+poly 2 10 18 17 9
+poly 1 18 2 1 17
+poly 2 3 19 16 0
+poly 1 19 11 8 16
+poly 2 12 20 23 15
+poly 1 20 4 7 23
+poly 3 13 12 15 14
+poly 3 4 3 0 7
+poly 3 11 10 9 8
+poly 3 2 5 6 1
+poly 1 5 2 10 11 3 4 12 13
+poly 2 1 6 14 15 7 0 8 9

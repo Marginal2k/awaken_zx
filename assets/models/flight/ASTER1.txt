@@ -1,0 +1,35 @@
+# ASTER1 (record of OBJECTS2)
+model ASTER1
+radius 89
+scale 4
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 74 45 29 mask=0x5A        # v0..v3
+group 43 60 61 mask=0xA5        # v4..v7
+group 17 29 83 mask=0x41        # v8..v9
+group 25 89 4 mask=0x09        # v10..v11
+group 85 4 24 mask=0x84        # v12..v13
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 2 8 1 0
+poly 2 5 1 8
+poly 2 4 5 8
+poly 2 9 2 3
+poly 2 6 9 7
+poly 2 6 11 9
+poly 2 9 11 2
+poly 2 1 11 6
+poly 2 5 11 1
+poly 2 2 11 5
+poly 2 13 1 6
+poly 2 13 6 7
+poly 2 0 1 13
+poly 2 0 13 7
+poly 2 4 8 0
+poly 2 2 5 12
+poly 2 3 2 12
+poly 2 12 5 4
+poly 2 3 12 4
+poly 2 10 4 0
+poly 2 7 10 0
+poly 2 9 10 7
+poly 2 3 10 9
+poly 2 4 10 3

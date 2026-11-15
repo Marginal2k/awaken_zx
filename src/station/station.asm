@@ -65,7 +65,7 @@ MAKE_1:          equ  #C000
             include "CLPXR1.asm"
 
 Objcts:
-            include "OBJX.asm"
+            include "gen/OBJX.inc"   ; GENERATED from assets/models/station/*.txt
 Eobj:
 
 TISHIP:

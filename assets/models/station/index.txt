@@ -1,0 +1,15 @@
+# Station 3D viewer models in the order of the old source OBJX.asm.
+# One [SECTION] per generated include file (build/gen/<SECTION>.inc); the lines are the model files (NAME.txt) in this directory, in memory order.
+# Adding a model: create NAME.txt and add NAME here (and a reference to its label in the object index table of the code).
+
+[OBJX]
+Kobrad
+Kryld
+Pushkad
+Wognd
+Treugd
+Klopd
+Sturm
+Trad
+Turi
+Istr

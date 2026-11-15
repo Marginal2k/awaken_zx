@@ -1,0 +1,13 @@
+# KN10trg3 (record of OBJECTS)
+model KN10trg3
+radius 108
+scale 2
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 0 0 108 mask=0x80        # v0
+group 96 27 49 mirror=x        # v1..v2
+group 0 49 106 mask=0x08        # v3
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 3 1 3 2
+poly 1 2 0 1
+poly 2 2 3 0
+poly 2 0 3 1

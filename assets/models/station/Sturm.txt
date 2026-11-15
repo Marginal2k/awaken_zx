@@ -1,0 +1,30 @@
+# Sturm (record of OBJX)
+model Sturm
+radius 109
+scale 2
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 46 15 67 mirror=xyz        # v0..v7
+group 93 0 22 mirror=xz        # v8..v11
+group 30 21 101 mirror=xz        # v12..v15
+group 24 0 109 mask=0x0C        # v16..v17
+group 35 0 85 mask=0xC0        # v18..v19
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 3 15 4 7
+poly 3 14 6 5
+poly 3 4 11 7
+poly 3 10 5 6
+poly 1 14 5 4 15
+poly 2 16 2 1 13
+poly 2 3 17 12 0
+poly 1 4 3 8 11
+poly 0 8 3 0
+poly 0 1 2 9
+label P00stur
+poly 2 12 17 16 13
+poly 0 19 5 4 18
+poly 1 9 2 5 10
+poly 2 4 5 2 3
+poly 1 17 3 2 16
+poly 2 13 9 10 14
+poly 2 12 15 11 8
+poly 2 15 12 13 14

@@ -1,0 +1,26 @@
+# KOBRA (record of OBJECTS2)
+model KOBRA
+radius 120
+scale 2
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 44 22 42 mirror=xyz        # v0..v7
+group 120 1 15 mirror=xz        # v8..v11
+group 0 0 102 mask=0x10        # v12
+group 33 21 78 mirror=xy        # v13..v16
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 1 10 5 6
+poly 1 7 4 11
+poly 2 12 4 7
+poly 2 5 12 6
+poly 2 1 14 15 2
+poly 2 13 0 3 16
+poly 1 12 5 4
+poly 3 6 12 7
+poly 3 4 3 8 11
+poly 3 7 11 8 0
+poly 3 2 5 10 9
+poly 3 9 10 6 1
+label P00SH1
+poly 2 15 14 13 16
+poly 2 14 1 6 7 0 13
+poly 2 5 2 15 16 3 4

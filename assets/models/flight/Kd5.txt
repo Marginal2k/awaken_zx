@@ -1,0 +1,25 @@
+# Kd5 (record of OBJECTS)
+model Kd5
+radius 109
+scale 2
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 19 13 109 mask=0xC0        # v0..v1
+group 85 7 83 mirror=x        # v2..v3
+group 61 47 59 mask=0x0C        # v4..v5
+group 0 45 109 mask=0x08        # v6
+group 22 50 0 mask=0xC0        # v7..v8
+group 30 3 101 mask=0x30        # v9..v10
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 1 9 10 2 3
+poly 2 7 8 4 6 5
+poly 3 7 0 1 8
+poly 1 0 7 5
+poly 1 1 4 8
+poly 2 1 0 10 9
+poly 2 2 6 3
+poly 3 0 5 2 10
+label P00Kd5
+poly 2 5 6 2
+label P01Kd5
+poly 2 6 4 3
+poly 3 1 9 3 4

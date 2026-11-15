@@ -1,0 +1,40 @@
+# Pushkad (record of OBJX)
+model Pushkad
+radius 109
+scale 2
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 21 2 79 mask=0xC0        # v0..v1
+group 57 6 43 mask=0x0C        # v2..v3
+group 20 11 83 mask=0x0C        # v4..v5
+group 13 29 46 mask=0x0C        # v6..v7
+group 14 29 15 mask=0x0C        # v8..v9
+group 25 27 31 mask=0x0C        # v10..v11
+group 109 0 50 mask=0x0C        # v12..v13
+group 104 0 34 mirror=x        # v14..v15
+group 62 13 0 mirror=x        # v16..v17
+group 51 28 58 mirror=x        # v18..v19
+group 102 1 11 mask=0x0C        # v20..v21
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 3 0 3 16
+poly 3 17 2 1
+poly 2 16 3 14
+poly 2 15 2 17
+poly 1 7 11 9 8 10 6
+line 8 14 21
+poly 1 2 15 12 4
+poly 3 3 11 7 5
+line 8 15 20
+poly 3 18 5 4 19
+label P00pshd
+poly 2 13 5 18
+poly 1 14 3 5 13
+poly 2 6 4 5 7
+poly 2 10 8 1 2
+poly 3 8 9 0 1
+poly 3 6 10 2 4
+label P01pshd
+poly 2 19 4 12
+poly 1 19 12 15 17
+poly 2 11 3 0 9
+poly 1 14 13 18 16
+poly 1 1 0 16 18 19 17

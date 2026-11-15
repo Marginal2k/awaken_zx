@@ -215,9 +215,9 @@ MAKE_3:          equ  NEXTL2
             savebin "CONTROL.C",MAKE_3,$-MAKE_3
 MAKE_4:          equ  #C000
             org  MAKE_4
-            include "OBJECTS.asm"
-            include "OBJECTS2.asm"
-            include "OBJECTSS.asm"
+            include "gen/OBJECTS.inc"   ; GENERATED from assets/models/flight/*.txt
+            include "gen/OBJECTS2.inc"
+            include "gen/OBJECTSS.inc"
             endif
 
 

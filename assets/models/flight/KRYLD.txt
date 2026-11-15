@@ -1,0 +1,30 @@
+# KRYLD (record of OBJECTS2)
+model KRYLD
+radius 96
+scale 2
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 18 12 22 mirror=xyz        # v0..v7
+group 96 5 10 mirror=xz        # v8..v11
+group 11 4 80 mask=0x30        # v12..v13
+group 10 6 44 mirror=xy        # v14..v17
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 3 10 5 6
+poly 1 13 4 7
+poly 3 4 11 7
+poly 1 5 12 6
+poly 0 8 3 0
+poly 0 2 9 1
+poly 2 0 3 17 14
+poly 2 16 2 1 15
+poly 2 5 4 13 12
+poly 2 6 12 13 7
+poly 2 9 2 5 10
+poly 1 2 3 4 5
+poly 2 11 4 3 8
+label P00SH2D
+poly 2 16 15 14 17
+poly 2 0 14 15 1
+poly 1 7 0 1 6
+poly 3 10 6 1 9
+poly 3 7 11 8 0
+poly 2 17 3 2 16

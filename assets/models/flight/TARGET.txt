@@ -1,0 +1,6 @@
+# TARGET (record of OBJECTS2)
+model TARGET
+radius 1
+scale 1
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>

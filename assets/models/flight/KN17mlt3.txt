@@ -1,0 +1,26 @@
+# KN17mlt3 (record of OBJECTS)
+model KN17mlt3
+radius 108
+scale 2
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 54 28 87 mirror=xy        # v0..v3
+group 39 0 102 mask=0xC0        # v4..v5
+group 69 19 83 mirror=xyz        # v6..v13
+group 108 0 27 mirror=x        # v14..v15
+group 69 68 28 mirror=xyz        # v16..v23
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 2 2 3 4 5
+poly 2 1 5 4 0
+poly 4 0 3 2 1
+poly 3 15 11 12
+poly 3 15 7 8
+poly 3 14 13 10
+poly 3 14 20 19 9
+poly 3 14 6 16 23
+poly 3 14 9 6
+poly 3 15 22 17 7
+poly 3 18 21 15 8
+poly 3 15 21 11
+poly 3 22 15 12
+poly 3 14 23 13
+poly 3 14 10 20

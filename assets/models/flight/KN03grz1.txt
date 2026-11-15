@@ -1,0 +1,22 @@
+# KN03grz1 (record of OBJECTS)
+model KN03grz1
+radius 109
+scale 3
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 45 21 109 mirror=xy        # v0..v3
+group 32 0 109 mask=0xC0        # v4..v5
+group 58 21 65 mask=0xF0        # v6..v9
+group 23 33 77 mirror=xy        # v10..v13
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 2 9 6 13 10
+poly 2 7 8 11 12
+poly 3 10 13 3 0
+poly 3 12 11 1 2
+poly 1 6 9 4
+poly 1 12 2 3 13
+poly 2 10 0 1 11
+label P00KN03grz1
+poly 3 1 0 3 2
+poly 1 8 7 5
+poly 1 11 8 5 4 9 10
+poly 1 5 7 12 13 6 4

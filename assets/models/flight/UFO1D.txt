@@ -1,0 +1,25 @@
+# UFO1D (record of OBJECTS2)
+model UFO1D
+radius 60
+scale 3
+# group x y z mirror   -> vertex numbers (copies of the point, see tools/assets/models.py)
+group 59 50 60 mask=0x30        # v0..v1
+group 32 12 30 mask=0x3F        # v2..v7
+group 0 33 48 mask=0x50        # v8..v9
+# faces: poly <fill 0..7> <vertex numbers>   |   line <flags 8..15> <vertex numbers>
+poly 1 0 6 9
+poly 1 9 7 1
+poly 2 8 6 3
+poly 2 8 2 7
+poly 1 8 5 2
+poly 3 8 7 9
+poly 1 4 8 3
+poly 3 6 8 9
+poly 2 9 3 0
+poly 3 1 7 2
+poly 2 9 1 2
+poly 3 3 6 0
+poly 2 8 4 5
+label P00UFO1
+poly 3 5 4 3 2
+poly 3 9 2 3

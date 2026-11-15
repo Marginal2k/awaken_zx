@@ -37,7 +37,7 @@ rname:
             ld   bc,.stub_end-.stub_src
             ldir
             jp   STUB_ADDR
-.stub_src:
+.stub_src
             DISP STUB_ADDR
             ld   sp,STUB_SP
             ld   a,9
@@ -56,7 +56,7 @@ rname:
             ld   (STATE_FLAG),a
             ld   sp,#6000
             jp   entry
-.fn:      db   fname
+.fn      db   fname
             ENT
-.stub_end:
+.stub_end
             ENDM

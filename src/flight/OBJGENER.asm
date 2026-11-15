@@ -284,21 +284,21 @@ DOPGEN:
             ld   a,h
 
             or   c
-            jr   nz,DGN2
+            jr   nz,.DGN2
 
             ld   a,l
             cp   SPACEBS
-            jr   nc,DGN2
+            jr   nc,.DGN2
             ld   a,e
             cp   SPACEBS
-            jr   nc,DGN2
+            jr   nc,.DGN2
             ld   a,b
             cp   SPACEBS
-            jr   nc,DGN2
+            jr   nc,.DGN2
 
             jp   STATGEN_
 
-DGN2:
+.DGN2
             call RNDK2
             ld   a,h
             xor  l
@@ -318,7 +318,7 @@ PWPR:       cp   #F2
 DOPC1:
             ld   (DOPCOUNT+1),a
             and  a
-            jp   p,DOPC_
+            jp   p,.DOPC_
             ld   a,e
             and  3
             add  a,5
@@ -333,7 +333,7 @@ DOPC1:
             jr   c,$+4
             ld   a,T_PIRAT
             ld   (TYPERAID+3),a
-DOPC_:
+.DOPC_
             call FINDFREE
 ; ЕСЛИ БУФЕР ПОЛОН
             ret  z
@@ -528,51 +528,51 @@ VARPS:      equ  $-1
             ld   a,h
             nop
 ; ПИРАТ
-            jr   c,CHSN
+            jr   c,.CHSN
             cp   #43
             ld   c,T_TRADER
 ; МИРНЫЙ
-            jr   c,CHSN
+            jr   c,.CHSN
             cp   #50
             ld   c,T_MILITARY
 ; ПОЛИЦИЯ
-            jr   c,CHSN
+            jr   c,.CHSN
             cp   #50
             ld   c,T_POLICE
 ; ВОЕННЫЙ
-            jr   c,CHSN
+            jr   c,.CHSN
             cp   #5A
             ld   c,T_LEGIONER
 ; ЛЕГИОНЕР
-            jr   c,CHSN
+            jr   c,.CHSN
             cp   #5E
             ld   c,T_PIRAT2
 ; ПИРАТ НЕОПАСНЫЙ
-            jr   c,CHSN
+            jr   c,.CHSN
             cp   #63
             ld   c,T_UFO
 ; УФО
-            jr   c,CHSN
+            jr   c,.CHSN
             cp   #6B
             ld   c,T_UFO2
 ; УФО ВРАЖДЕБНЫЙ
-            jr   c,CHSN
+            jr   c,.CHSN
             cp   #70
             ld   c,T_HERMIT
 ; ОТШЕЛЬНИК
-            jr   c,CHSN
+            jr   c,.CHSN
             pop  de
             ret
-CHSN:
+.CHSN
             ld   a,c
             cp   T_HERMIT
-            jr   nz,CHSN2
+            jr   nz,.CHSN2
             ld   a,(NOSTAT)
             or   a
-            jr   z,CHSN2
+            jr   z,.CHSN2
             pop  de
             ret
-CHSN2:
+.CHSN2
             ld   (ix+TYPE),c
             sla  c
             ld   b,0
@@ -605,9 +605,9 @@ CHSN2:
             ld   l,a
             ld   a,(ix+TYPE)
             cp   T_UFO
-            jr   z,GSS99
+            jr   z,.GSS99
             cp   T_UFO2
-            jr   z,GSS99
+            jr   z,.GSS99
             ld   a,#80
             sub  h
             ld   h,a
@@ -617,11 +617,11 @@ CHSN2:
             add  a,25
             cp   h
 ; ЕСЛИ КОРАБЛЬ ПРОСТО ЛЕТИТ
-            jp   c,GSS1
+            jp   c,.GSS1
             ld   a,c
             cp   #10
-            jp   z,GSS1
-GSS99:
+            jp   z,.GSS1
+.GSS99
 ; МАСШТАБНЫЙ КОЭФИЦИЕНТ ТИПА КОРАБЛЯ
             ld   a,l
             call SIZEOBJ
@@ -669,31 +669,31 @@ GSS99:
             call TONEARPLAN
 
 ; НА ГЕНЕРАЦИЯ ДРУГИХ ДАННЫЙ
-            jp   GSH29
+            jp   .GSH29
 
 ; ГЕНЕРИМ ДАННЫЕ КООРДИНАТ КОГДА КОРАБЛЬ
 ; ПРОСТО ЛЕТЕЛ
-GSS1:
+.GSS1
             ld   a,r
             bit  1,a
-            jp   z,GSH1
+            jp   z,.GSH1
 
             call FINDOBJ
             ld   a,(STATGEN)
             and  a
-            jp   z,GSH1
+            jp   z,.GSH1
             ld   a,(ix+TYPE)
             cp   T_PIRAT
 ; ЕСЛИ ПИРАТ ТО ОН НЕ МОЖЕТ ГЕНЕРИТЬСЯ ИЗ
 ; СТАНЦИИ
-            jp   z,GSH1
+            jp   z,.GSH1
             cp   T_PIRAT2
-            jp   nc,GSH1
+            jp   nc,.GSH1
 
 
             ld   d,T_STATION
             call FINDOBJ
-            jr   z,GSH1
+            jr   z,.GSH1
 
             ld   l,(iy+0)
             ld   h,(iy+1)
@@ -719,11 +719,11 @@ GSS1:
             ld   (ix+ALFA),#40
             ld   (ix+BETA),0
             ld   (ix+GAMA),0
-            jp   GSH299
+            jp   .GSH299
 
 
 ; ЛЕТИМ К ПЛАНЕТЕ
-GSH1:
+.GSH1
 
             ld   hl,(SNX+1)
             ld   de,(SNY+1)
@@ -731,24 +731,24 @@ GSH1:
             ABSHL
             ABSDE
             ABSBC
-GSH23:
+.GSH23
             sla  l
             rl   h
-            jp   m,GSH21
+            jp   m,.GSH21
             sla  e
             rl   d
-            jp   m,GSH22
+            jp   m,.GSH22
             sla  c
             rl   b
-            jp   p,GSH23
+            jp   p,.GSH23
             rr   b
             rr   c
             and  a
-GSH22:
+.GSH22
             rr   d
             rr   e
             and  a
-GSH21:
+.GSH21
             rr   h
             rr   l
             res  1,b
@@ -818,7 +818,7 @@ GSH21:
             ld   l,a
             ld   a,(KOLPLANET+1)
             or   a
-            jr   z,GSH29
+            jr   z,.GSH29
             ld   h,a
             ld   a,l
             cp   h
@@ -837,9 +837,9 @@ GSH21:
             call TOPLAN
 ; УГЛЫ
 
-GSH29:
+.GSH29
             ld   (ix+ALFA),0
-GSH299:
+.GSH299
             call RNDL7
             ld   a,l
             and  #55
@@ -876,7 +876,7 @@ PMUEK:      ld   h,100
             ld   (SDW+2),a
             ld   a,(ix+TYPE)
             cp   T_HERMIT
-            jr   nz,GNR1
+            jr   nz,.GNR1
             ld   (ix+ENERGY),240
             ld   (ix+MENE),250
             ld   a,(ix+ALFA)
@@ -885,17 +885,17 @@ PMUEK:      ld   h,100
             ld   (ix+RAND+1),a
             ld   a,(ix+GAMA)
             ld   (ix+MSPD),a
-GNR1:
+.GNR1
             ld   a,(ix+TYPE)
             cp   T_UFO
-            jr   nz,GNR19
+            jr   nz,.GNR19
             cp   7
-            jr   nz,GNR19
+            jr   nz,.GNR19
             ld   (ix+ENERGY),240
             ld   (ix+MENE),250
             ld   (ix+LZS),110
             ld   (ix+FORSAG),0
-GNR19:
+.GNR19
             ld   a,(ix+MODE)
             ld   (ix+OMODE),a
             ld   a,r

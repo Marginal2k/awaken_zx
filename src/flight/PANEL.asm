@@ -75,7 +75,7 @@ COMPOS:
 STK08:      ld   sp,0
             ld   a,(NOSUN)
             dec  a
-            jr   z,ECOMP
+            jr   z,.ECOMP
 ; ЕСЛИ ЗВЕЗДА ЕСТЬ В ПОЛЕ ВИДИМОСТИ
             ld   a,(STX)
 ;X-ЗВЕЗДЫ ПРЕОБРАЗОВАННАЯ К X НА КОМПАСЕ
@@ -106,7 +106,7 @@ STK08:      ld   sp,0
             jp   p,$+6
             ld   de,UVISUN
             call MINISPRITE
-ECOMP:
+.ECOMP
 ; ТОЖЕ С ПЛАНЕТОЙ
             ld   a,(ETX)
             ld   c,a
@@ -385,32 +385,32 @@ RDR2:
             ret  z
 RDR1:
             ld   de,OLEN
-RDR11:
+.RDR11
             add  ix,de
             ld   a,(ix+1)
             cp   #80
             jr   z,RDR2
             ld   a,(ix+TYPE)
             cp   #14                ;TPAШ
-            jr   z,RDR11
+            jr   z,.RDR11
             cp   #15                ;CHAPЯД
-            jr   z,RDR11
+            jr   z,.RDR11
             ld   a,(ix+PX+1)
             cp   #80
-            jr   z,RDR11
+            jr   z,.RDR11
             ld   c,a
             and  a
             jp   p,$+5
             neg
             cp   RADFAR
-            jr   nc,RDR11
+            jr   nc,.RDR11
             ld   a,(ix+PY+1)
             ld   b,a
             and  a
             jp   p,$+5
             neg
             cp   RADFAR
-            jr   nc,RDR11
+            jr   nc,.RDR11
             ld   a,(ix+PZ+1)
             ld   e,a
             and  a
@@ -486,8 +486,8 @@ RDR11:
             exx
             sra  a
             sra  a
-            jp   z,MRAD2
-            jp   p,DOWNLINE
+            jp   z,.MRAD2
+            jp   p,.DOWNLINE
 ;UPLINE
             neg
             ld   b,a
@@ -500,12 +500,12 @@ RDR11:
             jr   c,$+13
             sub  #90-#28+3
             add  a,b
-            jp   m,MRAD2
+            jp   m,.MRAD2
             ld   b,a
             and  a
-            jp   z,MRAD2
+            jp   z,.MRAD2
             ex   af,af'
-UPL1:
+.UPL1
             ld   a,(de)
             or   c
             ld   (de),a
@@ -520,7 +520,7 @@ UPL1:
             ld   a,d
             add  a,8
             ld   d,a
-            djnz UPL1
+            djnz .UPL1
             ld   a,d
             dec  d
             and  7
@@ -544,8 +544,8 @@ UPL1:
             add  a,8
             ld   d,a
             ld   a,d
-            jp   MRAD
-DOWNLINE:
+            jp   .MRAD
+.DOWNLINE
             ld   b,a
             exx
             ld   a,c
@@ -558,10 +558,10 @@ DOWNLINE:
             neg
             ld   b,a
             and  a
-            jr   z,MRAD2
-            jp   m,MRAD2
+            jr   z,.MRAD2
+            jp   m,.MRAD2
             ex   af,af'
-UPL2:
+.UPL2
             ld   a,(de)
             or   c
             ld   (de),a
@@ -576,11 +576,11 @@ UPL2:
             ld   a,d
             sub  8
             ld   d,a
-            djnz UPL2
-MRAD:
+            djnz .UPL2
+.MRAD
             ex   af,af'
             jp   nc,RDR1
-MRAD2:
+.MRAD2
             exx
             ld   a,e
             and  7
@@ -721,7 +721,7 @@ DATAL:
             ld   c,a
             and  a
 ; ЕСЛИ РОВНО НУЛЮ ЗНАЧЕНИЕ
-            jr   z,ZR1
+            jr   z,.ZR1
             cpl
             and  7
             ld   a,c
@@ -733,7 +733,7 @@ DATAL:
             rrca
             rrca
             and  7
-            jr   z,ZR1
+            jr   z,.ZR1
             ld   b,a
             ld   de,#05AA
             rept 5
@@ -746,12 +746,12 @@ DATAL:
             ld   h,a
             inc  l
             djnz $-15
-ZR1:
+.ZR1
             ld   a,c
             ex   af,af'
             ld   a,c
             and  7
-            jr   z,ZR2
+            jr   z,.ZR2
             ld   c,a
             ld   b,0
             EXD
@@ -768,7 +768,7 @@ ZR1:
             ld   d,a
             EXD
             inc  l
-ZR2:
+.ZR2
             ex   af,af'
             ld   c,a
             and  7
@@ -830,7 +830,7 @@ LIGHTER:
             ld   bc,#20
             exx
             ld   l,7
-ZR3:
+.ZR3
             exx
             ld   a,#80
             xor  (hl)
@@ -844,7 +844,7 @@ ZR3:
             EXD
             exx
             dec  l
-            jp   nz,ZR3
+            jp   nz,.ZR3
             exx
 
             ld   hl,#870E
@@ -852,7 +852,7 @@ ZR3:
 
             exx
             ld   l,7
-ZR5:
+.ZR5
             exx
             ld   a,#80
             xor  (hl)
@@ -866,7 +866,7 @@ ZR5:
             EXD
             exx
             dec  l
-            jp   nz,ZR5
+            jp   nz,.ZR5
 
             ex   af,af'
             dec  a
@@ -885,7 +885,7 @@ ZR5:
             ld   bc,#20
             exx
             ld   l,#57
-ZR4:
+.ZR4
             exx
             ld   a,#80
             xor  (hl)
@@ -899,37 +899,37 @@ ZR4:
             EXD
             exx
             dec  l
-            jp   nz,ZR4
+            jp   nz,.ZR4
 
 
 ; ВЫВОД МАРКЕРОВ КОРАБЛЕЙ
             ld   de,OLEN
             ld   ix,CARSB-OLEN
             jp   $+9
-ZR8:
+.ZR8
             ld   a,(ix+0)
             cp   #80
             ret  z
-ZR6:
+.ZR6
             ld   de,OLEN
-ZR7:
+.ZR7
             add  ix,de
             ld   a,(ix+1)
             cp   #80
-            jr   z,ZR8              ;ПУСТОЕ ПОЛЕ
+            jr   z,.ZR8              ;ПУСТОЕ ПОЛЕ
             ld   a,(ix+TYPE)
             cp   #14                ;TRASH
-            jr   z,ZR8
+            jr   z,.ZR8
             ld   a,(ix+PX+1)
             cp   #80
 ; ЕСЛИ НЕТ РАСЧЕТНЫХ КООРДИНАТ
-            jr   z,ZR7
+            jr   z,.ZR7
             ld   b,a
             ld   c,(ix+PX)
             ld   d,(ix+PZ+1)
             bit  7,d
 ; ЕСЛИ ЗА ЭКРАНОМ СЗАДИ
-            jr   nz,ZR6
+            jr   nz,.ZR6
 ;ДОП. ПРОВЕРКА ПО X
 ;           and  a
 ;           jp   p,$+5
@@ -938,7 +938,7 @@ ZR7:
 ;           jrnc $R6;ДАЛЕКО ПО X
             ld   a,d
             cp   6
-            jr   c,ZR6
+            jr   c,.ZR6
             ld   e,(ix+PZ)
             ld   a,(ix+PY+1)
             ld   h,a
@@ -949,25 +949,25 @@ ZR7:
 ;           jrnc $R6;ДАЛЕКО ПО Y
             ld   l,(ix+PY)
             call CALC2D3D
-            jr   nz,ZR6             ;ПЕРЕПОЛНЕНИЕ
+            jr   nz,.ZR6             ;ПЕРЕПОЛНЕНИЕ
             ld   a,h
             and  a
-            jr   nz,ZR6             ;ДАЛЕКО ПО X
+            jr   nz,.ZR6             ;ДАЛЕКО ПО X
             ld   a,d
             and  a
-            jr   nz,ZR6             ;ПО Y
+            jr   nz,.ZR6             ;ПО Y
             ld   a,l
 ;X НАЧАЛА ПОДСВЕТКИ
             sub  #50
-            jr   c,ZR6
+            jr   c,.ZR6
             cp   #5E                ;ДЛИННА ЕЕ
-            jr   nc,ZR6
+            jr   nc,.ZR6
             ld   a,e
 ;Y НАЧАЛА ПОДСВЕТКИ
             sub  #0E
-            jr   c,ZR6
+            jr   c,.ZR6
             cp   #4C                ;ВЫСОТА
-            jr   nc,ZR6
+            jr   nc,.ZR6
             ld   b,e
             ld   a,l
             sub  4
@@ -998,21 +998,21 @@ ZR7:
             ld   l,a
             ld   a,(ROKETN1)
             cp   l
-            jr   z,ZR9
+            jr   z,.ZR9
             ld   a,(ROKETN2)
             cp   l
-            jr   z,ZR9
+            jr   z,.ZR9
             ld   a,(ROKETN3)
             cp   l
-            jr   nz,ZR10
-ZR9:
+            jr   nz,.ZR10
+.ZR9
             ld   a,e
             add  a,#80
             ld   e,a
             ld   a,d
             adc  a,0
             ld   d,a
-ZR10:
+.ZR10
             ld   a,c
             rrca
             rrca
@@ -1048,5 +1048,5 @@ ZR10:
             ld   a,(de)
             xor  (hl)
             ld   (hl),a
-            jp   ZR6
+            jp   .ZR6
             include "gen/RADAR_TARGET.inc"   ; GENERATED from assets/gfx/radar_sprites.png

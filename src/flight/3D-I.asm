@@ -3,7 +3,7 @@ REN3D:
 ; НАЧИНАЕМ ВЫБОР ОБЪЕКТОВ КОТОРЫЕ ВИДИМЫ
 RETPRI:     ld   a,0
             and  a
-            jr   nz,RTPR
+            jr   nz,.RTPR
 ; ЕСЛИ НАДО ВЕРНУТЬ ПРИЦЕЛ В ЦЕНТРАЛЬНОЕ
 ; ПОЛОЖЕНИЕ, ЗНАЧИТ НЕБЫЛО НАВЕДЕНИЯ
             ld   hl,(PCORD)
@@ -26,7 +26,7 @@ RETPRI:     ld   a,0
             dec  h
             dec  h
             ld   (PCORD),hl
-RTPR:
+.RTPR
             xor  a
             ld   (RETPRI+1),a
             ld   (NUNU+1),a
@@ -208,10 +208,10 @@ L9F04:
             ld   a,c
             srl  a
             sub  #0F
-            jr   nc,NUNU2
+            jr   nc,.NUNU2
             neg
-            jp   NUNU2+1
-NUNU2:
+            jp   .NUNU2+1
+.NUNU2
             xor  a
             ld   c,a
             ld   a,(NUNU+1)
@@ -225,10 +225,10 @@ NUNU2:
             jp   m,L9EFC
             cp   DETALIZ
             ld   a,(INDX)           ;ind
-            jp   p,LA0BC
+            jp   p,.LA0BC
             add  a,#02
             ld   (INDX),a           ;ind
-LA0BC:
+.LA0BC
             ld   sp,(END_1+1)
             call SIZEOBJ
             ld   a,6
@@ -247,31 +247,31 @@ Jmp1:       jr   $
             rr   l
             ld   de,(DX+1)          ;DX
             bit  7,d
-            jr   z,LA108
+            jr   z,.LA108
             adc  hl,de
-            jp   LA10A
-LA108:      sbc  hl,de
-LA10A:      jp   m,LA121
+            jp   .LA10A
+.LA108      sbc  hl,de
+.LA10A      jp   m,.LA121
             pop  hl
             push hl
             ld   de,(DZ+1)          ;DZ
             bit  7,d
-            jr   z,LA11C
+            jr   z,.LA11C
             adc  hl,de
-            jp   LA11E
-LA11C:      sbc  hl,de
-LA11E:      jp   m,LA121
+            jp   .LA11E
+.LA11C      sbc  hl,de
+.LA11E      jp   m,.LA121
             pop  hl
             push hl
             ld   de,(DY+1)          ;DY
             bit  7,d
-            jr   z,LA1C
+            jr   z,.LA1C
             adc  hl,de
-            jp   LA1E
-LA1C:       sbc  hl,de
-LA1E:
+            jp   .LA1E
+.LA1C       sbc  hl,de
+.LA1E
             call p,CRASH
-LA121:      pop  de
+.LA121      pop  de
             pop  bc
 
 LA13A:      ld   hl,(TZ+1)
@@ -540,21 +540,21 @@ MDYY:       ld   de,0
             ld   de,ROKETN1
             ld   a,(de)
             inc  a
-            jr   z,CSA1
+            jr   z,.CSA1
             ld   de,ROKETN2
             ld   a,(de)
             inc  a
-            jr   z,CSA1
+            jr   z,.CSA1
             ld   de,ROKETN3
             ld   a,(de)
             inc  a
-            jr   z,CSA1
+            jr   z,.CSA1
             ld   hl,EFF14
             ld   (SFXA+1),hl
 
             MESAG _ALLTARGET
             jp   LLLK
-CSA1:
+.CSA1
             exx
             ld   a,l
             ex   af,af'
@@ -590,7 +590,7 @@ LLLK:
             sbc  hl,bc
             jp   m,LA238
 LA1FF:      ld   iyh,L9D
-LA202:      ld   a,(ix+#00)
+.LA202      ld   a,(ix+#00)
             cp   #01
             jr   z,LA24E
             ld   iyl,a
@@ -600,7 +600,7 @@ LA202:      ld   a,(ix+#00)
             jp   m,LA260
             ld   a,iyl
             ld   ixl,a
-            jp   LA202
+            jp   .LA202
 LA238:      ld   a,(INDT2)
             cp   #FC
             jp   z,END_1
@@ -684,18 +684,18 @@ LA2FD:      ld   sp,#0000
 
 ; МАСКА ВИДИМОСТИ ОБЪЕКТОВ
             call VSMASK
-            jr   z,LA339
+            jr   z,.LA339
             ld   b,a
             cpl
             and  #F0
-            jr   nz,LA339
+            jr   nz,.LA339
             ld   a,b
             and  #0F
             jr   nz,$+8
             call DRWPOL2
             jp   $+6
             call DRWPOL
-LA339:      pop  hl
+.LA339      pop  hl
             ld   a,(hl)
 LA33B:      cp   #01
             ret  z
@@ -720,25 +720,25 @@ CRASH:      ld   a,0
             cp   T_TRASH
             ret  z
             cp   T_STATION
-            jr   nz,CRSH
+            jr   nz,.CRSH
 ; ОПРЕДЕЛЕНИЕ СТЫКОВКИ СО СТАНЦИЕЙ
             bit  4,(ix+SETUP)
-            jr   z,CRSH
+            jr   z,.CRSH
 ; СТЫКОВОЧНЫЙ БЛОК
             ld   a,(ix+1)
             ACPL_A
             cp   CRSHST
-            jr   nc,CRSH
+            jr   nc,.CRSH
             ld   a,(ix+3)
             ACPL_A
             cp   CRSHST
-            jr   nc,CRSH
+            jr   nc,.CRSH
             ld   a,(ix+5)
             ACPL_A
             cp   CRSHST
 ; ЕСЛИ ВОЗВРАТ НА СТАНЦИЮ
             jp   c,RETST
-CRSH:
+.CRSH
             ld   hl,CRASH+1
             dec  (hl)
             call LM1

@@ -157,8 +157,8 @@ InitStarTable:ld a,#6f
             call BuildSprites
             ld de,L8000
             ld h,#a0
-L6645:      ld l,#00
-L6647:      ld a,(hl)
+.L6645      ld l,#00
+.L6647      ld a,(hl)
             srl a
             srl a
             ld (de),a
@@ -168,11 +168,11 @@ L6647:      ld a,(hl)
             ld (de),a
             inc l
             inc e
-            jr nz,L6647
+            jr nz,.L6647
             inc h
             inc d
             bit 6,d
-            jr z,L6645
+            jr z,.L6645
             ld a,#16
             call SetPage
             jp ShowFrame
@@ -245,26 +245,26 @@ FadeCopy:   ld a,#14
             call SetPage
             ld d,#80
             ld hl,#c000
-L6733:      ld e,#00
+.L6733      ld e,#00
             ld b,#40
-L6737:      ld a,(hl)
+.L6737      ld a,(hl)
             add a,ixl
             ld (de),a
             inc hl
             inc e
-            djnz L6737
+            djnz .L6737
             inc d
             bit 6,d
-            jr z,L6733
+            jr z,.L6733
             ld h,#80
             ld d,h
-L6747:      ld bc,#00c0
+.L6747      ld bc,#00c0
             ld l,b
             ld e,#40
             ldir
             inc h
             bit 6,h
-            jr z,L6747
+            jr z,.L6747
             jp Page11
 ShowFrame:  ld bc,#4000
             ld hl,L8000
@@ -299,15 +299,15 @@ L6792:      ld de,#0000
 L679D:      ld hl,#4000
             dec h
             ld (L679E),hl
-L67A4:      ld a,h
+.L67A4      ld a,h
             ld (bc),a
             add hl,de
             inc c
             bit 7,c
-            jp z,L67A4
+            jp z,.L67A4
             ld bc,#6400
             ld ix,L6440
-L67B4:      ld h,#80
+.L67B4      ld h,#80
             ld a,(bc)
             ld l,a
             srl l
@@ -324,15 +324,15 @@ L67B4:      ld h,#80
             ld (de),a
             inc ixl
             inc c
-            jr nz,L67B4
+            jr nz,.L67B4
             pop bc
             djnz L6784
             ld ixl,#02
-L67D6:      ld hl,L8100
-L67D9:      inc l
+.L67D6      ld hl,L8100
+.L67D9      inc l
             ld a,(hl)
             cp #ff
-            jr nz,L67E7
+            jr nz,.L67E7
             inc h
             ld d,(hl)
             dec l
@@ -341,11 +341,11 @@ L67D9:      inc l
             ld (hl),e
             inc l
             ld (hl),d
-L67E7:      inc hl
+.L67E7      inc hl
             bit 7,h
-            jr nz,L67D9
+            jr nz,.L67D9
             dec ixl
-            jr nz,L67D6
+            jr nz,.L67D6
             ret
 NextWarp:   ld a,#00
             add a,#80
@@ -355,14 +355,14 @@ NextWarp:   ld a,#00
 L67FD:      ld h,#14
 L67FF:      ld (L6839),hl
             call WaitFrame
-            jr nz,L6818
+            jr nz,.L6818
             ld hl,#6100
             call L6827
             ld hl,#60c0
             call L68A4
             ld hl,#6000
             jr L6827
-L6818:      ld hl,#6000
+.L6818      ld hl,#6000
             call L6827
             ld hl,#61c0
             call L68A4
@@ -455,9 +455,9 @@ MakeBlitCode:exx
             ld hl,L68A9
             ld d,ixl
             ld c,#08
-L6935:      ld e,ixl
+.L6935      ld e,ixl
             ld b,#04
-L6939:      ld (hl),#e1
+.L6939      ld (hl),#e1
             inc hl
             ld (hl),#22
             inc hl
@@ -467,10 +467,10 @@ L6939:      ld (hl),#e1
             inc hl
             inc e
             inc e
-            djnz L6939
+            djnz .L6939
             inc d
             dec c
-            jr nz,L6935
+            jr nz,.L6935
             exx
             ld hl,#6000
             ld a,#26
@@ -484,31 +484,31 @@ L6939:      ld (hl),#e1
             ld b,h
             ld c,l
 L6964:      ld ixh,#08
-L6967:      ld ixl,#08
+.L6967      ld ixl,#08
             ld a,(hl)
             inc hl
             and #0f
             ld iyl,a
             push bc
-L6971:      ld a,(bc)
+.L6971      ld a,(bc)
             inc bc
             and #f0
             or iyl
             ld (de),a
             inc e
             dec ixl
-            jr nz,L6971
+            jr nz,.L6971
             pop bc
             dec ixh
-            jr nz,L6967
+            jr nz,.L6967
             ret
 BlitWait:   halt
             ld a,(L67F2)
             or a
             ld hl,#60c0
-            jr z,L6990
+            jr z,.L6990
             ld hl,#61c0
-L6990:      jp L68A4
+.L6990      jp L68A4
 L6993:
             db   #88,#88,#AA,#AA,#EE,#EE,#FF,#FF,#00,#22,#22,#AA,#AA,#BB,#BB,#FF
 PokeBlock:  ld (hl),e
@@ -531,15 +531,15 @@ PokeBlock:  ld (hl),e
             ret
 InitRowTabs:ld hl,L647F
             ld de,L6481
-L69BC:      ld a,(hl)
+.L69BC      ld a,(hl)
             ld (de),a
             dec l
             inc e
-            jr nz,L69BC
+            jr nz,.L69BC
             ld hl,#6000
             ld de,#4000
             ld b,#10
-L69CA:      inc l
+.L69CA      inc l
             inc l
             ld (hl),e
             inc l
@@ -556,15 +556,15 @@ L69CA:      inc l
             ld a,e
             add a,#20
             ld e,a
-            jr nc,L69E3
+            jr nc,.L69E3
             ld a,d
             add a,#08
             ld d,a
-L69E3:      djnz L69CA
+.L69E3      djnz .L69CA
             ld hl,#6000
             ld de,#6100
             ld b,#20
-L69ED:      inc l
+.L69ED      inc l
             inc l
             inc e
             inc e
@@ -577,7 +577,7 @@ L69ED:      inc l
             ld (de),a
             inc l
             inc e
-            djnz L69ED
+            djnz .L69ED
             ret
 PokeJp:     ld (hl),#c3
             inc hl
@@ -607,13 +607,13 @@ FillMem:    ld d,h
 ; HL -> DE, BC bytes, repeated B times (A = B on entry), HL advanced by the caller
 RepeatLdir: ld a,b
             ld b,#00
-L6A21:      push hl
+.L6A21      push hl
             push bc
             ldir
             pop bc
             pop hl
             dec a
-            jr nz,L6A21
+            jr nz,.L6A21
             ex de,hl
             ret
 SlopeInit:  ld (L6A47),sp
@@ -624,7 +624,7 @@ SlopeInit:  ld (L6A47),sp
             pop de
             push de
             bit 7,b
-            jr z,L6A41
+            jr z,.L6A41
             ld a,e
             cpl
             ld e,a
@@ -632,7 +632,7 @@ SlopeInit:  ld (L6A47),sp
             cpl
             ld d,a
             inc de
-L6A41:      add hl,de
+.L6A41      add hl,de
             push hl
             add hl,bc
             push hl
@@ -661,7 +661,7 @@ L6A5D:      call #cdcd
 ; fill the pixel area #4000-#57FF with C (unrolled)
 FillScreen: ld hl,#4000
             ld b,#80
-L6A6C:      ld e,l
+.L6A6C      ld e,l
             ld (hl),c
             inc l
             ld (hl),c
@@ -729,15 +729,15 @@ L6A6C:      ld e,l
             inc h
             ld a,h
             and #07
-            jp nz,L6ABE
+            jp nz,.L6ABE
             ld a,l
             add a,#20
             ld l,a
-            jr c,L6ABE
+            jr c,.L6ABE
             ld a,h
             sub #08
             ld h,a
-L6ABE:      djnz L6A6C
+.L6ABE      djnz .L6A6C
             ret
 InitSprite: call Page11
             ld de,#d000
@@ -749,35 +749,35 @@ InitSprite: call Page11
             ld hl,#d800
             ld de,#0100
             ld c,#10
-L6ADD:      push hl
+.L6ADD      push hl
             ld ixl,#40
             ld b,#60
-L6AE3:      ld a,h
+.L6AE3      ld a,h
             cp #e8
-            jr c,L6AE9
+            jr c,.L6AE9
             sub a
-L6AE9:      cp #d8
-            jr nc,L6AEE
+.L6AE9      cp #d8
+            jr nc,.L6AEE
             sub a
-L6AEE:      ld (ix+#00),a
+.L6AEE      ld (ix+#00),a
             inc ixl
             add hl,de
-            djnz L6AE3
+            djnz .L6AE3
             inc ixh
             ld hl,#fffb
             add hl,de
             ex de,hl
             pop hl
             dec c
-            jr nz,L6ADD
+            jr nz,.L6ADD
             ld d,#da
             ld a,#20
-L6B05:      ld e,#e0
+.L6B05      ld e,#e0
             ld hl,ShadeTab
             ld bc,#0020
             ldir
             dec a
-            jr nz,L6B05
+            jr nz,.L6B05
             ld (L67FE),a
             ld ixl,#00
             call FadeCopy
@@ -787,8 +787,8 @@ L6B05:      ld e,#e0
             ld bc,#0100
             ldir
             pop hl
-L6B28:      ld l,#00
-L6B2A:      ld a,(hl)
+.L6B28      ld l,#00
+.L6B2A      ld a,(hl)
             inc h
             add a,(hl)
             inc l
@@ -800,7 +800,7 @@ L6B2A:      ld a,(hl)
             ld (hl),a
             inc l
             bit 6,l
-            jr z,L6B2A
+            jr z,.L6B2A
             ld e,l
             ld d,h
             ld bc,#00c0
@@ -808,7 +808,7 @@ L6B2A:      ld a,(hl)
             ldir
             inc h
             bit 6,h
-            jr z,L6B28
+            jr z,.L6B28
             sub a
             ld (L6993),a
             ld ixl,#c0
@@ -902,26 +902,26 @@ L6C11:      ld hl,L6400
             ret
 ScrollStep: ld a,#a1
             dec a
-            jr nz,L6C27
+            jr nz,.L6C27
             inc a
-L6C27:      ld (L6C22),a
+.L6C27      ld (L6C22),a
             dec a
             jr z,L6C3E
 L6C2D:      ld a,#00
             inc a
             bit 6,a
-            jr z,L6C35
+            jr z,.L6C35
             dec a
-L6C35:      ld (L6C2E),a
+.L6C35      ld (L6C2E),a
             srl a
             add a,#27
             jr SetWaveBase
 L6C3E:      ld a,#00
             inc a
             cp #28
-            jr nz,L6C46
+            jr nz,.L6C46
             sub a
-L6C46:      ld (L6C3F),a
+.L6C46      ld (L6C3F),a
             ld e,a
             ld d,#00
             ld hl,WaveTab
@@ -974,8 +974,8 @@ InitEffect2:ld a,#14
             ld hl,#a800
             ld de,#c000
             ld c,#26
-L6CDA:      ld b,#08
-L6CDC:      ld (hl),#e1
+.L6CDA      ld b,#08
+.L6CDC      ld (hl),#e1
             inc hl
             ld (hl),#22
             inc hl
@@ -985,15 +985,15 @@ L6CDC:      ld (hl),#e1
             inc hl
             inc e
             inc e
-            djnz L6CDC
+            djnz .L6CDC
             ld e,#00
             inc d
             dec c
-            jr nz,L6CDA
+            jr nz,.L6CDA
             ld de,L6BBC
             call PokeJp
             ld hl,#9800
-L6CF9:      ld a,l
+.L6CF9      ld a,l
             rrca
             rrca
             rrca
@@ -1001,7 +1001,7 @@ L6CF9:      ld a,l
             and #0f
             ld (hl),a
             inc l
-            jr nz,L6CF9
+            jr nz,.L6CF9
             ld h,#64
             ld de,#9400
             ld c,#09
@@ -1017,31 +1017,31 @@ L6CF9:      ld a,l
             ld c,#00
 L6D24:      ld e,d
             ld b,#10
-L6D27:      ld a,e
+.L6D27      ld a,e
             cp #80
-            jr c,L6D2E
+            jr c,.L6D2E
             ld a,#7f
-L6D2E:      cp #70
-            jr nc,L6D34
+.L6D2E      cp #70
+            jr nc,.L6D34
             ld a,#70
-L6D34:      sub #70
+.L6D34      sub #70
             srl a
             add a,#89
             ld (hl),a
             dec e
             inc hl
-            djnz L6D27
+            djnz .L6D27
 L6D3F:      ld a,#80
             add a,#80
             ld (L6D40),a
-            jr nz,L6D49
+            jr nz,.L6D49
             dec d
-L6D49:      dec c
+.L6D49      dec c
             jr nz,L6D24
             ld ixl,#28
-L6D4F:      call InitScroll
+.L6D4F      call InitScroll
             dec ixl
-            jr nz,L6D4F
+            jr nz,.L6D4F
             ld a,#88
             ld (L6993),a
             ld ixl,#89
@@ -1071,12 +1071,12 @@ MakeBackdrop:ld a,#2c
             call BuildSprites
             ld de,L8000
             ld h,#ad
-L6D9A:      ld l,#40
+.L6D9A      ld l,#40
             ld bc,#0080
             ldir
             inc h
             dec a
-            jr nz,L6D9A
+            jr nz,.L6D9A
             ld a,#14
             call SetPage
             ld hl,L8000
@@ -1107,7 +1107,7 @@ RunEffect2: ei
             ld hl,L80D0
             ld de,L8000
             ld ixl,#20
-L6DF0:      ld bc,#0020
+.L6DF0      ld bc,#0020
             push bc
             ldir
             pop bc
@@ -1117,27 +1117,27 @@ L6DF0:      ld bc,#0020
             ld l,e
             dec l
             ld b,#20
-L6DFE:      ld a,(hl)
+.L6DFE      ld a,(hl)
             sub #89
             ld (hl),a
             ld (de),a
             inc de
             dec l
-            djnz L6DFE
+            djnz .L6DFE
             pop hl
             dec ixl
-            jr nz,L6DF0
+            jr nz,.L6DF0
             ld hl,L87FF
             ld de,L8800
             ld bc,#0800
-L6E15:      ld a,(hl)
+.L6E15      ld a,(hl)
             ld (de),a
             dec hl
             inc de
             dec bc
             ld a,b
             or c
-            jr nz,L6E15
+            jr nz,.L6E15
             ld a,#14
             call SetPage
             ld hl,L8000

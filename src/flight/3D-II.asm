@@ -120,7 +120,7 @@ NXTE:
             ld   a,ixh
             ld   c,a
             sub  iyh
-            jr   nc,LC654
+            jr   nc,.LC654
             add  a,a
             ld   ($+11),a
             ld   a,(bc)
@@ -132,8 +132,8 @@ NXTE:
             ex   af,af'
             jp   LC5
 
-LC654:
-            jr   nz,VB1
+.LC654
+            jr   nz,.VB1
             ld   a,(hl)
             ld   e,iyl
             ld   l,e
@@ -147,7 +147,7 @@ LC654:
             and  e
             or   l
             ld   (bc),a
-VB1:
+.VB1
             ex   af,af'
 MSK2:       xor  #00
             ex   af,af'
@@ -200,9 +200,9 @@ LC67F:      ld   a,(hl)
             dec  l
             ld   a,(hl)
             sub  e
-            jp   c,LC76A
+            jp   c,.LC76A
             cp   d
-            jp   c,LC763
+            jp   c,.LC763
             ld   e,a
             xor  a
 
@@ -210,7 +210,7 @@ LC67F:      ld   a,(hl)
             rl   e
 
             and  a
-            jr   z,LC75E
+            jr   z,.LC75E
             sub  d
             neg
             ld   (LC616+1),a
@@ -232,7 +232,7 @@ LC67F:      ld   a,(hl)
             ld   a,d
             jp   LC635
 
-LC75E:
+.LC75E
             ld   (LC616+1),a
             ld   a,e
             cpl
@@ -252,7 +252,7 @@ LC75E:
             ld   a,d
             jp   LC635
 
-LC763:      sub  d
+.LC763      sub  d
             neg
             ld   (LC616+1),a
             exx
@@ -263,7 +263,7 @@ LC763:      sub  d
             ld   d,l
             ld   a,d
             jp   LC635
-LC76A:      neg
+.LC76A      neg
             cp   d
             jr   c,LC7B1
             ld   e,a
@@ -346,9 +346,9 @@ LC6D1:      ld   a,(hl)
             dec  l
             ld   a,(hl)
             sub  e
-            jp   c,LC76AL
+            jp   c,.LC76AL
             cp   d
-            jp   c,LC763L
+            jp   c,.LC763L
             ld   e,a
             xor  a
 
@@ -356,7 +356,7 @@ LC6D1:      ld   a,(hl)
             rl   e
 
             and  a
-            jr   z,LC625L
+            jr   z,.LC625L
             sub  d
             neg
             ld   (LC622+1),a
@@ -377,7 +377,7 @@ LC6D1:      ld   a,(hl)
             ld   d,l
             jp   NXTE2
 
-LC625L:
+.LC625L
             ld   (LC622+1),a
             ld   a,e
             cpl
@@ -396,7 +396,7 @@ LC625L:
             ld   d,l
             jp   NXTE2
 
-LC763L:     sub  d
+.LC763L     sub  d
             neg
             ld   (LC622+1),a
             exx
@@ -407,7 +407,7 @@ LC763L:     sub  d
             ld   d,l
             jp   NXTE2
 
-LC76AL:     neg
+.LC76AL     neg
             cp   d
             jp   c,LC7B1L
             ld   e,a
@@ -440,23 +440,23 @@ LC632:      ld   e,#00
             ld   a,e
             cp   l
             ld   a,(LC635+1)
-            jr   c,NXTE3
+            jr   c,.NXTE3
             cp   l
-            jr   c,NXTE4
+            jr   c,.NXTE4
             ld   a,l
             ld   (BORD+1),a
             ld   a,JMP1
             ld   (JUMP+1),a
             jp   NXTE
-NXTE3:
+.NXTE3
             cp   e
-            jr   c,NXTE4
+            jr   c,.NXTE4
             ld   a,e
             ld   (BORD+1),a
             ld   a,JMP2
             ld   (JUMP+1),a
             jp   NXTE
-NXTE4:
+.NXTE4
             ld   (BORD+1),a
             ld   a,JMP3
             ld   (JUMP+1),a
@@ -497,7 +497,7 @@ POLYGON:
             srl  b
             ld   hl,(low(L9E)*256)+1
             ld   de,#FF00
-LC7D2:
+.LC7D2
             ld   a,(hl)
             cp   d
             jp   nc,$+5
@@ -508,7 +508,7 @@ LC7D2:
             ld   e,a
             inc  l
             inc  l
-            djnz LC7D2
+            djnz .LC7D2
             ld   a,e
             cp   d
             jr   z,LLC
@@ -618,7 +618,7 @@ RENOBJ:
             ld   (JMP6+1),a
 
             inc  hl
-LD597:      ld   a,(hl)
+.LD597      ld   a,(hl)
             inc  hl
             and  a
             ret  z
@@ -632,7 +632,7 @@ LD597:      ld   a,(hl)
             push hl
             call RENDOT2
             pop  hl
-            jp   LD597
+            jp   .LD597
 
 RENDOT2:
 ;b,c,d,xl-X,Y,z,COLOR andAMOUNT DOTS
@@ -727,9 +727,9 @@ MVZ1:       equ  $-2
 XB0:        ld   de,0
             ld   a,b
             cp   #01
-            jr   z,LD62F            ;SIMPLY GET DOT
+            jr   z,.LD62F            ;SIMPLY GET DOT
             cp   #81
-            jr   nz,LD633
+            jr   nz,.LD633
             ld   a,ixh
             ld   hl,$+6
             jp   CALCD
@@ -742,12 +742,12 @@ XB0:        ld   de,0
             ld   a,e
             neg
             ld   e,a
-LD62F:
+.LD62F
             ld   a,ixh
             ld   hl,ENDC
             jp   CALCD
 ; ПРОЦЕСС ПОСТРОЕНИЯ
-LD633:
+.LD633
             ld   a,ixh
             bit  0,b
             ld   hl,$+6
@@ -833,112 +833,112 @@ JMP5:       jr   $
             ex   af,af'
             ld   a,d
             or   a
-            jp   z,PP0
+            jp   z,.PP0
             xor  a
             SM3
-            jr   c,PP1
+            jr   c,.PP1
             SM3
-            jr   c,PP1+6
+            jr   c,.PP1+6
             SM3
-            jr   c,PP1+12
+            jr   c,.PP1+12
             SM3
-            jr   c,PP1+18
+            jr   c,.PP1+18
             SM3
-            jr   c,PP1+24
+            jr   c,.PP1+24
             SM3
-            jr   c,PP1+30
+            jr   c,.PP1+30
             SM3
-            jr   c,PP1+36
+            jr   c,.PP1+36
             SM3
-            jr   c,PP1+42
+            jr   c,.PP1+42
             SM3
-            jr   c,PP1+48
+            jr   c,.PP1+48
             SM3
             ld   b,l
-            jr   c,PP1+55
+            jr   c,.PP1+55
             SM3
-            jr   c,PP1+61
+            jr   c,.PP1+61
             SM3
-            jr   c,PP1+67
+            jr   c,.PP1+67
             SM3
-            jr   c,PP1+73
+            jr   c,.PP1+73
             SM3
-            jr   c,PP1+79
+            jr   c,.PP1+79
             SM3
-            jr   c,PP1+85
+            jr   c,.PP1+85
             SM3
-            jp   c,PP1+91
+            jp   c,.PP1+91
             ld   b,a
-            jp   PP9
-PP1:        rla
+            jp   .PP9
+.PP1        rla
             cp   d
-            jr   nc,PP2
+            jr   nc,.PP2
             SM2
-            jr   nc,PP2+7
+            jr   nc,.PP2+7
             SM2
-            jr   nc,PP2+14
+            jr   nc,.PP2+14
             SM2
-            jr   nc,PP2+21
+            jr   nc,.PP2+21
             SM2
-            jr   nc,PP2+28
+            jr   nc,.PP2+28
             SM2
-            jr   nc,PP2+35
+            jr   nc,.PP2+35
             SM2
-            jr   nc,PP2+42
+            jr   nc,.PP2+42
             SM2
-            jr   nc,PP2+49
+            jr   nc,.PP2+49
             SM2
             ld   b,l
-            jr   nc,PP2+56
+            jr   nc,.PP2+56
             SM2
-            jr   nc,PP2+63
+            jr   nc,.PP2+63
             SM2
-            jr   nc,PP2+70
+            jr   nc,.PP2+70
             SM2
-            jr   nc,PP2+77
+            jr   nc,.PP2+77
             SM2
-            jr   nc,PP2+84
+            jr   nc,.PP2+84
             SM2
-            jr   nc,PP2+91
+            jr   nc,.PP2+91
             SM2
-            jr   nc,PP2+98
+            jr   nc,.PP2+98
             adc  hl,hl
             rla
             SM1
-            jp   PP4+105
+            jp   .PP4+105
 
-PP2:        SM1
-            jp   PP3
+.PP2        SM1
+            jp   .PP3
             SM1
-            jp   PP4
+            jp   .PP4
             SM1
-            jp   PP4+8
+            jp   .PP4+8
             SM1
-            jp   PP4+16
+            jp   .PP4+16
             SM1
-            jp   PP4+24
+            jp   .PP4+24
             SM1
-            jp   PP4+32
+            jp   .PP4+32
             SM1
-            jp   PP4+40
+            jp   .PP4+40
             SM1
-            jp   PP4+48
+            jp   .PP4+48
             SM1
-            jp   PP4+56
+            jp   .PP4+56
             SM1
-            jp   PP4+63
+            jp   .PP4+63
             SM1
-            jp   PP4+70
+            jp   .PP4+70
             SM1
-            jp   PP4+77
+            jp   .PP4+77
             SM1
-            jp   PP4+84
+            jp   .PP4+84
             SM1
-            jp   PP4+91
+            jp   .PP4+91
             SM1
-            jp   PP4+98
+            jp   .PP4+98
 
-PP0:        ld   a,l
+.PP0        ld   a,l
             ld   l,h
             ld   h,0
             sbc  hl,de
@@ -946,12 +946,12 @@ PP0:        ld   a,l
             add  hl,de
             rla
             adc  hl,hl
-PP3:        sbc  hl,de
+.PP3        sbc  hl,de
             jp   nc,LD73D
             add  hl,de
             rla
             adc  hl,hl
-PP4:        sbc  hl,de
+.PP4        sbc  hl,de
             jr   nc,$+3
             add  hl,de
             rept 6
@@ -975,7 +975,7 @@ PP4:        sbc  hl,de
             add  hl,de
             endr
             rla
-PP9:        ld   c,a
+.PP9        ld   c,a
             ex   af,af'
             ld   hl,(YEND+1)/2      ;MIDLE Y
             jp   m,$+8
@@ -1005,112 +1005,112 @@ ZZZ:        ld   de,0
             ex   af,af'
             ld   a,d
             or   a
-            jp   z,OO0
+            jp   z,.OO0
             xor  a
             SM3
-            jr   c,OO1
+            jr   c,.OO1
             SM3
-            jr   c,OO1+6
+            jr   c,.OO1+6
             SM3
-            jr   c,OO1+12
+            jr   c,.OO1+12
             SM3
-            jr   c,OO1+18
+            jr   c,.OO1+18
             SM3
-            jr   c,OO1+24
+            jr   c,.OO1+24
             SM3
-            jr   c,OO1+30
+            jr   c,.OO1+30
             SM3
-            jr   c,OO1+36
+            jr   c,.OO1+36
             SM3
-            jr   c,OO1+42
+            jr   c,.OO1+42
             SM3
-            jr   c,OO1+48
+            jr   c,.OO1+48
             SM3
             ld   b,l
-            jr   c,OO1+55
+            jr   c,.OO1+55
             SM3
-            jr   c,OO1+61
+            jr   c,.OO1+61
             SM3
-            jr   c,OO1+67
+            jr   c,.OO1+67
             SM3
-            jr   c,OO1+73
+            jr   c,.OO1+73
             SM3
-            jr   c,OO1+79
+            jr   c,.OO1+79
             SM3
-            jr   c,OO1+85
+            jr   c,.OO1+85
             SM3
-            jp   c,OO1+91
+            jp   c,.OO1+91
             ld   b,a
-            jp   OO9
-OO1:        rla
+            jp   .OO9
+.OO1        rla
             cp   d
-            jr   nc,OO2
+            jr   nc,.OO2
             SM2
-            jr   nc,OO2+7
+            jr   nc,.OO2+7
             SM2
-            jr   nc,OO2+14
+            jr   nc,.OO2+14
             SM2
-            jr   nc,OO2+21
+            jr   nc,.OO2+21
             SM2
-            jr   nc,OO2+28
+            jr   nc,.OO2+28
             SM2
-            jr   nc,OO2+35
+            jr   nc,.OO2+35
             SM2
-            jr   nc,OO2+42
+            jr   nc,.OO2+42
             SM2
-            jr   nc,OO2+49
+            jr   nc,.OO2+49
             SM2
             ld   b,l
-            jr   nc,OO2+56
+            jr   nc,.OO2+56
             SM2
-            jr   nc,OO2+63
+            jr   nc,.OO2+63
             SM2
-            jr   nc,OO2+70
+            jr   nc,.OO2+70
             SM2
-            jr   nc,OO2+77
+            jr   nc,.OO2+77
             SM2
-            jr   nc,OO2+84
+            jr   nc,.OO2+84
             SM2
-            jr   nc,OO2+91
+            jr   nc,.OO2+91
             SM2
-            jr   nc,OO2+98
+            jr   nc,.OO2+98
             adc  hl,hl
             rla
             SM1
-            jp   OO4+105
+            jp   .OO4+105
 
-OO2:        SM1
-            jp   OO3
+.OO2        SM1
+            jp   .OO3
             SM1
-            jp   OO4
+            jp   .OO4
             SM1
-            jp   OO4+8
+            jp   .OO4+8
             SM1
-            jp   OO4+16
+            jp   .OO4+16
             SM1
-            jp   OO4+24
+            jp   .OO4+24
             SM1
-            jp   OO4+32
+            jp   .OO4+32
             SM1
-            jp   OO4+40
+            jp   .OO4+40
             SM1
-            jp   OO4+48
+            jp   .OO4+48
             SM1
-            jp   OO4+56
+            jp   .OO4+56
             SM1
-            jp   OO4+63
+            jp   .OO4+63
             SM1
-            jp   OO4+70
+            jp   .OO4+70
             SM1
-            jp   OO4+77
+            jp   .OO4+77
             SM1
-            jp   OO4+84
+            jp   .OO4+84
             SM1
-            jp   OO4+91
+            jp   .OO4+91
             SM1
-            jp   OO4+98
+            jp   .OO4+98
 
-OO0:        ld   a,l
+.OO0        ld   a,l
             ld   l,h
             ld   h,0
             sbc  hl,de
@@ -1118,12 +1118,12 @@ OO0:        ld   a,l
             add  hl,de
             rla
             adc  hl,hl
-OO3:        sbc  hl,de
+.OO3        sbc  hl,de
             jp   nc,LD73C
             add  hl,de
             rla
             adc  hl,hl
-OO4:        sbc  hl,de
+.OO4        sbc  hl,de
             jr   nc,$+3
             add  hl,de
             rept 6
@@ -1147,7 +1147,7 @@ OO4:        sbc  hl,de
             add  hl,de
             endr
             rla
-OO9:        ld   c,a
+.OO9        ld   c,a
             ex   af,af'
             ld   hl,#0080           ;MIDLE X
             jp   m,$+13
@@ -1195,7 +1195,7 @@ DRWPOL:
             and  #0F
             ld   b,a
             call VSPOLY
-            jp   p,LD8A5
+            jp   p,.LD8A5
             xor  a                  ;MAY BE VISIBLE POLY
             ld   (L91+#5A),a
             call LDA9F
@@ -1213,7 +1213,7 @@ DRWPOL:
             ld   (TEXTU_R),a
             ld   a,c
             and  #0F
-            jr   nz,LD89A
+            jr   nz,.LD89A
             ld   de,low(L9E)*256
             ld   a,b
             add  a,a
@@ -1236,10 +1236,10 @@ DRWPOL:
             jp   nz,$-13
             call POLYGON
             jp   DRWPOL
-LD89A:      call CLIP
+.LD89A      call CLIP
             call nc,POLYGON
             jp   DRWPOL
-LD8A5:      ld   a,#01              ;UNVISIBLE POLY
+.LD8A5      ld   a,#01              ;UNVISIBLE POLY
             ld   (L91+#5A),a
 LD8AA:      inc  b
             ld   c,b
@@ -1251,31 +1251,31 @@ LD8AA:      inc  b
 LIN_E:      and  #0F
             ld   b,a
             bit  6,(hl)
-            jr   z,LD8BF            ;ALWAYS VISIBLE
+            jr   z,.LD8BF            ;ALWAYS VISIBLE
             ld   a,(L91+#5A)
             and  a
             jr   nz,LD8AA           ;LAST POLY WAS UNVISIBLE
 ;ifLAST POLY VIS THAT LINES VIS TOO
-LD8BF:      dec  b
+.LD8BF      dec  b
             ld   a,(hl)
             inc  hl
             and  #30
-            jr   z,LD8D2            ;andMASK
+            jr   z,.LD8D2            ;andMASK
             cp   #10
-            jr   z,LD8DA            ;orMASK
+            jr   z,.LD8DA            ;orMASK
 ;xorMASK
 ;COMAND xorc:jrc,
             ld   de,#38A9
             ld   a,low(MASKS)
-            jp   LD8DF
+            jp   .LD8DF
 ;COMAND andc:jrnc,
-LD8D2:      ld   de,#30A1
+.LD8D2      ld   de,#30A1
             ld   a,low(MASKS)+8
-            jp   LD8DF
+            jp   .LD8DF
 ;COMAND orc:jrc,
-LD8DA:      ld   de,#38B1
+.LD8DA      ld   de,#38B1
             ld   a,low(MASKS)
-LD8DF:      ld   (L91+#4E),de
+.LD8DF      ld   (L91+#4E),de
             ld   (LDADD),a
             ld   ixh,L9C
             ld   a,(hl)
@@ -1373,7 +1373,7 @@ DRWPOL2:
             and  #0F
             ld   b,a
             call VSPOLY
-            jp   p,LD9DD
+            jp   p,.LD9DD
             xor  a
             ld   (L91+#5A),a
             ld   a,(hl)
@@ -1406,7 +1406,7 @@ DRWPOL2:
             jp   nz,$-13
             call POLYGON
             jp   DRWPOL2
-LD9DD:      ld   a,#01
+.LD9DD      ld   a,#01
             ld   (L91+#5A),a
 LD9E2:      inc  b
             ld   c,b
@@ -1416,26 +1416,26 @@ LD9E2:      inc  b
 LD9EA:      and  #0F
             ld   b,a
             bit  6,(hl)
-            jr   z,LD9F7
+            jr   z,.LD9F7
             ld   a,(L91+#5A)
             and  a
             jr   nz,LD9E2
-LD9F7:      dec  b
+.LD9F7      dec  b
             ld   a,(hl)
             inc  hl
             and  #30
-            jr   z,LDA0A
+            jr   z,.LDA0A
             cp   #10
-            jr   z,LDA12
+            jr   z,.LDA12
             ld   de,#38A9
             ld   a,low(MASKS)
-            jp   LDA17
-LDA0A:      ld   de,#30A1
+            jp   .LDA17
+.LDA0A      ld   de,#30A1
             ld   a,low(MASKS)+8
-            jp   LDA17
-LDA12:      ld   de,#38B1
+            jp   .LDA17
+.LDA12      ld   de,#38B1
             ld   a,low(MASKS)
-LDA17:      ld   (L91+#4E),de
+.LDA17      ld   (L91+#4E),de
             ld   (LDADD),a
             ld   d,L9C
             ld   e,(hl)
@@ -1446,7 +1446,7 @@ LDA17:      ld   (L91+#4E),de
             inc  e
             ld   a,(de)
             ld   (L91+#2D),a
-LDA2C:      ld   d,L9C
+.LDA2C      ld   d,L9C
             ld   e,(hl)
             inc  hl
             push bc
@@ -1462,7 +1462,7 @@ LDA2C:      ld   d,L9C
             call DRWLIN
             pop  hl
             pop  bc
-            djnz LDA2C
+            djnz .LDA2C
             jp   DRWPOL2
 
 LDA9F:      ld   ixl,b
@@ -1471,20 +1471,20 @@ LDA9F:      ld   ixl,b
             inc  de
             ld   h,L9C
             ld   c,#00
-LDAA8:      ld   a,(de)
+.LDAA8      ld   a,(de)
             inc  de
             add  a,#04
             ld   l,a
             ld   a,(hl)
             and  a
-            jr   z,LDAB9
+            jr   z,.LDAB9
             or   c
             ld   c,a
-            djnz LDAA8
+            djnz .LDAA8
             pop  hl
             ld   b,ixl
             ret
-LDAB9:      scf
+.LDAB9      scf
             pop  hl
             ld   b,ixl
             ret
@@ -1504,10 +1504,10 @@ DRAWL1:
             ld   sp,#0020
             ld   a,d
             sub  h
-            jr   nc,LDAD8
+            jr   nc,.LDAD8
             EXD
             neg
-LDAD8:      ld   d,a
+.LDAD8      ld   d,a
             ld   a,l
             and  #07
             add  a,#00
@@ -1672,7 +1672,7 @@ LD814:      ld   c,#00
             inc  l
             cp   #80
             jr   z,LD85D
-            jr   nc,LD826
+            jr   nc,.LD826
             and  a
             jp   nz,LD82B
             ld   a,(hl)
@@ -1705,7 +1705,7 @@ LD814:      ld   c,#00
             ex   af,af'
             ret
 
-LD826:      set  1,c
+.LD826      set  1,c
             ld   a,(hl)
             and  a
             jp   m,LD83F
@@ -1818,21 +1818,21 @@ VSPOLY:
             push hl
             inc  hl
             cp   #05
-            jr   nc,LDA5B
+            jr   nc,.LDA5B
             ld   d,(hl)
             inc  hl
             ld   e,(hl)
             inc  hl
             ld   a,(hl)
-            jp   LDA62
-LDA5B:      ld   d,(hl)
+            jp   .LDA62
+.LDA5B      ld   d,(hl)
             inc  hl
             inc  hl
             ld   e,(hl)
             inc  hl
             inc  hl
             ld   a,(hl)
-LDA62:      ld   h,L9C
+.LDA62      ld   h,L9C
             ld   l,d
             ld   (LDA7A),sp
             ld   sp,hl

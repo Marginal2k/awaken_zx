@@ -9,7 +9,7 @@ GMATRX:
 ;BOKPУГ "У"
             ld   a,(EYEG)
             and  a
-            jp   nz,TLZ
+            jp   nz,.TLZ
             ld   hl,(LA11)
             ld   (LC11+1),hl
             ld   hl,(LA21)
@@ -22,8 +22,8 @@ GMATRX:
             ld   (LB22+1),hl
             ld   hl,(LA32)
             ld   (LB32+1),hl
-            jp   TLX
-TLZ:
+            jp   .TLX
+.TLZ
             ld   l,a
             ld   h,high(COSTB2)
             ld   e,(hl)
@@ -143,11 +143,11 @@ TLZ:
             ADPHLDE LB32
 
 
-TLX:
+.TLX
 ;BOKPУГ "X"
             ld   a,(EYEA)
             and  a
-            jp   nz,TLX2
+            jp   nz,.TLX2
             ld   hl,(LB13)
             ld   (LC13+1),hl
             ld   hl,(LB23)
@@ -161,7 +161,7 @@ TLX:
             ld   hl,(LB32+1)
             ld   (LA32),hl
             jp   TLY
-TLX2:
+.TLX2
             ld   l,a
             ld   h,high(COSTB2)
             ld   e,(hl)
@@ -284,7 +284,7 @@ TLY:
 ;BOKPУГ "Y"
             ld   a,(EYEB)
             and  a
-            jp   nz,TLY2
+            jp   nz,.TLY2
             ld   hl,(LC11+1)
             ld   (LA11),hl
             ld   hl,(LC21+1)
@@ -298,7 +298,7 @@ TLY:
             ld   hl,(LC33+1)
             ld   (LB33),hl
             ret
-TLY2:
+.TLY2
             ld   l,a
             ld   h,high(COSTB2)
             ld   e,(hl)

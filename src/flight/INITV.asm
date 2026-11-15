@@ -40,7 +40,7 @@ INITV1:
 ;GEN TABLE Y.B=2^(X/256)-1 ,X=(0;1)
 GEN2X:      ld   ix,TB2X
             ld   hl,0
-GN2X:       ld   a,h                ;ROUNDING
+.GN2X       ld   a,h                ;ROUNDING
             bit  7,l
             jr   z,$+3
             inc  a
@@ -53,25 +53,25 @@ GN2X:       ld   a,h                ;ROUNDING
             ld   bc,#00B2           ;(2^1/256)*#10000
             exx
             ld   bc,#1801
-GN2X1:      rr   c
+.GN2X1      rr   c
             rr   h
             rr   l
             exx
-            jr   nc,GN2X2
+            jr   nc,.GN2X2
             add  hl,bc
             adc  a,1
-GN2X2:      rra
+.GN2X2      rra
             rr   h
             rr   l
             exx
-            djnz GN2X1
+            djnz .GN2X1
             ld   a,c
             rra
             exx
             ld   h,l
             ld   l,a
             inc  ixl
-            jr   nz,GN2X
+            jr   nz,.GN2X
             ret
 ;GEN TABLE Y.W=LOG2(X) ,X=(1,255)
 GENLOG2:    ld   hl,TBLOG2
@@ -83,7 +83,7 @@ GENLOG2:    ld   hl,TBLOG2
             ld   (hl),#F0
             dec  h
             inc  l
-GNLG1:      ld   (hl),d
+.GNLG1      ld   (hl),d
             inc  h
             ld   (hl),a
             dec  h
@@ -100,19 +100,19 @@ GNLG1:      ld   (hl),d
             ld   h,a
             ld   l,a
             ld   b,#10
-GNLG2:      exx
+.GNLG2      exx
             add  hl,hl
             adc  a,a
             sbc  hl,de
             sbc  a,c
-            jr   nc,GNLG3
+            jr   nc,.GNLG3
             add  hl,de
             adc  a,c
-GNLG3:      exx
+.GNLG3      exx
             ccf
             rl   l
             rl   h
-            djnz GNLG2
+            djnz .GNLG2
             pop  de
             ex   af,af'
             add  hl,de
@@ -120,7 +120,7 @@ GNLG3:      exx
             ex   de,hl
             pop  hl
             inc  l
-            jr   nz,GNLG1
+            jr   nz,.GNLG1
             ret
 GENTBXY:
 ; ГЕНЕРИМ ТАБЛИЦУ ПЕРЕВОД КООРДИНАТ В
@@ -128,7 +128,7 @@ GENTBXY:
             ld   hl,TBXY
             ld   de,#8000
             ld   bc,32
-MT1:
+.MT1
             ld   (hl),d
             inc  h
             ld   (hl),e
@@ -137,15 +137,15 @@ MT1:
             add  hl,bc
             ex   de,hl
             inc  l
-            jr   nz,MT1
+            jr   nz,.MT1
             inc  h
             inc  h
             ld   a,#80
             ex   af,af'
             xor  a
-MT3:
+.MT3
             ld   b,8
-MT2:
+.MT2
             ld   (hl),a
             ex   af,af'
             inc  h
@@ -154,8 +154,8 @@ MT2:
             dec  h
             ex   af,af'
             inc  l
-            djnz MT2
+            djnz .MT2
             inc  a
             cp   32
-            jr   c,MT3
+            jr   c,.MT3
             ret

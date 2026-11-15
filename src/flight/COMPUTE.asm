@@ -11,7 +11,7 @@ INIMS:
             ld   hl,#5074
             ld   de,#5060
             ld   a,30
-ZJ67:
+.ZJ67
             add  ix,bc
             ld   (ix+0),l
             ld   (ix+1),h
@@ -23,7 +23,7 @@ ZJ67:
             ld   a,h
             and  7
             cp   6
-            jr   nz,ZJ70
+            jr   nz,.ZJ70
             ld   a,l
             add  a,32
             ld   l,a
@@ -32,10 +32,10 @@ ZJ67:
             ld   e,a
             ld   h,#50
             ld   d,h
-ZJ70:
+.ZJ70
             ex   af,af'
             dec  a
-            jr   nz,ZJ67
+            jr   nz,.ZJ67
             ret
 MNUMS:
 ;NUMBERS inORDER PRINT
@@ -93,43 +93,43 @@ ADTT:       ld   hl,0
 ATBUF:      ld   hl,0
             inc  hl
             inc  hl
-ZJ68:
+.ZJ68
             ld   (ATBUF+1),hl
             ld   a,(hl)
             cp   2
-            jr   c,ZJ60
+            jr   c,.ZJ60
             ld   (hl),1
             ld   d,a
             inc  hl
             ld   e,(hl)
-            jr   nz,ZJ61
+            jr   nz,.ZJ61
             ld   a,e
             call PRINTNUM
             ld   a,(CORD+1)
             inc  a
             ld   (CORD+1),a
             ret
-ZJ60:
+.ZJ60
             or   a
             ret  nz
             ld   hl,TBUF
-            jp   ZJ68
-ZJ61:
+            jp   .ZJ68
+.ZJ61
             EXD
 ZJ59:
             ld   a,(hl)
             inc  hl
             ld   (ADTT+1),hl
             cp   ED
-            jr   z,ZJ63
+            jr   z,.ZJ63
             cp   CR
-            jr   z,ZJ58
+            jr   z,.ZJ58
             jp   RST10
-ZJ63:
+.ZJ63
             ld   hl,0
             ld   (ADTT+1),hl
             ret
-ZJ58:
+.ZJ58
             xor  a
             ld   (CORD+1),a
             call SCROLL
@@ -139,7 +139,7 @@ ZJ58:
 PRINTNUM:
 ;a-NUMBER
             cp   100
-            jr   c,ZJ53
+            jr   c,.ZJ53
             ld   c,0
             ld   b,100
             sub  b
@@ -153,11 +153,11 @@ PRINTNUM:
             push bc
             call RST10
             pop  af
-ZJ53:
+.ZJ53
             ld   b,a
             cp   10
             ld   c,0
-            jr   c,ZJ54
+            jr   c,.ZJ54
             ld   b,10
             sub  b
             inc  c
@@ -165,7 +165,7 @@ ZJ53:
             jp   nc,$-2
             add  a,b
             ld   b,a
-ZJ54:
+.ZJ54
             ld   a,c
             add  a,"0"
             push bc
@@ -260,12 +260,12 @@ RST10:
 CORD:       ld   c,0
             ld   a,c
             cp   #18
-            jr   c,ZJ55
+            jr   c,.ZJ55
             push de
             call SCROLL
             pop  de
             ld   c,0                ;BEGIN X OF WIN FOR PR
-ZJ55:
+.ZJ55
             ld   b,c
             ld   h,#50
             ld   a,#F4
@@ -288,7 +288,7 @@ ZJ56:
             ld   c,a
             bit  0,c
             ld   c,b
-            jr   nz,ZJ57
+            jr   nz,.ZJ57
             rept 5
             ld   a,c
             cpl
@@ -318,7 +318,7 @@ ZJ56:
             or   b
             ld   (hl),a
             ret
-ZJ57:
+.ZJ57
 ; ПЕЧАТЬ БЕЗ СДВИГА
 
             rept 5

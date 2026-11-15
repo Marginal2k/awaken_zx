@@ -60,7 +60,7 @@ GAMEOVER:
             ld   i,a
             ld   iy,#5C3A
             ld   b,100
-EBEG:
+.EBEG
             push bc
             ld   de,#8000
             ld   a,r
@@ -78,21 +78,21 @@ EBEG:
             call SFXA
             pop  bc
             dec  b
-            jp   nz,EBEG2
+            jp   nz,.EBEG2
             ld   b,1
             xor  a
             in   a,(#FE)
             and  #1F
             cp   #1F
-            jr   z,EBEG
+            jr   z,.EBEG
             jp   EXIT
-EBEG2:
+.EBEG2
             ld   a,1
             xor  a
             in   a,(#FE)
             and  #1F
             cp   #1F
-            jr   EBEG
+            jr   .EBEG
 
 
 NEWROKET:
@@ -103,13 +103,13 @@ NEWROKET:
             inc  l
             ld   a,(hl)
             cp   #80
-            jr   nz,RKN12
+            jr   nz,.RKN12
             ld   hl,EFF13
             ld   (SFXA+1),hl
             MESAG _LOSTTARGET
             and  a
             ret
-RKN12:
+.RKN12
             push bc
             exx
             ld   hl,0
@@ -278,11 +278,11 @@ RNDTURN:
             call RND
             ld   a,h
             cp   #7F
-            jr   nz,JL14
+            jr   nz,.JL14
             ld   a,l
             and  #7F
             cp   #10
-            jr   c,JL14
+            jr   c,.JL14
             and  #0F
             add  a,32
             ld   h,a
@@ -290,7 +290,7 @@ RNDTURN:
             and  #80
             or   h
             ld   (ix+POWOR),a
-JL14:
+.JL14
             ld   a,(ix+POWOR)
             and  #7F
             dec  a
@@ -327,12 +327,12 @@ ONWAY:
             call GETADRY
             ld   a,(iy+1)
             cp   #80
-            jr   z,NONW
+            jr   z,.NONW
             call RASTOY
 ; РАССТОЯНИЕ ДЛЯ СВОРАЧИВАНИЯ
             cp   MINRAS
             jr   c,TURNUP
-NONW:
+.NONW
             pop  bc
             pop  de
             pop  hl
@@ -346,20 +346,20 @@ ONWAY2:
             neg
             ld   l,a
             cp   2
-            jr   c,JLK1
+            jr   c,.JLK1
             ld   a,(ix+SPT)
             cp   l
-            jr   c,OY1
-            jr   z,OY1
+            jr   c,.OY1
+            jr   z,.OY1
             rra
             jp   $-6
-OY1:
+.OY1
             bit  7,e
             jr   nz,$+4
             neg
             add  a,d
             ld   (ix+BETA),a
-JLK1:
+.JLK1
             ld   a,(ix+GAMA)
             ld   d,a
             sub  c
@@ -371,11 +371,11 @@ JLK1:
             ret  c
             ld   a,(ix+SPT)
             cp   h
-            jr   z,OY2
-            jr   c,OY2
+            jr   z,.OY2
+            jr   c,.OY2
             rra
             jp   $-6
-OY2:
+.OY2
             bit  7,e
             jr   nz,$+4
             neg
@@ -408,9 +408,9 @@ CHNPOL:
             dec  l
             ld   a,(hl)
             cp   #80
-            jr   z,ECN1
+            jr   z,.ECN1
             inc  l
-ECN2:
+.ECN2
             add  hl,de
             ld   a,(hl)
             cp   #80
@@ -422,26 +422,26 @@ ECN2:
             ld   a,(hl)
             cp   T_POLICE
             ld   l,c
-            jr   nz,ECN2
+            jr   nz,.ECN2
             ld   a,l
             add  a,MODE-1
             ld   l,a
             ld   a,(hl)
             cp   C_FIGHT
             ld   l,c
-            jr   nz,ECN2
+            jr   nz,.ECN2
             ld   a,l
             add  a,SUBJ-1
             ld   l,a
             ld   a,(hl)
             cp   (ix+RAND)
             ld   l,c
-            jr   nz,ECN2
+            jr   nz,.ECN2
             inc  b
             ld   a,b
             cp   2
-            jr   c,ECN2
-ECN1:
+            jr   c,.ECN2
+.ECN1
             ld   a,b
             cp   2
             ret
@@ -458,14 +458,14 @@ CHARCO:
             ld   a,d
             cp   1
             ld   a,ROKSPD
-            jr   nc,RSP1
+            jr   nc,.RSP1
             ld   a,e
             srl  d
             rra
             srl  d
             rra
             srl  a
-RSP1:
+.RSP1
             ld   e,a
             ld   d,0
             bit  7,h
@@ -702,17 +702,17 @@ NEWCARGO:
             call GETIND
             ld   e,a
             ld   hl,CARGS-1
-NXTCA:
+.NXTCA
             inc  hl
             ld   a,(hl)
             cp   #FE
-            jr   c,CHCA
+            jr   c,.CHCA
             ret  z
             ld   (hl),e
             ret
 
 
-CHCA:
+.CHCA
 ; ПРОВЕРКА ГРУЗА НА СУЩЕСТВОВАНИЕ
             exx
             call GETADR
@@ -720,7 +720,7 @@ CHCA:
             ld   a,(hl)
             cp   #80
             exx
-            jp   nz,NXTCA
+            jp   nz,.NXTCA
             ld   (hl),e
             ret
 
@@ -856,14 +856,14 @@ POLIC:
 PWNPP:      cp   6
             ld   (ix+MODE),C_FIGHT
             ld   (ix+SUBJ),#FF
-            jr   c,POLIC2
+            jr   c,.POLIC2
             call FINDPIRAT
             ret  z
             ld   (ix+SUBJ),a
             ret
 
 ; ПРОВЕРКА СТАТУСА ИГРОКА
-POLIC2:
+.POLIC2
             ld   a,(STATUS)
             cp   64                 ;РОЗЫСКИВАЕМЫЙ
             ret  c
@@ -958,7 +958,7 @@ HIGH_:      ld   a,0
             ld   (FHIGH+1),a
 FSPEED:     ld   a,0
             and  a
-            jr   z,FSPD
+            jr   z,.FSPD
             xor  a
             ld   (FSPEED+1),a
             ld   hl,(Speed)
@@ -978,7 +978,7 @@ FSPEED:     ld   a,0
             ld   a,l
             ld   hl,#49B9
             call DATAL_
-FSPD:
+.FSPD
             ret
 
 
@@ -1130,7 +1130,7 @@ SSUN:
             ld   a,l
             and  a
 ; СЛИШКОМ ДАЛЕКО
-            jr   nz,MSL1
+            jr   nz,.MSL1
             ld   hl,(SNX+1)
             bit  7,h
             ld   a,l
@@ -1179,14 +1179,14 @@ SSUN:
             inc  e
             ld   a,d
             cp   e
-            jr   c,JKL1
+            jr   c,.JKL1
             ld   (TONN),de
             ld   (hl),c
-JKL1:
+.JKL1
             ld   a,1
             ld   (FFUEL+1),a
             jp   MVPLN
-MSL1:
+.MSL1
 ; ЕСЛИ ЗВЕЗДА ВЫШЛА ЗА ПРЕДЕЛЫ ИЗМЕНЕНИЯ
 ; ТЕМПЕРАТУРЫ ТО СТАВИМ ЕЕ ВЕГДА 0
             ld   a,(TEMPE+1)
@@ -1312,7 +1312,7 @@ KP2:
             call FAREAR
             ld   a,l
             and  a
-            jr   nz,MSL2
+            jr   nz,.MSL2
 ; ИЗМЕНЯЕМ ВЫСОТУ
             ld   a,h
             neg
@@ -1324,7 +1324,7 @@ KP2:
             ld   a,1
             ld   (FHIGH+1),a
             ret
-MSL2:
+.MSL2
             ld   a,(HIGH_+1)
             and  a
             jr   z,$+9
@@ -1601,7 +1601,7 @@ OE6:
             pop  iy
             pop  de
             dec  c
-            jr   nz,OE7
+            jr   nz,.OE7
 ; НАСТРОЙКА КООРДИНАТ КОМПАСА НА ВЫБРАННУЮ
 ; ПЛАНЕТУ
             ld   a,(TX+2)
@@ -1610,7 +1610,7 @@ OE6:
             ld   (ETY),a
             ld   a,(TZ+2)
             ld   (ETZ),a
-OE7:
+.OE7
             add  iy,de
             djnz OE2
             pop  iy
@@ -1827,24 +1827,24 @@ EXPL:       ld   a,0
 ; СЧЕТЧИК КАДРОВ ВЗРЫВОВ ОДИН ДЛЯ ВСЕХ
 CEX:        ld   a,0
             dec  a
-            jr   nz,SV6
+            jr   nz,.SV6
 ; ОТКЛЮЧИТЬ ПРОРАБОТКУ ВЗРЫВОВ
             xor  a
             ld   (EXPL+1),a
-SV6:
+.SV6
             ld   (CEX+1),a
 
 ; БУФЕР ДАННЫХ О ВОКС АНИМАЦИИ
             ld   ix,VOXCOR-VLEN
 CX22:
             ld   de,VLEN
-CX2:
+.CX2
             add  ix,de
             ld   a,(ix+7)
             and  a
             ret  m                  ;КОНЕЦ БУФЕРА
 ; ПУСТОЕ МЕСТО
-            jr   z,CX2
+            jr   z,.CX2
 ; УМЕНЬШАЕМ ВРЕМЯ
             dec  (ix+7)
 ; КООРДИНТЫ СМЕСТИЛИ ОТНОСИТЕЛЬНО ДВИЖЕНИЯ
@@ -1954,28 +1954,28 @@ GOSTA:
 ; Н     3-СВОБОДНЫЕ ЗЕМЛИ
             ld   a,h
             cp   74
-            jr   c,NGF1
+            jr   c,.NGF1
             cp   78
-            jr   nc,NGF1
+            jr   nc,.NGF1
             ld   a,l
             cp   54
-            jr   c,NGF1
+            jr   c,.NGF1
             cp   58
             ld   a,0                ;ФЕДЕРЦИЯ
             ret  c
-NGF1:
+.NGF1
             ld   a,h
             cp   71
-            jr   c,NGF2
+            jr   c,.NGF2
             cp   74
-            jr   nc,NGF2
+            jr   nc,.NGF2
             ld   a,l
             cp   52
-            jr   c,NGF2
+            jr   c,.NGF2
             cp   56
             ld   a,1                ;СОДР. МИРОВ
             ret  c
-NGF2:
+.NGF2
             ld   a,h
             cp   71
             ld   a,3

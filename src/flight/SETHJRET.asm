@@ -109,7 +109,7 @@ LOAD_:
             exx
             pop  bc
             pop  de
-LOD1_:
+.LOD1_
             ld   a,(DSK)
             and  %00101111
             ld   c,a
@@ -128,7 +128,7 @@ LOD1_:
             ld   c,#5F
             call TOREG_
             exx
-RETL_:
+.RETL_
             push hl
             ld   a,#80
             ld   c,#1F
@@ -148,17 +148,17 @@ RETL_:
             ld   a,(#5CCD)
             and  #7F
             pop  hl
-            jr   nz,RETL_
+            jr   nz,.RETL_
             inc  h
             exx
             inc  e
             ld   a,e
             cp   #11
-            jr   c,LOD2_
+            jr   c,.LOD2_
             inc  d
             ld   e,1
             bit  0,d
-            jr   nz,LOD2_
+            jr   nz,.LOD2_
             exx
             ld   a,#58              ;STEP ON
             ld   c,#1F
@@ -166,9 +166,9 @@ RETL_:
             ld   ix,#2F59           ;WAIT
             call TOTD_
             exx
-LOD2_:
+.LOD2_
             dec  b
-            jp   nz,LOD1_
+            jp   nz,.LOD1_
             ret
 TOREG_:
             ld   ix,#2A53
@@ -338,28 +338,28 @@ CLRBUFS:
 
             ld   iy,CARSB-OLEN
             ld   de,OLEN
-GJ1:
+.GJ1
             add  iy,de
             ld   a,(iy)
             cp   #80
             jr   nz,$+7
             cp   (iy+1)
-            jr   z,GJ3
+            jr   z,.GJ3
             ld   (iy),0
             ld   (iy+1),#80
             ld   (iy+SETUP),#FF
-            jr   GJ1
-GJ3:
+            jr   .GJ1
+.GJ3
 
             ld   ix,VOXCOR-VLEN
             ld   de,VLEN
-GJ11:
+.GJ11
             add  ix,de
             ld   a,(ix+7)
             and  a
             jp   m,$+9
             ld   (ix+7),0
-            jr   GJ11
+            jr   .GJ11
 
             ld   hl,(WHERE)
             ld   (PLACE),hl
@@ -411,27 +411,27 @@ SETT:
             ld   hl,LEVLTAB+1
             ld   ix,PLANDICTAT
             ld   a,15
-STIT1:
+.STIT1
             ex   af,af'
             ld   a,(hl)
             and  a
-            jp   p,STIT2
+            jp   p,.STIT2
             neg
             dec  a
-            jr   z,STIT3
+            jr   z,.STIT3
             ld   b,a
             xor  a
             sub  c
             djnz $-1
-            jr   STIT3
-STIT2:
+            jr   .STIT3
+.STIT2
             dec  a
-            jr   z,STIT3
+            jr   z,.STIT3
             ld   b,a
             xor  a
             add  a,c
             djnz $-1
-STIT3:
+.STIT3
             inc  hl
             ld   b,(hl)
             rr   b
@@ -453,7 +453,7 @@ STIT3:
             inc  hl
             ex   af,af'
             dec  a
-            jp   nz,STIT1
+            jp   nz,.STIT1
             exx
             pop  bc
             exx

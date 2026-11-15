@@ -83,7 +83,7 @@ SETCONTROL:
             ld   de,ADCON-2
             ld   l,KKEYS+1
             ld   c,#FE
-SCL1:
+.SCL1
             dec  l
             jr   z,JFLAG
             ld   b,(ix+0)
@@ -93,7 +93,7 @@ SCL1:
             inc  de
             in   a,(c)
             and  (ix-1)
-            jr   nz,SCL1
+            jr   nz,.SCL1
             push hl
             push de
             push bc
@@ -112,16 +112,16 @@ SCL1:
             pop  bc
             pop  de
             pop  hl
-            jr   SCL1
+            jr   .SCL1
 
 ; УБЕРЕМ ТРЕШИ ЕСЛИ НАДО
 JFLAG:      ld   a,0
             or   a
 JFLAG2:     ld   c,0
             ld   (JFLAG2+1),a
-            jr   nz,JFG
+            jr   nz,.JFG
             cp   c
-            jr   nc,JFG
+            jr   nc,.JFG
             call KILLTRASH
             ld   hl,MXSPD
             ld   (MAXSPEED+1),hl
@@ -129,7 +129,7 @@ JFLAG2:     ld   c,0
             ld   (Speed),hl
             ld   a,1
             ld   (FSPEED+1),a
-JFG:
+.JFG
             xor  a
             ld   (JFLAG+1),a
 
@@ -152,16 +152,16 @@ NOPWR2:
             ld   a,(EYE_B)
             and  a
             jr   z,KL3
-            jp   p,KL
+            jp   p,.KL
             add  a,1
-            jp   m,KL2
+            jp   m,.KL2
             xor  a
-            jp   KL2
-KL:
+            jp   .KL2
+.KL
             sub  1
-            jp   p,KL2
+            jp   p,.KL2
             xor  a
-KL2:
+.KL2
             ld   (EYE_B),a
 KL3:
             ld   a,0
@@ -180,16 +180,16 @@ KL3:
             ld   a,(EYE_A)
             and  a
             jr   z,KL6
-            jp   p,KL4
+            jp   p,.KL4
             add  a,1
-            jp   m,KL5
+            jp   m,.KL5
             xor  a
-            jp   KL5
-KL4:
+            jp   .KL5
+.KL4
             sub  1
-            jp   p,KL5
+            jp   p,.KL5
             xor  a
-KL5:
+.KL5
             ld   (EYE_A),a
 KL6:
             ld   a,0
@@ -207,16 +207,16 @@ KL6:
             ld   a,(EYE_G)
             and  a
             ret  z
-            jp   p,KL7
+            jp   p,.KL7
             add  a,1
-            jp   m,KL8
+            jp   m,.KL8
             xor  a
-            jp   KL8
-KL7:
+            jp   .KL8
+.KL7
             sub  1
-            jp   p,KL8
+            jp   p,.KL8
             xor  a
-KL8:
+.KL8
             ld   (EYE_G),a
             ret
 
@@ -381,7 +381,7 @@ HIPER:
             ret  c                  ;МАЛО ТОПЛИВА
             ld   a,l
             and  a
-            jr   nz,HR1
+            jr   nz,.HR1
             ld   a,(GDIABLO)
             inc  a
 ; ЕСЛИ ПРЫЖОК НА ТУЖУ ЗВЕЗДУ
@@ -395,7 +395,7 @@ HIPER:
             ret  z
 ; ОДНУ ТОНУ НАДО ИСТРАТИТЬ НА ТУЖУ ПЛАНЕТУ
             inc  l
-HR1:
+.HR1
             ld   b,l
             call AFUEL
             ld   a,c
@@ -481,7 +481,7 @@ STU1:
             ld   a,(ix+PX+1)
             cp   #80
             scf
-            jr   z,NOANTI
+            jr   z,.NOANTI
             ld   b,a
             ld   c,(ix+PX)
             ld   l,(ix+PY)
@@ -499,7 +499,7 @@ STU1:
             ld   de,0-1
             ld   (TZ+1),de
             call FG1
-NOANTI:
+.NOANTI
             pop  ix
             ret
 
@@ -534,12 +534,12 @@ NAVOD_:
             ld   a,(FNAVOD+1)
             xor  1
             ld   (FNAVOD+1),a
-            jr   nz,ZM3
+            jr   nz,.ZM3
             MESAG _MODEOFF
-            jr   ZM2
-ZM3:
+            jr   .ZM2
+.ZM3
             MESAG _MODEON
-ZM2:
+.ZM2
             MESAG _GETTARGET
             ret
 
@@ -639,7 +639,7 @@ STKL:       ld   sp,0
             ld   l,a
             ld   a,(hl)
             cp   T_CARGO
-            jr   z,OKGRU            ;КОНТЕЙНЕР
+            jr   z,.OKGRU            ;КОНТЕЙНЕР
             cp   T_CHIP
 ; ЧЕРНЫЙ МЕТАЛ ЕСЛИ ОСКОЛОК
             ld   e,15
@@ -648,8 +648,8 @@ STKL:       ld   sp,0
             ld   a,r
             and  7
             inc  a
-            jr   OKGRU2
-OKGRU:
+            jr   .OKGRU2
+.OKGRU
             ld   a,l
             add  a,TOWR-TYPE
             ld   l,a
@@ -657,7 +657,7 @@ OKGRU:
             add  a,LZS-TOWR
             ld   l,a
             ld   a,(hl)
-OKGRU2:
+.OKGRU2
             ld   d,0
             ld   hl,TNN
             add  hl,de
@@ -668,14 +668,14 @@ OKGRU2:
             ld   a,(hl)
             pop  hl
             and  #C0
-            jr   nz,TNN2
+            jr   nz,.TNN2
             ld   a,b
             add  a,c
             ld   b,a
             ld   a,(TONN+1)
             cp   b
             ret  c
-TNN2:
+.TNN2
             push hl
             ld   hl,TWRI
             add  hl,de
@@ -755,12 +755,12 @@ ZAHWAT:
             ld   (ROKETN2),a
             ld   (ROKETN3),a
 
-            jr   z,ZM4
+            jr   z,.ZM4
             MESAG _MODEON
-            jr   ZM5
-ZM4:
+            jr   .ZM5
+.ZM4
             MESAG _MODEOFF
-ZM5:
+.ZM5
             MESAG _POWERRAY
             jp   NAVOD_
 
@@ -803,7 +803,7 @@ JUMPDRIVE:
             inc  l
             cp   #80
             jr   z,FUEL_
-JJD1:
+.JJD1
             add  hl,de
             ld   a,(hl)
             cp   #80
@@ -818,10 +818,10 @@ JJD1:
             ld   l,a
             ld   a,b
             cp   T_STATION
-            jr   z,NXTJ
+            jr   z,.NXTJ
             cp   T_CHIP
-            jr   nc,JJD1
-NXTJ:
+            jr   nc,.JJD1
+.NXTJ
             inc  l
             inc  l
             ld   a,(hl)
@@ -840,7 +840,7 @@ NXTJ:
             ld   a,c
 ; МИН. РАССТОЯНИЕ ДЛЯ ДЖАМПА
             cp   JMIN
-            jp   nc,JJD1
+            jp   nc,.JJD1
             jp   KILLTRASH
 AFUEL:
             ld   hl,FUEL
@@ -858,19 +858,19 @@ FUEL_:
             ld   a,0
             inc  a
             ld   ($-2),a
-            jr   nz,JKL2
+            jr   nz,.JKL2
             ld   a,0
             inc  a
             and  7
             ld   ($-4),a
-            jr   nz,JKL2
+            jr   nz,.JKL2
             ld   (hl),c
             ld   a,(TONN)
             dec  a
             ld   (TONN),a
             ld   a,1
             ld   (FFUEL+1),a
-JKL2:
+.JKL2
             ld   a,#11
             rrca
             ld   ($-2),a
@@ -909,14 +909,14 @@ FREECONTROL:
             ld   a,(CALCSTEP)
             cp   #3A
 
-            jr   z,ZM6
+            jr   z,.ZM6
             MESAG _MODEOFF
             ld   a,#3A
-            jr   ZM7
-ZM6:
+            jr   .ZM7
+.ZM6
             MESAG _MODEON
             ld   a,#C9
-ZM7:
+.ZM7
             ld   (CALCSTEP),a
             MESAG _FREEFLY
             ret
@@ -936,11 +936,11 @@ DROPCR:
             inc  hl
             ld   a,(hl)
             and  a
-            jr   nz,DC2
+            jr   nz,.DC2
             djnz $-5
             MESAG _NOCARGO
             ret
-DC2:
+.DC2
             ld   (hl),0
             ld   de,0-TWRI
             add  hl,de
@@ -962,7 +962,7 @@ DROPMINE:
             ld   (COUNTER+1),a
             ld   a,(MINA)
             and  a
-            jr   z,DM1
+            jr   z,.DM1
             dec  a
             ld   (MINA),a
             ld   a,1
@@ -971,7 +971,7 @@ DROPMINE:
             call NEWCARGO
             MESAG _DROPMINE
             ret
-DM1:
+.DM1
             MESAG _NOMINE
             ret
 
@@ -1010,7 +1010,7 @@ FRONTBACK:
             call GGALD
             ld   a,(BFC1)
             and  a
-            jr   z,BK1
+            jr   z,.BK1
             ld   hl,0
             ld   (BFC1),hl
             ld   (BFC2),hl
@@ -1018,7 +1018,7 @@ FRONTBACK:
             MESAG _MODEON
             MESAG _FRONT
             ret
-BK1:
+.BK1
             ld   hl,#44ED
             ld   (BFC1),hl
             ld   (BFC2),hl

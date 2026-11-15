@@ -112,7 +112,7 @@ VOX:
 VX:         ld   hl,0
             ld   a,h
             and  a
-            jp   p,VX1
+            jp   p,.VX1
 ; ЕСЛИ ЧАСТЬ СПРАЙТА ЗА ЭКРАНОМ СЛЕВА
             adc  hl,bc
             ret  m                  ;ВЕСЬ СПРАЙТ ЗА ЭКРАНОМ
@@ -131,13 +131,13 @@ VX:         ld   hl,0
             ld   (DBV+1),a
             set  0,c                ;МЕТКА КЛИПИНГА СЛЕВА
             exx
-            jp   VX2
-VX1:
+            jp   .VX2
+.VX1
             ret  nz                 ;ЗА ЭКРАНОМ СПРАВА
             ld   a,l
             cp   Xend
             ret  nc                 ;ТОЖЕ
-VX2:
+.VX2
             add  hl,bc
             ld   a,h
             or   a
@@ -157,7 +157,7 @@ VY:         ld   hl,0
             ld   d,0
             ld   a,h
             and  a
-            jp   p,VX3
+            jp   p,.VX3
 ; ЕСЛИ СПРАЙТ ВЫХОДИТ СВЕРХУ ЗА ЭКРАН
             adc  hl,de
             ret  m                  ;ВЫЛЕТ ПО У ВВЕРХУ ВСЕГО
@@ -176,20 +176,20 @@ VY:         ld   hl,0
             ld   b,a
             set  1,c                ;МАРКЕР КЛИПИНГА ПО У
             exx
-            jp   VX4
-VX3:
+            jp   .VX4
+.VX3
             ret  nz                 ;ВЕСЬ СПРАЙТ НИЖЕ СКРИНА
             ld   a,l
             cp   Yend
             ret  nc                 ;ТОЖЕ
-VX4:
+.VX4
             add  hl,de
             ld   a,h
             or   a
             ld   a,l
             jr   nz,$+6
             cp   Yend+1
-            jr   c,VX5
+            jr   c,.VX5
 ; СПРАЙТ ВЫШЕ ВЫСОТЫ СКРИНА ИЛИ ВЫЛЕЗ
 ; СНИЗУ
             sub  Yend
@@ -198,7 +198,7 @@ VX4:
             ld   e,a                ;НОВАЯ ВЫСОТА
 
 
-VX5:
+.VX5
 ; ДЕЛАЕМ НУЖНЫЕ КООРДИНАТЫ ЕСЛИ БЫЛИ
 ; КЛИППИНГИ
             exx
@@ -295,7 +295,7 @@ VX5:
 ; СВЕРХУ
             ld   a,b
             and  a
-            jr   z,VX6
+            jr   z,.VX6
 
 ; В xlСТАР.БАЙТ КОЕФ.МАСШ.ПО У
 
@@ -313,7 +313,7 @@ VX5:
 
             ld   a,h
             and  a
-            jr   z,VX6
+            jr   z,.VX6
             ld   b,a
             exx
             ld   a,b
@@ -335,13 +335,13 @@ VX5:
             pop  bc
             add  hl,de
             EXD
-VX6:
+.VX6
             exx
 DBV:        ld   a,0                ;КОЛ.КЛИПНУТЫХ ДАБЛ
 ; ВОКСЕЛЕЙ ПО ШИРИНЕ
 ; СЛЕВА
             and  a
-            jr   z,P1
+            jr   z,.P1
 ; ИЗМЕНЯЕМ АДРЕС СПРАЙТА ЕСЛИ БЫЛ КЛИПИНГ
 ; СЛЕВА ПО ШИРИНЕ
 
@@ -379,7 +379,7 @@ DBV:        ld   a,0                ;КОЛ.КЛИПНУТЫХ ДАБЛ
             EXD
             exx
             EXD
-P1:
+.P1
             ld   a,b
             pop  bc
             pop  de
@@ -408,7 +408,7 @@ VOXOUT:
             ld   b,a
             ld   a,ixl
             or   a
-            jr   z,P2
+            jr   z,.P2
             ex   af,af'
             ld   a,c
             ex   af,af'
@@ -434,7 +434,7 @@ VOXOUT:
             ld   ixl,a
             ld   a,h
 ; В a-СМЕЩЕНИЕ ДЛЯ СТ.БАЙТА АДРЕСА СПРАЙТ
-P2:
+.P2
             ld   (WE1+1),a
 
 ; РАСЧИТЫВАЕМ АДРЕС НАЧАЛА ВЫВОДА ВОКСЕЛЯ
@@ -451,13 +451,13 @@ XX:         ld   a,0
             add  a,c
             rra
             ld   a,#0F
-            jr   nc,Q2
+            jr   nc,.Q2
             ld   a,(AW3)
             cp   #38
             jr   z,$+3
             inc  c
             xor  a
-Q2:
+.Q2
             ld   (AW1+1),a
             ld   (AW2+1),a
 
@@ -480,14 +480,14 @@ Q2:
             ld   bc,VXL4
             add  hl,bc
             ld   (VXL3+1),hl
-AW3:        jr   nc,Q1
+AW3:        jr   nc,.Q1
             inc  hl
             inc  hl
             inc  hl
             inc  hl
             ld   (hl),0
             dec  hl
-Q1:
+.Q1
             ld   (VXL2+1),hl
             ld   iyl,e              ;ДУБЛИРУЕМ МЛ.БАЙТ АДРЕСА
             ld   c,e
@@ -891,20 +891,20 @@ DIVV:
             xor  a
             sli  l
             sli  l
-            jr   c,M1
+            jr   c,.M1
             sli  l
-            jr   c,M1+7
+            jr   c,.M1+7
             sli  l
-            jr   c,M1+(7*2)
+            jr   c,.M1+(7*2)
             sli  l
-            jr   c,M1+(7*3)
+            jr   c,.M1+(7*3)
             sli  l
-            jr   c,M1+(7*4)
+            jr   c,.M1+(7*4)
             sli  l
-            jr   c,M1+(7*5)
+            jr   c,.M1+(7*5)
             sli  l
-            jp   M1+(7*6)
-M1:
+            jp   .M1+(7*6)
+.M1
             rept 7
             rla
             sbc  a,e

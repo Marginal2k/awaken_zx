@@ -64,7 +64,7 @@ COUNTER:    ld   a,0
 ; ЕСЛИ ИГРОК СТОЛКНУЛСЯ С КЕМ ЛИБО
             ld   a,(CRASH+1)        ;nz-CRASH
             and  a
-            jr   z,IIO31
+            jr   z,.IIO31
             xor  a
             ld   (CRASH+1),a
             ld   a,(SHILD)
@@ -76,7 +76,7 @@ COUNTER:    ld   a,0
 
             ld   a,2
             ld   (FSHILD+1),a
-IIO31:
+.IIO31
 ; ВОССТАНОВЛЕНИЕ ТЕМПЕРАТУРЫ ЛАЗЕРА ИГРОКА
             ld   a,0
 PSRLI:      add  a,20
@@ -134,26 +134,26 @@ PMLPI:      sub  1
             ld   (FSHILD+1),a
 IIO1:
             bit  1,c
-            jr   z,IIO3
+            jr   z,.IIO3
 ; ПУСК РАКЕТЫ ПО ИГРОКУ
             ld   a,%10000000
             rrca
             ld   ($-2),a
             ld   a,%00000101
-            jr   nc,IIO4
+            jr   nc,.IIO4
             ld   hl,ROKA
             ld   (SFXB+1),hl
             ld   a,%00110101
-IIO4:
+.IIO4
             ld   (#5A1C),a
             xor  a
             ld   (ACTION),a
-            jp   IIO3+5
-IIO3:
+            jp   .IIO3+5
+.IIO3
             ld   a,%00000101
             ld   (#5A1C),a
             bit  2,c
-            jr   z,IIO5
+            jr   z,.IIO5
 ; ПОПАДАНИЕ РАКЕТОЙ
             xor  a
             ld   (ACTION),a
@@ -166,20 +166,20 @@ IIO3:
 
             ld   a,1
             ld   (FSHILD+1),a
-IIO5:
+.IIO5
 ; ВОССТАНОВЛЕНИЕ ЭНЕРГИИ ИГРОКА
             ld   a,0
 PSRZI:      add  a,80
             ld   ($-3),a
-            jr   nc,IIO2
+            jr   nc,.IIO2
             ld   a,(SHILD)
             cp   46
-            jr   nc,IIO2
+            jr   nc,.IIO2
             inc  a
             ld   (SHILD),a
             ld   a,1
             ld   (FSHILD+1),a
-IIO2:
+.IIO2
 ; ЗВУКИ
             call SFXA
 
@@ -371,27 +371,27 @@ REMOVEOBJ:
             ld   de,OBJBUF
             ldi
             ldi
-ZJ72:
+.ZJ72
             ld   a,(hl)
             or   a
-            jr   z,ZJ71
+            jr   z,.ZJ71
             ldi
             ldi
             ldi
             ldi
-            jp   ZJ72
-ZJ71:
+            jp   .ZJ72
+.ZJ71
             ldi
-ZJ73:
+.ZJ73
             ld   a,(hl)
             and  #0F
-            jr   z,ZJ74
+            jr   z,.ZJ74
             inc  a
             ld   c,a
             ld   b,0
             ldir
-            jp   ZJ73
-ZJ74:
+            jp   .ZJ73
+.ZJ74
             ldi
             PAGE___NOARG
             ret
@@ -465,7 +465,7 @@ LL403F:     add  hl,hl
             call LL4115
             jr   c,LL4036
             ld   e,#01
-LL4049:     ld   a,#80
+.LL4049     ld   a,#80
             add  hl,hl
             djnz $+5
             call LL4115
@@ -476,7 +476,7 @@ LL4049:     ld   a,#80
             add  a,e
             ld   e,a
             xor  c
-            jr   nz,LL4049
+            jr   nz,.LL4049
             add  a,e
             cp   #04
             jr   z,LL40C4
@@ -486,28 +486,28 @@ LL4049:     ld   a,#80
 LL4067:     ld   c,a
 LL4068:     exx
             ld   a,#BF
-            jr   c,LL4082
-LL406D:     add  hl,hl
+            jr   c,.LL4082
+.LL406D     add  hl,hl
             djnz $+5
             call LL4115
             rla
-            jr   c,LL406D
-            jr   z,LL407D
+            jr   c,.LL406D
+            jr   z,.LL407D
             inc  a
             add  a,d
-            jr   nc,LL4084
+            jr   nc,.LL4084
             sub  d
-LL407D:     inc  a
-            jr   nz,LL408D
+.LL407D     inc  a
+            jr   nz,.LL408D
             ld   a,#EF
-LL4082:     rrca
+.LL4082     rrca
             cp   a
-LL4084:     add  hl,hl
+.LL4084     add  hl,hl
             djnz $+5
             call LL4115
             rla
-            jr   c,LL4084
-LL408D:     exx
+            jr   c,.LL4084
+.LL408D     exx
             ld   h,#FF
             jr   z,LL409B
             ld   h,a
@@ -542,12 +542,12 @@ LL40B1:     ld   l,a
             ld   a,(hl)
             jp   LL403C
 LL40C4:     ld   a,#80
-LL40C6:     add  hl,hl
+.LL40C6     add  hl,hl
             djnz $+5
             call LL4115
             adc  a,a
             jr   nz,LL40F3
-            jr   c,LL40C6
+            jr   c,.LL40C6
             ld   a,#FC
             jr   LL40F6
 LL40D5:     ld   b,a
@@ -560,12 +560,12 @@ LL40DE:     cp   #0F
             jr   nz,LL4067
             ld   b,#03
             EXD
-LL40E7:     pop  de
+.LL40E7     pop  de
             ld   (hl),e
             inc  hl
             ld   (hl),d
             inc  hl
-            djnz LL40E7
+            djnz .LL40E7
             ld   hl,#2758
             exx
             ret
@@ -832,7 +832,7 @@ CALC2D3D:
 ;Y
             call FDIV
             pop  de
-            jp   c,LD3
+            jp   c,.LD3
             bit  7,d
             jr   z,$+9
             NEGHL
@@ -849,7 +849,7 @@ CALC2D3D:
             ABSDE
             call FDIV
             pop  de
-            jp   c,LD3
+            jp   c,.LD3
             bit  7,d
             jr   z,$+9
             NEGHL
@@ -859,7 +859,7 @@ CALC2D3D:
             pop  de
             xor  a
             ret
-LD3:
+.LD3
             pop  af
             xor  a
             inc  a
@@ -895,7 +895,7 @@ ATAGDIV:
             ABSDE
             call FDIV
             pop  bc
-            jr   c,CUG1
+            jr   c,.CUG1
             ABSHL
             ld   a,l
             rept 4
@@ -905,7 +905,7 @@ ATAGDIV:
             ld   l,a
             ld   a,h
             and  a
-            jp   nz,CUG1
+            jp   nz,.CUG1
             pop  af
             ld   h,high(ATAGTAB)
             ld   a,(hl)
@@ -920,7 +920,7 @@ ATAGDIV:
             add  a,#80
             ret
 
-CUG1:
+.CUG1
             pop  af
             ld   a,#40
             ret  p
@@ -936,18 +936,18 @@ FDIV:
             EXD
             inc  h
             dec  h
-            jr   z,FDV1
+            jr   z,.FDV1
             rept 6
             inc  b
             sra  h
-            jr   z,FDV1-2
+            jr   z,.FDV1-2
             rr   l
             endr
             inc  b
             sra  h
 
             rr   l
-FDV1:       ld   h,high(TBLOG2)
+.FDV1       ld   h,high(TBLOG2)
             ld   a,(hl)
             inc  h
             ld   h,(hl)
@@ -956,40 +956,40 @@ FDV1:       ld   h,high(TBLOG2)
             EXD
             ld   a,h
             rla
-            jr   nc,FDV2
+            jr   nc,.FDV2
             NEGHL
             scf
-FDV2:       ex   af,af'
+.FDV2       ex   af,af'
             ld   bc,#0800
             inc  h
             dec  h
-            jr   z,FDV3
+            jr   z,.FDV3
 
             rept 6
             inc  b
             sra  h
-            jr   z,FDV3-2
+            jr   z,.FDV3-2
             rr   l
             endr
 
             inc  b
             sra  h
             rr   l
-FDV3:       ld   h,high(TBLOG2)
+.FDV3       ld   h,high(TBLOG2)
             ld   a,(hl)
             inc  h
             ld   h,(hl)
             ld   l,a
             add  hl,bc
             SUB_DE
-            jp   m,FDV4
+            jp   m,.FDV4
             ld   a,h
             ld   b,a
             ld   h,high(TB2X)
             ld   l,(hl)
             ld   h,1
             sub  8
-            jr   nc,FDV5
+            jr   nc,.FDV5
             ld   a,7
             sub  b
             ld   ($+4),a
@@ -997,18 +997,18 @@ FDV3:       ld   h,high(TBLOG2)
             ADDHLHL 7
             ld   l,h
             ld   h,0
-            jp   FDV7
-FDV4:
+            jp   .FDV7
+.FDV4
             ld   hl,0
             and  a
             ret
-FDV5:       ld   a,#0F
+.FDV5       ld   a,#0F
             sub  b
             ret  c
             ld   ($+4),a
             jr   nz,$
             ADDHLHL 7
-FDV7:       ex   af,af'
+.FDV7       ex   af,af'
             jr   nc,$+9
             NEGHL
             and  a
@@ -1175,7 +1175,7 @@ KORNI:
 ; ЗНАЧЕНИЕ a
             ld   a,d
             and  a
-            jr   z,KOR
+            jr   z,.KOR
             ld   l,a
             ld   h,high(KORN)
             ld   a,(hl)
@@ -1205,7 +1205,7 @@ KORNI:
             ret  nc
             inc  a
             ret
-KOR:
+.KOR
 ; ПОДСЧЕТ КОРНЯ БЕЗ ТАБЛИЦЫ, ДЛЯ МАЛЕНЬКИХ
 ; ЧИСЕЛ
 ; ДАННЫЕ de<2116

@@ -62,17 +62,17 @@ FORSAGE:
 ; ФОРСАЖ ОБЪЕКТА
             ld   a,(ix+TYPE)
             cp   T_HERMIT
-            jr   nc,FS4
+            jr   nc,.FS4
             ld   a,#11
             rrca
             ld   ($-2),a
-            jr   nc,FS1
+            jr   nc,.FS1
             ld   a,(ix+FORSAG)
             cp   #0F
-            jr   nc,FS1
+            jr   nc,.FS1
             inc  a
             ld   (ix+FORSAG),a
-FS1:
+.FS1
             ld   a,(ix+1)
             ACPL_A
             ld   c,a
@@ -89,7 +89,7 @@ FS1:
             ld   a,c
             cp   JMIN_
             jp   nc,GOSIMPLY
-FS4:
+.FS4
             ld   a,(ix+OMODE)
             ld   (ix+MODE),a
             ld   (ix+FORSAG),0
@@ -260,13 +260,13 @@ GOSIMPLY:
             ld   (ix+RSPD),a
             ld   a,(ix+TYPE)
             cp   T_CHIP
-            jr   nc,NNI1
+            jr   nc,.NNI1
 ; УБИРТЬ ФОРСАЖ ТОЛЬКО КОРАБЛЯМ
             ld   a,(ix+MODE)
             cp   C_FORSAGE          ;FORSAGE
             jr   z,$+6
             ld   (ix+FORSAG),0
-NNI1:
+.NNI1
             ld   d,(ix+FORSAG)
             jp   MOVEON
 
@@ -275,17 +275,17 @@ FIGHT:
 ; РЕЖИМ НАПАДЕНИЯ НА ОБЪЕКТ
             ld   a,(ix+SUBJ)
             inc  a
-            jr   nz,FGH7
+            jr   nz,.FGH7
             ld   a,r
             cp   120
-            jr   c,FTT1
+            jr   c,.FTT1
             call YESCARGO
-            jr   z,FTT1
+            jr   z,.FTT1
             call NEARCARGO
             ld   (ix+MODE),C_GETCARGO
             ld   (ix+SUBJ),a
             jp   GOSIMPLY
-FTT1:
+.FTT1
             call NEWORD
             ld   a,(ix+SUBJ)
             inc  a
@@ -303,39 +303,39 @@ FTT1:
             ld   h,(hl)
             ld   l,a
             jp   (hl)
-FGH7:
+.FGH7
             call FLOTSTART
             ld   a,(ix+TYPE)
             cp   T_HERMIT
             jp   z,GOASTER
             ld   a,(ix+ENERGY)
             cp   35
-            jr   nc,FGT9
+            jr   nc,.FGT9
             ld   a,r
             cp   100
             ld   c,a
-            jr   c,FGH71
+            jr   c,.FGH71
             ld   a,(ix+TYPE)
             cp   T_HERMIT
-            jr   z,FGH71
+            jr   z,.FGH71
             cp   T_MIKR
-            jr   z,FGH71
+            jr   z,.FGH71
             ld   (ix+MODE),C_JUMPOUT
             jp   GOSIMPLY
-FGH71:
+.FGH71
             ld   a,c
             cp   50
-            jr   nc,FGT9
+            jr   nc,.FGT9
             ld   a,(ix+TYPE)
             cp   T_POLICE
-            jr   z,FGT9
+            jr   z,.FGT9
             cp   T_MILITARY
-            jr   z,FGT9
+            jr   z,.FGT9
             cp   T_HERMIT
-            jr   nz,DFN102
+            jr   nz,.DFN102
             bit  2,(ix+SETUP)
-            jr   nz,FGT9
-DFN102:
+            jr   nz,.FGT9
+.DFN102
             call DROPCARGO
 ; РЕЖИМ СВОБОДНОГО ПОЛЕТА
             ld   a,(ix+TYPE)
@@ -343,12 +343,12 @@ DFN102:
             jp   z,GOSIMPLY
             ld   (ix+MODE),C_GOAWAY
             jp   GOSIMPLY
-FGT9:
+.FGT9
             call TESTSUBJ
-            jr   nz,FGH1
+            jr   nz,.FGH1
             ld   (ix+SUBJ),#FF
             jp   GOSIMPLY
-FGH1:
+.FGH1
             call OPONE
             jp   c,FGHT1
             ld   a,(ix+RCO)
@@ -461,17 +461,17 @@ DEFENCE:
 ; РЕЖИМ ЗАЩИТЫ ОТ НАПАДЕНИЯ
             ld   a,(ix+SUBJ)
             inc  a
-            jr   nz,DFN7
+            jr   nz,.DFN7
             ld   a,r
             cp   126
-            jr   c,DFC1
+            jr   c,.DFC1
             call YESCARGO
-            jr   z,DFC1
+            jr   z,.DFC1
             call NEARCARGO
             ld   (ix+MODE),C_GETCARGO
             ld   (ix+SUBJ),a
             jp   GOSIMPLY
-DFC1:
+.DFC1
             call NEWORD
             ld   a,(ix+SUBJ)
             inc  a
@@ -489,47 +489,47 @@ DFC1:
             ld   h,(hl)
             ld   l,a
             jp   (hl)
-DFN7:
+.DFN7
             ld   a,(ix+ENERGY)
             cp   35
-            jp   nc,DFN1
+            jp   nc,.DFN1
             ld   a,r
             cp   100
             ld   c,a
-            jr   c,DFN71
+            jr   c,.DFN71
             ld   a,(ix+TYPE)
             cp   T_HERMIT
-            jr   z,DFN71
+            jr   z,.DFN71
             cp   T_MIKR
-            jr   z,DFN71
+            jr   z,.DFN71
             ld   (ix+MODE),C_JUMPOUT
             jp   GOSIMPLY
-DFN71:
+.DFN71
             ld   a,c
             cp   40
-            jr   c,DFN1
+            jr   c,.DFN1
             ld   a,(ix+TYPE)
             cp   T_POLICE
-            jr   z,DFN1
+            jr   z,.DFN1
             cp   T_MILITARY
-            jr   z,DFN1
+            jr   z,.DFN1
             cp   T_HERMIT
-            jr   nz,DFN101
+            jr   nz,.DFN101
             bit  2,(ix+SETUP)
-            jr   nz,DFN1
-DFN101:
+            jr   nz,.DFN1
+.DFN101
             call DROPCARGO
             ld   a,(ix+TYPE)
             cp   T_HERMIT
             jp   z,GOSIMPLY
             ld   (ix+MODE),C_GOAWAY
             jp   GOSIMPLY
-DFN1:
+.DFN1
             call TESTSUBJ
-            jr   nz,FGH11
+            jr   nz,.FGH11
             ld   (ix+SUBJ),#FF
             jp   GOSIMPLY
-FGH11:
+.FGH11
 
             ld   a,(ix+RCO)
             dec  a
@@ -618,11 +618,11 @@ OTLET:
             ld   a,(ix+POWOR)
             dec  a
             ld   (ix+POWOR),a
-            jr   nz,OTLET2
+            jr   nz,.OTLET2
             ld   a,(ix+PMODE)
             ld   (ix+MODE),a
             jp   GOSIMPLY
-OTLET2:
+.OTLET2
             call TESTSUBJ
             jp   z,GOSIMPLY
             call RND
@@ -809,33 +809,33 @@ STYSTAT:
 ; ПЛОХ, ТО ВЫЛЕТ ПОЛИЦИИ
             ld   a,r
             cp   VWLPL
-            jr   c,STTT9
+            jr   c,.STTT9
             call RNDL4
             ld   a,l
             cp   40
-            jr   nc,STTT9
+            jr   nc,.STTT9
             ld   a,(STATUS)
             cp   80                 ;ВЫЩЕ ПРЕДЕЛА
             ld   a,SPLAYER
-            jr   nc,STTT1
-STTT9:
+            jr   nc,.STTT1
+.STTT9
             ld   d,0
             call FINDOBJ
-            jr   z,STTT2
+            jr   z,.STTT2
             call GETINDY
-            jr   STTT1
-STTT2:
+            jr   .STTT1
+.STTT2
             ld   d,7
             call FINDOBJ
-            jr   z,STTT3
+            jr   z,.STTT3
             call GETINDY
-            jr   STTT1
-STTT3:
+            jr   .STTT1
+.STTT3
             ld   d,5
             call FINDOBJ
             jr   z,STAYSTATION
             call GETINDY
-STTT1:
+.STTT1
 ; ИНИТ РЕЖИМА ПУСКА КОРАБЛЕЙ
             ex   af,af'
 ; ЕСЛИ ЕСТЬ ПОЛИЦИЯ В КОСМОСЕ
@@ -872,16 +872,16 @@ NAVODROKET:
             ld   c,(iy+0)
             ld   a,(iy+1)
             cp   #80
-            jr   nz,NR1
+            jr   nz,.NR1
             ld   a,(ix+LZS)
             and  a
-            jr   z,ZM21
+            jr   z,.ZM21
             MESAG _LOSTTARGET
-ZM21:
+.ZM21
             ld   d,ixh
             ld   e,ixl
-            jp   EXPLO2
-NR1:
+            jp   .EXPLO2
+.NR1
             ld   b,a
             exx
             ld   c,0
@@ -909,7 +909,7 @@ NR1:
             ld   a,c
             exx
             and  a
-            jr   z,EXPLO1
+            jr   z,.EXPLO1
             ld   (ix+4),l
             ld   (ix+5),h
             inc  (ix+ALFA)
@@ -924,7 +924,7 @@ NR1:
             ld   (STPZ_+1),hl
             ret
 
-EXPLO1:
+.EXPLO1
 ; ПРОВЕРИМ ЕСЛИ ЭТО ИГРОК ПО МРКЕРУ
             ld   a,(ix+MSPD)
             call GETADR
@@ -933,17 +933,17 @@ EXPLO1:
             ld   l,a
             ld   a,(hl)
             inc  a
-            jr   z,EXL4
+            jr   z,.EXL4
             call DEATHX
-EXL4:
+.EXL4
 ; РАКЕТА ПОПАЛА В ЦЕЛЬ
             set  2,(iy+ACTN)
             ld   a,(ix+LZS)
             and  a
-            jr   z,EXPLO2
+            jr   z,.EXPLO2
 ; ЦЕЛЬ УНИЧТОЖЕНА
             MESAG _DESTROY
-EXPLO2:
+.EXPLO2
             push ix
             ld   ixh,d
             ld   ixl,e
@@ -967,20 +967,20 @@ JUMPING:
 STAY:
             ld   a,(ix+RSPD)
             and  a
-            jr   z,SY1
+            jr   z,.SY1
             dec  a
             dec  a
             ld   (ix+RSPD),a
             call GOSIMPLY
             ret
-            jp   SY2
-SY1:
+            jp   .SY2
+.SY1
             ld   hl,0
             ld   (STPX_+1),hl
             ld   (STPY_+1),hl
             ld   (STPZ_+1),hl
             ret
-SY2:
+.SY2
             call RND
             ld   de,#F000
             SUB_DE
@@ -1074,7 +1074,7 @@ SINT1:
             ld   a,(ix+TYPE)
             cp   T_CHIP
 ; ЕСЛИ НЕ КОРАБЛИ
-            jp   nc,SINT2
+            jp   nc,.SINT2
 ; ЕСЛИ ЭНЕРГИИ МЕНЬШЕ, ТО ДОБАВИТЬ
 ; МАКСИМАЛЬНЫЙ УРОВЕНЬ ЭНЕРГИИ КОРАБЛЕЙ
             ld   a,(ix+MENE)
@@ -1083,11 +1083,11 @@ SINT1:
 ; ЕСЛИ ЭНЕРГИИ МЕНЬШЕ, ТО ДОБАВИТЬ
             ld   a,(ix+ENERGY)
             cp   h
-            jr   nc,SINT2
+            jr   nc,.SINT2
             inc  a
             ld   (ix+ENERGY),a
 
-SINT2:
+.SINT2
 ; ЕСЛИ БЫЛО ДЕЙСТВИЕ СО СТОРОНЫ
             ld   a,(ix+ACTN)
             and  a
@@ -1102,7 +1102,7 @@ SINT2:
             cp   T_STATION
 
 ; ЕСЛИ ОБЪЕКТ НЕ СТАНЦИЯ
-            jr   nz,SINT4
+            jr   nz,.SINT4
 
 ; ЭТО СТАНЦИЯ, ЕЕ ЛАЗЕРОМ НЕ ВОЗЬМЕШЬ
 ; СТАРТ ПОЛИЦИИ НА НАПАДАЮЩЕГО
@@ -1131,7 +1131,7 @@ SINT2:
 
 ; ЕСЛИ НАПАЛ ИГРОК, ТО ОДНО ПРИРАЩЕНИЕ
 ; ЭНЕРГИИ ИНАЧЕ ДРУГОЕ
-SINT4:
+.SINT4
             ld   a,(ix+SUBJ)
             cp   SPLAYER
 PMLPL:      ld   c,#0A
@@ -1193,7 +1193,7 @@ SINT5:
             ld   a,(ix+MODE)
             cp   C_FIGHT
 
-            jp   nz,SINT8
+            jp   nz,.SINT8
 
 ; ЕСЛИ РЕЖИМ СРАЖЕНИЯ
 ; ПРОВЕРКА СУБЪЕКТА НА КОГО НАПАДАЛИ ДО
@@ -1202,21 +1202,21 @@ SINT5:
             inc  c
 ; ЕСЛИ НЕТ СУБЪЕКТА ТО ОПРЕДЕЛЕНИЕ
 ; БУДУЩЕГО РЕЖИМА УЧИТЫВАЯ ОБЪЕКТ
-            jr   z,SINT6
+            jr   z,.SINT6
 ;----------
 ; ЕСТЬ СУБЪЕКТ НАПАДЕНИЯ
 ; СЛУЧАЙНО МОЖНО ПЕРЕЙТИ В НАПАДЕНИЕ НА
 ; НОВОГО ПРОТИВНИКА
             ld   a,r
             cp   10
-            jr   c,SINT6
+            jr   c,.SINT6
             jp   SINT3
-SINT8:
+.SINT8
             cp   4                  ;FREEFLY
-            jp   c,SINT6
+            jp   c,.SINT6
             cp   10
             jp   c,SINT3
-SINT6:
+.SINT6
 ; ОПРЕДЕЛИМ ВЕРОЯТНОСТЬ ПЕРЕХОДА В
 ; НАПАДЕНИЕ ИЛИ ОБРАТНУЮ ВЕРОЯТНОСТЬ
 ; ПЕРЕХОДА В ЗАЩИТУ ДЛЯ ОПР. ОБЪЕКТ
@@ -1224,14 +1224,14 @@ SINT6:
             and  #0F
             cp   T_POLICE
             ld   c,#70
-            jp   z,SINT7
+            jp   z,.SINT7
             cp   T_PIRAT
             ld   c,#75
-            jp   z,SINT7
+            jp   z,.SINT7
             cp   T_TRADER
             ld   c,#50
-            jp   z,SINT7
-SINT7:
+            jp   z,.SINT7
+.SINT7
             ld   a,(ix+MODE)
             cp   C_JUMPING
             jr   z,SINT3

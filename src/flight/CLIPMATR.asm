@@ -36,7 +36,7 @@ CLIP:
             ld   (_Y1),de
             ld   a,(hl)
             ld   (_F1),a
-X8B2:       ld   hl,(_X1)
+.X8B2       ld   hl,(_X1)
             ld   (_X0),hl
             ld   hl,(_Y1)
             ld   (_Y0),hl
@@ -78,7 +78,7 @@ X8B2:       ld   hl,(_X1)
             push de
             jp   (hl)
             pop  bc
-            djnz X8B2
+            djnz .X8B2
             pop  hl
             ld   a,(LOW_CORDS_BUF)
             cp   #06
@@ -136,10 +136,10 @@ X97A:       call DXaY
 X989:       call aXDY
 X98C:       call DXaY
             call aY_aX
-            jp   m,X99B
+            jp   m,.X99B
             call SET_XaYa
             jp   X92C
-X99B:       call C_XY_aXDY+3
+.X99B       call C_XY_aXDY+3
             jp   X920
 X9A1:       call aXDY
 X9A4:       call DXiY
@@ -184,10 +184,10 @@ XA06:       call DXiY
 XA15:       call iXDY
 XA18:       call DXiY
             call iY_iX
-            jp   m,XA27
+            jp   m,.XA27
             call SET_XiYi
             jp   X946
-XA27:       call C_XY_iXDY+3
+.XA27       call C_XY_iXDY+3
             jp   X93A
 XA2D:       call C_XY_DXaY
             jp   STOR_Y1_X1
@@ -218,10 +218,10 @@ XA67:       call aXDY
 XA79:       call DXaY
 XA7C:       call iXDY
             call aY_iX
-            jp   m,XA8B
+            jp   m,.XA8B
             call SET_XiYa
             jp   X960
-XA8B:       call C_XY_DXaY+3
+.XA8B       call C_XY_DXaY+3
             call DXiY
             jp   X957
 XA94:       call DXaY
@@ -240,13 +240,13 @@ XAB0:       call X1_X0
 XAB7:       call DXaY
             call aXDY
             call aY_aX
-            jp   m,XAD0
+            jp   m,.XAD0
             ld   hl,F_ACTING
             bit  0,(hl)
             set  0,(hl)
             call nz,SET_XaYa
             jp   XA48
-XAD0:       call C_XY_aXDY+3
+.XAD0       call C_XY_aXDY+3
             jp   C_XY_iXDY
 XAD6:       ld   hl,F_ACTING
             bit  0,(hl)
@@ -299,13 +299,13 @@ XB51:       call Y1_Y0
 XB58:       call DXaY
             call iXDY
             call aY_iX
-            jp   m,XB71
+            jp   m,.XB71
             ld   hl,F_ACTING
             bit  1,(hl)
             set  1,(hl)
             call nz,SET_XiYa
             jp   XA06
-XB71:       call C_XY_DXaY+3
+.XB71       call C_XY_DXaY+3
             jp   C_XY_DXiY
 XB77:       call DXaY
             call iXDY
@@ -337,10 +337,10 @@ XBC0:       call C_XY_DXiY
 XBC6:       call DXiY
 XBC9:       call aXDY
             call iY_aX
-            jp   m,XBD8
+            jp   m,.XBD8
             call SET_XaYi
             jp   X912
-XBD8:       call C_XY_DXiY+3
+.XBD8       call C_XY_DXiY+3
             call DXaY
             jp   X909
 XBE1:       call DXiY
@@ -378,13 +378,13 @@ XC24:       call DXiY
 XC39:       call DXiY
             call aXDY
             call iY_aX
-            jp   m,XC52
+            jp   m,.XC52
             ld   hl,F_ACTING
             bit  2,(hl)
             set  2,(hl)
             call nz,SET_XaYi
             jp   X97A
-XC52:       call C_XY_DXiY+3
+.XC52       call C_XY_DXiY+3
             jp   C_XY_DXaY
 XC58:       call XC19
             jp   X912
@@ -413,13 +413,13 @@ XC94:       call C_XY_DXiY+3
 XC9A:       call DXiY
             call iXDY
             call iY_iX
-            jp   m,XCB3
+            jp   m,.XCB3
             ld   hl,F_ACTING
             bit  3,(hl)
             set  3,(hl)
             call nz,SET_XiYi
             jp   XB9F
-XCB3:       call C_XY_iXDY+3
+.XCB3       call C_XY_iXDY+3
             jp   C_XY_aXDY
 XCB9:       call X1_X0
             jp   m,_BREAK
@@ -588,10 +588,10 @@ C_XY_iXDY:  call iXDY
             add  hl,de
             ld   a,h
             and  a
-            jp   m,IO1
+            jp   m,.IO1
             ld   a,l
             and  a
-            jp   p,IO2
+            jp   p,.IO2
             ld   a,(LOW_CORDS_BUF)
             ld   l,a
             ld   h,L9E
@@ -602,7 +602,7 @@ C_XY_iXDY:  call iXDY
             ld   a,l
             ld   (LOW_CORDS_BUF),a
             ret
-IO1:
+.IO1
             ld   a,(LOW_CORDS_BUF)
             ld   l,a
             ld   h,L9E
@@ -614,7 +614,7 @@ IO1:
             ld   a,l
             ld   (LOW_CORDS_BUF),a
             ret
-IO2:
+.IO2
             ld   d,l
             ld   a,(LOW_CORDS_BUF)
             ld   l,a
@@ -640,10 +640,10 @@ C_XY_aXDY:  call aXDY
             add  hl,de
             ld   a,h
             and  a
-            jp   m,IO4
+            jp   m,.IO4
             ld   a,l
             and  a
-            jp   p,IO3
+            jp   p,.IO3
             ld   a,(LOW_CORDS_BUF)
             ld   l,a
             ld   h,L9E
@@ -654,7 +654,7 @@ C_XY_aXDY:  call aXDY
             ld   a,l
             ld   (LOW_CORDS_BUF),a
             ret
-IO4:
+.IO4
             ld   a,(LOW_CORDS_BUF)
             ld   l,a
             ld   h,L9E
@@ -665,7 +665,7 @@ IO4:
             ld   a,l
             ld   (LOW_CORDS_BUF),a
             ret
-IO3:
+.IO3
             ld   d,l
             ld   a,(LOW_CORDS_BUF)
             ld   l,a
@@ -885,7 +885,7 @@ LD030:      rr   e
 
 ; ДЕЛЕНИЕ hl=hl/de
 DIVHLDE:    ld   ixl,0
-            jp   p,LD098
+            jp   p,.LD098
             EXD
             ld   b,h
             ld   c,l
@@ -893,8 +893,8 @@ DIVHLDE:    ld   ixl,0
             SUB_BC
             EXD
             inc  ixl
-LD098:      bit  7,h
-            jr   z,LD0AA
+.LD098      bit  7,h
+            jr   z,.LD0AA
             ex   af,af'
             cpl
             ex   af,af'
@@ -905,7 +905,7 @@ LD098:      bit  7,h
             scf
             sbc  hl,bc
             inc  ixl
-LD0AA:
+.LD0AA
 
             rept 8
             rla
@@ -946,7 +946,7 @@ CLIPLINE:
             ld   (F_POL_LIN),a
             ld   a,(_F0)
             cp   #F0
-            jr   nz,LD16E
+            jr   nz,.LD16E
             ld   b,a
             ld   a,(_F1)
             ld   (_F0),a
@@ -960,7 +960,7 @@ CLIPLINE:
             ld   de,(_Y1)
             ld   (_Y1),hl
             ld   (_Y0),de
-LD16E:      xor  a
+.LD16E      xor  a
             ld   (LOW_CORDS_BUF),a
             ld   a,(_F0)
             cpl
@@ -991,7 +991,7 @@ LD16E:      xor  a
 MATRX:
             ld   hl,SETS
             bit  0,(hl)
-            jr   z,LD1D8            ;ifALFA GAMA TURN ON
+            jr   z,.LD1D8            ;ifALFA GAMA TURN ON
             ld   a,(EYEB)           ;BETA
             ld   b,a
             add  a,#40
@@ -1013,7 +1013,7 @@ MATRX:
             ld   a,#7F
             ld   (GM_22+1),a
             ret
-LD1D8:
+.LD1D8
             ld   a,(EYEA)
             ld   h,SINTB
             ld   l,a
@@ -1192,14 +1192,14 @@ GM_33:      ld   d,0
 
             ld   ixh,a
             bit  0,(iy+0)
-            jr   nz,LD34C
+            jr   nz,.LD34C
             ld   a,(SM_21+1)
 
             MULAC
             ADPAXH
 
             ld   ixh,a
-LD34C:      ld   a,(SM_31+1)
+.LD34C      ld   a,(SM_31+1)
 
             MULAD
             ADPAXH
@@ -1211,14 +1211,14 @@ LD34C:      ld   a,(SM_31+1)
 
             ld   ixh,a
             bit  0,(iy+0)
-            jr   nz,LD375
+            jr   nz,.LD375
             ld   a,(SM_22+1)
 
             MULAC
             ADPAXH
 
             ld   ixh,a
-LD375:      ld   a,(SM_32+1)
+.LD375      ld   a,(SM_32+1)
 
             MULAD
             ADPAXH
@@ -1230,14 +1230,14 @@ LD375:      ld   a,(SM_32+1)
 
             ld   ixh,a
             bit  0,(iy+0)
-            jr   nz,LD39E
+            jr   nz,.LD39E
             ld   a,(SM_23+1)
 
             MULAC
             ADPAXH
 
             ld   ixh,a
-LD39E:      ld   a,(SM_33+1)
+.LD39E      ld   a,(SM_33+1)
 
             MULAD
             ADPAXH
@@ -1319,9 +1319,9 @@ LD43C:
             ld   (OM_32+1),a
             ld   a,(EYEB)
             and  a
-            jr   z,LD485
-            jp   p,LD4AA
-            jp   po,LD4D5
+            jr   z,.LD485
+            jp   p,.LD4AA
+            jp   po,.LD4D5
             ld   a,(SM_31+1)
             ld   (OM_11+1),a
             ld   a,(SM_32+1)
@@ -1338,7 +1338,7 @@ LD43C:
             neg
             ld   (OM_33+1),a
             ret
-LD485:      ld   a,(SM_11+1)
+.LD485      ld   a,(SM_11+1)
             ld   (OM_11+1),a
             ld   a,(SM_12+1)
             ld   (OM_21+1),a
@@ -1351,7 +1351,7 @@ LD485:      ld   a,(SM_11+1)
             ld   a,(SM_33+1)
             ld   (OM_33+1),a
             ret
-LD4AA:      ld   a,(SM_31+1)
+.LD4AA      ld   a,(SM_31+1)
             neg
             ld   (OM_11+1),a
             ld   a,(SM_32+1)
@@ -1367,7 +1367,7 @@ LD4AA:      ld   a,(SM_31+1)
             ld   a,(SM_13+1)
             ld   (OM_33+1),a
             ret
-LD4D5:      ld   a,(SM_11+1)
+.LD4D5      ld   a,(SM_11+1)
             neg
             ld   (OM_11+1),a
             ld   a,(SM_12+1)

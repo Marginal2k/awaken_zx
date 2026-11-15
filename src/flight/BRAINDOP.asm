@@ -8,7 +8,7 @@ PRECORD:
 
             ld   a,(ix+TYPE)
             cp   T_TRASH
-            jr   nz,PD1
+            jr   nz,.PD1
             ld   hl,(STPX+1)
             ld   (RSTPX+1),hl
             rept 1
@@ -30,7 +30,7 @@ PRECORD:
             rr   l
             endr
             ld   (STPZ+1),hl
-PD1:
+.PD1
             ld   a,(ix+INDI)
             call SIZEOBJ
             ld   a,#06
@@ -142,14 +142,14 @@ EXES:
             ld   (NOSTAT),a
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
-EXE2:
+.EXE2
             call FINDOB
             ret  z
             ld   a,(iy+TYPE)
             cp   T_STATION
-            jr   nz,EXE2
+            jr   nz,.EXE2
             call DEATHY
-            jp   EXE2
+            jp   .EXE2
 
 REXE:
             ld   a,(ix+TYPE)
@@ -256,17 +256,17 @@ PWNPI:      cp   #A0
             ret  nc
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
-FP2L:
+.FP2L
             call FINDOB
             ret  z
             ld   e,(iy+TYPE)
             ld   a,e
             cp   T_PIRAT
-            jr   z,FP2L
+            jr   z,.FP2L
             cp   T_STATION
             jr   z,$+6
             cp   T_CHIP
-            jr   nc,FP2L
+            jr   nc,.FP2L
             call GETINDY
             inc  e                  ;cБPOC FZ
             ret
@@ -276,15 +276,15 @@ FINDALL:
 ; НАЙТИ ЛЮБОГО НО НЕ УФО
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
-FP6L:
+.FP6L
             call FINDOB
             ret  z
             ld   e,(iy+TYPE)
             ld   a,e
             cp   T_UFO
-            jr   z,FP6L
+            jr   z,.FP6L
             cp   T_UFO2
-            jr   z,FP6L
+            jr   z,.FP6L
             call GETINDY
             inc  e                  ;cБPOC FZ
             ret
@@ -294,7 +294,7 @@ FINDUFO:
 ; НАЙТИ УФО
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
-FP3L:
+.FP3L
             call FINDOB
             ret  z
             ld   e,(iy+TYPE)
@@ -302,7 +302,7 @@ FP3L:
             cp   T_UFO
             jr   z,$+6
             cp   T_UFO2
-            jr   nz,FP3L
+            jr   nz,.FP3L
             call GETINDY
             inc  e
             ret
@@ -312,7 +312,7 @@ FINDPIRAT:
 ; НАЙТИ ПИРАТА
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
-FP2:
+.FP2
             call FINDOB
             ret  z
             ld   e,(iy+TYPE)
@@ -320,7 +320,7 @@ FP2:
             cp   T_PIRAT2
             jr   z,$+6
             cp   PIRAT
-            jr   nz,FP2
+            jr   nz,.FP2
             call GETINDY
             inc  e
             ret
@@ -332,13 +332,13 @@ TESTSUBJ:
 ; УЖЕ ИСЧЕЗНОВЕНИЯ
             ld   a,(ix+SUBJ)
             inc  a
-            jr   nz,TS1
+            jr   nz,.TS1
             ld   hl,OLEN*SPLAYER+CARSB
-            jr   TS2
-TS1:
+            jr   .TS2
+.TS1
             dec  a
             call GETADR
-TS2:
+.TS2
             ld   (OPONE+2),hl
             inc  l
             ld   a,(hl)
@@ -357,7 +357,7 @@ TS2:
 OPONE:      ld   iy,0
             ld   a,(ix+SUBJ)
             cp   SPLAYER
-            jr   nz,FG2
+            jr   nz,.FG2
             ld   bc,0
             ld   (TX+1),bc
             ld   (DX+1),bc
@@ -370,7 +370,7 @@ OPONE:      ld   iy,0
             ld   iy,PLAYER
             and  a
             ret
-FG2:
+.FG2
             ld   a,(iy+PX+1)
             cp   #80
             scf
@@ -569,16 +569,16 @@ CHECKA2:
             call RNDK3
             ld   a,h
             cp   #FA
-            jr   c,FS3
+            jr   c,.FS3
             ld   a,l
 ; ВЕРОЯТНОСТЬ ФОРСАЖА
             cp   VFRS
-            jr   c,FS3
+            jr   c,.FS3
             ld   a,(ix+MODE)
             ld   (ix+OMODE),a
 ; ФОРСАЖ
             ld   (ix+MODE),C_FORSAGE
-FS3:
+.FS3
             ld   a,(ix+PX+1)
             ACPL_A
 ; МИНИМАЛЬНОЕ РАССТОЯНИЕ ПО X,Y В ПУТИ
@@ -619,12 +619,12 @@ FINDOBJ:
 ;retiyАДРЕС ВЕКТОРА ОБЪЕКТА
             ld   iy,CARSB-OLEN
             ld   bc,OLEN
-FIND2:
+.FIND2
             call FINDOB
             ret  z
             ld   a,(iy+TYPE)
             cp   d
-            jp   nz,FIND2
+            jp   nz,.FIND2
             inc  a
             ret
 
@@ -635,18 +635,18 @@ FINDFREE:
 ;retiyАДРЕС СВОБОДНОГО ВЕКТОРА
             ld   iy,CARSB-OLEN
             ld   de,OLEN
-HHH3:
+.HHH3
             add  iy,de
             ld   a,(iy+1)
             cp   #80
-            jr   nz,HHH3
+            jr   nz,.HHH3
             ld   a,(iy)
             cp   #80
             ret  z
             ld   a,(iy+SETUP)
             ld   (iy+SETUP),0
             inc  a
-            jr   z,HHH3
+            jr   z,.HHH3
             ret
 
 
@@ -1172,7 +1172,7 @@ SFXB:
             ld   hl,0
             ld   a,h
             or   a
-            jr   z,SFXN
+            jr   z,.SFXN
             ld   bc,#FFFD
             ld   a,2
             out  (c),a
@@ -1203,7 +1203,7 @@ SFXB:
             ld   (SFXB+1),hl
             ld   a,(hl)
             or   a
-            jr   nz,SFXN
+            jr   nz,.SFXN
             ld   (SFXB+2),a
             ld   b,#FF
             ld   a,7
@@ -1212,7 +1212,7 @@ SFXB:
             or   %00010010
             ld   b,#BF
             out  (c),a
-SFXN:
+.SFXN
             ld   c,#FD
             if   OFF
             ld   b,#FF

@@ -96,8 +96,8 @@ SLOT_SECTORS    equ  2
             ld   b,SLOT_SECTORS
             DISK_RDSEC
             jr   .slotend
-.slotf:     db   "SAVE0   s"
-.slotend:
+.slotf     db   "SAVE0   s"
+.slotend
             ENDM
 
             MACRO DISK_SLOT_SAVE_ROUTINE
@@ -132,17 +132,17 @@ DiskSlotSave:
             jr   z,.fail
             dec  a
             DISK_INFO
-.buf:       ld   hl,0
+.buf       ld   hl,0
             ld   de,(TRDOS_SECTOR)
             ld   b,SLOT_SECTORS
             ld   c,6                    ; TR-DOS function 6: write sectors
             call TRDOS_CALL
             xor  a                      ; carry clear
             jr   .done
-.fail:      scf
-.done:      ex   af,af'                 ; keep the carry through the register restore
+.fail      scf
+.done      ex   af,af'                 ; keep the carry through the register restore
             di
-.i:         ld   a,0
+.i         ld   a,0
             ld   i,a
             im   2
             exx
@@ -158,5 +158,5 @@ DiskSlotSave:
             ex   af,af'
             ei
             ret
-.slotf:     db   "SAVE0   s"
+.slotf     db   "SAVE0   s"
             ENDM

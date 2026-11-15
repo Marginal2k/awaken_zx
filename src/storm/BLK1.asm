@@ -1,707 +1,700 @@
-; BLK1 -- restored from awk2/BLK1.C (4458 bytes, STORM tokenized)
-; (STORM source converted to sjasmplus by tools/convert_storm.py; see docs/STORM.md)
-;ПPOЦEДУPЫ УПPABЛEHИЯ KOPAБЛEM, OПPEДEЛ
-;EHИE EГO
-;CTOЛKHOBEHИЙ
+; Процедуры управления кораблем, определ
+; Ение его
+; Столкновений
 
 Moveu
-        CALL Touch ;GOING THROUGH STA
-;T OBJECTS
-        CALL Setcont ;GET CONTROL
-;SETTINGS
-        JP Calcstp
+        call Touch              ; Going through sta
+        ; T objects
+        call Setcont            ; Get control
+        ; Settings
+        jp   Calcstp
 Touch
-Cmode   LD A,0
-        AND A
-        RET Z
-        LD (Fspeed+1),A
-        LD HL,(Speed)
-        BIT 7,H
-        EX AF,AF
-        JR Z,$+9
-        LD A,L
-        CPL
-        LD L,A
-        LD A,H
-        CPL
-        LD H,A
-        INC HL
-        LD BC,2
-        AND A
-        SBC HL,BC
-        EX AF,AF
-        JR Z,$+9
-        LD A,L
-        CPL
-        LD L,A
-        LD A,H
-        CPL
-        LD H,A
-        INC HL
-        EX AF,AF
-        JR NC,$+6
-        LD (Speed),HL
-        RET
-        XOR A
-        LD (Cmode+1),A
-        RET
+Cmode   ld   a,0
+        and  a
+        ret  z
+        ld   (Fspeed+1),a
+        ld   hl,(Speed)
+        bit  7,h
+        ex   af,af
+        jr   z,$+9
+        ld   a,l
+        cpl
+        ld   l,a
+        ld   a,h
+        cpl
+        ld   h,a
+        inc  hl
+        ld   bc,2
+        and  a
+        sbc  hl,bc
+        ex   af,af
+        jr   z,$+9
+        ld   a,l
+        cpl
+        ld   l,a
+        ld   a,h
+        cpl
+        ld   h,a
+        inc  hl
+        ex   af,af
+        jr   nc,$+6
+        ld   (Speed),hl
+        ret
+        xor  a
+        ld   (Cmode+1),a
+        ret
 Lm1
-        LD A,1
-        LD (Cmode+1),A
-        LD HL,(Stpx+1)
-        LD A,L
-        CPL
-        LD L,A
-        LD A,H
-        CPL
-        LD H,A
-        INC HL
-        LD (Stpx+1),HL
-        LD HL,(Stpz+1)
-        LD A,L
-        CPL
-        LD L,A
-        LD A,H
-        CPL
-        LD H,A
-        INC HL
-        LD (Stpz+1),HL
-        LD HL,(Stpy+1)
-        LD A,L
-        CPL
-        LD L,A
-        LD A,H
-        CPL
-        LD H,A
-        INC HL
-        LD (Stpy+1),HL
-        LD HL,(Speed)
-        LD A,L
-        CPL
-        LD L,A
-        LD A,H
-        CPL
-        LD H,A
-        INC HL
-        SRA H
-        RR L
-        INC HL
-        LD (Speed),HL
-        RET
+        ld   a,1
+        ld   (Cmode+1),a
+        ld   hl,(Stpx+1)
+        ld   a,l
+        cpl
+        ld   l,a
+        ld   a,h
+        cpl
+        ld   h,a
+        inc  hl
+        ld   (Stpx+1),hl
+        ld   hl,(Stpz+1)
+        ld   a,l
+        cpl
+        ld   l,a
+        ld   a,h
+        cpl
+        ld   h,a
+        inc  hl
+        ld   (Stpz+1),hl
+        ld   hl,(Stpy+1)
+        ld   a,l
+        cpl
+        ld   l,a
+        ld   a,h
+        cpl
+        ld   h,a
+        inc  hl
+        ld   (Stpy+1),hl
+        ld   hl,(Speed)
+        ld   a,l
+        cpl
+        ld   l,a
+        ld   a,h
+        cpl
+        ld   h,a
+        inc  hl
+        sra  h
+        rr   l
+        inc  hl
+        ld   (Speed),hl
+        ret
 
 Rain
-        DEC (HL)
-        LD A,(Tonn)
-        DEC A
-        LD (Tonn),A
-        LD A,17 ;PAKETA УШЛA
-        CALL Mesags
-        LD A,10 ;OCTAЛOCЬ
-        CALL Mesags
-        CALL Aroks
-        CALL Mnums
-        LD A,11 ;PAKET
-        JP Mesags
+        dec  (hl)
+        ld   a,(Tonn)
+        dec  a
+        ld   (Tonn),a
+        ld   a,17               ; Ракета ушла
+        call Mesags
+        ld   a,10               ; Осталось
+        call Mesags
+        call Aroks
+        call Mnums
+        ld   a,11               ; Paket
+        jp   Mesags
 Nocels
-        PUSH AF
-        LD A,15 ;HE БЫЛO 3AXBAЧEHO
-;HE OДHOЙ ЦEЛИ
-        CALL Mesags
-        POP AF
-        RET
+        push af
+        ld   a,15               ; Не было 3ахвачено
+        ; Не одной цели
+        call Mesags
+        pop  af
+        ret
 Aroks
-        LD HL,Roks+1
-        LD A,(HL)
-        AND A
-        RET NZ
-        DEC HL
-        LD A,(HL)
-        RET
+        ld   hl,Roks+1
+        ld   a,(hl)
+        and  a
+        ret  nz
+        dec  hl
+        ld   a,(hl)
+        ret
 
-;ЧTEHИE KHOПOK УПPABЛEHИЯ И УПPABЛEHИE
+; Чтение кнопок управления и управление
 Setcont
-        LD IX,Lc5b6
-;IX-БУФEP KHOПOK УПPABЛEHИЯ
-        LD A,(Counter+1)
-        AND A
-        JP NZ,Blk11
-        CALL Aroks
-        AND A
-        JR NZ,Rtn1
-        LD A,(IX+3)
-        CPL
-        AND 7
-        JP Z,Blk11
-        LD A,#FF
-        LD (Roketn3),A
-        LD (Roketn2),A
-        LD (Roketn1),A
-        LD A,12 ;PAKET HET
-        CALL Mesags
-        JP Blk11
-Rtn1
-;ПPOBEPKA KHOПOK ПУCKA PAKET
-        BIT 2,(IX+3) ;3
-        JR NZ,Rkn21
-        LD A,5
-        LD (Counter+1),A
-        LD A,(Roketn3)
-        INC A
-        CALL Z,Nocels
-        JR Z,Rkn21
-        LD HL,Eff13
-        LD (Sfxa+1),HL
-        DEC A
-        LD H,A
-        LD C,A
-        LD A,#FF
-        LD (Roketn3),A
-        CALL Newrokt
-        JP NC,Rkn21
-        LD HL,+(0-Subj)+Type
-        ADD HL,DE
-        LD B,(HL)
-        CALL Chstat_
-        CALL Aroks
-        CALL Rain
-Rkn21
-        BIT 1,(IX+3) ;2
-        JR NZ,Rkn31
-        LD A,5
-        LD (Counter+1),A
-        LD A,(Roketn2)
-        INC A
-        CALL Z,Nocels
-        JR Z,Rkn31
-        LD HL,Eff13
-        LD (Sfxa+1),HL
-        DEC A
-        LD H,A
-        LD C,A
-        LD A,#FF
-        LD (Roketn2),A
-        CALL Newrokt
-        JP NC,Rkn31
-        LD HL,+(0-Subj)+Type
-        ADD HL,DE
-        LD B,(HL)
-        CALL Chstat_
-        CALL Aroks
-        CALL Rain
-Rkn31
-        BIT 0,(IX+3) ;1
-        JR NZ,Blk11
-        LD A,5
-        LD (Counter+1),A
-        LD A,(Roketn1)
-        INC A
-        CALL Z,Nocels
-        JR Z,Blk11
-        LD HL,Eff13
-        LD (Sfxa+1),HL
-        DEC A
-        LD H,A
-        LD C,A
-        LD A,#FF
-        LD (Roketn1),A
-        CALL Newrokt
-        JP NC,Blk11
-        LD HL,+(0-Subj)+Type
-        ADD HL,DE
-        LD B,(HL)
-        CALL Chstat_
-        CALL Aroks
-        CALL Rain
-Blk11
-        BIT 4,(IX+0) ;V
-        BIT 3,(IX+0) ;C
-        CALL Z,Clrmark
-        BIT 0,(IX+2) ;Q
-        CALL Z,Unroket
-        BIT 0,(IX+5) ;P
-        CALL Z,Towar
-        BIT 1,(IX+5) ;O
-        CALL Z,Karta
-        BIT 2,(IX+5) ;I
-        CALL Z,Missio
-        BIT 4,(IX+1) ;G
-        CALL Z,Hiper
-        BIT 2,(IX+2) ;E
-        CALL Z,Dropcr
-        BIT 1,(IX+2) ;W
-        CALL Z,Dropmin
-        BIT 3,(IX+2) ;R
-        CALL Z,Returns
+        ld   ix,Lc5b6
+        ; Ix-буфер кнопок управления
+        ld   a,(Counter+1)
+        and  a
+        jp   nz,.Blk11
+        call Aroks
+        and  a
+        jr   nz,.Rtn1
+        ld   a,(ix+3)
+        cpl
+        and  7
+        jp   z,.Blk11
+        ld   a,#FF
+        ld   (Roketn3),a
+        ld   (Roketn2),a
+        ld   (Roketn1),a
+        ld   a,12               ; Paket het
+        call Mesags
+        jp   .Blk11
+.Rtn1
+        ; Проверка кнопок пуска ракет
+        bit  2,(ix+3)           ; 3
+        jr   nz,.Rkn21
+        ld   a,5
+        ld   (Counter+1),a
+        ld   a,(Roketn3)
+        inc  a
+        call z,Nocels
+        jr   z,.Rkn21
+        ld   hl,Eff13
+        ld   (Sfxa+1),hl
+        dec  a
+        ld   h,a
+        ld   c,a
+        ld   a,#FF
+        ld   (Roketn3),a
+        call Newrokt
+        jp   nc,.Rkn21
+        ld   hl,+(0-Subj)+Type
+        add  hl,de
+        ld   b,(hl)
+        call Chstat_
+        call Aroks
+        call Rain
+.Rkn21
+        bit  1,(ix+3)           ; 2
+        jr   nz,.Rkn31
+        ld   a,5
+        ld   (Counter+1),a
+        ld   a,(Roketn2)
+        inc  a
+        call z,Nocels
+        jr   z,.Rkn31
+        ld   hl,Eff13
+        ld   (Sfxa+1),hl
+        dec  a
+        ld   h,a
+        ld   c,a
+        ld   a,#FF
+        ld   (Roketn2),a
+        call Newrokt
+        jp   nc,.Rkn31
+        ld   hl,+(0-Subj)+Type
+        add  hl,de
+        ld   b,(hl)
+        call Chstat_
+        call Aroks
+        call Rain
+.Rkn31
+        bit  0,(ix+3)           ; 1
+        jr   nz,.Blk11
+        ld   a,5
+        ld   (Counter+1),a
+        ld   a,(Roketn1)
+        inc  a
+        call z,Nocels
+        jr   z,.Blk11
+        ld   hl,Eff13
+        ld   (Sfxa+1),hl
+        dec  a
+        ld   h,a
+        ld   c,a
+        ld   a,#FF
+        ld   (Roketn1),a
+        call Newrokt
+        jp   nc,.Blk11
+        ld   hl,+(0-Subj)+Type
+        add  hl,de
+        ld   b,(hl)
+        call Chstat_
+        call Aroks
+        call Rain
+.Blk11
+        bit  4,(ix+0)           ; V
+        bit  3,(ix+0)           ; C
+        call z,Clrmark
+        bit  0,(ix+2)           ; Q
+        call z,Unroket
+        bit  0,(ix+5)           ; P
+        call z,Towar
+        bit  1,(ix+5)           ; O
+        call z,Karta
+        bit  2,(ix+5)           ; I
+        call z,Missio
+        bit  4,(ix+1)           ; G
+        call z,Hiper
+        bit  2,(ix+2)           ; E
+        call z,Dropcr
+        bit  1,(ix+2)           ; W
+        call z,Dropmin
+        bit  3,(ix+2)           ; R
+        call z,Returns
 
-
-        BIT 4,(IX+6) ;H;BKЛЮЧИTЬ PEЖИ
-;M 3AXBATA ЦEЛИ
-        CALL Z,Navod
-        BIT 4,(IX+7) ;B;PEЖИM 3AXBATA
-; OБЪEKTA K CEБE
-        CALL Z,Zahwat
-        BIT 1,(IX+#01) ;S
-        CALL Z,Upp
-        BIT 2,(IX+#00) ;X
-        CALL Z,Downn
-        BIT 3,(IX+#07) ;N
-        CALL Z,Leftt
-        BIT 2,(IX+#07) ;M
-        CALL Z,Rightt
-        BIT 2,(IX+#06) ;K
-        CALL Z,Leftf
-        BIT 1,(IX+#06) ;L
-        CALL Z,Rightf
-        BIT 0,(IX+1) ;A
-        CALL Z,Fline2
-        BIT 3,(IX+6) ;J
-        CALL Z,Jumpdrv
-        BIT 2,(IX+1) ;D
-        CALL Z,Snarad
-        BIT 3,(IX+1) ;F
-        BIT 1,(IX+0) ;Z
-        LD A,(Calcstp)
-        CP #3A
-        JR NZ,Nopwr
-        LD A,(Jflag+1)
-        AND A
-        JR NZ,Nopwr
-        BIT 0,(IX+#07) ;SP
-        CALL Z,Gaz
-        BIT 1,(IX+#07) ;SS
-        CALL Z,Tormoz
-Nopwr
-;ГAШEHИE PA3ГOHOB ПOBOPOTOB И JAMПOB
-Mxspd   EQU 150
-        BIT 3,(IX+6) ;J
-        JR Z,Nopwr2
-        LD HL,(Maxspd+1)
-        LD BC,Mxspd
-        AND A
-        SBC HL,BC
-        JR Z,Nopwr2
-        LD HL,Mxspd
-        LD (Maxspd+1),HL
-        LD HL,Mxspd
-        LD (Speed),HL
-        LD A,1
-        LD (Fspeed+1),A
-Nopwr2
-        LD A,(IX+6) ;KL
-        RRCA
-        LD L,A
-        AND L
-        RRCA
-        JR NC,Kl3
-        LD A,200
-        LD (Rif1+1),A
-        LD (Lef1+1),A
-        LD A,%10010010
-        RRCA
-        LD ($-2),A
-        JR NC,Kl3
-        LD A,(Eye_b)
-        AND A
-        JR Z,Kl3
-        JP P,Kl
-        ADD A,1
-        JP M,Kl2
-        XOR A
-        JP Kl2
-Kl
-        SUB 1
-        JP P,Kl2
-        XOR A
-Kl2
-        LD (Eye_b),A
-Kl3
-        LD A,(IX+1)
-        RRCA
-        LD C,A
-        LD A,(IX+0)
-        RRCA
-        RRCA
-        AND C
-        RRCA
-        JR NC,Kl6
-        LD A,200
-        LD (Upp1+1),A
-        LD (Dwn1+1),A
-        LD A,%10010010
-        RRCA
-        LD ($-2),A
-        JR NC,Kl6
-        LD A,(Eye_a)
-        AND A
-        JR Z,Kl6
-        JP P,Kl4
-        ADD A,1
-        JP M,Kl5
-        XOR A
-        JP Kl5
-Kl4
-        SUB 1
-        JP P,Kl5
-        XOR A
-Kl5
-        LD (Eye_a),A
-Kl6
-        LD A,(IX+7)
-        RRCA
-        RRCA
-        LD L,A
-        RRCA
-        AND L
-        RRCA
-        RET NC
-        LD A,250
-        LD (Let1+1),A
-        LD (Rit1+1),A
-        LD A,%10010010
-        RRCA
-        LD ($-2),A
-        RET NC
-        LD A,(Eye_g)
-        AND A
-        RET Z
-        JP P,Kl7
-        ADD A,1
-        JP M,Kl8
-        XOR A
-        JP Kl8
-Kl7
-        SUB 1
-        JP P,Kl8
-        XOR A
-Kl8
-        LD (Eye_g),A
-        RET
-
+        bit  4,(ix+6)           ; H;включить режи
+        ; M 3ахвата цели
+        call z,Navod
+        bit  4,(ix+7)           ; B;режим 3ахвата
+        ; Объекта K себе
+        call z,Zahwat
+        bit  1,(ix+#01)         ; S
+        call z,Upp
+        bit  2,(ix+#00)         ; X
+        call z,Downn
+        bit  3,(ix+#07)         ; N
+        call z,Leftt
+        bit  2,(ix+#07)         ; M
+        call z,Rightt
+        bit  2,(ix+#06)         ; K
+        call z,Leftf
+        bit  1,(ix+#06)         ; L
+        call z,Rightf
+        bit  0,(ix+1)           ; A
+        call z,Fline2
+        bit  3,(ix+6)           ; J
+        call z,Jumpdrv
+        bit  2,(ix+1)           ; D
+        call z,Snarad
+        bit  3,(ix+1)           ; F
+        bit  1,(ix+0)           ; Z
+        ld   a,(Calcstp)
+        cp   #3A
+        jr   nz,.Nopwr
+        ld   a,(Jflag+1)
+        and  a
+        jr   nz,.Nopwr
+        bit  0,(ix+#07)         ; Sp
+        call z,Gaz
+        bit  1,(ix+#07)         ; Ss
+        call z,Tormoz
+.Nopwr
+; Гашение ра3гонов поворотов и jампов
+Mxspd           equ 150
+        bit  3,(ix+6)           ; J
+        jr   z,.Nopwr2
+        ld   hl,(Maxspd+1)
+        ld   bc,Mxspd
+        and  a
+        sbc  hl,bc
+        jr   z,.Nopwr2
+        ld   hl,Mxspd
+        ld   (Maxspd+1),hl
+        ld   hl,Mxspd
+        ld   (Speed),hl
+        ld   a,1
+        ld   (Fspeed+1),a
+.Nopwr2
+        ld   a,(ix+6)           ; Kl
+        rrca
+        ld   l,a
+        and  l
+        rrca
+        jr   nc,.Kl3
+        ld   a,200
+        ld   (Rif1+1),a
+        ld   (Lef1+1),a
+        ld   a,%10010010
+        rrca
+        ld   ($-2),a
+        jr   nc,.Kl3
+        ld   a,(Eye_b)
+        and  a
+        jr   z,.Kl3
+        jp   p,.Kl
+        add  a,1
+        jp   m,.Kl2
+        xor  a
+        jp   .Kl2
+.Kl
+        sub  1
+        jp   p,.Kl2
+        xor  a
+.Kl2
+        ld   (Eye_b),a
+.Kl3
+        ld   a,(ix+1)
+        rrca
+        ld   c,a
+        ld   a,(ix+0)
+        rrca
+        rrca
+        and  c
+        rrca
+        jr   nc,.Kl6
+        ld   a,200
+        ld   (Upp1+1),a
+        ld   (Dwn1+1),a
+        ld   a,%10010010
+        rrca
+        ld   ($-2),a
+        jr   nc,.Kl6
+        ld   a,(Eye_a)
+        and  a
+        jr   z,.Kl6
+        jp   p,.Kl4
+        add  a,1
+        jp   m,.Kl5
+        xor  a
+        jp   .Kl5
+.Kl4
+        sub  1
+        jp   p,.Kl5
+        xor  a
+.Kl5
+        ld   (Eye_a),a
+.Kl6
+        ld   a,(ix+7)
+        rrca
+        rrca
+        ld   l,a
+        rrca
+        and  l
+        rrca
+        ret  nc
+        ld   a,250
+        ld   (Let1+1),a
+        ld   (Rit1+1),a
+        ld   a,%10010010
+        rrca
+        ld   ($-2),a
+        ret  nc
+        ld   a,(Eye_g)
+        and  a
+        ret  z
+        jp   p,.Kl7
+        add  a,1
+        jp   m,.Kl8
+        xor  a
+        jp   .Kl8
+.Kl7
+        sub  1
+        jp   p,.Kl8
+        xor  a
+.Kl8
+        ld   (Eye_g),a
+        ret
 
 Unroket
-;ПPOTИBOPAKETHAЯ CИCTEMA
-        LD A,(Counter+1)
-        AND A
-        RET NZ
-        LD A,5
-        LD (Counter+1),A
-        LD A,20 ;AKTИBИPOBAHA ПPOTИ
-;BOPAKETHAЯ
-        CALL Mesags
-        LD HL,Eff19
-        LD (Sfxa+1),HL
-        LD HL,+(Carsb-Olen)+1
-        LD DE,Olen
-        JP Stu1
-Stu3
-        DEC L
-        LD A,(HL)
-        CP #80
-        RET Z
-        INC L
-Stu1
-        ADD HL,DE
-        LD A,(HL)
-        CP #80
-        JR Z,Stu3
-        LD A,L
-        ADD A,Type-1
-        LD L,A
-        LD C,(HL)
-        DEC L
-        DEC L
-        DEC L
-        LD B,(HL)
-        SUB Type-1
-        LD L,A
-        LD A,C
-        CP #11
-        JR NZ,Stu1
-        LD A,B
-        CP Splayer
-        JR NZ,Stu1
-        PUSH IX
-        DEC L
-        PUSH HL
-        POP IX
-        SET 0,(IX+Actn) ;BЫCTPEЛ ЛA3EPA
-        SET 3,(IX+Actn) ;HO ПPOTPAKET
-;HOЙ CИCTEMЫ
-;PИC.ЛИHИИ OT ИГPOKA K PAKETE
-        LD A,(IX+(Px+1))
-        CP #80
-        SCF
-        JR Z,Noanti
-        LD B,A
-        LD C,(IX+Px)
-        LD L,(IX+Py)
-        LD H,(IX+(Py+1))
-        LD E,(IX+Pz)
-        LD D,(IX+(Pz+1))
-        EXX
-        LD BC,3
-        LD (Tx+1),BC
-        LD (Dx+1),BC
-        LD (Dy+1),BC
-        LD (Dz_+1),BC
-        LD HL,#B0
-        LD (Ty+1),HL
-        LD DE,0-1
-        LD (Tz+1),DE
-        CALL Fg1
-Noanti
-        POP IX
-        RET
+        ; Противоракетная система
+        ld   a,(Counter+1)
+        and  a
+        ret  nz
+        ld   a,5
+        ld   (Counter+1),a
+        ld   a,20               ; Активирована проти
+        ; Воракетная
+        call Mesags
+        ld   hl,Eff19
+        ld   (Sfxa+1),hl
+        ld   hl,+(Carsb-Olen)+1
+        ld   de,Olen
+        jp   .Stu1
+.Stu3
+        dec  l
+        ld   a,(hl)
+        cp   #80
+        ret  z
+        inc  l
+.Stu1
+        add  hl,de
+        ld   a,(hl)
+        cp   #80
+        jr   z,.Stu3
+        ld   a,l
+        add  a,Type-1
+        ld   l,a
+        ld   c,(hl)
+        dec  l
+        dec  l
+        dec  l
+        ld   b,(hl)
+        sub  Type-1
+        ld   l,a
+        ld   a,c
+        cp   #11
+        jr   nz,.Stu1
+        ld   a,b
+        cp   Splayer
+        jr   nz,.Stu1
+        push ix
+        dec  l
+        push hl
+        pop  ix
+        set  0,(ix+Actn)        ; Выстрел ла3ера
+        set  3,(ix+Actn)        ; Но протракет
+        ; Ной системы
+        ; Рис.линии от игрока K ракете
+        ld   a,(ix+(Px+1))
+        cp   #80
+        scf
+        jr   z,.Noanti
+        ld   b,a
+        ld   c,(ix+Px)
+        ld   l,(ix+Py)
+        ld   h,(ix+(Py+1))
+        ld   e,(ix+Pz)
+        ld   d,(ix+(Pz+1))
+        exx
+        ld   bc,3
+        ld   (Tx+1),bc
+        ld   (Dx+1),bc
+        ld   (Dy+1),bc
+        ld   (Dz_+1),bc
+        ld   hl,#B0
+        ld   (Ty+1),hl
+        ld   de,0-1
+        ld   (Tz+1),de
+        call Fg1
+.Noanti
+        pop  ix
+        ret
 Clrmark
-;OTMEHИTЬ 3AXBAT ЦEЛEЙ
-        LD A,(Counter+1)
-        AND A
-        RET NZ
-        LD A,7
-        LD (Counter+1),A
-        LD HL,Eff13
-        LD (Sfxa+1),HL
-        LD A,#FF
-        LD (Roketn1),A
-        LD (Roketn2),A
-        LD (Roketn3),A
-        LD A,21 ;ЦEЛИ CHЯTЫ
-        JP Mesags
+        ; Отменить 3ахват целей
+        ld   a,(Counter+1)
+        and  a
+        ret  nz
+        ld   a,7
+        ld   (Counter+1),a
+        ld   hl,Eff13
+        ld   (Sfxa+1),hl
+        ld   a,#FF
+        ld   (Roketn1),a
+        ld   (Roketn2),a
+        ld   (Roketn3),a
+        ld   a,21               ; Цели сняты
+        jp   Mesags
 Navod
-;PEЖИM HABEДEHИЯ PAKETЫ
-        LD A,(Counter+1)
-        AND A
-        RET NZ
-        LD HL,Eff13
-        LD (Sfxa+1),HL
-        LD A,7
-        LD (Counter+1),A
-        LD A,(Fnavod+1)
-        XOR 1
-        LD (Fnavod+1),A
-        LD A,2 ;PEЖИM BKЛ
-        JR NZ,$+4
-        LD A,3 ;PEЖИM BЫKЛ
-        CALL Mesags
-        LD A,5 ;HABEДEHИЯ PAKET
-        JP Mesags
+        ; Режим наведения ракеты
+        ld   a,(Counter+1)
+        and  a
+        ret  nz
+        ld   hl,Eff13
+        ld   (Sfxa+1),hl
+        ld   a,7
+        ld   (Counter+1),a
+        ld   a,(Fnavod+1)
+        xor  1
+        ld   (Fnavod+1),a
+        ld   a,2                ; Режим вкл
+        jr   nz,$+4
+        ld   a,3                ; Режим выкл
+        call Mesags
+        ld   a,5                ; Наведения ракет
+        jp   Mesags
 Fline2
-;KHOПKA FIRE
-;B PA3HЫX PEЖИMAX
-        JP Fline
-
+        ; Кнопка fire
+        ; B ра3ных режимах
+        jp   Fline
 
 Jumpdrv
-;ФOPCИPOBKA ДBИГATEЛЯ
-        LD A,(Calcstp)
-        CP #C9
-        RET Z
-        LD A,1
-        LD (Jflag+1),A
-;ПPOBEPЯEM БЛИ3OCTЬ ДPУГИX OБЪEKTOB
-;ECЛИ XOTЬ OДИH БЛИ3KO TO OTMEHA
-        LD HL,+(Carsb-Olen)+1
-        LD DE,Olen
-        JR $+9
-        DEC L
-        LD A,(HL)
-        INC L
-        CP #80
-        JR Z,Fuel_
-Jjd1
-        ADD HL,DE
-        LD A,(HL)
-        CP #80
-        JR Z,$-11
-        AND A
-        JP P,$+4
-        CPL
-        LD C,A
-        LD A,L
-        ADD A,Type-1
-        LD L,A
-        LD B,(HL)
-        SUB Type-1
-        LD L,A
-        LD A,B
-        CP #12
-        JR Z,Nxtj
-        CP #10
-        JR NC,Jjd1
-Nxtj
-        INC L
-        INC L
-        LD A,(HL)
-        AND A
-        JP P,$+4
-        CPL
-        OR C
-        LD C,A
-        INC L
-        INC L
-        LD A,(HL)
-        AND A
-        JP P,$+4
-        CPL
-        OR C
-        LD C,A
-        LD A,L
-        SUB 4
-        LD L,A
-        LD A,C
-        CP Jmin ;MИH.PACTOЯHИE ДЛЯ ДЖAMПA
-        JP NC,Jjd1
-        SET 3,(IX+6) ;J
-        RET
+        ; Форсировка двигателя
+        ld   a,(Calcstp)
+        cp   #C9
+        ret  z
+        ld   a,1
+        ld   (Jflag+1),a
+        ; Проверяем бли3ость других объектов
+        ; Если хоть один бли3ко то отмена
+        ld   hl,+(Carsb-Olen)+1
+        ld   de,Olen
+        jr   $+9
+        dec  l
+        ld   a,(hl)
+        inc  l
+        cp   #80
+        jr   z,Fuel_
+.Jjd1
+        add  hl,de
+        ld   a,(hl)
+        cp   #80
+        jr   z,$-11
+        and  a
+        jp   p,$+4
+        cpl
+        ld   c,a
+        ld   a,l
+        add  a,Type-1
+        ld   l,a
+        ld   b,(hl)
+        sub  Type-1
+        ld   l,a
+        ld   a,b
+        cp   #12
+        jr   z,.Nxtj
+        cp   #10
+        jr   nc,.Jjd1
+.Nxtj
+        inc  l
+        inc  l
+        ld   a,(hl)
+        and  a
+        jp   p,$+4
+        cpl
+        or   c
+        ld   c,a
+        inc  l
+        inc  l
+        ld   a,(hl)
+        and  a
+        jp   p,$+4
+        cpl
+        or   c
+        ld   c,a
+        ld   a,l
+        sub  4
+        ld   l,a
+        ld   a,c
+        cp   Jmin               ; Мин.растояние для джампа
+        jp   nc,.Jjd1
+        set  3,(ix+6)           ; J
+        ret
 Afuel
-        LD HL,Fuel
-        LD A,(HL)
-        AND A
-        RET NZ
-        INC HL
-        LD A,(HL)
-        RET
+        ld   hl,Fuel
+        ld   a,(hl)
+        and  a
+        ret  nz
+        inc  hl
+        ld   a,(hl)
+        ret
 Fuel_
-        CALL Afuel
-        LD C,A
-        DEC C
-        SET 3,(IX+6) ;J
-        RET M
-        RES 3,(IX+6)
-        LD A,0
-        INC A
-        LD ($-2),A
-        JR NZ,Jkl2
-        LD A,0
-        INC A
-        AND 7
-        LD ($-4),A
-        JR NZ,Jkl2
-        LD (HL),C
-        LD A,(Tonn)
-        DEC A
-        LD (Tonn),A
-        LD A,1
-        LD (Ffuel+1),A
-Jkl2
-        LD HL,(Maxspd+1)
-        LD BC,64
-        ADD HL,BC
-        LD A,H
-        AND %00011000
-        CP %00011000
-        RET Z
-        LD (Maxspd+1),HL
-        SET 0,(IX+7)
-        CALL Gaz
-        JP Gaz
-
+        call Afuel
+        ld   c,a
+        dec  c
+        set  3,(ix+6)           ; J
+        ret  m
+        res  3,(ix+6)
+        ld   a,0
+        inc  a
+        ld   ($-2),a
+        jr   nz,.Jkl2
+        ld   a,0
+        inc  a
+        and  7
+        ld   ($-4),a
+        jr   nz,.Jkl2
+        ld   (hl),c
+        ld   a,(Tonn)
+        dec  a
+        ld   (Tonn),a
+        ld   a,1
+        ld   (Ffuel+1),a
+.Jkl2
+        ld   hl,(Maxspd+1)
+        ld   bc,64
+        add  hl,bc
+        ld   a,h
+        and  %00011000
+        cp   %00011000
+        ret  z
+        ld   (Maxspd+1),hl
+        set  0,(ix+7)
+        call Gaz
+        jp   Gaz
 
 Leftf
-Lef1    LD A,0
-        ADD A,70
-        LD (Lef1+1),A
-        LD A,200
-        LD (Rif1+1),A
-        RET NC
-        LD A,(Eye_b) ;UNGLE OF TURN
-        SUB 1
-        JP M,$+5
-        LD A,#FF
-        CP #0100-Mane2
-        RET C
-        LD (Eye_b),A
-        RET
+Lef1    ld   a,0
+        add  a,70
+        ld   (Lef1+1),a
+        ld   a,200
+        ld   (Rif1+1),a
+        ret  nc
+        ld   a,(Eye_b)          ; UNGLE of turn
+        sub  1
+        jp   m,$+5
+        ld   a,#FF
+        cp   #0100-Mane2
+        ret  c
+        ld   (Eye_b),a
+        ret
 Rightf
-Rif1    LD A,0
-        ADD A,70
-        LD (Rif1+1),A
-        LD A,200
-        LD (Lef1+1),A
-        RET NC
-        LD A,(Eye_b)
-        ADD A,1
-        JP P,$+5
-        LD A,1
-        CP Mane2+1
-        RET NC
-        LD (Eye_b),A
-        RET
+Rif1    ld   a,0
+        add  a,70
+        ld   (Rif1+1),a
+        ld   a,200
+        ld   (Lef1+1),a
+        ret  nc
+        ld   a,(Eye_b)
+        add  a,1
+        jp   p,$+5
+        ld   a,1
+        cp   Mane2+1
+        ret  nc
+        ld   (Eye_b),a
+        ret
 
-;YOUR TURNS
+; Your turns
 Calcstp
-        LD A,(Sm_13+1)
-Bfc1    DW 0
-        LD DE,(Speed)
-        LD IX,$+7
-        JP Lc52c
-        LD (Stpx+1),HL
-        LD A,(Sm_23+1)
-Bfc2    DW 0
-        LD DE,(Speed)
-        LD IX,$+7
-        JP Lc52c
-        LD (Stpy+1),HL
-        LD A,(Sm_33+1)
-Bfc3    DW 0
-        LD DE,(Speed)
-        LD IX,$+7
-        JP Lc52c
-        LD (Stpz+1),HL
-        RET
+        ld   a,(Sm_13+1)
+Bfc1    dw   0
+        ld   de,(Speed)
+        ld   ix,$+7
+        jp   Lc52c
+        ld   (Stpx+1),hl
+        ld   a,(Sm_23+1)
+Bfc2    dw   0
+        ld   de,(Speed)
+        ld   ix,$+7
+        jp   Lc52c
+        ld   (Stpy+1),hl
+        ld   a,(Sm_33+1)
+Bfc3    dw   0
+        ld   de,(Speed)
+        ld   ix,$+7
+        jp   Lc52c
+        ld   (Stpz+1),hl
+        ret
 
-
-;BEGIN CONTROL PROCS
+; BEGIN control procs
 Readkey
-        CALL Lc5a5 ;IN REN3D
+        call Lc5a5              ; In ren3d
 
-        LD HL,Lc5b6
-        XOR A
-        LD B,8
-Exk2
-        LD D,#FF
-        LD E,(HL)
-        RR E
-        CCF
-        ADC A,0
-        CP 4
-        JR NC,Exk
-        RL D
-        RR E
-        CCF
-        ADC A,0
-        CP 4
-        JR NC,Exk
-        RL D
-        RR E
-        CCF
-        ADC A,0
-        CP 4
-        JR NC,Exk
-        RL D
-        RR E
-        CCF
-        ADC A,0
-        CP 4
-        JR NC,Exk
-        RL D
-        RR E
-        CCF
-        ADC A,0
-        CP 4
-        JR NC,Exk
-        RL D
-        INC HL
-        DJNZ Exk2
-        RET
-Exk
-        LD A,(HL)
-        OR D
-        LD (HL),A
-Exk4
-        DJNZ Exk3
-        RET
-Exk3
-        INC HL
-        LD (HL),#FF
-        JP Exk4
+        ld   hl,Lc5b6
+        xor  a
+        ld   b,8
+.Exk2
+        ld   d,#FF
+        ld   e,(hl)
+        rr   e
+        ccf
+        adc  a,0
+        cp   4
+        jr   nc,.Exk
+        rl   d
+        rr   e
+        ccf
+        adc  a,0
+        cp   4
+        jr   nc,.Exk
+        rl   d
+        rr   e
+        ccf
+        adc  a,0
+        cp   4
+        jr   nc,.Exk
+        rl   d
+        rr   e
+        ccf
+        adc  a,0
+        cp   4
+        jr   nc,.Exk
+        rl   d
+        rr   e
+        ccf
+        adc  a,0
+        cp   4
+        jr   nc,.Exk
+        rl   d
+        inc  hl
+        djnz .Exk2
+        ret
+.Exk
+        ld   a,(hl)
+        or   d
+        ld   (hl),a
+.Exk4
+        djnz .Exk3
+        ret
+.Exk3
+        inc  hl
+        ld   (hl),#FF
+        jp   .Exk4

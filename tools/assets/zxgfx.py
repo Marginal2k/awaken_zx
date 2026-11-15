@@ -5,14 +5,25 @@ NORMAL = [(0, 0, 0), (0, 0, 205), (205, 0, 0), (205, 0, 205), (0, 205, 0), (0, 2
 BRIGHT = [(0, 0, 0), (0, 0, 255), (255, 0, 0), (255, 0, 255), (0, 255, 0), (0, 255, 255), (255, 255, 0), (255, 255, 255)]
 
 
-def scr_to_image(d):
-    """6912 bytes (bitmap 6144 + attributes 768) -> RGB image 256x192"""
+def bitmap_offset(y, xb, layout):
+    """offset of the bitmap byte of pixel row y, byte column xb (0..31) inside the 6144 bitmap bytes.
+    layout 'screen': the ZX Spectrum screen order (as in #4000..#57FF) - flight panel, intro logo, any raw screen.
+    layout 'cell'  : cell-linear: 8 bytes (the 8 pixel rows) of cell 0, then of cell 1 ... cells row by row (cell = y//8*32 + xb).
+                     This is the form of the station backgrounds: the station code (BODY.asm Rp1 'Nbs3') copies one cell (8 bytes) at a time
+                     from the depacked picture to the screen."""
+    if layout == 'cell':
+        return ((y >> 3) * 32 + xb) * 8 + (y & 7)
+    return ((y & 7) << 8) | (((y >> 3) & 7) << 5) | ((y >> 6) << 11) | xb
+
+
+def scr_to_image(d, layout='screen', attrs=True):
+    """6912 bytes (bitmap 6144 + attributes 768) -> RGB image 256x192.  attrs=False: ignore the attribute bytes (white ink on black)."""
     im = Image.new('RGB', (256, 192))
     px = im.load()
     for y in range(192):
         for xb in range(32):
-            b = d[((y & 7) << 8) | (((y >> 3) & 7) << 5) | ((y >> 6) << 11) | xb]
-            a = d[6144 + (y >> 3) * 32 + xb]
+            b = d[bitmap_offset(y, xb, layout)]
+            a = d[6144 + (y >> 3) * 32 + xb] if attrs else 7
             pal = BRIGHT if a & 64 else NORMAL
             ink = pal[a & 7]
             pap = pal[(a >> 3) & 7]
@@ -31,7 +42,7 @@ def _nearest(c):
     return best[1], best[2]
 
 
-def image_to_scr(im, name='image'):
+def image_to_scr(im, name='image', layout='screen'):
     """RGB image 256x192 -> 6912 bytes.  Each 8x8 cell may use two colours of the same brightness (the ZX attribute limit)."""
     im = im.convert('RGB')
     if im.size != (256, 192):
@@ -62,7 +73,7 @@ def image_to_scr(im, name='image'):
                     if i == ink and len(idx) > 1 or (len(idx) == 1 and False):
                         v |= 0x80 >> x
                 Y = cy * 8 + y
-                out[((Y & 7) << 8) | (((Y >> 3) & 7) << 5) | ((Y >> 6) << 11) | cx] = v
+                out[bitmap_offset(Y, cx, layout)] = v
     return bytes(out)
 
 

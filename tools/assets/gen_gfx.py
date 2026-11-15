@@ -13,18 +13,18 @@ SECTAB_ORIG = [13, 11, 11, 12, 8, 14, 19, 15, 15, 13, 19, 12, 16, 20, 21, 20]
 MAX_SECTORS = max(SECTAB_ORIG)      # the loader buffer was sized for the biggest original picture (21 sectors)
 
 
-def packed_picture(root, gfx, cache, name, im):
+def packed_picture(root, gfx, cache, name, im, layout='screen'):
     h = zxgfx.pixels_hash(im)
     c = cache.get(name)
     if c and c['pixels'] == h:
         return open(os.path.join(gfx, c['orig']), 'rb').read(), True
     cdir = os.path.join(root, 'build', 'gfxcache')
     os.makedirs(cdir, exist_ok=True)
-    cf = os.path.join(cdir, h + '.hr')
+    cf = os.path.join(cdir, h + '.' + layout + '.hr')
     if os.path.exists(cf):
         return open(cf, 'rb').read(), False
     print('gen_gfx: packing %s (changed picture)' % name)
-    scr = zxgfx.image_to_scr(im, name)
+    scr = zxgfx.image_to_scr(im, name, layout)
     pk = hrust.pack(scr)
     open(cf, 'wb').write(pk)
     return pk, False
@@ -40,7 +40,7 @@ def generate(root, outdir):
     first_len = None
     for i in range(16):
         name = 'station_bg_%02d.png' % (i + 1)
-        pk, orig = packed_picture(root, gfx, cache, name, Image.open(os.path.join(gfx, name)))
+        pk, orig = packed_picture(root, gfx, cache, name, Image.open(os.path.join(gfx, name)), 'cell')
         if orig:
             ch = pk                              # full sectors as on the original disk
         else:

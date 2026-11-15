@@ -67,9 +67,9 @@ The prices and speeds are also written as plain text in `text/ships.txt` (viewer
 
 | file | in game | format / limits |
 |--|--|--|
-| station_bg_01..16.png | stscr (16 Hrust-packed station backgrounds, loaded one at a time to a bank at #C000) | 256x192 RGB, ZX palette (normal 205 / bright 255 levels), at most 2 colours per 8x8 cell, normal or bright per cell (not mixed). The pictures are mostly solid ink with sparse dither noise (the game stores them that way) |
-| panel.png | PANEL (flight HUD, unpacked by the flight at load) | same rules |
-| intro_logo.png | boot intro "Awaken" logo (raw screen) | same rules |
+| station_bg_01..16.png | stscr (16 Hrust-packed station backgrounds, loaded one at a time to a bank at #C000) | 256x192 RGB, ZX palette (normal 205 / bright 255 levels), at most 2 colours per 8x8 cell, normal or bright per cell (not mixed). The depacked data is **cell-linear** (8 bytes = one 8x8 cell, cells row by row, then 768 attribute bytes; the station code copies it cell by cell to the screen), the PNG shows the picture as the game displays it |
+| panel.png | PANEL (flight HUD, unpacked by the flight at load) | same rules, normal ZX screen byte order |
+| intro_logo.png | boot intro "Awaken" logo (raw screen, bitmap in the lower third) | white ink on black; the game uses only the bitmap bits and overwrites the attribute bytes, so colours are not editable |
 | pro_font.png, pro_font_widths.csv | PRO.f station proportional font | 128x128, 16x16 cells of 8x8, black = ink, code = row*16+column; width per code in the csv (advance in pixels) |
 | panel_font.png | FONT.f flight panel font | 4x6 glyphs, cell 5x7, 16 per row, codes 32..239 |
 | cursors.png | KSPOplus.s mouse cursors | 12 cursors of 16x16, RGBA: transparent = see-through, white = ink, black = paper |
@@ -79,7 +79,8 @@ Packing: `tools/assets/hrust.py` writes the game's Hrust 1.x format (`HR` header
 game depacker run in a Z80 core, `tools/assets/z80depack.py`).  It is not byte-identical to the original packer (the original used more command forms and packs ~3 % smaller),
 therefore **a picture whose pixels are unchanged is taken from `orig/` (byte-identical build)**; a changed picture is converted and packed (a few seconds, cached in `build/gfxcache/`).
 After a change the sector count of each picture is recalculated (`SECTAB.inc`) and `stscr` is rebuilt.  A picture may not need more than 21 sectors (the loader buffer).
-Not verified in the emulator: only the packer/depacker round trip was checked, not a changed picture in the running game.
+Verified in the emulator (work/assets_tech2): the unchanged PNGs equal the screenshots of the running game pixel by pixel in the free background areas (station 05: 100 % of 3600 non-black pixels; flight panel static strips 100 %; intro logo bitmap 100 %), and a changed station_bg_05.png (magenta block + stripes, 8 -> 9 sectors) appears in the running station exactly as drawn.
+`python tools/assets/extract_gfx.py --from-orig` re-renders the PNGs from `orig/` (layouts: `zxgfx.bitmap_offset`).
 
 ## What stays binary (and why)
 
